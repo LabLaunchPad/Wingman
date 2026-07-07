@@ -59,3 +59,16 @@ After presenting the summary, use `AskUserQuestion` to get an explicit decision 
 - "Let me see the details" — show the full, unabridged output from each seat (this is the only path where the founder sees raw technical detail, and only if they ask for it).
 
 Record the decision so the calling stage command (`plan`/`build`/`secure`/`ship`) knows whether it's clear to continue.
+
+## Mark the plan file (only when the scope was a plan, not a diff)
+
+If step "What to review" resolved to a plan file, append this section to the end of that file, verbatim, after the founder's decision is known — this is what the `boardroom-checkpoint` hook checks before allowing `ExitPlanMode`, so it must be written even on a `DO NOT SHIP` or `GO WITH CHANGES` result, not just on approval:
+
+```markdown
+## Wingman Boardroom Checkpoint
+Bottom line: <GO | GO WITH CHANGES | DO NOT SHIP>
+Founder decision: <ship it | fix concerns first | still reviewing>
+Timestamp: <ISO 8601 timestamp>
+```
+
+If this section already exists at the end of the file from a previous run, replace it rather than appending a second copy — the hook only looks at the most recent one. When code has already changed and the scope was a diff instead, this step does not apply (the hook only gates `ExitPlanMode`, which only fires for plans).
