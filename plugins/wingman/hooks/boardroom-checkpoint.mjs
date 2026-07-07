@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PermissionRequest hook, matched on ExitPlanMode (see hooks.json).
+// PreToolUse hook, matched on ExitPlanMode (see hooks.json).
 //
 // This is a deterministic backstop, not the checkpoint mechanism itself.
 // The actual plain-language translation happens earlier, when /wingman:plan
@@ -44,7 +44,7 @@ function findMostRecentPlanFile(cwd) {
 
 function allow() {
   console.log(JSON.stringify({
-    hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: { behavior: 'allow' } },
+    hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'allow' },
   }));
   process.exit(0);
 }
@@ -58,9 +58,14 @@ let input;
 try {
   input = JSON.parse(readStdin());
 } catch {
-  // Malformed input from the harness is not this plugin's problem to fail
-  // closed on — let the normal permission flow continue.
-  process.exit(0);
+  // This script is only ever invoked for ExitPlanMode (see hooks.json's
+  // matcher), so malformed stdin here is anomalous, not routine traffic from
+  // unrelated tool calls. Fail closed, matching the "deterministic backstop"
+  // intent above — a gate that quietly opens on unexpected input isn't one.
+  deny(
+    `Wingman: couldn't read the tool-call input to check for a Boardroom ` +
+    `checkpoint. Re-run /wingman:boardroom and try exiting plan mode again.`
+  );
 }
 
 if (input.tool_name !== 'ExitPlanMode') process.exit(0);

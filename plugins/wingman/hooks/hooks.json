@@ -1,6 +1,6 @@
 {
   "hooks": {
-    "PermissionRequest": [
+    "PreToolUse": [
       {
         "matcher": "ExitPlanMode",
         "hooks": [

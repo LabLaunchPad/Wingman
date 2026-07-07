@@ -78,6 +78,29 @@ If this section already exists at the end of the file from a previous run, repla
 
 ## Record the checkpoint (always, regardless of scope)
 
-Append one line to `.wingman/checkpoints.jsonl` at the project root, following the exact schema in `docs/DATABASE.md` (`checkpoint_id`, `stage`, `scope_ref`, `seats[]`, `bottom_line`, `founder_decision`, `founder_notes`, `next_stage`). Create `.wingman/` and the file if they don't exist yet. This is a plain append (`>>`), never a rewrite — it's an audit log. Then overwrite `.wingman/state.json` with the current `current_stage`, `last_checkpoint_id`, and `updated_at` (see `docs/DATABASE.md` for the exact shape). Both files should be committed to the project's own git repo, same as any other project file.
+Append one line to `.wingman/checkpoints.jsonl` at the project root with exactly this shape:
+
+```json
+{
+  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage>",
+  "stage": "plan | build | secure | ship | <free-text for an ad-hoc run>",
+  "scope_ref": "<path to the plan file reviewed, or \"diff\">",
+  "seats": [
+    { "seat": "founder",  "verdict": "GO | GO_WITH_CONCERNS | NO_GO", "summary": "<one line>" },
+    { "seat": "engineer", "verdict": "...", "summary": "..." },
+    { "seat": "security", "verdict": "...", "summary": "..." },
+    { "seat": "design",   "verdict": "...", "summary": "..." },
+    { "seat": "cost",     "verdict": "...", "summary": "..." }
+  ],
+  "bottom_line": "GO | GO_WITH_CHANGES | DO NOT SHIP",
+  "founder_decision": "ship_it | fix_concerns_first | still_reviewing",
+  "founder_notes": "",
+  "next_stage": "<the stage this clears the way for>"
+}
+```
+
+Create `.wingman/` and the file if they don't exist yet. This is a plain append (`>>`), never a rewrite — it's an audit log.
+
+Then update `.wingman/state.json`. **Read the existing file first if it exists** — this is a merge, not a blind overwrite: keep `active_department_leads` and `active_specialists` exactly as they were (this file is the only place that roster is tracked; dropping it here breaks `department-lead-activation` and `evolve-promotion` on every subsequent run), and set only `current_stage` (to `next_stage` above), `last_checkpoint_id` (to this checkpoint's `checkpoint_id`), and `updated_at` (now, ISO 8601). If `state.json` doesn't exist yet, create it with `active_department_leads: []` and `active_specialists: []`. Both files should be committed to the project's own git repo, same as any other project file.
 
 **Before reporting this checkpoint as done, re-read both files from disk to confirm the write actually landed** (per the `verification-before-completion` skill) — do not consider the stage complete on the strength of having decided to write them. All five seats reporting is not the same as the checkpoint being recorded; this step is what makes it real.

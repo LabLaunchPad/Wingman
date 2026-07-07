@@ -37,6 +37,7 @@ At the start of `/wingman:plan` (checks Product, always), `/wingman:build` (chec
 - Fill in the department-specific sections (remit, checklist, activation reason) from the table above and `docs/ARCHITECTURE.md` §5.
 - Write the file to `.claude/agents/dept-<name>.md` **in the founder's project repository** — never under Wingman's own plugin directory (`plugins/wingman/...`). This distinction matters: see `docs/ARCHITECTURE.md` §5 for why.
 - Tell the founder, in one plain-language sentence, that a new specialist was added to their project and why (e.g. "Since this touches customer payments, I've added a Legal & Security lead to your project's team going forward.").
+- Add `dept-<name>` to `active_department_leads` in `.wingman/state.json` (read the existing file first and append to the array — never drop `active_specialists` or the rest of the file's contents; create `state.json` fresh with empty arrays if it doesn't exist yet). This is the only place that roster is tracked, so skipping this step makes the department lead invisible to `/wingman:evolve` and to a fresh session recovering state.
 
 **4. If the file already exists, use it as-is** — don't regenerate or overwrite a department lead that's already been created and possibly customized for this project.
 
@@ -70,7 +71,7 @@ At the start of `/wingman:plan` (checks Product, always), `/wingman:build` (chec
 
 ## Verification
 
-Before creating a file, confirm: (1) the activation signal is actually true, with a concrete piece of evidence (a file found, a grep match, an explicit founder request) — not a guess; (2) the target path is under the founder's project's `.claude/agents/`, not under Wingman's plugin directory; (3) the file doesn't already exist.
+Before creating a file, confirm: (1) the activation signal is actually true, with a concrete piece of evidence (a file found, a grep match, an explicit founder request) — not a guess; (2) the target path is under the founder's project's `.claude/agents/`, not under Wingman's plugin directory; (3) the file doesn't already exist. After creating it, re-read `.wingman/state.json` to confirm `active_department_leads` actually includes the new entry and nothing else was dropped.
 
 ## Output
 

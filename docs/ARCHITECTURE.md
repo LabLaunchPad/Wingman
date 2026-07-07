@@ -78,7 +78,7 @@ One lead subagent per corporate department. Each lead covers its department's *e
 | 5 | QA & Peer Review | `dept-qa` | Always | `/wingman:build`'s verification step |
 | 6 | Legal, Security & Compliance | `dept-legal-security` | Project touches auth, payments, or personal data | `/wingman:secure` |
 | 7 | DevOps & SRE | `dept-devops` | Project has CI config, a Dockerfile, or has shipped once already | `/wingman:ship` |
-| 8 | Revenue, Marketing & Ops | `dept-growth` | Founder requests docs/SEO/launch copy | `/wingman:launch` *(planned — see Open Items)* |
+| 8 | Revenue, Marketing & Ops | `dept-growth` | Founder requests docs/SEO/launch copy | `/wingman:launch` |
 
 **Boardroom seats vs. department leads are different roles by design:** a boardroom seat reviews and gates; a department lead produces the thing being reviewed. This avoids the 1:1 redundancy in a literal corporate org chart (e.g. a CPO *and* a separate Requirements Analyst covering overlapping ground) — in Wingman, the Founder seat reviews what `dept-product` produces, full stop.
 
@@ -142,11 +142,13 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 
 - **v1** (current scaffold): 5 boardroom seats (all built), 4 pipeline commands (`plan`/`build`/`secure`/`ship`), 5 adaptive commands (`retro`/`learn`/`evolve`/`harness`/`telemetry`). No department leads yet — pipeline commands do the work inline.
 - **v1.1**: add `.wingman/checkpoints.jsonl` audit logging to `/wingman:boardroom` (a lightweight `## Wingman Boardroom Checkpoint` marker written to the plan file, and enforced by the `boardroom-checkpoint` hook, already exist — the structured JSONL log is the remaining piece).
-- **v2** (built): department-lead activation logic (`skills/department-lead-activation`), wired into all four delegating commands, and the standard lead-agent template. Not yet exercised against a real founder project — see `docs/PROJECT.md` roadmap.
-- **v3** (built): `skills/evolve-promotion` — the concrete mechanism behind `/wingman:evolve`, gathering signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`, requiring 2+ genuine occurrences, and writing promoted specialists to the founder's own project (never Wingman's plugin directory). Not yet exercised against a real or realistic project — see Open Items. The 56-role catalog fills in organically and differently per project as this runs — never as a fixed upfront set.
-- **v3.1 (planned)**: `commands/launch.md` and `commands/hotfix.md` — built, but neither has an eval case yet.
+- **v2** (built, verified): department-lead activation logic (`skills/department-lead-activation`), wired into all four delegating commands, and the standard lead-agent template. Behaviorally exercised — `evals/cases/department-lead-activation.md` (`verified`) and again as part of `evals/cases/full-pipeline-e2e.md` (`provisional`).
+- **v3** (built, verified): `skills/evolve-promotion` — the concrete mechanism behind `/wingman:evolve`, gathering signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`, requiring 2+ genuine occurrences, and writing promoted specialists to the founder's own project (never Wingman's plugin directory). Behaviorally exercised — `evals/cases/evolve-promotion.md` (`verified`, positive + negative cases). The 56-role catalog fills in organically and differently per project as this runs — never as a fixed upfront set.
+- **v3.1 (built)**: `commands/launch.md` and `commands/hotfix.md` — no dedicated eval case yet (see Open Items).
+- **v4 (built, provisional)**: the full pipeline exercised end-to-end in sequence (`evals/cases/full-pipeline-e2e.md`) rather than one command/skill at a time. Surfaced and fixed two real bugs along the way: `boardroom.md`'s checkpoint-recording step wasn't reliably followed through on and could silently clobber `active_department_leads`/`active_specialists` in `state.json`, and `hooks/hooks.json` registered the `boardroom-checkpoint` gate under a hook event name (`PermissionRequest`) that doesn't exist in Claude Code's hooks system — the gate had never actually fired. Both fixed; see `docs/PROJECT.md`'s decisions log.
 
 ## Open items (planned, not yet built)
 
 - The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — see that document's "Why no server yet").
-- An eval case for `skills/evolve-promotion`, mirroring `evals/cases/department-lead-activation.md` — the specialist-promotion mechanism hasn't been behaviorally exercised yet, only structurally validated.
+- Dedicated eval cases for `commands/launch.md`, `commands/hotfix.md`, `boardroom.md` itself, `retro.md`/`learn.md`/`harness.md`/`telemetry.md`, each Boardroom persona individually, and the 7 discipline skills (`plain-language-checkpoint`, `writing-plans`, `systematic-debugging`, `design-taste`, `engineering-minimalism`, `token-economy`, `verification-before-completion`) — all currently covered only by structural validation or incidentally by `full-pipeline-e2e`, not a dedicated behavioral case.
+- A second, differently-shaped `full-pipeline-e2e` run (one producing a genuine `NO_GO`/`DO NOT SHIP` outcome and a real specialist promotion) to promote that eval case from `provisional` to `verified`.
