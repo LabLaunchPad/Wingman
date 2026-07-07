@@ -66,3 +66,18 @@ Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally 
 - Both created files passed frontmatter/placeholder checks identically to Run 1.
 
 Both the positive and negative cases now pass. Promoted to `verified` (see Trust level above).
+
+### Run 3 — 2026-07-07 (targeted regression check, post-fix)
+
+A 2026-07-07 multi-expert audit found the skill never wrote to `.wingman/state.json` at all despite `docs/DATABASE.md`/`evolve-promotion` assuming it populates `active_department_leads` — fixed by adding that step to Core Workflow step 3. Since this changed the skill's actual behavior, Runs 1–2 (which predate the fix) no longer fully cover it; re-running the whole positive/negative case from scratch would re-test unchanged logic at real token cost for no new information, so this run targets only what changed, plus a quick spot-check that the untouched parts didn't regress — reusing the existing `setup-fetch-app.sh` fixture rather than writing a new one.
+
+**Procedure:** one fresh subagent, given only the skill/template and the fixture, asked to (1) simulate `/wingman:build`'s check (Design/Engineering/Data/QA) against the fixture from a clean `.wingman/`, (2) verify `state.json` was created fresh with the right 4 leads and an empty `active_specialists`, (3) hand-seed `active_specialists: ["migration-engineer"]` to simulate an earlier specialist promotion, (4) simulate `/wingman:secure`'s check (Legal/Security) on the same fixture, (5) verify the new lead was appended without disturbing the seeded specialist, (6) spot-check that `dept-devops` — whose signal is present in this fixture but is only checked by `/wingman:ship`, not simulated here — was correctly not created.
+
+**Result: PASS on every step**, independently verified against the real filesystem (not the subagent's self-report):
+```json
+{
+  "active_department_leads": ["dept-design", "dept-engineering", "dept-data", "dept-qa", "dept-legal-security"],
+  "active_specialists": ["migration-engineer"]
+}
+```
+All 5 department-lead files present under `.claude/agents/` with zero unfilled placeholders, `active_specialists` survived the second write intact (the exact failure mode the fix targeted), `dept-devops.md` correctly absent, and `git status --porcelain -- plugins/wingman/` in the Wingman repo returned empty. Trust level remains `verified` — this run reconfirms it holds after the fix rather than re-establishing it from zero.
