@@ -47,12 +47,13 @@ This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE
 
 ### `state.json`
 
-Small, overwritten in place (not append-only). Tracks what a fresh Claude Code session needs to pick up where the last one left off, and what department leads (once they exist, per `docs/ARCHITECTURE.md` §5) are active for this project.
+Small, overwritten in place (not append-only). Tracks what a fresh Claude Code session needs to pick up where the last one left off, what department leads (once they exist, per `docs/ARCHITECTURE.md` §5) are active for this project, and what specialists (per §6) have been promoted.
 
 ```json
 {
   "current_stage": "build",
   "active_department_leads": [],
+  "active_specialists": [],
   "last_checkpoint_id": "2026-07-07T14-32-00Z-plan",
   "updated_at": "2026-07-07T14-32-05Z"
 }

@@ -64,3 +64,12 @@ Design reference: `jnuyens/gsd-plugin`'s bundled MCP server pattern (`mcp/server
 
 ### `plugins/wingman/skills/department-lead-activation/`
 Original to Wingman — no single vendor source. Informed by the general pattern (seen across `gsd-plugin`'s phase-gates and `wshobson/agents`' generated-per-target artifacts) of deriving runtime state from a project's actual signals rather than a fixed manifest, and by `addyosmani/agent-skills`' persona/command orchestration split (department leads are personas; the delegating commands and this skill do the orchestrating).
+
+### `plugins/wingman/skills/evolve-promotion/`
+Original to Wingman, extending `department-lead-activation`'s own file-placement precedent (specialist agents go to the founder's `.claude/agents/`, never Wingman's plugin directory) to the specialist-promotion mechanism described in `docs/AGENT-ROSTER.md`. Fixes an inconsistency in the original `evolve.md`/`AGENT-ROSTER.md` text, written before that precedent was established, which had instructed writing promoted specialists into Wingman's own plugin directory.
+
+### `plugins/wingman/commands/launch.md`
+Original to Wingman. Structurally mirrors `commands/ship.md` (preflight/activation → do the work → plain-language report → Boardroom checkpoint → suggest next steps), per the pattern shared across all Wingman pipeline commands.
+
+### `plugins/wingman/commands/hotfix.md`
+Original to Wingman. Structurally mirrors `commands/secure.md`'s gate pattern (build a picture → gate on disposition → Boardroom checkpoint), and explicitly delegates its root-cause step to the existing `systematic-debugging` skill (from `obra/superpowers`) by phase name rather than re-describing debugging methodology.

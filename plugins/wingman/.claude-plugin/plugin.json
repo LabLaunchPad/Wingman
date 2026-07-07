@@ -17,7 +17,9 @@
     "commands/learn.md",
     "commands/evolve.md",
     "commands/harness.md",
-    "commands/telemetry.md"
+    "commands/telemetry.md",
+    "commands/launch.md",
+    "commands/hotfix.md"
   ],
   "agents": [
     "agents/boardroom-founder.md",
@@ -34,7 +36,8 @@
     "skills/token-economy",
     "skills/engineering-minimalism",
     "skills/design-taste",
-    "skills/department-lead-activation"
+    "skills/department-lead-activation",
+    "skills/evolve-promotion"
   ],
   "hooks": {
     "file": "hooks/hooks.json"

@@ -15,8 +15,10 @@ Before writing anything, look at real evidence from this work: commit history, t
 
 ## Write the retro
 
+Append to `docs/wingman/retros.md` at the project root (create it with a one-line header if it doesn't exist yet — same append-only convention as `LEARNINGS.md`). Retros scattered across individual plan files can't be reliably found later, including by `/wingman:evolve`'s clustering step, so this is the one canonical location:
+
 ```markdown
-## Retro: <what was built>
+## Retro: <what was built> — <YYYY-MM-DD>
 
 **What went well:** <1-3 concrete things, plain language>
 **What was harder than expected:** <1-3 concrete things, plain language, with the real reason if known>

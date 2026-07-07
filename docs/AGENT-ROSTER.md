@@ -6,6 +6,8 @@ A role only gets built when `/wingman:evolve` promotes it — after a department
 
 **Status legend:** every row starts as `candidate`. Update a row to `active (<project>)` only when `/wingman:evolve` actually creates that specialist's file for a specific project, with a link to the generated agent file.
 
+**Runtime copy:** this file lives at the Wingman repo root, outside `plugins/wingman/` — the only directory `marketplace.json` actually installs into a founder's project. `plugins/wingman/skills/evolve-promotion/references/specialist-catalog.md` is the copy that ships with the installed plugin and is what `/wingman:evolve` actually reads at runtime. Keep both in sync when either changes (see `docs/PROJECT.md`'s decisions log for why this duplication exists instead of one shared file).
+
 ---
 
 ## Executive Leadership Team → The Boardroom
@@ -107,7 +109,7 @@ Not a department — the 5 fixed gate-reviewer seats, always present. See `ARCHI
 1. A department lead (or a pipeline command working inline before a lead exists) logs friction via `/wingman:learn` — a gotcha, a repeated workaround, a decision that had to be re-made.
 2. On the second occurrence of the same narrow friction, `/wingman:evolve` clusters the learnings and proposes a promotion, naming the matching candidate role from this catalog (or a new one if nothing here fits).
 3. The founder approves via `AskUserQuestion` in plain language — what's being created and why, not a technical spec.
-4. Only then is the specialist's agent file written, following the structure of the existing boardroom/department agent files, and registered in `plugins/wingman/.claude-plugin/plugin.json`.
-5. This file gets updated: the promoted row's status changes from `candidate` to `active (<project-or-context>)` with a link.
+4. Only then is the specialist's agent file written, following `skills/evolve-promotion/references/specialist-agent-template.md`, to `.claude/agents/<specialist-slug>.md` **in the founder's own project — never into Wingman's own plugin directory.** This matches the department-lead rule in `docs/ARCHITECTURE.md` §5: plugin files get resynced from the marketplace source, and a specialist tied to one founder's specific codebase belongs in that founder's repo, not baked into a shared plugin install.
+5. The promotion is recorded in that project's own `.wingman/state.json` (`active_specialists` array) — there's no cross-project roster to update at runtime. This catalog file itself only gets a status update by a human maintaining the Wingman repo, when they choose to note that a candidate role has proven itself active somewhere.
 
 No role in this catalog should ever be bulk-created "to be thorough." A roster that reflects real, evidenced need is the entire point of the hybrid model in `ARCHITECTURE.md`.

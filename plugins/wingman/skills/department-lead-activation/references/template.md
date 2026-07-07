@@ -18,7 +18,7 @@ You are the **{{Department Name}} lead** for this project, one of Wingman's buil
 
 ## What you check/produce
 
-{{A checklist specific to this department's remit, adapted from the relevant rows of docs/AGENT-ROSTER.md for this department. Keep it concrete to this project's actual stack — don't paste the generic 56-role descriptions verbatim.}}
+{{A checklist specific to this department's remit and this project's actual stack — reason from the department's general purpose (e.g. "Data & Analytics" covers schema design, migrations, query performance) and what you can see in the codebase, not a pasted generic description.}}
 
 ## Constraints
 

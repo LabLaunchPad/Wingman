@@ -94,8 +94,10 @@ The mechanism for detecting signals and writing these files is `skills/departmen
 
 The full 56-role catalog from the original corporate blueprint lives in `docs/AGENT-ROSTER.md` as **candidates**, organized under their department. None of them are files until `/wingman:evolve` promotes one:
 
-- A department lead repeatedly hits friction in one narrow sub-task (2+ occurrences logged via `/wingman:learn` or surfaced in a `/wingman:retro`).
-- `/wingman:evolve` proposes splitting that sub-task into its own dedicated specialist subagent, names the specific candidate role from the catalog (or a new one if the catalog doesn't cover it), and asks the founder to approve before creating it.
+- A department lead repeatedly hits friction in one narrow sub-task (2+ occurrences logged via `/wingman:learn`, surfaced in `docs/wingman/retros.md`, or visible as repeated `GO_WITH_CONCERNS`/`NO_GO` on the same topic in `.wingman/checkpoints.jsonl`).
+- `/wingman:evolve` (via the `skills/evolve-promotion` mechanism) proposes splitting that sub-task into its own dedicated specialist subagent, names the specific candidate role from the catalog (or a new one if the catalog doesn't cover it), and asks the founder to approve before creating it.
+
+**Every artifact `/wingman:evolve` promotes — specialist agent, command, or skill — follows the exact same placement rule as department leads (§5): written into the founder's own project under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate), never into Wingman's own plugin directory.** "Wingman's plugin directory" means the founder's locally-installed copy, which gets resynced from the marketplace source — every one of these artifacts is specific to this founder's own project/patterns anyway, not a general-purpose Wingman capability, so the plugin directory is never the right home for them.
 
 This means two different Wingman-managed projects end up with different specialist rosters — a fintech project accumulates Legal/Security specialists fast (PCI, fraud review); a content site may never need one. That's intentional: the roster should reflect what the company actually does, not a template applied uniformly regardless of fit.
 
@@ -105,7 +107,7 @@ This means two different Wingman-managed projects end up with different speciali
 |---|---|
 | Boardroom meeting / phase gateway | `/wingman:boardroom` — parallel dispatch of the 5 seats, consolidated verdict, `.wingman/checkpoints.jsonl` record (§4) |
 | Cross-departmental PR loop (QA + Security run together; Security can block and reassign) | `/wingman:build`'s closing verification step and `/wingman:secure`'s gate. Read-only review passes (`dept-qa`, `boardroom-security`) dispatch in parallel — same one-message/multiple-Task-call pattern `/wingman:boardroom` already uses. |
-| Automated error-correction loop (prod error → root-cause → hotfix → re-verify) | `/wingman:hotfix` *(planned — see Open Items)*: founder pastes a production error (or it arrives via an error-tracking MCP connector wired up through `/wingman:telemetry`) → `systematic-debugging` skill investigates → `dept-engineering` fixes → `dept-qa` verifies → boardroom checkpoint → `/wingman:ship`. |
+| Automated error-correction loop (prod error → root-cause → hotfix → re-verify) | `/wingman:hotfix`: founder pastes a production error (or it arrives via an error-tracking MCP connector wired up through `/wingman:telemetry`) → `systematic-debugging` skill investigates → `dept-engineering` fixes → `dept-qa` verifies → boardroom checkpoint → `/wingman:ship`. |
 
 ## 8. Model tiering
 
@@ -141,11 +143,10 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 - **v1** (current scaffold): 5 boardroom seats (all built), 4 pipeline commands (`plan`/`build`/`secure`/`ship`), 5 adaptive commands (`retro`/`learn`/`evolve`/`harness`/`telemetry`). No department leads yet — pipeline commands do the work inline.
 - **v1.1**: add `.wingman/checkpoints.jsonl` audit logging to `/wingman:boardroom` (a lightweight `## Wingman Boardroom Checkpoint` marker written to the plan file, and enforced by the `boardroom-checkpoint` hook, already exist — the structured JSONL log is the remaining piece).
 - **v2** (built): department-lead activation logic (`skills/department-lead-activation`), wired into all four delegating commands, and the standard lead-agent template. Not yet exercised against a real founder project — see `docs/PROJECT.md` roadmap.
-- **v3+**: `/wingman:evolve` begins promoting specialists out of department leads as real projects generate repeated, evidenced friction (§6). The 56-role catalog fills in organically and differently per project — never as a fixed upfront set.
+- **v3** (built): `skills/evolve-promotion` — the concrete mechanism behind `/wingman:evolve`, gathering signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`, requiring 2+ genuine occurrences, and writing promoted specialists to the founder's own project (never Wingman's plugin directory). Not yet exercised against a real or realistic project — see Open Items. The 56-role catalog fills in organically and differently per project as this runs — never as a fixed upfront set.
+- **v3.1 (planned)**: `commands/launch.md` and `commands/hotfix.md` — built, but neither has an eval case yet.
 
 ## Open items (planned, not yet built)
 
-- `commands/launch.md` — public-facing launch prep (changelog, docs, announcement copy), the `dept-growth` delegating command.
-- `commands/hotfix.md` — the production error-correction loop.
-- Department-lead agent templates and the activation-signal check inside `/wingman:plan`.
-- `.wingman/checkpoints.jsonl` writer wired into `/wingman:boardroom`.
+- The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — see that document's "Why no server yet").
+- An eval case for `skills/evolve-promotion`, mirroring `evals/cases/department-lead-activation.md` — the specialist-promotion mechanism hasn't been behaviorally exercised yet, only structurally validated.

@@ -12,9 +12,10 @@ $ARGUMENTS
 ## What to review
 
 Figure out what's in scope, in this order of preference:
-1. If a plan file exists (e.g. from `ExitPlanMode` or a `docs/**/plans/*.md` file just written), review that plan.
-2. Otherwise, if there are uncommitted changes, review `git diff` (and `git diff --staged`).
-3. Otherwise, ask the user what they want reviewed.
+1. If the calling command passed specific content to review directly (e.g. `/wingman:launch` handing over drafted announcement copy that isn't a plan or a diff), review that content as given.
+2. Otherwise, if a plan file exists (e.g. from `ExitPlanMode` or a `docs/**/plans/*.md` file just written), review that plan.
+3. Otherwise, if there are uncommitted changes, review `git diff` (and `git diff --staged`).
+4. Otherwise, ask the user what they want reviewed.
 
 ## Run the boardroom
 
@@ -73,7 +74,7 @@ Founder decision: <ship it | fix concerns first | still reviewing>
 Timestamp: <ISO 8601 timestamp>
 ```
 
-If this section already exists at the end of the file from a previous run, replace it rather than appending a second copy — the hook only looks at the most recent one. When code has already changed and the scope was a diff instead, this step does not apply (the hook only gates `ExitPlanMode`, which only fires for plans).
+If this section already exists at the end of the file from a previous run, replace it rather than appending a second copy — the hook only looks at the most recent one. When the scope was a diff or content passed directly by the calling command instead of a plan file, this step does not apply (the hook only gates `ExitPlanMode`, which only fires for plans).
 
 ## Record the checkpoint (always, regardless of scope)
 

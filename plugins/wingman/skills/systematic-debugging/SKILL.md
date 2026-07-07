@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes. Triggers whenever /wingman:build or /wingman:secure hits something the plan didn't anticipate.
+description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes. Triggers whenever /wingman:build or /wingman:secure hits something the plan didn't anticipate, and is the required first step of /wingman:hotfix before any production fix is proposed.
 ---
 
 <!--

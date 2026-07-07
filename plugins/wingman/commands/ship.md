@@ -45,6 +45,7 @@ If this is a meaningful release (not a trivial fix), run `/wingman:boardroom dif
 ## After shipping
 
 Suggest the adaptive stages that make sense next, without forcing them:
+- `/wingman:launch` if this is worth telling users/customers about publicly (a changelog entry, docs, or an announcement).
 - `/wingman:retro` if this was a substantial piece of work worth reflecting on.
 - `/wingman:learn` to capture anything durable that was discovered (a gotcha, a decision, a pattern) so it isn't relearned next time.
 - `/wingman:telemetry` if this shipped something worth watching in production.
