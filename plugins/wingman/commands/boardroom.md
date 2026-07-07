@@ -79,3 +79,5 @@ If this section already exists at the end of the file from a previous run, repla
 ## Record the checkpoint (always, regardless of scope)
 
 Append one line to `.wingman/checkpoints.jsonl` at the project root, following the exact schema in `docs/DATABASE.md` (`checkpoint_id`, `stage`, `scope_ref`, `seats[]`, `bottom_line`, `founder_decision`, `founder_notes`, `next_stage`). Create `.wingman/` and the file if they don't exist yet. This is a plain append (`>>`), never a rewrite — it's an audit log. Then overwrite `.wingman/state.json` with the current `current_stage`, `last_checkpoint_id`, and `updated_at` (see `docs/DATABASE.md` for the exact shape). Both files should be committed to the project's own git repo, same as any other project file.
+
+**Before reporting this checkpoint as done, re-read both files from disk to confirm the write actually landed** (per the `verification-before-completion` skill) — do not consider the stage complete on the strength of having decided to write them. All five seats reporting is not the same as the checkpoint being recorded; this step is what makes it real.
