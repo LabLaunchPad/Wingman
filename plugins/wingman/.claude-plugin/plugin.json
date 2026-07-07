@@ -23,7 +23,8 @@
     "agents/boardroom-founder.md",
     "agents/boardroom-engineer.md",
     "agents/boardroom-security.md",
-    "agents/boardroom-design.md"
+    "agents/boardroom-design.md",
+    "agents/boardroom-cost.md"
   ],
   "skills": [
     "skills/plain-language-checkpoint",

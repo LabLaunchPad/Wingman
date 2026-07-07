@@ -36,7 +36,7 @@ Every checkpoint runs all five seats in parallel and consolidates them into one 
 | Engineer | `agents/boardroom-engineer.md` | Correctness, architecture, test coverage | CTO |
 | Security | `agents/boardroom-security.md` | Data safety, injection, auth, secrets | Legal & Compliance (license, privacy/GDPR/CCPA) — folded in as checklist items, not a separate seat |
 | Design | `agents/boardroom-design.md` | Usability, consistency, dev-experience | — |
-| Cost | `agents/boardroom-cost.md` *(planned — see Open Items)* | Compute/token spend, hosting cost, new paid dependencies | CFO |
+| Cost | `agents/boardroom-cost.md` | Compute/token spend, hosting cost, new paid dependencies | CFO |
 
 **Gate rule:** any single `NO_GO` verdict makes the consolidated bottom line `DO NOT SHIP`, regardless of the other four. Any `GO_WITH_CONCERNS` (with no `NO_GO`) yields `GO WITH CHANGES`. Only all-`GO` is a clean `GO`. The founder always makes the final call via `AskUserQuestion` — the boardroom informs the decision, it doesn't make it.
 
@@ -122,14 +122,13 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 
 ## 10. Rollout sequencing
 
-- **v1** (current scaffold): 5 boardroom seats *(4 built, cost seat planned)*, 4 pipeline commands (`plan`/`build`/`secure`/`ship`), 5 adaptive commands (`retro`/`learn`/`evolve`/`harness`/`telemetry`). No department leads yet — pipeline commands do the work inline.
-- **v1.1**: add `boardroom-cost`, add `.wingman/checkpoints.jsonl` audit logging to `/wingman:boardroom`.
+- **v1** (current scaffold): 5 boardroom seats (all built), 4 pipeline commands (`plan`/`build`/`secure`/`ship`), 5 adaptive commands (`retro`/`learn`/`evolve`/`harness`/`telemetry`). No department leads yet — pipeline commands do the work inline.
+- **v1.1**: add `.wingman/checkpoints.jsonl` audit logging to `/wingman:boardroom` (a lightweight `## Wingman Boardroom Checkpoint` marker written to the plan file, and enforced by the `boardroom-checkpoint` hook, already exist — the structured JSONL log is the remaining piece).
 - **v2**: add department-lead activation logic to `/wingman:plan` (§5's signal table) and the first lead agent templates, created on demand.
 - **v3+**: `/wingman:evolve` begins promoting specialists out of department leads as real projects generate repeated, evidenced friction (§6). The 56-role catalog fills in organically and differently per project — never as a fixed upfront set.
 
 ## Open items (planned, not yet built)
 
-- `agents/boardroom-cost.md` — the 5th boardroom seat.
 - `commands/launch.md` — public-facing launch prep (changelog, docs, announcement copy), the `dept-growth` delegating command.
 - `commands/hotfix.md` — the production error-correction loop.
 - Department-lead agent templates and the activation-signal check inside `/wingman:plan`.

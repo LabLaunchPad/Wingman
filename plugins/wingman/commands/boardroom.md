@@ -5,7 +5,7 @@ argument-hint: "[plan|diff] [optional focus notes]"
 
 # Boardroom Checkpoint
 
-This is Wingman's replacement for code review: instead of asking a non-technical founder to read a diff, four specialist reviewers each examine the current plan (if in plan mode, or a plan file was just written) or the current diff (if code has already changed), and their verdicts are consolidated into ONE short, plain-language summary the founder can act on.
+This is Wingman's replacement for code review: instead of asking a non-technical founder to read a diff, five specialist reviewers each examine the current plan (if in plan mode, or a plan file was just written) or the current diff (if code has already changed), and their verdicts are consolidated into ONE short, plain-language summary the founder can act on.
 
 $ARGUMENTS
 
@@ -18,14 +18,15 @@ Figure out what's in scope, in this order of preference:
 
 ## Run the boardroom
 
-Dispatch all four boardroom seats **in parallel** (single message, multiple Task/Agent calls) against the same scope, each as its own subagent so their reviews don't bias each other:
+Dispatch all five boardroom seats **in parallel** (single message, multiple Task/Agent calls) against the same scope, each as its own subagent so their reviews don't bias each other. Per the `addyosmani-agent-skills` orchestration pattern this plugin follows: boardroom seats never call each other or any other agent — only this command orchestrates and merges.
 
 - `boardroom-founder` — business/product/scope lens
 - `boardroom-engineer` — correctness/architecture/test lens
 - `boardroom-security` — risk/data-safety lens
 - `boardroom-design` — usability/consistency lens
+- `boardroom-cost` — compute/token/hosting cost lens
 
-Each seat returns its own `## <SEAT> VERDICT` block as specified in its agent definition. Wait for all four before continuing.
+Each seat returns its own `## <SEAT> VERDICT` block as specified in its agent definition. Wait for all five before continuing.
 
 ## Consolidate into one founder-facing summary
 
@@ -43,6 +44,7 @@ Do not just concatenate the four reports — a founder should never have to read
 - 🛠️ Engineering: <one-line plain summary>
 - 🔒 Security: <one-line plain summary>
 - 🎨 Design: <one-line plain summary>
+- 💰 Cost: <one-line plain summary>
 
 ## If you want to ship this
 <Either "Nothing else needed — approve below to continue." OR a short numbered list of the specific things that need fixing first, in plain language, ordered by how much they matter.>
