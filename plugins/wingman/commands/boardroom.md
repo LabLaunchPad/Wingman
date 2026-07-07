@@ -53,6 +53,8 @@ Do not just concatenate the four reports — a founder should never have to read
 
 **Bottom line rule:** if ANY seat returned `NO_GO`, the bottom line is `DO NOT SHIP` regardless of the others. If any seat returned `GO_WITH_CONCERNS` and none returned `NO_GO`, the bottom line is `GO WITH CHANGES`. Only an all-`GO` result is a clean `GO`.
 
+**`next_stage` on `DO NOT SHIP`:** set `next_stage` to the *same* stage that was just reviewed (e.g. a `build`-stage checkpoint that comes back `DO NOT SHIP` gets `next_stage: "build"`), not the following pipeline stage. `state.json`'s `current_stage` is set from `next_stage` unconditionally (see "Record the checkpoint" below), so pointing it at the next stage would silently advance the project past a blocked gate. The project should stay pinned at the reviewed stage until the concerns are fixed and a re-run clears cleanly.
+
 ## Ask for the decision
 
 After presenting the summary, use `AskUserQuestion` to get an explicit decision — do not assume silence means approval:
