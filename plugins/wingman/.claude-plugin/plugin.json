@@ -30,7 +30,10 @@
     "skills/plain-language-checkpoint",
     "skills/verification-before-completion",
     "skills/writing-plans",
-    "skills/systematic-debugging"
+    "skills/systematic-debugging",
+    "skills/token-economy",
+    "skills/engineering-minimalism",
+    "skills/design-taste"
   ],
   "hooks": {
     "file": "hooks/hooks.json"

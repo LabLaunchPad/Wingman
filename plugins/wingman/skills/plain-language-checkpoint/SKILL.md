@@ -31,6 +31,25 @@ That doesn't mean dumbing down the substance — it means translating it. A foun
 | "There's a potential race condition" | "If two people do this at the exact same time, one of their changes could get silently lost" |
 | A wall of bullet points with no bottom line | One bottom-line sentence first, details after, only if asked |
 
+## Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "The founder can just ask if they don't understand" | They can't evaluate what they don't know is missing — the burden is on the checkpoint, not on the founder to catch the gap. |
+| "This technical detail is important context" | If it's important, translate its consequence; if it can't be translated, it probably wasn't decision-relevant to begin with. |
+| "It's basically fine, no need to hedge" | If you haven't verified it, say what you actually know — false confidence is worse than an honest "not yet checked." |
+
+## Red Flags — Stop and Reconsider
+
+- You're about to send a technical term to the founder without defining it in the same sentence.
+- You're about to lead with mechanism ("how it broke") instead of consequence ("what it means for them").
+- You're about to write "looks fine" / "should work" without evidence behind it.
+- The message has no single bottom-line sentence a founder could stop reading after and still know what to do.
+
+## Verification
+
+Before sending any founder-facing message, check it against the "three things" rule in step 3 above (what it is, why it matters, what to do) and re-read it as if you were the founder with no technical background — if any sentence requires unstated context to act on, rewrite it before sending.
+
 ## When this applies
 
 Every boardroom agent verdict, every `/wingman:*` stage completion message, and any time this plugin reports status to the user — not just the dedicated `/wingman:boardroom` command.
