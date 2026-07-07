@@ -86,7 +86,7 @@ Append one line to `.wingman/checkpoints.jsonl` at the project root with exactly
 {
   "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage>",
   "stage": "plan | build | secure | ship | <free-text for an ad-hoc run>",
-  "scope_ref": "<path to the plan file reviewed, or \"diff\">",
+  "scope_ref": "<path to the plan file reviewed, \"diff\", or a short description of the directly-passed content and where it's headed (e.g. \"content passed directly: CHANGELOG.md entry + announcement copy\") when the calling command handed over content that's neither a plan nor a diff>",
   "seats": [
     { "seat": "founder",  "verdict": "GO | GO_WITH_CONCERNS | NO_GO", "summary": "<one line>" },
     { "seat": "engineer", "verdict": "...", "summary": "..." },
