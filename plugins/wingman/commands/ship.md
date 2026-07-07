@@ -11,6 +11,8 @@ $ARGUMENTS
 
 ## Preflight checks
 
+Use the `department-lead-activation` skill to check the DevOps activation signal: if this project has CI config, a Dockerfile, or has shipped once already (check `.wingman/checkpoints.jsonl` for a prior `ship` stage entry), create `dept-devops` (if it doesn't exist yet) and delegate the deployment-mechanics portion of this stage to it.
+
 Before shipping, confirm all of the following, and stop with a plain-language explanation if any fail:
 
 1. **Verified** — the build stage's tests/checks passed with fresh evidence (see `verification-before-completion`), and the secure stage cleared with no open risks.

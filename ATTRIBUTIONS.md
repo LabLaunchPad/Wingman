@@ -61,3 +61,6 @@ Concept adapted from two sources, implementation original: `wshobson/agents`' ag
 
 ### `docs/DATABASE.md` and the flat-file state store
 Design reference: `jnuyens/gsd-plugin`'s bundled MCP server pattern (`mcp/server.cjs` exposing project state as MCP resources/tools backed by flat files) — studied as the proof that this approach works, but not yet built for Wingman; see that document's "Why no server yet" section for the reasoning.
+
+### `plugins/wingman/skills/department-lead-activation/`
+Original to Wingman — no single vendor source. Informed by the general pattern (seen across `gsd-plugin`'s phase-gates and `wshobson/agents`' generated-per-target artifacts) of deriving runtime state from a project's actual signals rather than a fixed manifest, and by `addyosmani/agent-skills`' persona/command orchestration split (department leads are personas; the delegating commands and this skill do the orchestrating).

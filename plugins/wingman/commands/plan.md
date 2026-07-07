@@ -19,6 +19,8 @@ Do not ask the founder to make technical decisions (frameworks, data models, fil
 
 Before writing a plan, look at the existing codebase for related functionality, existing utilities, and established patterns. Prefer reuse over new abstractions — a small addition to something that exists beats a parallel new system.
 
+Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
+
 ## Step 3: Write the plan
 
 Enter plan mode (if not already in it) and write a concrete implementation plan. Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. The plan should read as if written for a competent engineer who has zero context on this specific codebase.

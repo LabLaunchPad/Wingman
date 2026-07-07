@@ -4,32 +4,32 @@ Living document. Update this alongside any change that affects status, not as a 
 
 ## Current state (as of this writing)
 
-**Built and committed** (local branch `claude/init-6eg3d1`, not yet pushed to remote):
+**Built, committed, and pushed** (branch `claude/init-6eg3d1`, in sync with remote):
 - Marketplace + plugin scaffold (`.claude-plugin/marketplace.json`, `plugins/wingman/.claude-plugin/plugin.json`)
 - 10 commands: `plan`, `build`, `secure`, `ship`, `boardroom`, `retro`, `learn`, `evolve`, `harness`, `telemetry`
 - 5 Boardroom seats: `boardroom-founder`, `boardroom-engineer`, `boardroom-security`, `boardroom-design`, `boardroom-cost`
-- 7 skills: `plain-language-checkpoint`, `verification-before-completion`, `writing-plans`, `systematic-debugging`, `design-taste`, `engineering-minimalism`, `token-economy`
+- 8 skills: `plain-language-checkpoint`, `verification-before-completion`, `writing-plans`, `systematic-debugging`, `design-taste`, `engineering-minimalism`, `token-economy`, `department-lead-activation`
 - `hooks/hooks.json` + `boardroom-checkpoint.mjs` — the `ExitPlanMode` gate enforcing a recorded Boardroom verdict before plan mode can exit
+- `.wingman/checkpoints.jsonl` + `state.json` writer, wired into `/wingman:boardroom` (flat files; no server — see `docs/DATABASE.md`)
 - `plugins/wingman/scripts/validate-structure.mjs` — mechanical structural validator (see `docs/SRS.md` NFR-6)
-- `docs/ARCHITECTURE.md`, `docs/AGENT-ROSTER.md`, `docs/PRD.md`, `docs/SRS.md`, this file
+- `docs/ARCHITECTURE.md`, `docs/AGENT-ROSTER.md`, `docs/PRD.md`, `docs/SRS.md`, `docs/DATABASE.md`, this file, `ATTRIBUTIONS.md`, `LICENSE`
+- **v2, department-lead activation (this pass)**: `skills/department-lead-activation` — the shared signal-check-and-create mechanism, wired into `plan`/`build`/`secure`/`ship`. Writes department-lead files to the *founder's own project* (`.claude/agents/dept-*.md`), never into Wingman's own plugin directory — see the decision log below for why. A worked example (`examples/dept-product-worked-example.md`) proves the template produces project-specific content, not generic catalog text.
 - 16 vendor repos as git submodules under `vendor/`, each researched and mined for specific transferable patterns (see `docs/ARCHITECTURE.md` §9)
 
 **Not yet built:**
-- `docs/DATABASE.md` and the MCP state-store server it specifies
-- Department-lead agent templates and the activation-signal check inside `/wingman:plan`
-- `.wingman/checkpoints.jsonl` structured audit log (the plan-file marker exists; the JSONL log does not yet)
+- The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — flat files cover the current need)
+- Real-world exercise of the department-lead activation mechanism against an actual founder project (only a worked example exists so far — the mechanism hasn't been run for real yet)
 - `commands/launch.md`, `commands/hotfix.md`
-- `ATTRIBUTIONS.md` (referenced by several files, not yet written)
 - Any specialist from `docs/AGENT-ROSTER.md` (none should exist yet — this is expected, not a gap)
 
 **Known open items:**
 - The commit history shows as "Unverified" on GitHub (missing GPG/SSH signature — identity itself is correct). Unresolved by design pending the founder's decision on whether to set up commit signing.
-- Nothing has been pushed to the remote branch yet.
 
 ## Decisions log
 
 Durable decisions only — not every turn-level choice. Newest first.
 
+- **Department-lead files live in the founder's project, not in Wingman's plugin directory.** Considered writing dynamically-created `dept-*.md` agents into `plugins/wingman/agents/` at runtime; rejected because plugin files are resynced from the marketplace source and a mid-session write there risks silent loss on the next update, plus there's no guaranteed way to make a freshly-written *plugin* agent discoverable within the same session without a reload. Claude Code's project-scoped subagent mechanism (`.claude/agents/*.md`, auto-discovered, no manifest) is the correct home — it also matches intent, since each founder's project should accumulate its own department-lead roster, not share Wingman's.
 - **Runtime provider: Claude Code native only.** Evaluated LangGraph and smolagents for the literal 56-agent blueprint's orchestration layer; rejected both because either would require a separate hosted Python service, turning Wingman into "a plugin + a product" instead of just a plugin. Cross-agent collaboration uses Claude Code's own Task-tool dispatch (built) and, where useful later, the experimental Agent Teams feature (not yet used). Persistent state, where needed, is a small local MCP server following `gsd-plugin`'s proven pattern — not a database, not LangGraph state.
 - **Hybrid agent population, not the literal 56-agent roster upfront.** The full corporate-hierarchy blueprint is kept as a naming/organizing scheme (`docs/AGENT-ROSTER.md`), but only 5 Boardroom seats are built at install time; department leads and specialists grow lazily per-project. Rationale: a fixed 56-agent roster taxes every project's context budget regardless of whether that project ever needs a Row-Level-Security specialist or a canary-rollback agent.
 - **Vendoring means "read and adapt," not "depend on."** All 16 vendor repos are git submodules for reference/attribution only. None of their bespoke infrastructure (SDKs, CLIs, MCP servers, hosted dashboards) is a runtime dependency of the installed Wingman plugin.
@@ -39,7 +39,7 @@ Durable decisions only — not every turn-level choice. Newest first.
 ## Roadmap
 
 See `docs/ARCHITECTURE.md` §10 for the full v1 → v3+ sequencing. Immediate next steps, in the order being worked:
-1. `docs/DATABASE.md` + the MCP state-store server (in progress)
-2. `ATTRIBUTIONS.md`
-3. Push to remote, resolve or explicitly accept the commit-signature notice
-4. Department-lead activation logic in `/wingman:plan` (v2 start)
+1. Exercise the department-lead activation mechanism against a real (or realistic test) founder project to confirm it behaves as specified, not just as documented
+2. `commands/launch.md`, `commands/hotfix.md`
+3. Resolve or explicitly accept the commit-signature notice
+4. Begin v3: `/wingman:evolve` specialist-promotion logic, once a project has generated real, evidenced friction to promote from

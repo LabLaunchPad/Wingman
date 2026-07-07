@@ -13,6 +13,8 @@ $ARGUMENTS
 
 Confirm there is an approved plan (from `/wingman:plan`, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:plan`.
 
+Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly.
+
 ## Execution discipline
 
 Work through the plan task-by-task, not all at once:
@@ -22,6 +24,7 @@ Work through the plan task-by-task, not all at once:
 3. If you hit something the plan didn't anticipate (a genuine unknown, not a routine implementation detail), use the bundled `systematic-debugging` skill to investigate rather than guessing at fixes.
 4. If a task turns out to require a decision the plan didn't make (and it's a business tradeoff, not a technical one), stop and ask the founder in plain language rather than guessing.
 5. Keep commits small and scoped to one task each, with clear messages.
+6. Apply `engineering-minimalism` and, for any user-facing work, `design-taste` — both are bundled skills, not department-lead-specific, so they apply whether or not a department lead exists yet for this piece of work.
 
 ## Reuse over reinvention
 

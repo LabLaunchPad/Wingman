@@ -82,7 +82,13 @@ One lead subagent per corporate department. Each lead covers its department's *e
 
 **Boardroom seats vs. department leads are different roles by design:** a boardroom seat reviews and gates; a department lead produces the thing being reviewed. This avoids the 1:1 redundancy in a literal corporate org chart (e.g. a CPO *and* a separate Requirements Analyst covering overlapping ground) — in Wingman, the Founder seat reviews what `dept-product` produces, full stop.
 
-Department-lead files don't exist in a fresh install. `/wingman:plan` checks the activation signals above at the start of every planning pass and creates the relevant lead file (from the standard agent-file template) the first time it's actually warranted. Once created, it persists for the life of the project.
+Department-lead files don't exist in a fresh install. Each of the four delegating commands checks its relevant activation signals above at the start of its run and creates the relevant lead file (from the standard template in `skills/department-lead-activation/references/template.md`) the first time it's actually warranted. Once created, it persists for the life of the project.
+
+**Where these files actually live is load-bearing, not incidental.** Department-lead agents are written to **`.claude/agents/dept-<name>.md` in the founder's own project repository — never into Wingman's own plugin installation directory.** Two reasons:
+1. Wingman's plugin files live under Claude Code's plugin cache, resynced from the marketplace source; anything written there by a running session risks silent loss on the next plugin update, and there's no guaranteed way to make a freshly-written *plugin* agent file discoverable within the same session without a reload.
+2. Claude Code natively supports **project-scoped** subagents — `.claude/agents/*.md` in a project, auto-discovered with no manifest — which is exactly the right scope for a per-project, lazily-grown roster. It also matches intent: each founder's project accumulates its *own* department-lead roster in *their* repo, not a shared one baked into Wingman.
+
+The mechanism for detecting signals and writing these files is `skills/department-lead-activation`, shared by all four delegating commands rather than duplicated in each.
 
 ## 6. Specialists (grow 0 → N, per project, via `/wingman:evolve`)
 
@@ -134,7 +140,7 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 
 - **v1** (current scaffold): 5 boardroom seats (all built), 4 pipeline commands (`plan`/`build`/`secure`/`ship`), 5 adaptive commands (`retro`/`learn`/`evolve`/`harness`/`telemetry`). No department leads yet — pipeline commands do the work inline.
 - **v1.1**: add `.wingman/checkpoints.jsonl` audit logging to `/wingman:boardroom` (a lightweight `## Wingman Boardroom Checkpoint` marker written to the plan file, and enforced by the `boardroom-checkpoint` hook, already exist — the structured JSONL log is the remaining piece).
-- **v2**: add department-lead activation logic to `/wingman:plan` (§5's signal table) and the first lead agent templates, created on demand.
+- **v2** (built): department-lead activation logic (`skills/department-lead-activation`), wired into all four delegating commands, and the standard lead-agent template. Not yet exercised against a real founder project — see `docs/PROJECT.md` roadmap.
 - **v3+**: `/wingman:evolve` begins promoting specialists out of department leads as real projects generate repeated, evidenced friction (§6). The 56-role catalog fills in organically and differently per project — never as a fixed upfront set.
 
 ## Open items (planned, not yet built)

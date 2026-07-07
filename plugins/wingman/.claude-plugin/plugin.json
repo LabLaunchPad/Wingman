@@ -33,7 +33,8 @@
     "skills/systematic-debugging",
     "skills/token-economy",
     "skills/engineering-minimalism",
-    "skills/design-taste"
+    "skills/design-taste",
+    "skills/department-lead-activation"
   ],
   "hooks": {
     "file": "hooks/hooks.json"
