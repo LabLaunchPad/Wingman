@@ -133,6 +133,35 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task
 
+## Constraints
+
+**MUST:**
+- End every plan with the Plain-Language Summary section — this is what `/wingman:boardroom` builds the founder-facing checkpoint from, and the plan document itself is never shown to the founder.
+- Give every step real, complete content — exact file paths, full code, exact commands with expected output.
+- Break a spec covering multiple independent subsystems into separate plans, one per subsystem.
+- Run the full Self-Review pass (spec coverage, placeholder scan, type consistency) before presenting the plan as done.
+
+**MUST NOT:**
+- Ship any of the "No Placeholders" patterns above (TBD/TODO, "add appropriate error handling," "similar to Task N," code-free step descriptions, references to undefined types/functions).
+- Present a plan as finished without having actually re-read it from disk after writing it — a plan that only exists in a prior turn's draft state doesn't count as saved.
+
+## Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "The engineer can figure out the error handling themselves" | This is exactly what "add appropriate error handling" as a placeholder is banned for — specify the actual handling, or the plan has silently deferred a design decision to whoever executes it. |
+| "This task is basically the same as Task 3, I'll just reference it" | "Similar to Task N" is an explicit banned pattern — the engineer may read tasks out of order and never see Task 3's code. Repeat it in full. |
+| "The spec is vague here, I'll leave it flexible for the engineer to decide" | Vagueness in the spec is a signal to make an explicit, stated decision in the plan (or flag it for the founder) — not to defer it downstream as an implicit placeholder. |
+| "This is a small plan, the Plain-Language Summary feels like overkill" | Every plan feeds the same Boardroom checkpoint mechanism regardless of size — skipping it breaks the founder-facing gate this plan needs to pass through. |
+
+## Red Flags — Stop and Reconsider
+
+- You're about to write "TODO," "TBD," "handle edge cases," or any equivalent hedge instead of the actual content.
+- You're about to write "Similar to Task N" instead of repeating the real code.
+- You're using a function, type, or property name in a later task that no earlier task's "Produces" list actually defines.
+- You're about to hand off the plan without running the Self-Review pass.
+- You're finishing a plan with no Plain-Language Summary section.
+
 ## Plain-Language Summary (required — Wingman-specific)
 
 Every plan must end with a section written for a non-technical founder, per the `plain-language-checkpoint` skill's writing bar:
@@ -154,9 +183,9 @@ This is what `/wingman:boardroom` uses to build the founder-facing checkpoint �
 - Exact commands with expected output
 - DRY, YAGNI, TDD, frequent commits
 
-## Self-Review
+## Verification (Self-Review)
 
-After writing the complete plan, look at the spec with fresh eyes and check the plan against it.
+Before considering the plan done, re-read it from disk (not from memory of having just written it — per the `verification-before-completion` skill) and check it against the spec with fresh eyes.
 
 **1. Spec coverage:** Skim each section/requirement in the spec. Can you point to a task that implements it? List any gaps.
 
