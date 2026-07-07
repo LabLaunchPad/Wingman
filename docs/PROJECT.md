@@ -14,12 +14,11 @@ Living document. Update this alongside any change that affects status, not as a 
 - `plugins/wingman/scripts/validate-structure.mjs` — mechanical structural validator (see `docs/SRS.md` NFR-6)
 - `docs/ARCHITECTURE.md`, `docs/AGENT-ROSTER.md`, `docs/PRD.md`, `docs/SRS.md`, `docs/DATABASE.md`, this file, `ATTRIBUTIONS.md`, `LICENSE`
 - **v2, department-lead activation**: `skills/department-lead-activation` — the shared signal-check-and-create mechanism, wired into `plan`/`build`/`secure`/`ship`. Writes department-lead files to the *founder's own project* (`.claude/agents/dept-*.md`), never into Wingman's own plugin directory — see the decision log below for why.
-- **`evals/`** — a lightweight behavioral eval harness (fixture script + case doc + run log), scoped down from the Tier 1/2/3 pattern in `addyosmani-agent-skills`. `cases/department-lead-activation.md` has one real, independently-verified passing run (not just a worked example) against a realistic fixture project — see its run log for exactly what was checked and how.
+- **`evals/`** — a lightweight behavioral eval harness (fixture scripts + case doc + run log), scoped down from the Tier 1/2/3 pattern in `addyosmani-agent-skills`. `cases/department-lead-activation.md` is now `verified`: both a positive case (Fetch — all conditional signals present) and a negative case (linecount — none present) passed, each independently checked against the real file tree rather than the tested agent's self-report.
 - 16 vendor repos as git submodules under `vendor/`, each researched and mined for specific transferable patterns (see `docs/ARCHITECTURE.md` §9)
 
 **Not yet built:**
 - The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — flat files cover the current need)
-- The negative-case eval for `department-lead-activation` (a project with no conditional signals, confirming it creates *only* the two Always departments) — needed before that skill is `verified` rather than `provisional`
 - `commands/launch.md`, `commands/hotfix.md`
 - Any specialist from `docs/AGENT-ROSTER.md` (none should exist yet — this is expected, not a gap)
 
@@ -41,7 +40,6 @@ Durable decisions only — not every turn-level choice. Newest first.
 ## Roadmap
 
 See `docs/ARCHITECTURE.md` §10 for the full v1 → v3+ sequencing. Immediate next steps, in the order being worked:
-1. Run the negative-case eval for `department-lead-activation` (a project with no conditional signals) to move it from `provisional` to `verified`
-2. `commands/launch.md`, `commands/hotfix.md`
-3. Resolve or explicitly accept the commit-signature notice
-4. Begin v3: `/wingman:evolve` specialist-promotion logic, once a project has generated real, evidenced friction to promote from
+1. `commands/launch.md`, `commands/hotfix.md`
+2. Resolve or explicitly accept the commit-signature notice
+3. Begin v3: `/wingman:evolve` specialist-promotion logic, once a project has generated real, evidenced friction to promote from

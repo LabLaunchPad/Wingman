@@ -20,4 +20,4 @@ Borrowed from `addyosmani-agent-skills`' eval schema:
 
 ## Existing cases
 
-- `cases/department-lead-activation.md` — tests `skills/department-lead-activation`. Currently `provisional`; the negative case (a project with no conditional signals) is the next run needed before this is `verified`.
+- `cases/department-lead-activation.md` — tests `skills/department-lead-activation`. `verified`: passed both a positive case (all conditional signals present) and a negative case (none present, confirming no over-triggering).

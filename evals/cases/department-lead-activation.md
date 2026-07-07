@@ -2,9 +2,10 @@
 
 Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally — does a fresh agent, given only this skill and a realistic project, actually create the right department-lead files in the right place with the right content, and correctly withhold the ones that shouldn't activate?
 
-## Fixture
+## Fixtures
 
-`evals/fixtures/setup-fetch-app.sh <target-dir>` — "Fetch," a hypothetical dog meal-plan subscription app with deliberate signals: a Next.js frontend (Design), a Prisma schema with migrations (Data), auth + Stripe billing code (Legal/Security), and a Dockerfile + CI config (DevOps). No prior ship record, no Growth-department request.
+- **Positive case**: `evals/fixtures/setup-fetch-app.sh <target-dir>` — "Fetch," a hypothetical dog meal-plan subscription app with deliberate signals: a Next.js frontend (Design), a Prisma schema with migrations (Data), auth + Stripe billing code (Legal/Security), and a Dockerfile + CI config (DevOps). No prior ship record, no Growth-department request.
+- **Negative case**: `evals/fixtures/setup-minimal-cli.sh <target-dir>` — "linecount," a single-file Node CLI with none of the conditional signals: no frontend, no schema, no auth/payments, no CI/Dockerfile. Tests that the skill correctly creates *only* the two Always departments and doesn't over-trigger.
 
 ## Procedure
 
@@ -13,7 +14,7 @@ Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally 
 3. Do not tell the subagent which departments should activate — that's what's being tested.
 4. After it finishes, inspect the fixture directory against the expectations below. Do not trust the subagent's self-report alone — check the actual file tree and content.
 
-## Expectations
+## Expectations — positive case (Fetch)
 
 | Check | Expected |
 |---|---|
@@ -30,9 +31,18 @@ Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally 
 | Frontmatter validity | Each file has `name: dept-<x>` matching its filename, a `description` with an explicit trigger clause, and no unfilled `{{placeholder}}` tokens from the template |
 | Orchestration rule | No created agent file itself invokes another agent — matches the "personas never call personas" constraint |
 
+## Expectations — negative case (linecount)
+
+| Check | Expected |
+|---|---|
+| `dept-engineering.md` created | Yes — always active |
+| `dept-qa.md` created | Yes — always active |
+| `dept-design.md`, `dept-data.md`, `dept-legal-security.md`, `dept-devops.md`, `dept-growth.md` created | **No, all of them** — none of their signals are present in this fixture; over-triggering here would indicate the skill defaults to "create when unsure" instead of requiring real evidence |
+| File location, frontmatter validity, orchestration rule | Same bar as the positive case |
+
 ## Trust level
 
-`provisional` — single scenario, one run, graded by manual inspection rather than an automated assertion script. Sufficient to catch a broken or misunderstood skill; not a substitute for exercising this against a second, differently-shaped fixture (e.g. a project with *no* design/data/security/devops signals at all, to confirm the skill correctly creates *nothing* beyond the two Always departments) before relying on it heavily.
+`verified` — passed both the positive case (all 6 conditionally/always-active departments correctly created with evidence) and the negative case (only the 2 Always departments created, all 5 conditional departments correctly withheld with no false positives), each independently checked against the real file tree rather than the tested agent's self-report.
 
 ## Run log
 
@@ -46,4 +56,13 @@ Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally 
 - Produced genuinely project-specific content, not generic catalog text — e.g. `dept-legal-security.md` named the exact hardcoded placeholder token in `src/auth/session.ts`, the unchecked `STRIPE_SECRET_KEY!` non-null assertion, and the missing input validation on `chargeCustomer`'s `amountCents` parameter, none of which were prompted for — the subagent found them by actually reading the fixture code.
 - Did not violate the "personas never call personas" orchestration rule in any created file.
 
-**Not yet tested** (see Trust level above): the negative case — a project with none of the conditional signals present, to confirm the skill creates *only* the two Always departments and nothing else. Recommended before this skill is considered fully verified.
+### Run 2 — 2026-07-07 (negative case)
+
+**Result: PASS on every expectation.** A second fresh subagent, run against the `linecount` fixture (none of the conditional signals present), correctly:
+- Created **only** `dept-engineering.md` and `dept-qa.md` — independently confirmed via `ls` that none of `dept-design.md`, `dept-data.md`, `dept-legal-security.md`, `dept-devops.md`, `dept-growth.md`, or `dept-product.md` exist in the fixture.
+- Gave a specific, evidence-based reason for each withheld department (e.g. "no frontend framework, no HTML templates... the only files are `index.js`, `package.json`, `README.md`") rather than a generic "not applicable."
+- Did not default to creating a department "to be thorough" despite the ambiguity of a genuinely minimal project — this was the main failure mode this run was designed to catch.
+- Confirmed no writes outside the fixture's own `.claude/agents/`; the Wingman repo's `plugins/wingman/` stayed clean per `git status --porcelain`.
+- Both created files passed frontmatter/placeholder checks identically to Run 1.
+
+Both the positive and negative cases now pass. Promoted to `verified` (see Trust level above).
