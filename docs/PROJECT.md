@@ -4,7 +4,7 @@ Living document. Update this alongside any change that affects status, not as a 
 
 ## Current state (as of this writing)
 
-**Built** (branch `claude/init-6eg3d1`; prior work is pushed to remote, this batch — launch/hotfix/evolve-promotion — is not yet committed):
+**Built and pushed** (branch `claude/init-6eg3d1`, in sync with remote):
 - Marketplace + plugin scaffold (`.claude-plugin/marketplace.json`, `plugins/wingman/.claude-plugin/plugin.json`)
 - 12 commands: `plan`, `build`, `secure`, `ship`, `boardroom`, `retro`, `learn`, `evolve`, `harness`, `telemetry`, `launch`, `hotfix`
 - 5 Boardroom seats: `boardroom-founder`, `boardroom-engineer`, `boardroom-security`, `boardroom-design`, `boardroom-cost`
@@ -17,12 +17,11 @@ Living document. Update this alongside any change that affects status, not as a 
 - **v3, evolve specialist-promotion**: `skills/evolve-promotion` — gathers signal from `LEARNINGS.md`, `docs/wingman/retros.md` (now a canonical single file — see decisions log), and `.wingman/checkpoints.jsonl`; requires 2+ genuine occurrences; writes every promoted artifact (command/skill/agent) into the founder's own `.claude/`, never Wingman's plugin directory. Bundles its own runtime copy of the specialist catalog (`references/specialist-catalog.md`) since `docs/AGENT-ROSTER.md` isn't part of what ships to an installed plugin — see decisions log.
 - **`commands/launch.md`** — the `dept-growth` delegating command; extended `boardroom.md` to accept content passed directly by a calling command (not just a plan file or diff), since launch copy is neither.
 - **`commands/hotfix.md`** — the production error-correction loop, delegating root-causing to `systematic-debugging` by phase name and reusing `build.md`'s test-first discipline for the fix.
-- **`evals/`** — a lightweight behavioral eval harness (fixture scripts + case doc + run log), scoped down from the Tier 1/2/3 pattern in `addyosmani-agent-skills`. `cases/department-lead-activation.md` is `verified` (positive + negative cases). `cases/evolve-promotion.md` is `provisional` — a two-part run (gather/cluster/classify/propose, then file placement under simulated approval) passed and was independently verified; the negative case (no cluster reaches 2+) hasn't been run yet.
+- **`evals/`** — a lightweight behavioral eval harness (fixture scripts + case doc + run log), scoped down from the Tier 1/2/3 pattern in `addyosmani-agent-skills`. Both `cases/department-lead-activation.md` and `cases/evolve-promotion.md` are now `verified` (positive + negative cases each, independently checked against real file trees rather than the tested agent's self-report). `evolve-promotion`'s negative case specifically confirmed the skill doesn't mistake "same incident logged twice" (a learning entry plus its own checkpoint/retro) for two genuine occurrences.
 - 16 vendor repos as git submodules under `vendor/`, each researched and mined for specific transferable patterns (see `docs/ARCHITECTURE.md` §9)
 
 **Not yet built:**
 - The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — flat files cover the current need)
-- The negative-case eval for `skills/evolve-promotion`, needed before it moves from `provisional` to `verified`
 - Any specialist from the roster (none should exist yet — this is expected, not a gap)
 
 **Known open items:**
@@ -32,6 +31,7 @@ Living document. Update this alongside any change that affects status, not as a 
 
 Durable decisions only — not every turn-level choice. Newest first.
 
+- **A recurring-friction detector must distinguish "same incident, logged twice" from "genuine repetition."** `evolve-promotion`'s negative-case eval deliberately fed it three topics each appearing in exactly 2 files (a learning entry plus that same event's checkpoint or retro) to check it wouldn't naively count file-mentions as occurrences. It correctly recognized same-date, same-fix pairs as one incident each and proposed nothing — worth remembering as the specific failure mode this class of mechanism is most exposed to, since every piece of real work naturally produces a learning note *and* a checkpoint/retro for the same event.
 - **`docs/` isn't part of the installed plugin — anything a skill needs at runtime must be bundled inside `plugins/wingman/`.** Caught during v3 work: `marketplace.json`'s `pluginRoot`/`source` only installs `plugins/wingman/` into a founder's Claude Code environment; the repo-root `docs/` folder (including `docs/AGENT-ROSTER.md`, which `evolve-promotion` needs to name specialists from) never ships. Fixed by adding `plugins/wingman/skills/evolve-promotion/references/specialist-catalog.md` as the runtime-shipped copy, with an explicit sync note in both files rather than silently duplicating content. Also removed a similar latent dependency from `department-lead-activation`'s template, which didn't actually need the specialist-level catalog at all (department leads operate at a coarser granularity). Any future skill referencing another doc for *operational* purposes (not just rationale/citation) needs this same check.
 - **Evolve-promoted commands and skills follow the same founder's-project rule as specialist agents — not a plugin-directory exception.** The original `evolve.md`/`AGENT-ROSTER.md` text (written before `department-lead-activation` established the project-scoping precedent) said to write promoted commands/skills into `plugins/wingman/` while specialists went to the founder's project — an inconsistent carve-out. Fixed: `/wingman:evolve` never writes into `plugins/wingman/` for any artifact type; commands go to `.claude/commands/`, skills to `.claude/skills/`, agents to `.claude/agents/`, all in the founder's own project. "Wingman's plugin directory" always means the founder's resyncable local install, regardless of what's being written.
 - **Retros need one canonical file, like `LEARNINGS.md` already has.** `retro.md` originally didn't specify where retro blocks get saved, leaving them scattered across whichever file happened to be open — unfindable by `/wingman:evolve`'s clustering step. Fixed: retros now append to `docs/wingman/retros.md`, mirroring `LEARNINGS.md`'s convention exactly.
@@ -46,5 +46,5 @@ Durable decisions only — not every turn-level choice. Newest first.
 ## Roadmap
 
 See `docs/ARCHITECTURE.md` §10 for the full v1 → v3+ sequencing. Immediate next steps, in the order being worked:
-1. Run the negative-case eval for `skills/evolve-promotion` (only single occurrences anywhere, confirming no over-promotion) to move it to `verified`
-2. Resolve or explicitly accept the commit-signature notice
+1. Resolve or explicitly accept the commit-signature notice
+2. Exercise the pipeline end-to-end against a real or realistic project (plan → build → secure → ship, with department leads and a genuine specialist promotion arising naturally) rather than one skill at a time in isolation

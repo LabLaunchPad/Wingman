@@ -2,9 +2,10 @@
 
 Tests `plugins/wingman/skills/evolve-promotion/SKILL.md` behaviorally. The founder-approval gate (`AskUserQuestion`) can't be genuinely exercised by a background subagent with no real founder to answer it, so this eval is split into two parts: **Part A** tests gathering/clustering/classifying/proposing (steps 1–4, stopping before any write), and **Part B** tests file placement under a simulated approval (step 5 onward).
 
-## Fixture
+## Fixtures
 
-`evals/fixtures/setup-evolve-fixture.sh <target-dir>` — a project with repeated migration-rollback friction (2 `LEARNINGS.md` entries + 1 retro + 1 checkpoint `GO_WITH_CONCERNS`, all describing the same underlying issue) and a deliberate single-occurrence distractor (a route-naming-convention note) that should NOT be promoted.
+- **Positive case**: `evals/fixtures/setup-evolve-fixture.sh <target-dir>` — a project with repeated migration-rollback friction (2 `LEARNINGS.md` entries + 1 retro + 1 checkpoint `GO_WITH_CONCERNS`, all describing the same underlying issue) and a deliberate single-occurrence distractor (a route-naming-convention note) that should NOT be promoted.
+- **Negative case**: `evals/fixtures/setup-evolve-fixture-negative.sh <target-dir>` — a project with three topics, each appearing in exactly 2 files but describing the *same single incident* recorded twice (a learning entry plus the retro or checkpoint for that same piece of work), not genuinely separate occurrences. Deliberately harder than a trivial "everything mentioned once" fixture: it tests whether the skill can tell "same event, two logs" apart from "two separate incidents" rather than naively counting file-mentions as occurrences.
 
 ## Procedure — Part A (gather/cluster/classify/propose)
 
@@ -19,7 +20,7 @@ Tests `plugins/wingman/skills/evolve-promotion/SKILL.md` behaviorally. The found
 2. Spawn a fresh subagent, telling it explicitly: "Assume the founder has already approved promoting a Migration Engineer specialist for the reasons you'd expect from this fixture's signal — proceed directly to writing the specialist agent file per the skill's Core Workflow step 5 onward, using `references/specialist-agent-template.md`."
 3. Independently verify: the file lands at `.claude/agents/<slug>.md` in the fixture project (not under the Wingman repo's `plugins/wingman/`), the frontmatter/placeholders are clean, the content is grounded in the fixture's actual migration-rollback specifics (not generic catalog text), and `.wingman/state.json`'s `active_specialists` array was updated to include it.
 
-## Expectations
+## Expectations — positive case
 
 | Check | Expected |
 |---|---|
@@ -32,9 +33,18 @@ Tests `plugins/wingman/skills/evolve-promotion/SKILL.md` behaviorally. The found
 | Content specificity in Part B | References the fixture's actual migration-rollback specifics, not generic catalog text |
 | `state.json` updated in Part B | `active_specialists` array includes the new specialist |
 
+## Expectations — negative case
+
+| Check | Expected |
+|---|---|
+| Raw mention count per topic | Correctly counted as 2 per topic across files (not undercounted) |
+| Same-incident recognition | For each topic, correctly recognizes both mentions describe the *same single incident* (matching date, matching fix), not two separate occurrences |
+| Final proposal count | **Zero** — no topic gets proposed, explicitly stated as such with reasoning, not silently omitted |
+| No premature write | No file created, no `AskUserQuestion` called |
+
 ## Trust level
 
-`provisional` — one run each for Part A and Part B, graded by manual inspection. Not yet tested: a pure negative case (no cluster anywhere reaches 2+ occurrences, confirming the skill proposes nothing) — recommended before `verified`.
+`verified` — passed the positive case (all 6 checks) and the negative case (correctly withheld promotion on all 3 topics despite each appearing in 2 files, by correctly distinguishing same-incident double-logging from genuine repetition), each independently checked rather than trusted from the tested agent's self-report.
 
 ## Run log
 
@@ -55,4 +65,13 @@ Tests `plugins/wingman/skills/evolve-promotion/SKILL.md` behaviorally. The found
 - Created `.wingman/state.json` fresh (it didn't exist yet) with `active_specialists: ["migration-engineer"]`, matching the skill's step 6 instruction exactly.
 - Confirmed via `git status --porcelain -- plugins/wingman/` in the Wingman repo that no writes landed there beyond this session's own pre-existing edits (i.e. nothing new from the test agent).
 
-**Not yet tested**: the negative case (no signal anywhere reaches 2+ occurrences) — recommended before promoting this from `provisional` to `verified`.
+### Run 2 — 2026-07-07 (negative case)
+
+**Result: PASS on every expectation, including a subtler distinction than the department-lead-activation negative case required.** This fixture deliberately gave every topic exactly 2 raw mentions (not zero or one) to test whether the skill mistakes "appears in 2 files" for "2 genuine occurrences." A fresh subagent, given only the skill/references and the fixture, correctly:
+- Counted all three topics' raw mention counts accurately (2 each) — did not undercount or miss any.
+- For every topic, correctly recognized that both mentions shared the same date and described the same single piece of work (e.g. the timezone fix's `LEARNINGS.md` entry and its build checkpoint both dated 2026-06-10, both about the identical fix) — a learning-note and a checkpoint/retro naturally exist for the same event, and that's one occurrence logged twice, not two occurrences.
+- Concluded explicitly that **zero** topics qualified for promotion, citing the skill's own step 2 clustering rule ("genuine topical overlap, not superficial keyword match") and step 7 ("if nothing has genuinely repeated, say so plainly and don't force a promotion") by name.
+- Noted, as independent corroborating evidence (not required, but a good sign of genuine reasoning rather than pattern-matching), that two of the three topics were self-labeled as one-off in the source material itself ("One-off customization, not a general pattern").
+- Made no premature write and did not call `AskUserQuestion` — independently confirmed via `git status` in the fixture returning empty and no `.claude/` directory existing afterward.
+
+Both the positive and negative cases now pass. Promoted to `verified` (see Trust level above).

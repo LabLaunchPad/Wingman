@@ -21,4 +21,4 @@ Borrowed from `addyosmani-agent-skills`' eval schema:
 ## Existing cases
 
 - `cases/department-lead-activation.md` — tests `skills/department-lead-activation`. `verified`: passed both a positive case (all conditional signals present) and a negative case (none present, confirming no over-triggering).
-- `cases/evolve-promotion.md` — tests `skills/evolve-promotion`. `provisional`: passed a two-part run (gather/cluster/classify/propose, then file placement under a simulated approval — the real `AskUserQuestion` gate can't be exercised by a background subagent with no real founder to answer it). Negative case (no cluster reaches the 2+ threshold anywhere) not yet run.
+- `cases/evolve-promotion.md` — tests `skills/evolve-promotion`. `verified`: passed a positive case (gather/cluster/classify/propose, then file placement under a simulated approval — the real `AskUserQuestion` gate can't be exercised by a background subagent with no real founder to answer it) and a negative case that specifically tests same-incident-double-logging isn't mistaken for genuine repetition.
