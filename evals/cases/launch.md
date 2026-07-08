@@ -28,7 +28,7 @@ Tests `plugins/wingman/commands/launch.md` behaviorally — does it correctly se
 
 ## Trust level
 
-`provisional` — passed one real run, single scenario, all-`GO` outcome. Hasn't yet been tested with a scenario that should produce `GO_WITH_CHANGES` (e.g. draft copy that oversells the feature) or one that requires an actual docs update (to confirm the skip logic isn't just defaulting to "skip" regardless).
+`verified` — passed Run 1 (all-`GO`, docs correctly skipped because the README already covered the feature) and Run 2 (docs-update correctly produced for a feature that genuinely needs it), each independently verified against the real filesystem, showing the docs-update decision is a real judgment call in both directions. Not yet tested against a genuine non-`GO` launch outcome (e.g. overselling copy the Boardroom rejects) — a possible third dimension, not required for `verified`. (Full Run 2 detail below.)
 
 ## Run log
 
@@ -43,4 +43,8 @@ Tests `plugins/wingman/commands/launch.md` behaviorally — does it correctly se
 
 **Real finding surfaced and fixed**: `boardroom.md`'s checkpoint schema only documented `scope_ref` as a plan-file path or `"diff"`, leaving undefined what to record when content was passed directly (exactly launch.md's path). The subagent improvised a reasonable free-text description (`"content passed directly: CHANGELOG.md [0.2.0] entry + announcements/... (short + long copy)"`); `boardroom.md` now documents this pattern explicitly as the convention, rather than leaving each future caller to improvise its own format.
 
-Kept at `provisional` pending a scenario that isn't a clean all-`GO` (see above).
+### Run 2 — 2026-07-08 (docs-update path: a feature that genuinely needs docs)
+
+The complement of Run 1, which correctly *skipped* a docs update because the README already covered the feature. Here the shipped feature (a `search()` with five non-obvious options — filters, sort, pagination, fields) is genuinely unusable without documentation, and the README does not yet cover it. Fixture: `evals/fixtures/setup-launch-docs-fixture.sh`. Tests that `launch.md`'s "draft a docs update *only if* this feature needs user-facing documentation to be usable" is a real judgment call, not a reflexive skip.
+
+**Result: PASS**, independently verified. The subagent produced an **actual README docs update** — a `## Advanced search options` table documenting all five options with types, defaults, and plain-language effects, plus a usage block and worked examples — verified against `src/search.js` (all five option keys and defaults match). It correctly did *not* default past the docs step. `dept-growth` was created and merged into `state.json` preserving `dept-product` (both present, independently confirmed), the mandatory Boardroom checkpoint ran on the directly-passed content and came back `GO` (the design seat's ship-stage `GO_WITH_CONCERNS` about undocumented options is now resolved), and no pricing/billing scope was invented (grep confirmed). With Run 1 (docs correctly skipped) and Run 2 (docs correctly written), the docs-update decision is shown to be a genuine judgment call in both directions.

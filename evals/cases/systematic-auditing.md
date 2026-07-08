@@ -29,7 +29,7 @@ Tests `plugins/wingman/skills/systematic-auditing/SKILL.md` and `plugins/wingman
 
 ## Trust level
 
-`provisional` — passed one real run, single scenario, manually and independently graded. Not yet tested against a negative case (a genuinely clean project, to confirm the skill doesn't manufacture findings to justify having run) or a larger/messier codebase where concern-scoping is a harder judgment call.
+`verified` — passed Run 1 (a deliberately-flawed project: found all 3 seeded issues plus 2 real bonuses, zero false positives, fixed and verified) and Run 2 (a genuinely clean project: correctly found nothing material, manufactured no findings), each independently checked against the real filesystem — the skill neither over- nor under-triggers. Not yet tested against a large/messy codebase where concern-scoping is a much harder judgment call — a possible third dimension, not required for `verified`.
 
 ## Run log
 
@@ -44,3 +44,9 @@ Tests `plugins/wingman/skills/systematic-auditing/SKILL.md` and `plugins/wingman
 - Independent re-verification (paste of real output, cross-checked here): `npm start` now genuinely serves (confirmed live via a real HTTP request returning 200), `npm test` went from 2/2 to 11/11 passing, `README.md` now only claims CSV, `src/export.js` has real RFC4180-style field quoting, `src/pricing.js` has real `Number.isFinite` guards. `git status --porcelain` in the Wingman repo confirmed empty.
 
 **One process note, not a defect**: the subagent didn't commit its changes in the fixture (left them as uncommitted working-tree changes). Not required by the task, but worth a light instruction to commit in a future run for tidiness — noted, not treated as a finding against the skill itself.
+
+### Run 2 — 2026-07-08 (negative case: a genuinely clean project)
+
+The complement of Run 1: a small, correct "slugify" project with no seeded issues — correct start script, README matching the code, full test coverage. Fixture: `evals/fixtures/setup-audit-clean-fixture.sh`. Tests the negative failure mode — does the skill *manufacture* low-value findings to look thorough, or correctly conclude "nothing material"?
+
+**Result: PASS**, independently verified. The subagent scoped three concern areas (core logic, executable wiring, docs/consistency), successfully used nested subagent dispatch again, and — actually running `npm test` (4/4), the start script (`your-title-here`, matching the README example), and edge inputs — correctly concluded the project is **materially clean**, manufacturing nothing. It explicitly noted the only observations were non-defects consistent with the documented "a-z0-9 only" contract (`café`→`caf`), and did *not* inflate them into findings. Independently confirmed the fixture was left **unmodified** (nothing to fix) and the Wingman repo was untouched by it. It also correctly identified concurrent edits to *other* eval docs (from this same batch's parallel agents) as out-of-scope and left them alone rather than reverting — good scope discipline. With Run 1 (found all real issues + bonuses, zero false positives) and Run 2 (correctly found nothing on a clean project), the skill is shown not to over- or under-trigger.

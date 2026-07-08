@@ -28,7 +28,7 @@ Tests `plugins/wingman/commands/hotfix.md` behaviorally — given a real product
 
 ## Trust level
 
-`provisional` — passed one real run, single scenario (a pure logic bug with an unambiguous root cause). Has not yet been tested against a harder case — e.g. a bug requiring 2+ failed hypotheses before the right one (to check the "stop and question the architecture" escalation actually fires), or one spanning multiple files.
+`verified` — passed two differently-shaped runs: Run 1 (an unambiguous single-hypothesis logic bug) and Run 2 (a bug whose *obvious* hypothesis is wrong, requiring the investigation to reject it on evidence and reach a non-obvious cause before fixing). Both independently verified against real test output. Not yet tested against the 3+-failed-hypothesis "stop and question the architecture" escalation specifically — a possible third dimension, not required for `verified`.
 
 ## Run log
 
