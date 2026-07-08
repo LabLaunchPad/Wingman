@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "wingman",
+  "owner": {
+    "name": "LabLaunchPad"
+  },
+  "metadata": {
+    "description": "Wingman: an AI Boardroom that plans, builds, secures, and ships production-grade software for non-technical founders.",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "wingman",
+      "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
+      "source": "wingman",
+      "category": "productivity",
+      "tags": ["sdlc", "founders", "orchestration", "security", "plan-mode"]
+    }
+  ]
+}

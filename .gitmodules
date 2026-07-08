@@ -1,0 +1,48 @@
+[submodule "vendor/superpowers"]
+	path = vendor/superpowers
+	url = https://github.com/obra/superpowers.git
+[submodule "vendor/ecc"]
+	path = vendor/ecc
+	url = https://github.com/affaan-m/ECC.git
+[submodule "vendor/gstack"]
+	path = vendor/gstack
+	url = https://github.com/garrytan/gstack.git
+[submodule "vendor/gsd-plugin"]
+	path = vendor/gsd-plugin
+	url = https://github.com/jnuyens/gsd-plugin.git
+[submodule "vendor/claude-plugins-official"]
+	path = vendor/claude-plugins-official
+	url = https://github.com/anthropics/claude-plugins-official.git
+[submodule "vendor/wshobson-agents"]
+	path = vendor/wshobson-agents
+	url = https://github.com/wshobson/agents.git
+[submodule "vendor/claude-code-templates"]
+	path = vendor/claude-code-templates
+	url = https://github.com/davila7/claude-code-templates.git
+[submodule "vendor/awesome-claude-code-subagents"]
+	path = vendor/awesome-claude-code-subagents
+	url = https://github.com/VoltAgent/awesome-claude-code-subagents.git
+[submodule "vendor/taste-skill"]
+	path = vendor/taste-skill
+	url = https://github.com/Leonxlnx/taste-skill.git
+[submodule "vendor/andrej-karpathy-skills"]
+	path = vendor/andrej-karpathy-skills
+	url = https://github.com/multica-ai/andrej-karpathy-skills.git
+[submodule "vendor/jeffallan-claude-skills"]
+	path = vendor/jeffallan-claude-skills
+	url = https://github.com/jeffallan/claude-skills.git
+[submodule "vendor/addyosmani-agent-skills"]
+	path = vendor/addyosmani-agent-skills
+	url = https://github.com/addyosmani/agent-skills.git
+[submodule "vendor/caveman"]
+	path = vendor/caveman
+	url = https://github.com/JuliusBrussee/caveman.git
+[submodule "vendor/ui-ux-pro-max-skill"]
+	path = vendor/ui-ux-pro-max-skill
+	url = https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+[submodule "vendor/impeccable"]
+	path = vendor/impeccable
+	url = https://github.com/pbakaus/impeccable.git
+[submodule "vendor/ponytail"]
+	path = vendor/ponytail
+	url = https://github.com/DietrichGebert/ponytail.git

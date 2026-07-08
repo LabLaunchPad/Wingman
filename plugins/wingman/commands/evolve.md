@@ -1,0 +1,24 @@
+---
+description: Look for repeated friction across learnings, retros, and checkpoint history, and promote genuine 2+ occurrence patterns into a new command, skill, or specialist agent.
+argument-hint: ""
+---
+
+# Wingman: Evolve
+
+Wingman's pipeline is meant to get sharper the more it's used on a given project — but only from genuine, evidenced repetition, never speculatively. The actual mechanism (gathering signal, clustering, classifying, and — critically — where each promoted artifact gets written) lives in the `evolve-promotion` skill; this command is the entry point.
+
+$ARGUMENTS
+
+## Run the promotion mechanism
+
+Use the `evolve-promotion` skill now. It will:
+1. Gather signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`.
+2. Cluster genuine repeated friction (2+ occurrences required — a single occurrence is never enough).
+3. Classify each qualifying cluster as a candidate command, skill, or specialist agent.
+4. Present the proposals to you in plain language and get explicit approval via `AskUserQuestion` before creating anything.
+5. Write the approved artifact into **your own project** under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate) — never into Wingman's own plugin files, regardless of artifact type (see `docs/ARCHITECTURE.md` §6 for why).
+6. Record any promoted specialist in `.wingman/state.json`'s `active_specialists` array.
+
+## Keep it rare
+
+This is meant to run occasionally (after a handful of shipped features), not every session. If there isn't a genuine repeated pattern yet, say so plainly and don't force a promotion — see the skill's own Rationalizations and Red Flags sections for the specific excuses to watch for.
