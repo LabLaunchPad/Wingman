@@ -15,6 +15,23 @@ const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const errors = [];
 const warnings = [];
 
+// The only real hook events Claude Code's hooks system supports. A wrong
+// event name here fails silently at runtime -- the hook is just never
+// invoked, with no error anywhere -- so this is worth checking mechanically
+// rather than trusting it gets typed correctly. (Found the hard way: an
+// earlier version of hooks.json used "PermissionRequest", which isn't a
+// real event, and the plan-mode safety gate was silently inert because of
+// it until an unrelated audit caught it by accident.)
+const VALID_HOOK_EVENTS = new Set([
+  'SessionStart',
+  'SessionEnd',
+  'UserPromptSubmit',
+  'Stop',
+  'StopFailure',
+  'PreToolUse',
+  'PostToolUse',
+]);
+
 function parseFrontmatter(filePath) {
   const text = readFileSync(filePath, 'utf-8');
   const match = text.match(/^---\n([\s\S]*?)\n---/);
@@ -92,14 +109,27 @@ for (const relPath of plugin.skills || []) {
   }
 }
 
-// Hooks: plugin.json's hooks.file must exist and be valid JSON.
+// Hooks: plugin.json's hooks.file must exist, be valid JSON, and every
+// top-level key must be a real Claude Code hook event -- see
+// VALID_HOOK_EVENTS above for why this specific check exists.
 if (plugin.hooks?.file) {
   const fullPath = checkFile(plugin.hooks.file, 'hooks');
   if (fullPath) {
+    let hooksConfig;
     try {
-      JSON.parse(readFileSync(fullPath, 'utf-8'));
+      hooksConfig = JSON.parse(readFileSync(fullPath, 'utf-8'));
     } catch (e) {
       errors.push(`hooks file ${plugin.hooks.file}: not valid JSON (${e.message})`);
+    }
+    if (hooksConfig?.hooks && typeof hooksConfig.hooks === 'object') {
+      for (const eventName of Object.keys(hooksConfig.hooks)) {
+        if (!VALID_HOOK_EVENTS.has(eventName)) {
+          errors.push(
+            `hooks file ${plugin.hooks.file}: "${eventName}" is not a real Claude Code hook event ` +
+            `(valid events: ${[...VALID_HOOK_EVENTS].join(', ')}) -- this hook will never fire`
+          );
+        }
+      }
     }
   }
 }
