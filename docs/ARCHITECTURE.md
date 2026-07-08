@@ -119,7 +119,7 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 
 ## 9. Relationship to vendored reference repositories
 
-`vendor/` holds 16 upstream projects (all MIT or Apache-2.0, except `andrej-karpathy-skills` which has no LICENSE file and is treated as idea-only/describe-don't-quote) as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
+`vendor/` holds 16 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
 
 | Repo | What Wingman draws from it |
 |---|---|
@@ -134,7 +134,7 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 | `Leonxlnx/taste-skill`, `pbakaus/impeccable`, `nextlevelbuilder/ui-ux-pro-max-skill` | Merged into `skills/design-taste` — the countable-rule checklist discipline, the slop-vs-quality/accessibility category split, and a lightweight product-type reference table, respectively. Paid-API and browser-extension sub-skills from these repos explicitly excluded. |
 | `DietrichGebert/ponytail` | `skills/engineering-minimalism`'s decision ladder and "when NOT to be lazy" carve-out. |
 | `JuliusBrussee/caveman` | `skills/token-economy`, deliberately scoped to internal-only channels — never founder-facing output, which stays governed by `plain-language-checkpoint`. |
-| `multica-ai/andrej-karpathy-skills` | Assumption-surfacing and verifiable-success-criteria ideas folded into `skills/engineering-minimalism`, restated in Wingman's own words (no LICENSE file in this repo — not quoted). |
+| `multica-ai/andrej-karpathy-skills` | Assumption-surfacing and verifiable-success-criteria ideas folded into `skills/engineering-minimalism`, restated in Wingman's own words (MIT-declared, no standalone `LICENSE` file — not quoted regardless). |
 | `jeffallan/claude-skills` | The "description trap" finding (trigger conditions belong in the frontmatter `description`, not just the body) — enforced as a warning in `scripts/validate-structure.mjs`; the two-tier `SKILL.md`/`references/` split. |
 | `addyosmani/agent-skills` | The single most load-bearing pattern adopted: Skill(how)/Persona(who)/Command(when) with the hard rule "personas never call personas, only commands orchestrate" (`commands/boardroom.md`); the parallel-fan-out-then-merge-in-main-context pattern; the Rationalizations/Red-Flags/Verification triad now required in every Wingman skill. |
 

@@ -10,10 +10,15 @@ The agent population is deliberately **lazy, not exhaustive** — a fixed 5-seat
 
 ## Status
 
-This project is under active design and build-out. The plugin lives at `plugins/wingman/`, packaged as a Claude Code marketplace + plugin (`.claude-plugin/marketplace.json`). See `docs/ARCHITECTURE.md` for what's built versus planned.
+The pipeline is built and behaviorally tested, not just scaffolded: 13 commands (`plan`/`build`/`secure`/`ship` plus 9 adaptive commands including `audit`), 10 skills, and 5 fixed Boardroom seats. The plugin lives at `plugins/wingman/`, packaged as a Claude Code marketplace + plugin (`.claude-plugin/marketplace.json`).
+
+`evals/` holds a lightweight behavioral eval harness (not just structural validation) with 10 eval cases, including two full end-to-end pipeline runs against realistic projects. See `docs/PROJECT.md` for exact build/eval status and `docs/ARCHITECTURE.md` for what's built versus planned. This has all been verified in a sandboxed testing environment; it hasn't yet been run as a real installed plugin against a real project — see `docs/HUMAN-TODOS.md` for what that needs.
 
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — the hybrid Boardroom/department/specialist model and why it's shaped this way.
 - [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) — the full specialist candidate catalog, organized by department.
-- [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) — provenance for design patterns adapted from vendored reference repositories (once added).
+- [`docs/PROJECT.md`](docs/PROJECT.md) — current build/eval status, decisions log, and roadmap.
+- [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) — what's blocked on a human rather than more engineering (installing/dogfooding for real, publishing, demo content — see `docs/DEMO-CHECKLIST.md` for the demo-capture plan).
+- [`evals/README.md`](evals/README.md) — how the behavioral eval harness works and what's been verified.
+- [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) — provenance for design patterns adapted from vendored reference repositories.

@@ -21,7 +21,7 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `nextlevelbuilder/ui-ux-pro-max-skill` | MIT | `design-taste` — product-type reference table (condensed, not the full CSV database) |
 | `DietrichGebert/ponytail` | MIT | `engineering-minimalism` — decision ladder, "when NOT to be lazy" carve-out |
 | `JuliusBrussee/caveman` | MIT | `token-economy` — scoped to internal-only channels |
-| `multica-ai/andrej-karpathy-skills` | **No LICENSE file** — ideas restated in Wingman's own words only, never quoted | `engineering-minimalism` — assumption-surfacing, verifiable success criteria |
+| `multica-ai/andrej-karpathy-skills` | MIT (declared in `plugin.json`, `README.md`, and the `SKILL.md` frontmatter — no standalone `LICENSE` file, corrected 2026-07-08 from an earlier "no license" claim in this doc) | `engineering-minimalism` — assumption-surfacing, verifiable success criteria |
 | `jeffallan/claude-skills` | MIT | The "description trap" finding; two-tier `SKILL.md`/`references/` structure |
 | `addyosmani/agent-skills` | MIT (Addy Osmani) | Skill/Persona/Command model, "personas never call personas," parallel-fan-out-then-merge pattern, Rationalizations/Red-Flags/Verification triad |
 
@@ -45,7 +45,7 @@ Merged from three sources:
 Explicitly excluded: `ui-ux-pro-max-skill`'s `banner-design` sub-skill (requires a paid Gemini image-generation API) and `impeccable`'s browser extension / local live-overlay server (real running infrastructure) — neither fits a markdown-only Claude Code plugin.
 
 ### `plugins/wingman/skills/engineering-minimalism/SKILL.md`
-Primary source: `DietrichGebert/ponytail` (MIT, Copyright (c) 2026 DietrichGebert) — the decision ladder and "when NOT to be lazy" carve-out are drawn directly from that skill's structure. Secondary source: ideas publicly described by Andrej Karpathy and packaged in `multica-ai/andrej-karpathy-skills`. That repository has **no LICENSE file** — its content is not quoted; the assumption-surfacing and verifiable-success-criteria concepts are restated entirely in Wingman's own words.
+Primary source: `DietrichGebert/ponytail` (MIT, Copyright (c) 2026 DietrichGebert) — the decision ladder and "when NOT to be lazy" carve-out are drawn directly from that skill's structure. Secondary source: ideas publicly described by Andrej Karpathy and packaged in `multica-ai/andrej-karpathy-skills` (MIT — declared in that repo's `plugin.json`, `README.md`, and `SKILL.md` frontmatter, though it has no standalone `LICENSE` file; an earlier version of this document incorrectly stated it had no license at all). Its content is still not quoted regardless — the assumption-surfacing and verifiable-success-criteria concepts are restated entirely in Wingman's own words, which remains the right approach independent of the license correction.
 
 ### `plugins/wingman/skills/token-economy/SKILL.md`
 Concept adapted (not literal text) from `JuliusBrussee/caveman` (MIT, Copyright (c) 2026 Julius Brussee). Scope deliberately narrowed from upstream: caveman applies terseness broadly across an entire session; this skill applies it only to channels a founder will never read, and explicitly defers to `plain-language-checkpoint` on any conflict.
@@ -73,3 +73,6 @@ Original to Wingman. Structurally mirrors `commands/ship.md` (preflight/activati
 
 ### `plugins/wingman/commands/hotfix.md`
 Original to Wingman. Structurally mirrors `commands/secure.md`'s gate pattern (build a picture → gate on disposition → Boardroom checkpoint), and explicitly delegates its root-cause step to the existing `systematic-debugging` skill (from `obra/superpowers`) by phase name rather than re-describing debugging methodology.
+
+### `plugins/wingman/skills/systematic-auditing/SKILL.md` and `plugins/wingman/commands/audit.md`
+Original to Wingman, no vendor source — codified directly from this project's own build process after noticing that specific founder phrasing ("audit this," "evidence-driven," "test-driven") reliably triggered a multi-angle-parallel-review pattern that found real bugs a single review pass had repeatedly missed. Named in the same paired-skill style as `systematic-debugging` (from `obra/superpowers`) but shares no text or structure with it beyond that naming convention.

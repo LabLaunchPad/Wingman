@@ -9,8 +9,10 @@ DietrichGebert — see /ATTRIBUTIONS.md), with the decision ladder and
 "when NOT to be lazy" carve-out drawn directly from that skill. The
 assumption-surfacing and verifiable-success-criteria framing is inspired
 by ideas publicly described by Andrej Karpathy and packaged by
-multica-ai/andrej-karpathy-skills — that repo has no LICENSE file, so
-those ideas are restated here in Wingman's own words, not quoted.
+multica-ai/andrej-karpathy-skills (MIT, declared in that repo's
+plugin.json/README.md/SKILL.md frontmatter though it has no standalone
+LICENSE file) — those ideas are restated here in Wingman's own words,
+not quoted, which is the right approach regardless of license status.
 -->
 
 # Engineering Minimalism
