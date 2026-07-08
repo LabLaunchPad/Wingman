@@ -19,7 +19,8 @@
     "commands/harness.md",
     "commands/telemetry.md",
     "commands/launch.md",
-    "commands/hotfix.md"
+    "commands/hotfix.md",
+    "commands/audit.md"
   ],
   "agents": [
     "agents/boardroom-founder.md",
@@ -37,7 +38,8 @@
     "skills/engineering-minimalism",
     "skills/design-taste",
     "skills/department-lead-activation",
-    "skills/evolve-promotion"
+    "skills/evolve-promotion",
+    "skills/systematic-auditing"
   ],
   "hooks": {
     "file": "hooks/hooks.json"

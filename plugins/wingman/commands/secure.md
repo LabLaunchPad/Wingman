@@ -23,6 +23,8 @@ Look at what changed since the last checkpoint (or the whole project, if this is
 
 If this session has access to Claude Code's built-in `/security-review` capability, run it over the diff and fold its findings into this list rather than duplicating the work.
 
+If the founder has explicitly asked for deeper scrutiny than this standard checklist (e.g. "audit this thoroughly," "make sure this is production-grade"), use the `systematic-auditing` skill for this pass instead of just the list above.
+
 For every risk found, decide: **CLOSED** (mitigated, or a documented accepted risk) or **OPEN** (nothing done about it yet).
 
 ## The gate
@@ -30,7 +32,7 @@ For every risk found, decide: **CLOSED** (mitigated, or a documented accepted ri
 This stage does not pass with open risks. If anything is OPEN:
 
 1. Fix what can be fixed now (following the same test-then-implement discipline as `/wingman:build`).
-2. For anything that genuinely can't be fixed right now, present it to the founder in plain language via `AskUserQuestion`: what the risk is, what it would take to fix, and what accepting it as-is would mean for the business. Only the founder can accept a business risk — do not decide this on their behalf.
+2. For anything that genuinely can't be fixed right now, present it to the founder in plain language via `AskUserQuestion`: what the risk is, what it would take to fix, and what accepting it as-is would mean for the business. Only the founder can accept a business risk — do not decide this on their behalf. Once the founder decides, append a structured entry to `docs/wingman/founder-todos.md` in their project (create it if it doesn't exist yet, mirroring the `docs/wingman/retros.md` convention) — a one-line risk summary, what accepting it means, and the date — so this decision is scannable in one place instead of buried in a checkpoint's `founder_notes` field.
 3. Re-check until every risk is CLOSED (fixed or explicitly accepted).
 
 ## Boardroom checkpoint
