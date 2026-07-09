@@ -67,9 +67,11 @@ After presenting the summary, use `AskUserQuestion` to get an explicit decision 
 
 Record the decision so the calling stage command (`plan`/`build`/`secure`/`ship`) knows whether it's clear to continue.
 
+**If a decision genuinely can't be obtained in this turn** — `AskUserQuestion` isn't available in every environment (confirmed missing entirely in headless/print-mode sessions; a `ToolSearch` for it there returns no match), or the session simply ends before the founder answers — do not leave the checkpoint unrecorded and the plan file unmarked indefinitely. Proceed immediately to "Mark the plan file" and "Record the checkpoint" below using `still reviewing` / `"still_reviewing"` as the decision. A real, pending checkpoint that a later session or founder reply can update is strictly better than no record at all — the five seats already did real work reviewing this, and losing that because the last step of the turn couldn't complete is exactly the "did the work, skipped persisting it" failure mode this project has hit before. Once a real decision does arrive (this turn or a later one), replace the `still reviewing` marker/entry with the actual outcome rather than leaving both on file.
+
 ## Mark the plan file (only when the scope was a plan, not a diff)
 
-If step "What to review" resolved to a plan file, append this section to the end of that file, verbatim, after the founder's decision is known — this is what the `boardroom-checkpoint` hook checks before allowing `ExitPlanMode`, so it must be written even on a `DO NOT SHIP` or `GO WITH CHANGES` result, not just on approval:
+If step "What to review" resolved to a plan file, append this section to the end of that file, verbatim, once you have a decision — including the `still reviewing` fallback above if you couldn't get a real one this turn. This is what the `boardroom-checkpoint` hook checks before allowing `ExitPlanMode`, so it must be written even on a `DO NOT SHIP` or `GO WITH CHANGES` result, not just on approval, and it must never be left unwritten just because the founder hasn't answered yet:
 
 ```markdown
 ## Wingman Boardroom Checkpoint
@@ -80,7 +82,7 @@ Timestamp: <ISO 8601 timestamp>
 
 If this section already exists at the end of the file from a previous run, replace it rather than appending a second copy — the hook only looks at the most recent one. When the scope was a diff or content passed directly by the calling command instead of a plan file, this step does not apply (the hook only gates `ExitPlanMode`, which only fires for plans).
 
-## Record the checkpoint (always, regardless of scope)
+## Record the checkpoint (always, regardless of scope — and regardless of whether a decision was obtained; see the fallback in "Ask for the decision" above)
 
 Append one line to `.wingman/checkpoints.jsonl` at the project root with exactly this shape:
 
