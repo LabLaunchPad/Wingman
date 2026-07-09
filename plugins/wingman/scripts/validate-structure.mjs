@@ -59,6 +59,18 @@ function checkFile(relPath, label) {
   return fullPath;
 }
 
+// Claude Code's real plugin.json schema rejects a path string that doesn't
+// start with "./" (confirmed directly with `claude plugin validate` against
+// this repo -- it fails with a bare "Invalid input" and no further detail).
+// Node's path.join() silently tolerates the missing prefix, which is exactly
+// how this went unnoticed by checkFile() above until a real install was
+// attempted.
+function requireDotSlash(relPath, label) {
+  if (!relPath.startsWith('./')) {
+    errors.push(`${label} "${relPath}": path must start with "./" -- Claude Code's plugin.json schema rejects bare relative paths (confirmed via \`claude plugin validate\`)`);
+  }
+}
+
 const pluginJsonPath = join(pluginRoot, '.claude-plugin/plugin.json');
 if (!existsSync(pluginJsonPath)) {
   console.error('FATAL: .claude-plugin/plugin.json not found');
@@ -69,6 +81,7 @@ const plugin = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
 // Commands: require `description` in frontmatter.
 const seenCommandNames = new Set();
 for (const relPath of plugin.commands || []) {
+  requireDotSlash(relPath, 'command');
   const fullPath = checkFile(relPath, 'command');
   if (!fullPath) continue;
   const fm = parseFrontmatter(fullPath);
@@ -83,6 +96,7 @@ for (const relPath of plugin.commands || []) {
 // Agents: require `name` and `description`, and names must be globally unique.
 const seenAgentNames = new Set();
 for (const relPath of plugin.agents || []) {
+  requireDotSlash(relPath, 'agent');
   const fullPath = checkFile(relPath, 'agent');
   if (!fullPath) continue;
   const fm = parseFrontmatter(fullPath);
@@ -104,6 +118,7 @@ for (const relPath of plugin.agents || []) {
 // Skills: each declared path is a directory; require <dir>/SKILL.md with `name` and `description`.
 const seenSkillNames = new Set();
 for (const relPath of plugin.skills || []) {
+  requireDotSlash(relPath, 'skill');
   const skillMdRel = join(relPath, 'SKILL.md');
   const fullPath = checkFile(skillMdRel, 'skill');
   if (!fullPath) continue;
@@ -135,26 +150,34 @@ for (const relPath of plugin.skills || []) {
   }
 }
 
-// Hooks: plugin.json's hooks.file must exist, be valid JSON, and every
-// top-level key must be a real Claude Code hook event -- see
-// VALID_HOOK_EVENTS above for why this specific check exists.
-if (plugin.hooks?.file) {
-  const fullPath = checkFile(plugin.hooks.file, 'hooks');
-  if (fullPath) {
-    let hooksConfig;
-    try {
-      hooksConfig = JSON.parse(readFileSync(fullPath, 'utf-8'));
-    } catch (e) {
-      errors.push(`hooks file ${plugin.hooks.file}: not valid JSON (${e.message})`);
-    }
-    if (hooksConfig?.hooks && typeof hooksConfig.hooks === 'object') {
-      for (const eventName of Object.keys(hooksConfig.hooks)) {
-        if (!VALID_HOOK_EVENTS.has(eventName)) {
-          errors.push(
-            `hooks file ${plugin.hooks.file}: "${eventName}" is not a real Claude Code hook event ` +
-            `(valid events: ${[...VALID_HOOK_EVENTS].join(', ')}) -- this hook will never fire`
-          );
-        }
+// Hooks: `hooks/hooks.json` is auto-loaded by Claude Code purely by
+// convention -- it must NOT also be declared via plugin.json's `hooks`
+// field. Confirmed the hard way: a real `claude plugin install` of this
+// exact plugin failed outright with "Duplicate hooks file detected... the
+// standard hooks/hooks.json is loaded automatically, so manifest.hooks
+// should only reference additional hook files." So this check is inverted
+// from a naive reading of the schema: plugin.json declaring `hooks` at all
+// (when it just points at the conventional path) is the error, not its
+// absence.
+if (plugin.hooks) {
+  errors.push(`plugin.json declares "hooks": "${plugin.hooks}" -- hooks/hooks.json is auto-loaded by convention; an explicit manifest.hooks entry pointing at it makes the plugin fail to load entirely ("Duplicate hooks file detected")`);
+}
+const hooksFileRel = 'hooks/hooks.json';
+const hooksFullPath = join(pluginRoot, hooksFileRel);
+if (existsSync(hooksFullPath)) {
+  let hooksConfig;
+  try {
+    hooksConfig = JSON.parse(readFileSync(hooksFullPath, 'utf-8'));
+  } catch (e) {
+    errors.push(`hooks file ${hooksFileRel}: not valid JSON (${e.message})`);
+  }
+  if (hooksConfig?.hooks && typeof hooksConfig.hooks === 'object') {
+    for (const eventName of Object.keys(hooksConfig.hooks)) {
+      if (!VALID_HOOK_EVENTS.has(eventName)) {
+        errors.push(
+          `hooks file ${hooksFileRel}: "${eventName}" is not a real Claude Code hook event ` +
+          `(valid events: ${[...VALID_HOOK_EVENTS].join(', ')}) -- this hook will never fire`
+        );
       }
     }
   }
@@ -187,7 +210,7 @@ reportOrphans('commands', plugin.commands || [], 'command');
 reportOrphans('agents', plugin.agents || [], 'agent');
 reportOrphans('skills', plugin.skills || [], 'skill', true);
 
-console.log(`Checked ${(plugin.commands || []).length} commands, ${(plugin.agents || []).length} agents, ${(plugin.skills || []).length} skills, hooks: ${plugin.hooks?.file ?? 'none declared'}`);
+console.log(`Checked ${(plugin.commands || []).length} commands, ${(plugin.agents || []).length} agents, ${(plugin.skills || []).length} skills, hooks: ${existsSync(hooksFullPath) ? hooksFileRel + ' (auto-loaded)' : 'none found'}`);
 
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);

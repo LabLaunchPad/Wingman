@@ -8,40 +8,37 @@
   "license": "MIT",
   "keywords": ["sdlc", "founders", "boardroom", "plan-review", "security", "orchestration"],
   "commands": [
-    "commands/plan.md",
-    "commands/build.md",
-    "commands/secure.md",
-    "commands/ship.md",
-    "commands/boardroom.md",
-    "commands/retro.md",
-    "commands/learn.md",
-    "commands/evolve.md",
-    "commands/harness.md",
-    "commands/telemetry.md",
-    "commands/launch.md",
-    "commands/hotfix.md",
-    "commands/audit.md"
+    "./commands/plan.md",
+    "./commands/build.md",
+    "./commands/secure.md",
+    "./commands/ship.md",
+    "./commands/boardroom.md",
+    "./commands/retro.md",
+    "./commands/learn.md",
+    "./commands/evolve.md",
+    "./commands/harness.md",
+    "./commands/telemetry.md",
+    "./commands/launch.md",
+    "./commands/hotfix.md",
+    "./commands/audit.md"
   ],
   "agents": [
-    "agents/boardroom-founder.md",
-    "agents/boardroom-engineer.md",
-    "agents/boardroom-security.md",
-    "agents/boardroom-design.md",
-    "agents/boardroom-cost.md"
+    "./agents/boardroom-founder.md",
+    "./agents/boardroom-engineer.md",
+    "./agents/boardroom-security.md",
+    "./agents/boardroom-design.md",
+    "./agents/boardroom-cost.md"
   ],
   "skills": [
-    "skills/plain-language-checkpoint",
-    "skills/verification-before-completion",
-    "skills/writing-plans",
-    "skills/systematic-debugging",
-    "skills/token-economy",
-    "skills/engineering-minimalism",
-    "skills/design-taste",
-    "skills/department-lead-activation",
-    "skills/evolve-promotion",
-    "skills/systematic-auditing"
-  ],
-  "hooks": {
-    "file": "hooks/hooks.json"
-  }
+    "./skills/plain-language-checkpoint",
+    "./skills/verification-before-completion",
+    "./skills/writing-plans",
+    "./skills/systematic-debugging",
+    "./skills/token-economy",
+    "./skills/engineering-minimalism",
+    "./skills/design-taste",
+    "./skills/department-lead-activation",
+    "./skills/evolve-promotion",
+    "./skills/systematic-auditing"
+  ]
 }
