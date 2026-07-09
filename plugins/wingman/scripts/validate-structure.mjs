@@ -7,13 +7,19 @@
 // convention was adapted from). No dependencies beyond Node's stdlib, since
 // Node ships with Claude Code itself.
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const errors = [];
 const warnings = [];
+
+// Agents whose model tier is load-bearing, per docs/ARCHITECTURE.md §8:
+// the two highest-stakes reviewers (a wrong call is expensive) must run on
+// opus, not inherit. They silently drifted to `inherit` once and only an
+// audit caught it -- mechanizing keeps that from recurring.
+const OPUS_REQUIRED_AGENTS = new Set(['boardroom-engineer', 'boardroom-security']);
 
 // The only real hook events Claude Code's hooks system supports. A wrong
 // event name here fails silently at runtime -- the hook is just never
@@ -88,6 +94,10 @@ for (const relPath of plugin.agents || []) {
   if (fm?.name) {
     if (seenAgentNames.has(fm.name)) errors.push(`agent name collision: "${fm.name}" (${relPath})`);
     seenAgentNames.add(fm.name);
+    // Model-tier invariant (docs/ARCHITECTURE.md §8).
+    if (OPUS_REQUIRED_AGENTS.has(fm.name) && fm.model !== 'opus') {
+      errors.push(`agent ${relPath}: "${fm.name}" must be "model: opus" per ARCHITECTURE.md §8 (a wrong call from this seat is expensive), found "model: ${fm.model ?? 'unset'}"`);
+    }
   }
 }
 
@@ -102,6 +112,22 @@ for (const relPath of plugin.skills || []) {
   if (!fm || !fm.description) errors.push(`skill ${relPath}: missing required frontmatter field "description"`);
   if (fm?.description && !/use when|use for|use proactively|triggers/i.test(fm.description)) {
     warnings.push(`skill ${relPath}: description doesn't contain an explicit "Use when..." trigger clause`);
+  }
+  // Skill-anatomy: the self-detection triad this project requires of every
+  // skill (Rationalizations, Red Flags, Verification) is what makes a skill's
+  // own failure modes catchable. Missing sections is a warning, not an error,
+  // because a skill may legitimately use equivalent headings (e.g.
+  // systematic-debugging's "Iron Law" / "Common Rationalizations") -- but the
+  // concepts should all be present. Matched on concept, not exact heading.
+  const body = readFileSync(fullPath, 'utf-8');
+  for (const [concept, re] of [
+    ['Rationalizations', /rationaliz/i],
+    ['Red Flags', /red flag/i],
+    ['Verification', /\bverif/i],
+  ]) {
+    if (!re.test(body)) {
+      warnings.push(`skill ${relPath}: no "${concept}" content found — the self-detection triad (Rationalizations/Red Flags/Verification) is what makes a skill's own failure modes catchable; confirm an equivalent exists`);
+    }
   }
   if (fm?.name) {
     if (seenSkillNames.has(fm.name)) errors.push(`skill name collision: "${fm.name}" (${relPath})`);
@@ -133,6 +159,33 @@ if (plugin.hooks?.file) {
     }
   }
 }
+
+// Orphan detection: a file built on disk but never declared in plugin.json
+// is invisible to Claude Code at runtime -- it silently does nothing. The
+// "declared but missing" direction is already caught by checkFile above;
+// this catches the reverse ("built a command, forgot to register it").
+function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {
+  const declared = new Set(declaredPaths.map((p) => p.split('/').pop()));
+  let entries;
+  try {
+    entries = readdirSync(join(pluginRoot, dirRel));
+  } catch {
+    return; // dir doesn't exist -- nothing declared from it either, fine
+  }
+  for (const entry of entries) {
+    const full = join(pluginRoot, dirRel, entry);
+    if (isSkillDir) {
+      if (statSync(full).isDirectory() && !declared.has(entry)) {
+        errors.push(`${kind} "${entry}/" exists on disk but is not declared in plugin.json — it will never load`);
+      }
+    } else if (entry.endsWith('.md') && !declared.has(entry)) {
+      errors.push(`${kind} "${entry}" exists on disk but is not declared in plugin.json — it will never load`);
+    }
+  }
+}
+reportOrphans('commands', plugin.commands || [], 'command');
+reportOrphans('agents', plugin.agents || [], 'agent');
+reportOrphans('skills', plugin.skills || [], 'skill', true);
 
 console.log(`Checked ${(plugin.commands || []).length} commands, ${(plugin.agents || []).length} agents, ${(plugin.skills || []).length} skills, hooks: ${plugin.hooks?.file ?? 'none declared'}`);
 

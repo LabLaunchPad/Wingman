@@ -25,7 +25,7 @@ Additional checks: Case C's checkpoint file write is valid JSON, preserves both 
 
 ## Trust level
 
-`provisional` — passed one run testing all 4 points on the GO/GO_WITH_CHANGES/DO NOT SHIP spectrum, with a real file-write check on one of the two DO-NOT-SHIP shapes (mixed) but not the other (unanimous rejection, Case D) — that distinction is unlikely to matter mechanically (the rule is a simple "any NO_GO" predicate) but hasn't been separately confirmed against real file output.
+`verified` — passed two runs covering all four spectrum points analytically (GO / GO_WITH_CHANGES / DO NOT SHIP), plus real file-write verification of *both* `DO NOT SHIP` shapes: the mixed-`NO_GO` case (Run 1) and the unanimous-`NO_GO` case (Run 2), each independently checked against actual `.wingman/` file output, including the `next_stage`-pinned-not-advanced invariant and the fresh-`state.json` create path.
 
 ## Run log
 
@@ -37,4 +37,8 @@ Additional checks: Case C's checkpoint file write is valid JSON, preserves both 
 
 **Independent verification** (real filesystem, Case C): `.wingman/checkpoints.jsonl` created with one valid JSON line, `bottom_line: "DO NOT SHIP"`, both `NO_GO` summaries preserved verbatim, `next_stage: "build"` (same as `stage: "build"` — correctly pinned, not advanced). `.wingman/state.json` created fresh with `current_stage: "build"`, `active_department_leads: []`, `active_specialists: []` — matching the fixture having no prior state.
 
-Kept at `provisional` pending a real file-write check on the unanimous-rejection shape (Case D) too (see above).
+### Run 2 — 2026-07-08 (Case D real file-write)
+
+Completed the one shape Run 1 left unverified: the **unanimous-rejection** `DO NOT SHIP` (all 5 seats `NO_GO`), checked against real file output rather than only reasoned about. Against a fresh copy of the fixture, wrote the Case D checkpoint and independently verified: `.wingman/checkpoints.jsonl` is one valid JSON line with all five seats `NO_GO`, `bottom_line: "DO NOT SHIP"`, and — the invariant that matters — `next_stage: "build"` pinned to the reviewed stage, **not** advanced; `.wingman/state.json` created fresh with `current_stage: "build"` and empty rosters. Same bottom line and same `next_stage`-pinning behavior as the mixed-`NO_GO` Case C, confirming the rule is a pure "any `NO_GO`" predicate at the file-write level too, not just analytically.
+
+Both `DO NOT SHIP` shapes (mixed and unanimous) now have real file-write verification, alongside the analytical confirmation of all four spectrum points. Promoted to `verified`.

@@ -29,6 +29,8 @@ Dispatch all five boardroom seats **in parallel** (single message, multiple Task
 
 Each seat returns its own `## <SEAT> VERDICT` block as specified in its agent definition. Wait for all five before continuing.
 
+The dispatch prompt to each seat is an internal, agent-to-agent channel (no founder reads it), so apply the `token-economy` skill to it: pass the scope, the seat's lens, and the exact output contract — drop restated context the seat can already read for itself (file paths, prior tool output), and keep code, diffs, paths, and numbers verbatim. This is the single highest-volume internal channel in the whole pipeline (five dispatches per checkpoint, every checkpoint), so it's where terseness actually pays — but per `token-economy`'s own Verification note, never at the cost of a seat misunderstanding the scope; when in doubt, spend the words.
+
 ## Consolidate into one founder-facing summary
 
 Do not just concatenate the four reports — a founder should never have to read four separate verdicts to figure out what to do. Synthesize them into this exact structure:

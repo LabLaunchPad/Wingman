@@ -23,7 +23,7 @@ A hand-built trap fixture (not a `.sh` script — small enough to construct dire
 
 ## Trust level
 
-`provisional` — passed one real run, single scenario (a case where the lazy answer is wrong). Not yet tested against the inverse case (a claim that's actually true, to confirm the skill doesn't produce false negatives by being reflexively suspicious) or a scenario with no automated verification command available (forcing a manual-verification judgment call).
+`verified` — passed two differently-shaped runs: Run 1 (a "fixed" claim that actually regressed, correctly caught via real verification instead of a code-read judgment) and Run 2 (a claim that's actually true, correctly confirmed via real verification with no false negative), each independently re-checked against real command output. The skill keys on real evidence in both directions. Not yet tested against a scenario with no automated verification command available (a manual-verification judgment call) — a possible third dimension, not required for `verified`.
 
 ## Run log
 
@@ -35,3 +35,9 @@ A hand-built trap fixture (not a `.sh` script — small enough to construct dire
 - Cited real evidence: exact pass/fail counts and the specific assertion failure (`false !== true` on the normal-email case), matching exactly what an independent re-run showed.
 - Correctly answered "not ready to ship" — the more nuanced and accurate answer (not just "broken" or "fine," but specifically what broke and what didn't), consistent with the skill's "evidence before claims" bar applying to the *content* of the claim, not just whether to make one.
 - Did not fix the regression, per instructions — confirmed via the fixture's `git status` staying clean after the run.
+
+### Run 2 — 2026-07-08 (inverse case: a claim that's actually true)
+
+The complement of Run 1: a teammate claims a fix works and tests pass, and this time the claim is **genuinely true**. Tests the opposite failure mode — reflexively distrusting a correct claim (a false negative), or rubber-stamping without running. Fixture: `evals/fixtures/setup-verify-true-fixture.sh` (a correct `isValidEmail`, 4/4 tests genuinely passing).
+
+**Result: PASS**, independently re-verified (I re-ran `npm test` in the fixture myself: `# tests 4 / # pass 4 / # fail 0`). The subagent ran the real verification command rather than judging the diff by eye, observed the genuine 4/4 pass, and correctly answered "ready to ship" — neither rubber-stamping (it ran the command) nor producing a false negative (it trusted the real evidence, not a reflexive suspicion). Fixture unmodified; Wingman repo untouched. With Run 1 (a false claim correctly caught) and Run 2 (a true claim correctly confirmed) both passing, the skill is shown to key on real evidence in *both* directions.
