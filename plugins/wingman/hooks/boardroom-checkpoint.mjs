@@ -10,6 +10,14 @@
 // approve — so a founder never sees a raw plan/diff in place of a checkpoint,
 // even if some code path forgets to run the boardroom first.
 //
+// The checkpoint can be recorded in two places: the plan file on disk (where
+// /wingman:boardroom writes it) and/or the inline `plan` text ExitPlanMode
+// carries. Neither is guaranteed to echo the other, so the gate checks BOTH
+// and treats each as a self-contained checkpoint record — it opens only if
+// one of them is a fully approved "ship it" checkpoint, and denies otherwise.
+// (Checking only the inline text, as an earlier version did, falsely denied a
+// legitimate checkpoint that /wingman:boardroom had appended to the file.)
+//
 // Pattern adapted from gsd-plugin's secure-phase gate (blocks phase
 // advancement while threats_open > 0) and gstack's plan-ceo-review "EXIT
 // PLAN MODE GATE" (verifies the plan file ends with a required report
@@ -70,26 +78,63 @@ try {
 
 if (input.tool_name !== 'ExitPlanMode') process.exit(0);
 
-let planText = input.tool_input?.plan;
-if (!planText) {
-  const cwd = input.cwd || process.cwd();
-  const planFile = findMostRecentPlanFile(cwd);
-  if (planFile) {
-    try {
-      planText = readFileSync(planFile, 'utf-8');
-    } catch {
-      planText = '';
-    }
+// A checkpoint could live in either the inline plan text or the plan file (see
+// header). Gather every place one could have been recorded and evaluate each
+// independently — the marker, the "DO NOT SHIP" bottom line, and the founder's
+// decision are written together as one unit, so a source is only a valid
+// checkpoint if all three agree within that same source.
+const sources = [];
+const inlinePlan = input.tool_input?.plan;
+if (inlinePlan) sources.push(inlinePlan);
+const cwd = input.cwd || process.cwd();
+const planFile = findMostRecentPlanFile(cwd);
+if (planFile) {
+  try {
+    sources.push(readFileSync(planFile, 'utf-8'));
+  } catch {
+    // Unreadable plan file — just fall back to whatever other source exists.
   }
 }
 
-if (!planText) {
+if (sources.length === 0) {
   // No plan content to check (e.g. a trivial plan-mode exit outside
   // /wingman:plan's flow entirely). Don't block work Wingman never touched.
   allow();
 }
 
-if (!planText.includes(MARKER)) {
+// The founder's own decision, not just the Boardroom's bottom line, is the
+// actual gate per plan.md ("only once the boardroom checkpoint returns a
+// 'ship it' decision"). A GO / GO WITH CHANGES bottom line with no real
+// "ship it" yet (e.g. "still reviewing", used when AskUserQuestion couldn't
+// be reached in-turn -- see boardroom.md) must still block exit, so a valid
+// checkpoint requires: the marker present, no "DO NOT SHIP" bottom line, and
+// an explicit "ship it" founder decision -- all in the same source.
+function isApprovedCheckpoint(text) {
+  if (!text.includes(MARKER)) return false;
+  if (/Bottom line:\s*DO NOT SHIP/i.test(text)) return false;
+  const m = text.match(/Founder decision:\s*(.+)/i);
+  return !!(m && /^ship it\b/i.test(m[1].trim()));
+}
+
+const markedSources = sources.filter((t) => t.includes(MARKER));
+
+// Global veto: an explicit "DO NOT SHIP" in ANY checkpoint source blocks exit,
+// even if another (possibly stale) source looks approved. An explicit
+// rejection is the strongest signal there is, and the gate must fail safe on
+// it rather than let a leftover "ship it" elsewhere override it.
+if (markedSources.some((t) => /Bottom line:\s*DO NOT SHIP/i.test(t))) {
+  deny(
+    `Wingman: the Boardroom's last checkpoint on this plan was "DO NOT SHIP". ` +
+    `Address the concerns and re-run /wingman:boardroom before exiting plan mode.`
+  );
+}
+
+// Open only if some source is a fully approved "ship it" checkpoint.
+if (sources.some(isApprovedCheckpoint)) allow();
+
+// Not approved — a bare unmarked plan means the boardroom never ran; a marked
+// one means it ran but the founder hasn't said "ship it" yet.
+if (markedSources.length === 0) {
   deny(
     `Wingman: this plan hasn't been through a Boardroom checkpoint yet.\n` +
     `Run /wingman:boardroom before exiting plan mode, so the founder gets a ` +
@@ -97,27 +142,11 @@ if (!planText.includes(MARKER)) {
   );
 }
 
-if (/Bottom line:\s*DO NOT SHIP/i.test(planText)) {
-  deny(
-    `Wingman: the Boardroom's last checkpoint on this plan was "DO NOT SHIP". ` +
-    `Address the concerns and re-run /wingman:boardroom before exiting plan mode.`
-  );
-}
-
-// The founder's own decision, not just the Boardroom's bottom line, is the
-// actual gate per plan.md ("only once the boardroom checkpoint returns a
-// 'ship it' decision"). A GO / GO WITH CHANGES bottom line with no real
-// "ship it" yet (e.g. "still reviewing", used when AskUserQuestion couldn't
-// be reached in-turn -- see boardroom.md) must still block exit; the DO NOT
-// SHIP check above catches the bottom-line case but says nothing about
-// this one, so both are needed.
-const decisionMatch = planText.match(/Founder decision:\s*(.+)/i);
-if (!decisionMatch || !/^ship it\b/i.test(decisionMatch[1].trim())) {
-  deny(
-    `Wingman: the founder hasn't actually approved this plan yet ` +
-    `(recorded decision: "${decisionMatch ? decisionMatch[1].trim() : 'none found'}"). ` +
-    `Get an explicit "ship it" via /wingman:boardroom before exiting plan mode.`
-  );
-}
-
-allow();
+const decisionMatch = markedSources
+  .map((t) => t.match(/Founder decision:\s*(.+)/i))
+  .find(Boolean);
+deny(
+  `Wingman: the founder hasn't actually approved this plan yet ` +
+  `(recorded decision: "${decisionMatch ? decisionMatch[1].trim() : 'none found'}"). ` +
+  `Get an explicit "ship it" via /wingman:boardroom before exiting plan mode.`
+);
