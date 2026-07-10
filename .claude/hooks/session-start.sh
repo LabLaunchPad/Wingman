@@ -12,5 +12,5 @@ fi
 
 echo '{"async": true, "asyncTimeout": 300000}'
 
-cd "$CLAUDE_PROJECT_DIR"
+cd "${CLAUDE_PROJECT_DIR:-$PWD}"
 git submodule update --init --recursive

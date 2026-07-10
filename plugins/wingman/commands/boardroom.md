@@ -33,7 +33,7 @@ The dispatch prompt to each seat is an internal, agent-to-agent channel (no foun
 
 ## Consolidate into one founder-facing summary
 
-Do not just concatenate the four reports — a founder should never have to read four separate verdicts to figure out what to do. Synthesize them into this exact structure:
+Do not just concatenate the five reports — a founder should never have to read five separate verdicts to figure out what to do. Synthesize them into this exact structure:
 
 ```
 # Boardroom Checkpoint: <one-line description of what was reviewed>

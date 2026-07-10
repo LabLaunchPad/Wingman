@@ -45,7 +45,14 @@ function parseFrontmatter(filePath) {
   const fields = {};
   for (const line of match[1].split('\n')) {
     const fieldMatch = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
-    if (fieldMatch) fields[fieldMatch[1]] = fieldMatch[2].trim();
+    if (fieldMatch) {
+      // Strip a single layer of surrounding quotes so `model: "opus"` and
+      // `model: opus` parse identically — YAML treats them as the same value,
+      // but a naive capture keeps the quotes and would fail an exact-string
+      // check (e.g. the opus model-tier invariant) on the quoted form.
+      const raw = fieldMatch[2].trim();
+      fields[fieldMatch[1]] = raw.replace(/^(["'])(.*)\1$/, '$2');
+    }
   }
   return fields;
 }
