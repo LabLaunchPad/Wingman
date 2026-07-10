@@ -8,6 +8,17 @@ name: Claude
 # tailored to Wingman's node-validator toolchain and read-only git/gh — the
 # action itself performs any commit via the GitHub API, so local
 # add/commit/push (and destructive git) are deliberately not reachable.
+#
+# Also gated on the secret actually being present -- computed into the job's
+# HAS_ANTHROPIC_KEY env var below (env: CAN reference secrets) and read back
+# via env.* on the claude-code-action step's own `if:`. `secrets` is not a
+# valid context inside if: at all, job- or step-level (actionlint rejected
+# both direct attempts as an expression error before this env-var indirection
+# was found). Confirmed by a real failure on claude-code-review.yml (PR #9):
+# without this guard, the step runs anyway, gets partway into
+# claude-code-action's own git-auth step with no usable token, and fails with
+# a red X plus a stale "Claude Code is working…" comment -- not a graceful
+# no-op. This guard makes it skip cleanly instead.
 
 on:
   issue_comment:
@@ -44,6 +55,12 @@ jobs:
       )
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      # secrets are not a valid context inside if: (job- or step-level --
+      # actionlint confirmed both), so the presence check is computed here,
+      # where env: CAN reference secrets, and read back via env.* in the
+      # step's if: below, where env IS an allowed context.
+      HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     permissions:
       contents: write
       pull-requests: write
@@ -58,6 +75,7 @@ jobs:
           persist-credentials: false
 
       - name: Run Claude Code
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
         uses: anthropics/claude-code-action@4481e6d3c7bbb88db2a928ca3444c536f589c7c1 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
