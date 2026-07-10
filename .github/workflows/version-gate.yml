@@ -1,0 +1,69 @@
+name: Version gate
+
+# Fail a PR that changes shipped plugin content without bumping
+# plugins/wingman/.claude-plugin/plugin.json's "version". Without a bump,
+# `claude plugin update` silently no-ops on a directory-sourced plugin, so a
+# founder never receives the change — a real bug hit in PR #4. Pattern from
+# vendor/awesome-claude-code-subagents/.github/workflows/enforce-plugin-version-bump.yml,
+# simplified: Wingman is one plugin and its marketplace.json carries no version
+# field, so there's nothing to cross-sync — plugin.json is the single source.
+
+on:
+  pull_request:
+    paths:
+      - "plugins/wingman/commands/**"
+      - "plugins/wingman/agents/**"
+      - "plugins/wingman/skills/**"
+      - "plugins/wingman/hooks/**"
+      - "plugins/wingman/.claude-plugin/plugin.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  version-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Require a plugin.json version bump when shipped content changed
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          PLUGIN_JSON="plugins/wingman/.claude-plugin/plugin.json"
+
+          base="${BASE_SHA:-}"
+          if [ -z "${base}" ] || [ "${base}" = "0000000000000000000000000000000000000000" ]; then
+            base="$(git rev-list --max-parents=0 HEAD)"
+          fi
+          echo "Comparing HEAD against base ${base}"
+
+          extract_version() {
+            sed -n 's/.*"version":[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1
+          }
+
+          if ! git cat-file -e "${base}:${PLUGIN_JSON}" 2>/dev/null; then
+            echo "No plugin.json at base — new plugin, nothing to compare. OK."
+            exit 0
+          fi
+
+          old_version="$(git show "${base}:${PLUGIN_JSON}" | extract_version)"
+          new_version="$(extract_version < "${PLUGIN_JSON}")"
+          echo "plugin.json version: base=${old_version} head=${new_version}"
+
+          if [ "${old_version}" = "${new_version}" ]; then
+            echo "::error file=${PLUGIN_JSON}::Shipped plugin content changed but \"version\" was not bumped (still ${new_version}). Bump it so 'claude plugin update' actually applies the change."
+            exit 1
+          fi
+          echo "✓ version bumped ${old_version} → ${new_version}"

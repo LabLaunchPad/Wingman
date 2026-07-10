@@ -1,0 +1,28 @@
+name: Actionlint
+
+# Lint the workflow files themselves — a broken or unsafe workflow otherwise
+# ships silently. Pattern from vendor/gstack/.github/workflows/actionlint.yml.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      # actionlint is pinned by the maintainer's release tag (its own
+      # convention), matching gstack's precedent; first-party GitHub actions
+      # elsewhere in this repo are pinned to full commit SHAs.
+      - uses: rhysd/actionlint@v1.7.11

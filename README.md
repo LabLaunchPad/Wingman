@@ -1,6 +1,8 @@
 # Wingman
 
 [![Validate](https://github.com/LabLaunchPad/Wingman/actions/workflows/validate.yml/badge.svg)](https://github.com/LabLaunchPad/Wingman/actions/workflows/validate.yml)
+[![Install smoke](https://github.com/LabLaunchPad/Wingman/actions/workflows/install-smoke.yml/badge.svg)](https://github.com/LabLaunchPad/Wingman/actions/workflows/install-smoke.yml)
+[![Actionlint](https://github.com/LabLaunchPad/Wingman/actions/workflows/actionlint.yml/badge.svg)](https://github.com/LabLaunchPad/Wingman/actions/workflows/actionlint.yml)
 
 Wingman is a Claude Code plugin that gives non-technical founders a full AI SDLC — an AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.
 

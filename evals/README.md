@@ -8,9 +8,14 @@ Wingman's "code" is markdown prompts (commands, agents, skills). A structural va
 2. **Case** (`cases/*.md`) — documents the fixture used, the exact procedure for running the eval, the expected outcome per checkable item, and a **run log** of actual results from real executions — not just what's expected, but what actually happened, verified independently rather than trusted from the tested agent's own self-report.
 3. **Run** — spawn a fresh subagent (via the `Agent` tool) that reads only the skill/command under test and the fixture, deliberately not told the expected answer. Grade its actual output against the case's expectations by inspecting the real file tree/content afterward, never by trusting its self-report alone.
 
-## Why this isn't automated CI
+## How this splits between CI and manual grading
 
-Wingman has no build/test toolchain (see `CLAUDE.md`) and no budget for the kind of headless-agent-per-commit pipeline `addyosmani-agent-skills` and `wshobson-agents` run at their scale. Evals here are run manually, on demand — when a skill/command changes in a way that could affect its behavior, or when a skill hasn't been exercised yet at all. The run log in each case file is the record of when it was last actually verified, so staleness is visible rather than silently assumed away.
+The harness runs in two tiers, mirroring the gate/periodic split `gstack` uses (see `.github/workflows/`):
+
+- **Deterministic tier — every PR, no API key.** `node scripts/check-fixtures.mjs` (wired into `.github/workflows/validate.yml`) runs every `fixtures/setup-*.sh` into a throwaway dir and asserts it executes cleanly and produces a real git project. This catches a *broken fixture* on every PR, cheaply. `evals/run-headless.mjs --dry-run` additionally confirms every case references a fixture that exists.
+- **Behavioral tier — weekly + on-demand, needs `ANTHROPIC_API_KEY`.** `.github/workflows/evals.yml` (`schedule` + `workflow_dispatch`, never per-PR to control token cost) drives a subset of cases through `claude -p` headless via `evals/run-headless.mjs` and uploads the transcripts as an artifact. It **captures**, it does not **grade** — grading stays human/independent, because judging these behavioral cases reliably still needs a real check against the filesystem, not a self-report (this project's core discipline). With no key, the runner degrades to the dry-run integrity check above.
+
+So the *stochastic, model-in-the-loop* half is run on a schedule but graded by a human reading the run log; the *deterministic* half gates every PR. The run log in each case file remains the record of when a case was last actually graded, so staleness stays visible.
 
 ## Trust levels
 
