@@ -39,7 +39,13 @@ if (pluginJson && claudeMd) {
   const plugin = JSON.parse(pluginJson);
   for (const p of plugin.commands || []) {
     const name = p.split('/').pop().replace(/\.md$/, '');
-    if (!claudeMd.includes(name)) {
+    // Word-boundary match, not a bare substring: a substring test reports a
+    // command as "documented" whenever its name happens to sit inside some
+    // unrelated word, which would mask real drift (a false negative on the one
+    // thing this check exists to catch).
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const mentioned = new RegExp(`\\b${escaped}\\b`).test(claudeMd);
+    if (!mentioned) {
       warnings.push(`doc-drift: command "${name}" is declared in plugin.json but not mentioned in CLAUDE.md — confirm CLAUDE.md's command inventory hasn't drifted from what's built (this is how launch/hotfix went undocumented)`);
     }
   }
