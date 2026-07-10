@@ -104,4 +104,20 @@ if (/Bottom line:\s*DO NOT SHIP/i.test(planText)) {
   );
 }
 
+// The founder's own decision, not just the Boardroom's bottom line, is the
+// actual gate per plan.md ("only once the boardroom checkpoint returns a
+// 'ship it' decision"). A GO / GO WITH CHANGES bottom line with no real
+// "ship it" yet (e.g. "still reviewing", used when AskUserQuestion couldn't
+// be reached in-turn -- see boardroom.md) must still block exit; the DO NOT
+// SHIP check above catches the bottom-line case but says nothing about
+// this one, so both are needed.
+const decisionMatch = planText.match(/Founder decision:\s*(.+)/i);
+if (!decisionMatch || !/^ship it\b/i.test(decisionMatch[1].trim())) {
+  deny(
+    `Wingman: the founder hasn't actually approved this plan yet ` +
+    `(recorded decision: "${decisionMatch ? decisionMatch[1].trim() : 'none found'}"). ` +
+    `Get an explicit "ship it" via /wingman:boardroom before exiting plan mode.`
+  );
+}
+
 allow();

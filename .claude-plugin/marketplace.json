@@ -5,14 +5,13 @@
     "name": "LabLaunchPad"
   },
   "metadata": {
-    "description": "Wingman: an AI Boardroom that plans, builds, secures, and ships production-grade software for non-technical founders.",
-    "pluginRoot": "./plugins"
+    "description": "Wingman: an AI Boardroom that plans, builds, secures, and ships production-grade software for non-technical founders."
   },
   "plugins": [
     {
       "name": "wingman",
       "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
-      "source": "wingman",
+      "source": "./plugins/wingman",
       "category": "productivity",
       "tags": ["sdlc", "founders", "orchestration", "security", "plan-mode"]
     }
