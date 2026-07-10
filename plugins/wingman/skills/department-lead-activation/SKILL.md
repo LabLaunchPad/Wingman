@@ -43,17 +43,25 @@ At the start of `/wingman:plan` (checks Product, always), `/wingman:build` (chec
 
 **5. Do the actual delegated work this turn regardless of file-creation timing.** Whether the department-lead file was just created or already existed, dispatch to it via the Task tool using its `dept-<name>` agent type for this turn's work. Newly-created project-level agents under `.claude/agents/` are discovered the same way any other project subagent is — no plugin reload is needed, because this is a project-scoped file, not a plugin-scoped one.
 
+**6. After the department-lead check above, also check for a tech-stack or MCP skill signal.** This is a separate, smaller check using the same "real signal, then materialize" shape — not a new detection system:
+- Look for a real, concrete signal: a dependency in `package.json`/a Python requirements file/a lockfile, a `Dockerfile`, a `wrangler.toml`, or a real entry in the project's `.mcp.json` — against `references/skill-roster.md` in this skill (the runtime-shipped copy; `docs/SKILL-ROSTER.md` at the Wingman repo root is the human-facing source, kept in sync but never read at runtime since `docs/` doesn't ship).
+- If a genuine match is found AND no matching skill already exists in `.claude/skills/` in the founder's project, materialize *only that one* skill file there — same target-location convention this skill already uses for department leads (`.claude/`, never `plugins/wingman/`), using the roster row's "What it would teach" column as the skill's actual content, written narrowly (one skill, one tech, not a bundle).
+- This check runs at most once per matched signal per project — if the skill file already exists, leave it alone (same "don't regenerate or overwrite" rule as department leads, Core Workflow step 4).
+- Multiple genuine signals in the same run each materialize their own skill file — this isn't capped at one per turn, only at one file per already-covered signal.
+
 ## Constraints
 
 **MUST:**
 - Write department-lead files only to `.claude/agents/` in the founder's project, never into `plugins/wingman/`.
 - Check the activation signal before creating a file — never create a department lead "just in case."
 - Tell the founder in plain language when a new department lead is added.
+- Write tech-stack/MCP skill files only to `.claude/skills/` in the founder's project, never into `plugins/wingman/`, and only against a concrete signal from `references/skill-roster.md`.
 
 **MUST NOT:**
 - Recreate or overwrite an existing department-lead file.
 - Create all 8 department leads on the first run regardless of signals — this is the exact kitchen-sink anti-pattern `docs/ARCHITECTURE.md` and `docs/AGENT-ROSTER.md` warn against.
 - Infer the Growth department's activation from anything other than an explicit founder request.
+- Materialize every roster row in `skill-roster.md` "while we're at it" — same kitchen-sink anti-pattern, applied to skills instead of agents.
 
 ## Rationalizations
 
@@ -62,16 +70,18 @@ At the start of `/wingman:plan` (checks Product, always), `/wingman:build` (chec
 | "Might as well create all 8 now, saves checking later" | This is the literal kitchen-sink anti-pattern the whole hybrid model exists to avoid — see `docs/ARCHITECTURE.md` §2. |
 | "The signal is ambiguous, I'll create it to be safe" | An ambiguous signal is a reason to look closer or ask the founder, not a reason to default to "create." |
 | "It's just a file, no real cost to creating it early" | Every existing agent (project or plugin) has some context/discoverability cost, and an unused department lead is exactly the kind of scaffolding `engineering-minimalism` argues against. |
+| "The project uses React and Postgres, I'll materialize both roster skills now" | Only materialize what the CURRENT signal check actually matched this turn — a real dependency doesn't automatically mean a skill is needed yet if nothing has actually touched that surface. |
 
 ## Red Flags — Stop and Reconsider
 
 - You're about to write a `dept-*.md` file into `plugins/wingman/` instead of the founder's own `.claude/agents/`.
 - You're about to create a department lead without a true activation signal.
 - You're about to overwrite an existing department-lead file the founder may have customized.
+- You're about to materialize a tech-stack/MCP skill without a concrete signal in `package.json`/a lockfile/`.mcp.json` — a guess about "what this project will probably need" is not a signal.
 
 ## Verification
 
-Before creating a file, confirm: (1) the activation signal is actually true, with a concrete piece of evidence (a file found, a grep match, an explicit founder request) — not a guess; (2) the target path is under the founder's project's `.claude/agents/`, not under Wingman's plugin directory; (3) the file doesn't already exist. After creating it, re-read `.wingman/state.json` to confirm `active_department_leads` actually includes the new entry and nothing else was dropped.
+Before creating a file, confirm: (1) the activation signal is actually true, with a concrete piece of evidence (a file found, a grep match, an explicit founder request) — not a guess; (2) the target path is under the founder's project's `.claude/agents/` (or `.claude/skills/` for tech-stack materialization), not under Wingman's plugin directory; (3) the file doesn't already exist. After creating it, re-read `.wingman/state.json` to confirm `active_department_leads` actually includes the new entry and nothing else was dropped.
 
 ## Output
 

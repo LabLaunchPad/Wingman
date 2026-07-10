@@ -6,6 +6,7 @@ Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally 
 
 - **Positive case**: `evals/fixtures/setup-fetch-app.sh <target-dir>` — "Fetch," a hypothetical dog meal-plan subscription app with deliberate signals: a Next.js frontend (Design), a Prisma schema with migrations (Data), auth + Stripe billing code (Legal/Security), and a Dockerfile + CI config (DevOps). No prior ship record, no Growth-department request.
 - **Negative case**: `evals/fixtures/setup-minimal-cli.sh <target-dir>` — "linecount," a single-file Node CLI with none of the conditional signals: no frontend, no schema, no auth/payments, no CI/Dockerfile. Tests that the skill correctly creates *only* the two Always departments and doesn't over-trigger.
+- **Skill-materialization case** (Core Workflow step 6): `evals/fixtures/setup-skill-catalog-fixture.sh <target-dir>` — "single-signal-app," a minimal fixture with exactly one tech-stack catalog signal (`next` in `package.json` dependencies, matching only `nextjs-app-router` in `docs/SKILL-ROSTER.md`) and deliberately no other roster signal (no `react` dependency line, no schema/migrations, no Dockerfile, no `.mcp.json`) — isolates the "materialize exactly one, nothing else" check from the multi-signal noise the positive-case fixture would add.
 
 ## Procedure
 
@@ -40,9 +41,19 @@ Tests `plugins/wingman/skills/department-lead-activation/SKILL.md` behaviorally 
 | `dept-design.md`, `dept-data.md`, `dept-legal-security.md`, `dept-devops.md`, `dept-growth.md` created | **No, all of them** — none of their signals are present in this fixture; over-triggering here would indicate the skill defaults to "create when unsure" instead of requiring real evidence |
 | File location, frontmatter validity, orchestration rule | Same bar as the positive case |
 
+## Expectations — skill-materialization case (single-signal-app)
+
+| Check | Expected |
+|---|---|
+| `.claude/skills/nextjs-app-router/SKILL.md` created | Yes — `next` in `package.json` dependencies is a real, concrete signal |
+| Any other `.claude/skills/*` created | **No** — no other roster signal is present in this fixture; over-triggering here would indicate the skill materializes speculatively rather than off a real signal |
+| File location | Under `<fixture>/.claude/skills/`, never under the Wingman repo's own `plugins/wingman/` |
+| Content specificity | References this fixture's actual code (its `src/app/` structure), not generic catalog boilerplate copied verbatim from `skill-roster.md` |
+| Second run (same fixture, file already present) | No new file created, existing file not overwritten/duplicated — byte-identical before and after |
+
 ## Trust level
 
-`verified` — passed both the positive case (all 6 conditionally/always-active departments correctly created with evidence) and the negative case (only the 2 Always departments created, all 5 conditional departments correctly withheld with no false positives), each independently checked against the real file tree rather than the tested agent's self-report.
+`verified` — passed the positive case (all 6 conditionally/always-active departments correctly created with evidence), the negative case (only the 2 Always departments created, all 5 conditional departments correctly withheld with no false positives), and the skill-materialization case (exactly one narrowly-scoped skill file materialized off a real signal, nothing else, and correctly left alone on a second run) — each independently checked against the real file tree rather than the tested agent's self-report.
 
 ## Run log
 
@@ -81,3 +92,15 @@ A 2026-07-07 multi-expert audit found the skill never wrote to `.wingman/state.j
 }
 ```
 All 5 department-lead files present under `.claude/agents/` with zero unfilled placeholders, `active_specialists` survived the second write intact (the exact failure mode the fix targeted), `dept-devops.md` correctly absent, and `git status --porcelain -- plugins/wingman/` in the Wingman repo returned empty. Trust level remains `verified` — this run reconfirms it holds after the fix rather than re-establishing it from zero.
+
+### Run 4 — 2026-07-10 (skill-materialization case, v8 extension)
+
+Tests the new Core Workflow step 6 (tech-stack/MCP skill catalog check) added for the v8 "four-command extension" (see `docs/ARCHITECTURE.md` §12). Fresh subagent, given only `SKILL.md`, `references/skill-roster.md`, and the new `setup-skill-catalog-fixture.sh` fixture (not this eval document), asked to (1) simulate step 6 against the fixture, materializing any genuinely-signaled skill, and (2) immediately re-run the identical check against the same now-modified fixture.
+
+**Result: PASS on every expectation, independently re-verified against the real filesystem (not the subagent's self-report):**
+- First run: found exactly one real signal (`next` in `package.json` dependencies, cross-checked against every other roster row with none matching — no lockfile, no `Dockerfile`/`wrangler.toml`/`.mcp.json`, no `schema.prisma`/migrations), and materialized exactly one file, `.claude/skills/nextjs-app-router/SKILL.md`, under the fixture's own `.claude/`. Content is fixture-specific (names the project's actual `src/app/page.js`, App Router status derived from the real file tree), not generic roster text.
+- Independently confirmed via `find`: only that one file exists under `.claude/`. Independently confirmed via `git status --porcelain -- plugins/wingman/` in the Wingman repo: empty — nothing leaked into Wingman's own plugin directory.
+- Second run: correctly created no new file and did not touch the existing one — confirmed by comparing the file's md5sum before and after the second run (identical: `394a1cb9e1dba2fdacdd1f816c769379`), matching Core Workflow step 6's "this check runs at most once per matched signal per project" rule.
+- Judgment call flagged by the subagent, not a gap: step 6 doesn't specify a skill-file template the way step 3 points department leads at `references/template.md`; the subagent used the plugin's own skill files (frontmatter `name`/`description` + Overview/Core Workflow/Constraints/Verification shape) as the closest existing convention, and produced a well-formed, non-generic result — worth a template pointer in a future pass if this becomes a recurring point of variance, not a defect to fix now.
+
+Promoted to `verified` (see Trust level above) — third differently-shaped scenario now covered, all three independently checked against the real filesystem.

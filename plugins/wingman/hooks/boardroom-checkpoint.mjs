@@ -18,6 +18,15 @@
 // (Checking only the inline text, as an earlier version did, falsely denied a
 // legitimate checkpoint that /wingman:boardroom had appended to the file.)
 //
+// A single source can also contain MORE THAN ONE checkpoint marker over the
+// plan file's life -- plan.md's amendment mode (v8) appends new, unreviewed
+// content to the end of an already-approved plan, leaving the earlier
+// "ship it" checkpoint physically present but no longer current. Only the
+// LAST marker in each source is evaluated (an earlier version scanned the
+// whole source, so a stale approval anywhere in the file's history could
+// wrongly clear an unreviewed amendment -- found and fixed via the
+// drift.md eval's real hook test, not by inspection alone).
+//
 // Pattern adapted from gsd-plugin's secure-phase gate (blocks phase
 // advancement while threats_open > 0) and gstack's plan-ceo-review "EXIT
 // PLAN MODE GATE" (verifies required plan sections exist in the plan file
@@ -121,50 +130,90 @@ if (sources.length === 0) {
   allow();
 }
 
+// A plan file can accumulate more than one checkpoint marker over its life
+// -- plan.md's amendment mode (v8) appends new, unreviewed content to the
+// *end* of an already-approved plan, on top of an earlier "ship it"
+// checkpoint. That earlier checkpoint is still physically present, but it
+// no longer covers the file's current content, because the amendment text
+// that follows it was never reviewed. A checkpoint only counts as CURRENT
+// if nothing but its own 3 fields (Bottom line / Founder decision /
+// Timestamp) follows the marker -- i.e. it's genuinely the last thing in
+// the file, not just the last *marker*. (Before amendment mode existed, a
+// plan file only ever had one checkpoint section, always at the true end,
+// so this distinction never mattered -- it does now. Found and fixed via
+// the drift.md eval's real hook test, not by inspection alone: an earlier
+// version of this fix only looked at the last marker's fields without
+// checking whether trailing content followed it, and still wrongly allowed
+// exit on an unreviewed amendment.)
+function latestCheckpointStatus(text) {
+  const idx = text.lastIndexOf(MARKER);
+  if (idx === -1) return null;
+  const region = text.slice(idx);
+  const block = region.match(
+    /^## Wingman Boardroom Checkpoint[ \t]*\r?\n(?:.*\r?\n)*?Timestamp:[^\r\n]*\r?\n?/
+  );
+  // No recognizable Timestamp line means this isn't a well-formed, complete
+  // checkpoint block -- don't trust it as current either way.
+  const current = !!block && region.slice(block[0].length).trim().length === 0;
+  return { region, current };
+}
+
+const markedSources = sources.filter((t) => t.includes(MARKER));
+// Pair each source with its own checkpoint status so isApprovedCheckpoint can
+// judge a source's CURRENT-ness and its required-sections completeness
+// together, without losing which text a given status came from.
+const entries = sources
+  .map((text) => ({ text, status: latestCheckpointStatus(text) }))
+  .filter((e) => e.status);
+const currentEntries = entries.filter((e) => e.status.current);
+const currentStatuses = currentEntries.map((e) => e.status);
+
 // The founder's own decision, not just the Boardroom's bottom line, is the
 // actual gate per plan.md ("only once the boardroom checkpoint returns a
 // 'ship it' decision"). A GO / GO WITH CHANGES bottom line with no real
 // "ship it" yet (e.g. "still reviewing", used when AskUserQuestion couldn't
 // be reached in-turn -- see boardroom.md) must still block exit, so a valid
-// checkpoint requires: the marker present, no "DO NOT SHIP" bottom line, and
-// an explicit "ship it" founder decision -- all in the same source.
-function isApprovedCheckpoint(text) {
-  if (!text.includes(MARKER)) return false;
-  if (/Bottom line:\s*DO NOT SHIP/i.test(text)) return false;
-  const m = text.match(/Founder decision:\s*(.+)/i);
+// checkpoint requires: CURRENT (see above -- genuinely the last thing in its
+// source, not superseded by an unreviewed amendment), no "DO NOT SHIP" bottom
+// line, an explicit "ship it" founder decision, and (gstack's "EXIT PLAN MODE
+// GATE") a complete plan. Only an *approved* source is held to the
+// required-sections bar -- a bare plan text without the marker is simply "not
+// approved", not "missing sections", so a short inline summary can never
+// over-block a file-based checkpoint that has them.
+function isApprovedCheckpoint(text, status) {
+  if (!status || !status.current) return false;
+  if (/Bottom line:\s*DO NOT SHIP/i.test(status.region)) return false;
+  const m = status.region.match(/Founder decision:\s*(.+)/i);
   if (!(m && /^ship it\b/i.test(m[1].trim()))) return false;
-  // gstack "EXIT PLAN MODE GATE": an approved checkpoint must also be a
-  // complete plan. Only an *approved* source is held to this bar — a bare plan
-  // text without the marker is simply "not approved", not "missing sections",
-  // so a short inline summary can never over-block a file-based checkpoint.
   const missing = REQUIRED_PLAN_SECTIONS.filter((s) => !text.includes(s));
   if (missing.length > 0) return false;
   return true;
 }
 
-const markedSources = sources.filter((t) => t.includes(MARKER));
-
-// Global veto: an explicit "DO NOT SHIP" in ANY checkpoint source blocks exit,
+// Global veto: an explicit, CURRENT "DO NOT SHIP" in any source blocks exit,
 // even if another (possibly stale) source looks approved. An explicit
 // rejection is the strongest signal there is, and the gate must fail safe on
-// it rather than let a leftover "ship it" elsewhere override it.
-if (markedSources.some((t) => /Bottom line:\s*DO NOT SHIP/i.test(t))) {
+// it rather than let a leftover "ship it" elsewhere override it. Scoped to
+// CURRENT checkpoints only, so a plan that was rejected once, fixed, and
+// later re-approved via a fresh checkpoint isn't vetoed forever by its own
+// history.
+if (currentStatuses.some((s) => /Bottom line:\s*DO NOT SHIP/i.test(s.region))) {
   deny(
     `Wingman: the Boardroom's last checkpoint on this plan was "DO NOT SHIP". ` +
     `Address the concerns and re-run /wingman:boardroom before exiting plan mode.`
   );
 }
 
-// Open only if some source is a fully approved "ship it" checkpoint that also
-// satisfies gstack's required-sections gate. Each source is judged on its own
-// (per the header contract: the gate opens if ONE source is a valid approved
-// checkpoint), so a short inline summary without sections cannot veto a
-// file-based checkpoint that has them.
-if (sources.some(isApprovedCheckpoint)) allow();
+// Open only if some source is CURRENT and a fully approved "ship it"
+// checkpoint that also satisfies gstack's required-sections gate. Each
+// source is judged on its own (per the header contract: the gate opens if
+// ONE source is a valid approved checkpoint), so a short inline summary
+// without sections cannot veto a file-based checkpoint that has them.
+if (currentEntries.some((e) => isApprovedCheckpoint(e.text, e.status))) allow();
 
-// Not approved — a bare unmarked plan means the boardroom never ran; a marked
-// one means it ran but the founder hasn't said "ship it" yet.
+// Not approved. Three distinct reasons, each with its own message:
 if (markedSources.length === 0) {
+  // A bare unmarked plan means the boardroom never ran at all.
   deny(
     `Wingman: this plan hasn't been through a Boardroom checkpoint yet.\n` +
     `Run /wingman:boardroom before exiting plan mode, so the founder gets a ` +
@@ -172,17 +221,29 @@ if (markedSources.length === 0) {
   );
 }
 
-// Marked but not a valid approved checkpoint: either the founder hasn't said
-// "ship it" yet, or an approved-looking plan is missing required sections.
+if (currentEntries.length === 0) {
+  // Every checkpoint found is stale -- real content (e.g. a drift.md
+  // amendment) was appended after the last checkpoint ran, so no existing
+  // approval covers what's in the file now.
+  deny(
+    `Wingman: this plan has changed since its last Boardroom checkpoint ` +
+    `(new content was added after the checkpoint marker). Re-run ` +
+    `/wingman:boardroom on the new content before exiting plan mode.`
+  );
+}
+
+// A current checkpoint exists but isn't a valid approval: either the founder
+// hasn't said "ship it" yet, or an approved-looking plan is missing required
+// sections.
 const missing = [
   ...new Set(
-    markedSources.flatMap((t) =>
-      REQUIRED_PLAN_SECTIONS.filter((s) => !t.includes(s))
+    currentEntries.flatMap((e) =>
+      REQUIRED_PLAN_SECTIONS.filter((s) => !e.text.includes(s))
     )
   ),
 ];
-const decisionMatch = markedSources
-  .map((t) => t.match(/Founder decision:\s*(.+)/i))
+const decisionMatch = currentEntries
+  .map((e) => e.status.region.match(/Founder decision:\s*(.+)/i))
   .find(Boolean);
 if (missing.length > 0) {
   deny(

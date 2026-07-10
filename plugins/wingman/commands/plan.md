@@ -41,3 +41,18 @@ The plan file must end with a **Plain-Language Summary** section, written for th
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan` against the plan you just wrote. The founder approves or sends back changes through that plain-language checkpoint, not by reading the plan document itself (though it's always available if they ask to see it).
 
 Only once the boardroom checkpoint returns a "ship it" decision should you proceed to `/wingman:build`.
+
+## Amendment mode (alternate entry point — a plan already exists and needs a real change)
+
+Steps 1–4 above are for a fresh plan. Use this mode instead when `/wingman:drift` (or a direct founder ask) hands you a scope delta against an **already-approved, in-flight plan** — never start over from Step 1 and never rewrite the existing plan file.
+
+1. Append a dated section to the *end* of the existing plan file — do not touch anything above it. Plans are an append-only record, the same convention `LEARNINGS.md` and `docs/wingman/retros.md` already use:
+
+```markdown
+## Amendment: <YYYY-MM-DD>
+**What's changing:** <the new/changed scope, in plain language>
+**Why:** <the founder request or evidence that triggered this>
+```
+
+2. Enter plan mode (if not already in it) and run `/wingman:boardroom` against just this amendment (pass the amendment section as the scope, not the whole plan history) — use `/wingman:boardroom deep` instead if the founder or the evidence signals this delta needs deeper scrutiny (see `boardroom.md`'s deep-review mode).
+3. Same gate as Step 4 above: only a real "ship it" from that checkpoint clears the way to build the amended scope. Nothing about amendment mode weakens the gate — it's the identical mechanism, just scoped to a delta instead of a whole plan.

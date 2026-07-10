@@ -9,7 +9,12 @@ All Wingman state lives under `.wingman/` at the root of the founder's project (
 ```
 .wingman/
 ├── checkpoints.jsonl   # append-only log of every Boardroom checkpoint
-└── state.json          # current project-level state (small, overwritten in place)
+├── state.json          # current project-level state (small, overwritten in place)
+└── boardroom/          # only present after a deep-review checkpoint has run at least once
+    └── <checkpoint_id>/
+        ├── round-1/<seat>.md   # each seat's full round-1 verdict, verbatim
+        ├── round-2/<seat>.md   # each seat's round-2 verdict, after seeing round-1
+        └── round-3/<seat>.md   # only if the convergence check triggered a third round
 ```
 
 ### `checkpoints.jsonl`
@@ -31,7 +36,8 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
   "bottom_line": "GO_WITH_CHANGES",
   "founder_decision": "fix_concerns_first",
   "founder_notes": "",
-  "next_stage": "build"
+  "next_stage": "build",
+  "rounds": 1
 }
 ```
 
@@ -40,8 +46,9 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 - `stage`: one of `plan`, `build`, `secure`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation.
 - `scope_ref`: path to the plan file reviewed, or `"diff"` if the scope was a git diff rather than a plan file.
 - `seats[].verdict`: one of `GO`, `GO_WITH_CONCERNS`, `NO_GO` — matches each Boardroom agent's own output contract.
-- `bottom_line`: one of `GO`, `GO_WITH_CHANGES`, `DO NOT SHIP` — the consolidated result, per the gate rule in `docs/ARCHITECTURE.md` §4.
+- `bottom_line`: one of `GO`, `GO_WITH_CHANGES`, `DO NOT SHIP` — the consolidated result, per the gate rule in `docs/ARCHITECTURE.md` §4. One deliberate exception: `/wingman:drift`'s headless-session fallback writes `""` (empty string) here when it records a `still_reviewing` checkpoint with zero Boardroom seats dispatched — an honest "no review ran yet" rather than a fabricated `GO`-family value. Any consumer of this file should treat an empty `bottom_line` as pending, not as a pass.
 - `founder_decision`: one of `ship_it`, `fix_concerns_first`, `still_reviewing`.
+- `rounds`: how many Boardroom dispatch rounds produced this checkpoint. Defaults to `1` — true for every checkpoint written before deep-review mode existed, and for every ordinary (non-deep) `/wingman:boardroom` run today. Only a `/wingman:boardroom deep` run ever writes `2` or `3` (hard-capped); when it does, `.wingman/boardroom/<checkpoint_id>/round-*/<seat>.md` holds each round's full verdict text (see the directory tree above).
 
 This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
 

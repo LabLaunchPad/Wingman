@@ -1,6 +1,6 @@
 ---
-description: Run the AI Boardroom checkpoint on the current plan or diff and produce one plain-language go/no-go summary for a non-technical founder.
-argument-hint: "[plan|diff] [optional focus notes]"
+description: Run the AI Boardroom checkpoint on the current plan or diff and produce one plain-language go/no-go summary for a non-technical founder. Add "deep" as an argument, or ask to "really dig into this," "make sure everyone's questions get answered," or "have the team cross-check each other," for a deeper multi-round review where the five seats see and respond to each other's findings before the final verdict.
+argument-hint: "[plan|diff] [deep] [optional focus notes]"
 ---
 
 # Boardroom Checkpoint
@@ -30,6 +30,20 @@ Dispatch all five boardroom seats **in parallel** (single message, multiple Task
 Each seat returns its own `## <SEAT> VERDICT` block as specified in its agent definition. Wait for all five before continuing.
 
 The dispatch prompt to each seat is an internal, agent-to-agent channel (no founder reads it), so apply the `token-economy` skill to it: pass the scope, the seat's lens, and the exact output contract — drop restated context the seat can already read for itself (file paths, prior tool output), and keep code, diffs, paths, and numbers verbatim. This is the single highest-volume internal channel in the whole pipeline (five dispatches per checkpoint, every checkpoint), so it's where terseness actually pays — but per `token-economy`'s own Verification note, never at the cost of a seat misunderstanding the scope; when in doubt, spend the words.
+
+## Deep-review mode (optional — default path above is unchanged)
+
+If `$ARGUMENTS` contains `deep`, or the founder's own words signal they want more rigor than a standard pass ("really dig into this," "make sure everyone's questions get answered," "have the team cross-check each other," "I want them to challenge each other" — the same class of trigger `systematic-auditing` and `secure.md`'s deeper-scrutiny tie-in already use), run this instead of stopping after the single dispatch above. **If none of these signals are present, none of this section applies — the default single-round path is unmodified.**
+
+Compute `checkpoint_id` now, before round 1 dispatch, using the exact same format "Record the checkpoint" uses below (`<ISO-8601-timestamp-with-dashes>-<stage>`) — reuse this identical value for every round-file path in this section AND for the `checkpoint_id` field written to `checkpoints.jsonl` at the end. One checkpoint, one ID, referenced consistently throughout the run.
+
+**Round 1** is the exact dispatch already described above — same 5 seats, same scope, same verdict contract, nothing different. Once all five verdicts are in, persist each seat's full verdict text verbatim to `.wingman/boardroom/<checkpoint_id>/round-1/<seat>.md` (one file per seat; create the directories if needed). This is not a new capability — it's the same write action "Record the checkpoint" below already performs on `checkpoints.jsonl`/`state.json`, just one more file, at the same point in the flow. It does not require granting any seat a `Write` tool — the command itself, which already holds each seat's returned text in order to build the founder-facing summary, does the writing.
+
+**Round 2 (the meeting)**: re-dispatch all five seats one more time, in parallel, in a single message — still zero peer-to-peer contact, the command assembles every prompt. Give each seat: its own round-1 verdict, and the other four seats' round-1 verdicts as read-only reference text. Ask each seat to (a) name any question or conflict it has with another seat's specific finding, and (b) confirm or revise its own verdict in light of what it now sees. Persist each response to `.wingman/boardroom/<checkpoint_id>/round-2/<seat>.md`, same mechanism as round 1. Apply `token-economy` to this dispatch exactly as round 1's — it's a second instance of the same internal-channel pattern, not new content to invent.
+
+**Convergence check**: if round 2 changed any seat's bottom-line verdict (`GO`/`GO_WITH_CONCERNS`/`NO_GO`) in a way that could change the overall consolidation outcome below, run one more round using the identical round-2 mechanic (each seat now sees the latest round's verdicts) — **hard-capped at round 3**, do not loop further regardless of outcome. Otherwise, stop after round 2.
+
+Consolidate using the round from the last update to each seat's verdict (the *latest* real answer from each seat, not an average or a vote across rounds) and continue to the section below as normal, with one addition: the founder-facing summary gets one more line reporting how many rounds ran and whether any seat changed its mind, e.g. `_Reviewed across 2 rounds — Security revised its verdict after seeing Engineering's finding._` If only round 1 ran (deep mode wasn't triggered), omit this line entirely — it should never appear on a standard checkpoint.
 
 ## Consolidate into one founder-facing summary
 
@@ -101,9 +115,12 @@ Append one line to `.wingman/checkpoints.jsonl` at the project root with exactly
   "bottom_line": "GO | GO_WITH_CHANGES | DO NOT SHIP",
   "founder_decision": "ship_it | fix_concerns_first | still_reviewing",
   "founder_notes": "",
-  "next_stage": "<the stage this clears the way for>"
+  "next_stage": "<the stage this clears the way for>",
+  "rounds": 1
 }
 ```
+
+`rounds` defaults to `1` — the meaning for every checkpoint that exists today, including every one recorded before this field existed (a missing `rounds` field means the same thing as `rounds: 1`, so no backfill is needed). Only a deep-review run (see "Deep-review mode" above) ever writes a value greater than 1, matching however many rounds actually ran there (2 or 3).
 
 Create `.wingman/` and the file if they don't exist yet. This is a plain append (`>>`), never a rewrite — it's an audit log.
 
