@@ -1,0 +1,66 @@
+name: Install smoke
+
+# Real end-to-end install via the actual `claude` CLI — the one check that
+# would have caught the three install-breaking manifest bugs from PR #4 that
+# no structural validator could see. Pattern from
+# vendor/addyosmani-agent-skills/.github/workflows/test-plugin-install.yml,
+# plus the clean-box "no node_modules" assertion from
+# vendor/gsd-plugin/.github/workflows/install-smoke.yml (Wingman ships zero
+# npm deps, and this proves it stays that way). This is a required, blocking
+# check. No API key needed — validate/marketplace/install are local ops.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: "20"
+
+      - name: Install the Claude Code CLI (retry on transient network failure)
+        run: |
+          for attempt in 1 2 3; do
+            if npm install -g @anthropic-ai/claude-code; then exit 0; fi
+            echo "npm install attempt $attempt failed; retrying in $((attempt * 5))s..."
+            sleep $((attempt * 5))
+          done
+          echo "Could not install the Claude Code CLI after 3 attempts."
+          exit 1
+
+      - name: Validate marketplace + plugin manifests
+        run: claude plugin validate .
+
+      - name: Configure git to use HTTPS
+        run: git config --global url."https://github.com/".insteadOf "git@github.com:"
+
+      - name: Add the local marketplace
+        run: claude plugin marketplace add ./
+
+      - name: List marketplaces
+        run: claude plugin marketplace list
+
+      - name: Install the plugin
+        run: claude plugin install wingman@wingman --scope user
+
+      - name: Prove the plugin needs no npm dependencies
+        run: |
+          set -e
+          test ! -d node_modules || { echo "FAIL: node_modules was created — Wingman is supposed to be dependency-free"; ls -la node_modules; exit 1; }
+          echo "✓ no node_modules — plugin stays dependency-free"

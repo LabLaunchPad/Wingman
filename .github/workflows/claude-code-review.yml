@@ -1,0 +1,85 @@
+name: Claude Code Review
+
+# Auto-reviews PRs. Pattern from
+# vendor/wshobson-agents/.github/workflows/claude-code-review.yml. Gated to
+# non-draft, non-dependabot, SAME-REPO PRs only (head.repo == repository) so a
+# fork PR can never trigger a job holding a token — the load-bearing
+# fork-safety pattern. Read-only + inline-comment tools only; the review prompt
+# is scoped to Wingman's real invariants.
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  claude-review:
+    if: |
+      github.event.pull_request.draft == false &&
+      github.actor != 'dependabot[bot]' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@4481e6d3c7bbb88db2a928ca3444c536f589c7c1 # v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            You are reviewing a PR for Wingman — a Claude Code plugin (markdown
+            commands/agents/skills + dependency-free Node validators; no build,
+            no npm deps) that gives non-technical founders a full AI SDLC. Read
+            `CLAUDE.md` and `docs/ARCHITECTURE.md` before starting.
+
+            ## Review checklist (flag only real issues)
+
+            1. **Mechanical validators** — would this break
+               `node plugins/wingman/scripts/validate-structure.mjs`,
+               `node scripts/check-repo-consistency.mjs`, or
+               `node scripts/check-fixtures.mjs`? Run them if unsure.
+            2. **Manifest integrity** — `plugin.json` must declare every new
+               command/agent/skill with a `./` prefix, must NOT declare a
+               `hooks` field (hooks/hooks.json auto-loads), and shipped content
+               changes require a `plugin.json` `version` bump (else
+               `claude plugin update` no-ops). `boardroom-engineer` and
+               `boardroom-security` must be `model: opus`.
+            3. **The "docs/ isn't installed" bug class** — repo-root `docs/`
+               does NOT ship with the plugin. Flag any shipped skill/agent
+               template under `plugins/wingman/` that depends on a `docs/*`
+               path for runtime/operational use (citations are fine; a
+               dependency is not).
+            4. **Founder-facing tone** — any checkpoint/verdict/status output
+               must meet the `plain-language-checkpoint` bar (no unexplained
+               jargon, lead with consequence). Internal-only channels are
+               governed by `token-economy` instead.
+            5. **Security / CI hygiene** — no secrets in code or workflows; no
+               destructive git in scripts; new workflows must pin action SHAs
+               and set `persist-credentials: false` (match
+               `.github/workflows/validate.yml`); the safety-gate hook
+               (`boardroom-checkpoint.mjs`) must stay fail-safe.
+
+            ## Output rules
+            - Inline comments (`mcp__github_inline_comment__create_inline_comment`)
+              for line-specific issues; one short summary (≤ 10 lines) via
+              `gh pr comment` at the end.
+            - If nothing critical, post a single ✅ one-liner and stop.
+            - Be concise: one sentence per finding, prefer diff suggestions.
+            - Don't nitpick prose/formatting; don't re-raise points already in
+              the PR's existing comments (read them first).
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(node:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api repos/*/pulls/*/comments:*)"
