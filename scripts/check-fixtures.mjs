@@ -43,6 +43,18 @@ for (const f of fixtures) {
     execFileSync('bash', [script, target], {
       stdio: 'pipe',
       timeout: 60_000,
+      // Fixtures git-init and commit but don't set a local identity — they
+      // were only ever exercised in environments with an ambient global git
+      // config, which a fresh CI runner doesn't have ("empty ident name").
+      // Inject one here so this check is hermetic instead of depending on
+      // whatever happens to be configured on the machine running it.
+      env: {
+        ...process.env,
+        GIT_AUTHOR_NAME: 'Wingman Fixture Check',
+        GIT_AUTHOR_EMAIL: 'fixture-check@wingman.local',
+        GIT_COMMITTER_NAME: 'Wingman Fixture Check',
+        GIT_COMMITTER_EMAIL: 'fixture-check@wingman.local',
+      },
     });
     // A fixture must produce a real, non-empty git project.
     const entries = readdirSync(target);
