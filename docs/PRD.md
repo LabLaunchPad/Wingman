@@ -31,16 +31,22 @@ Five fixed seats — founder, engineer, security, design, cost — dispatched in
 `/wingman:plan` → `/wingman:build` → `/wingman:secure` → `/wingman:ship`, each ending in a Boardroom checkpoint before advancing.
 
 ### Adaptive commands (built)
-`/wingman:retro`, `/wingman:learn`, `/wingman:evolve`, `/wingman:harness`, `/wingman:telemetry` — invoked as needed, not part of the fixed pipeline.
+`/wingman:retro`, `/wingman:learn`, `/wingman:evolve`, `/wingman:harness`, `/wingman:telemetry`, `/wingman:launch`, `/wingman:hotfix`, `/wingman:audit`, `/wingman:drift`, `/wingman:agents` — invoked as needed, not part of the fixed pipeline. `/wingman:boardroom` also has an opt-in deep-review mode (a second, cross-informed review round) — its default single-round path is unchanged.
 
-### Department leads (planned, v2)
+### Department leads (built, v2)
 One build-time worker subagent per corporate department (Product, Design, Engineering, Data, QA, Legal/Security, DevOps, Growth), created lazily per-project only when that department's activation signal is true. None exist at fresh install. See `docs/ARCHITECTURE.md` §5.
 
-### Specialists (planned, evolve-gated)
-The 56-role candidate catalog in `docs/AGENT-ROSTER.md`. Only created by `/wingman:evolve` after repeated, evidenced friction on a real project. Never bulk-created.
+### Specialists (mechanism built, v3 — individual specialists remain lazy)
+The 56-role candidate catalog in `docs/AGENT-ROSTER.md`. `/wingman:evolve`'s promotion mechanism is built and verified; no individual specialist exists until one is actually promoted, on repeated, evidenced friction on a real project. Never bulk-created.
+
+### Tech-stack/MCP skill catalog (built, v8)
+`docs/SKILL-ROSTER.md` — the same lazy-materialization discipline as department leads and specialists, applied to tech-stack- and MCP-integration-specific skills instead of agents. A real signal (a `package.json`/lockfile dependency, `Dockerfile`, or `.mcp.json` entry) materializes exactly one narrowly-scoped skill into the founder's own project; nothing is bulk-shipped. See `docs/ARCHITECTURE.md` §12.
+
+### Mid-flight scope drift (built, v8)
+`/wingman:drift` routes a founder's new ask, or real evidence surfacing mid-build, back through a real Boardroom checkpoint instead of letting it get silently folded into whatever's already being built — gated mechanically in both interactive and headless sessions. See `docs/ARCHITECTURE.md` §12.
 
 ### Quality-discipline skills (built)
-`verification-before-completion`, `writing-plans`, `systematic-debugging` (adapted from `obra/superpowers`), `design-taste`, `engineering-minimalism`, `token-economy` (synthesized from vendor research — see `docs/ARCHITECTURE.md` §9), and `plain-language-checkpoint` (Wingman's own writing-quality bar for anything founder-facing).
+`verification-before-completion`, `writing-plans`, `systematic-debugging` (adapted from `obra/superpowers`), `systematic-auditing` (paired with `systematic-debugging`, codifying this project's own multi-angle-parallel-review pattern), `design-taste`, `engineering-minimalism`, `token-economy` (synthesized from vendor research — see `docs/ARCHITECTURE.md` §9), and `plain-language-checkpoint` (Wingman's own writing-quality bar for anything founder-facing).
 
 ## Success criteria
 
@@ -50,11 +56,14 @@ Wingman succeeds if a founder can, without ever reading a diff:
 3. Get an explicit, understandable answer to "is this safe" before every ship.
 4. Never be surprised by a cost, a security issue, or a UX problem that a reviewer should have caught.
 
-## Out of scope for v1
+## Out of scope for v1 (historical — see "Key features" above for what's since been built)
 
-- Department leads and specialists (see Non-goals) — v1 pipeline commands do this work inline.
-- The bundled MCP state-store server — planned, spec'd in `docs/DATABASE.md`, not yet built as of this writing.
-- `/wingman:launch` and `/wingman:hotfix` — named in `docs/ARCHITECTURE.md`'s open items, not yet built.
+- Department leads and specialists (see Non-goals) — v1 pipeline commands did this work inline; both are now built (v2/v3), lazily-activated per project as originally intended.
+- `/wingman:launch` and `/wingman:hotfix` — named in `docs/ARCHITECTURE.md`'s open items at v1; both are now built (v3.1).
+
+## Still out of scope
+
+- The bundled MCP state-store server — planned, spec'd in `docs/DATABASE.md`, deliberately deferred until a real project generates the friction that would justify it (see that document's "Why no server yet").
 
 ## Open questions
 
