@@ -663,3 +663,29 @@ describe('Gap Skill Structure — incident-response', () => {
     assert.match(text, /##\s*Verification/i);
   });
 });
+
+// ============================================================================
+// Gap G12 — cross-cutting reference docs (secrets policy + persona library)
+// ============================================================================
+
+describe('Gap G12 — cross-cutting reference docs', () => {
+  const refsDir = path.join(process.cwd(), 'plugins', 'wingman', 'references');
+  const secretsPath = path.join(refsDir, 'secrets-policy.md');
+  const personaPath = path.join(refsDir, 'persona-template.md');
+
+  it('references/secrets-policy.md exists with key sections', () => {
+    assert.ok(fs.existsSync(secretsPath), `missing ${secretsPath}`);
+    const text = fs.readFileSync(secretsPath, 'utf-8');
+    assert.match(text, /##\s*Handling/i, 'needs a Handling section');
+    assert.match(text, /secret-guard|secret-scanner/i, 'should reference the secret hooks');
+  });
+
+  it('references/persona-template.md exists with a copy-paste scaffold', () => {
+    assert.ok(fs.existsSync(personaPath), `missing ${personaPath}`);
+    const text = fs.readFileSync(personaPath, 'utf-8');
+    assert.match(text, /Rationalizations/i);
+    assert.match(text, /Red Flags/i);
+    assert.match(text, /Verification/i);
+    assert.match(text, /Use when/i, 'scaffold should include the Use-when trigger');
+  });
+});
