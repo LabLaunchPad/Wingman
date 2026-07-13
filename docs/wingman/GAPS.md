@@ -37,7 +37,7 @@ Schema per row:
 | G8 | commands | /wingman:advisory orchestrator | P0 | shipped (Batch 1) |
 | G9 | skills | code review | P1 | shipped (Batch 3) |
 | G10 | skills | simplify / refactor | P1 | shipped (Batch 4) |
-| G11 | skills/commands | incident response | P1 | proposed |
+| G11 | skills/commands | incident response | P1 | shipped (Batch 5) |
 | G12 | cross-cutting | secrets management + C-level persona library | P2 | proposed |
 
 ## Detailed specs
@@ -138,7 +138,7 @@ Schema per row:
 ### G11 — incident response (`skill` + `command`, proposed)
 - **source**: ops gap; founders need a runbook when prod breaks.
 - **founder-value**: a calm, ordered response instead of panic.
-- **type**: skill `incident-response` + command `incident.md`. **priority**: P1. **status**: proposed.
+- **type**: skill `incident-response` + command `incident.md`. **priority**: P1. **status**: shipped (Batch 5).
 
 ### G12 — secrets management + C-level persona library (`cross-cutting`, proposed)
 - **source**: gap analysis; no documented secret-handling policy and no reusable persona scaffolding.

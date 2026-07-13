@@ -172,14 +172,14 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 32 skills', () => {
+  it('should have 33 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 32);
+    assert.strictEqual(plugin.skills.length, 33);
   });
 
-  it('should have 18 commands', () => {
+  it('should have 19 commands', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.commands.length, 18);
+    assert.strictEqual(plugin.commands.length, 19);
   });
 
   it('should have 5 agents', () => {
@@ -212,6 +212,7 @@ describe('Plugin.json Structure', () => {
       'founder-cro',
       'code-review',
       'simplify',
+      'incident-response',
     ];
     
     for (const skill of requiredSkills) {
@@ -230,6 +231,7 @@ describe('Plugin.json Structure', () => {
       'debt-ledger',
       'research',
       'advisory',
+      'incident',
     ];
     
     for (const cmd of requiredCommands) {
@@ -605,6 +607,52 @@ describe('Gap Skill Structure — simplify', () => {
       if (m) fields[m[1]] = m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
     }
     assert.strictEqual(fields.name, 'simplify');
+    assert.match(fields.description, /use when/i, 'description needs a "Use when..." trigger');
+  });
+
+  it('has the self-detection triad (Rationalizations / Red Flags / Verification)', () => {
+    const text = fs.readFileSync(skillPath, 'utf-8');
+    assert.match(text, /##\s*Rationalizations/i);
+    assert.match(text, /##\s*Red Flags/i);
+    assert.match(text, /##\s*Verification/i);
+  });
+});
+
+// ============================================================================
+// New Gap Skill + Command — incident-response (gap G11)
+// ============================================================================
+
+describe('Gap Skill Structure — incident-response', () => {
+  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'incident-response', 'SKILL.md');
+  const cmdPath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'incident.md');
+
+  it('SKILL.md exists', () => {
+    assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);
+  });
+
+  it('command incident.md exists and has a description', () => {
+    assert.ok(fs.existsSync(cmdPath), `missing ${cmdPath}`);
+    const text = fs.readFileSync(cmdPath, 'utf-8');
+    const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    assert.ok(fm, 'no frontmatter block');
+    const fields = {};
+    for (const line of fm[1].split(/\r?\n/)) {
+      const m = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
+      if (m) fields[m[1]] = m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
+    }
+    assert.ok(fields.description, 'incident.md missing description frontmatter');
+  });
+
+  it('frontmatter has matching name + Use-when description', () => {
+    const text = fs.readFileSync(skillPath, 'utf-8');
+    const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    assert.ok(fm, 'no frontmatter block');
+    const fields = {};
+    for (const line of fm[1].split(/\r?\n/)) {
+      const m = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
+      if (m) fields[m[1]] = m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
+    }
+    assert.strictEqual(fields.name, 'incident-response');
     assert.match(fields.description, /use when/i, 'description needs a "Use when..." trigger');
   });
 
