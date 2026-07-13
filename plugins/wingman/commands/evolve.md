@@ -22,3 +22,9 @@ Use the `evolve-promotion` skill now. It will:
 ## Keep it rare
 
 This is meant to run occasionally (after a handful of shipped features), not every session. If there isn't a genuine repeated pattern yet, say so plainly and don't force a promotion — see the skill's own Rationalizations and Red Flags sections for the specific excuses to watch for.
+
+## References
+
+- `references/orchestration-patterns.md` — the endorsed multi-agent patterns (and anti-patterns) this promotion decision should respect.
+- `skills/evidence-gated-catalog` — a new pattern only earns a catalog entry once it has evidence behind it.
+- `skills/doc-index` — any promoted artifact that becomes documentation must stay discoverable; wire it into an owner and attribute it.

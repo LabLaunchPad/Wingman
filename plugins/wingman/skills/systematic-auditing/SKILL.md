@@ -63,3 +63,54 @@ After the audit, re-read every file you changed as a fix, and re-run any command
 ## Output
 
 No fixed founder-facing template — this is an internal engineering-discipline skill, not itself a checkpoint. Findings that need founder attention (an accepted-risk decision, a business tradeoff) still route through `plain-language-checkpoint` and, where the finding is a project-level business risk rather than an engineering one, the `docs/wingman/founder-todos.md` convention.
+
+## Continuous Execution
+
+**Principle:** Once you begin executing a workflow, maintain momentum through to completion. The workflow should run as a cohesive unit, not a series of start-stop-check cycles.
+
+### Rules
+
+1. Don't pause to announce what you're about to do — just do it
+2. Don't stop to summarize intermediate progress unless specifically asked
+3. If you hit a blocker, document it and work around it, don't stop
+4. Complete the full workflow before returning to the user
+5. Batch related operations rather than doing them one at a time
+
+### Anti-Patterns
+
+- "Let me check if this is working so far..." → just keep going
+- "Now I'll move on to..." → just move on
+- "Before I continue..." → continue
+- Stopping to explain each step as you go
+
+### Exception
+
+Only pause if you encounter a genuine decision point that requires user input, or if the session health hook warns about context limits.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "Tests are green, no need to audit further" | Tests prove code correctness, not configuration or wiring. A real example from this project: 100% passing tests coexisted with an entire safety-gate hook being silently inert. |
+| "One thorough reviewer is enough" | A single reviewer's blind spots are exactly what a second, differently-scoped reviewer exists to catch — that's the whole mechanism, not redundancy. |
+| "The subagent said PASS, that's good enough" | Self-reports aren't evidence — see `verification-before-completion`. Every finding needs independent confirmation. |
+| "We already ran an audit last week" | A prior audit only covers the concerns it was scoped to. New code, new config, or new integration surfaces need their own pass. |
+| "I'll skip the independent verification, the subagent seems reliable" | Subagent self-reports are the *least* trustworthy evidence. Verify against the real filesystem or a real execution. |
+| "The audit is taking too long, I'll wrap up early" | An incomplete audit creates the appearance of rigor without the substance — strictly worse than not auditing at all. |
+
+### Red Flags
+
+- You're about to audit with a single broad "review everything" pass instead of scoped, parallel, narrow ones.
+- You're about to report a finding without having independently checked it yourself.
+- You're producing a findings list with no plan to fix or track any of it.
+- You're re-running the same check a second time and calling it "more auditing."
+- You're skipping a check because "it probably still holds" rather than because it's actually out of scope.
+- You're trusting a subagent's self-report without verifying it against the real filesystem.
+
+### Anti-Pattern Callouts
+
+- **Verification theater:** Dispatching subagents but not independently checking their findings. The audit's value is in the cross-check, not in the dispatch.
+- **Same-angle redundancy:** Running two subagents on the same concern from the same angle. That's duplicate cost, not additional rigor.
+- **Findings-without-action:** Producing a list of problems and not fixing or tracking any of it. This is strictly worse than not auditing — it creates the appearance of rigor.

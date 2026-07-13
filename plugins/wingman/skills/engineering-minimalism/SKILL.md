@@ -48,16 +48,38 @@ Any time `/wingman:build`, a department lead, or a specialist is about to write 
 
 **6. Mark deliberate shortcuts.** If you take a rung-6/7 shortcut instead of a more complete rung-2/3 solution because of a real time or scope constraint, say so explicitly and name what a more complete version would look like — don't let a shortcut masquerade as the finished design.
 
+**7. The output rule.** Code first. Then at most three short lines: what was skipped, when to add it. No essays, no feature tours, no design notes. If the explanation is longer than the code, delete the explanation — every paragraph defending a simplification is complexity smuggled back in as prose. Pattern: `[code] → skipped: [X], add when [Y].`
+
+**8. The `minimal:` comment convention.** Mark deliberate simplifications that cut a real corner with a known ceiling (global lock, O(n²) scan, naive heuristic) with a `// minimal: <ceiling>, <upgrade path>` comment. This creates an auditable trail of shortcuts that can't rot silently into permanent debt. Example: `// minimal: global lock, per-account locks if throughput matters`
+
+## Intensity Levels
+
+| Level | Enforcement |
+|-------|-------------|
+| **lite** | Build what's asked, but name the lazier alternative in one line. User picks. |
+| **full** | The ladder enforced. Stdlib and native first. Shortest diff, shortest explanation. Default. |
+| **ultra** | YAGNI extremist. Deletion before addition. Ship the one-liner and challenge the rest of the requirement in the same breath. |
+
+Switch via `/wingman:build --intensity lite|full|ultra` or say "minimalism lite/ultra". Level persists until changed or session end.
+
 ## Constraints
 
 **MUST NOT simplify away, regardless of ladder rung:**
-- Input validation
+- Input validation at trust boundaries
 - Error handling that prevents data loss
 - Security-relevant checks (auth, injection prevention, secrets handling — see `boardroom-security`'s checklist)
-- Accessibility
+- Accessibility basics
 - Anything the founder explicitly asked for, even if it seems like more than the "minimal" solution
 
+**Hardware is never the ideal on paper:** a real clock drifts, a real sensor reads off. Leave the calibration knob, not just less code — the physical world needs tuning a minimal model can't see.
+
 These are the load-bearing exception to "smallest step wins" — minimalism applies to *how much code exists*, never to *how carefully the code that must exist is written*.
+
+## The One-Check Rule
+
+Non-trivial logic (a branch, a loop, a parser, a money/security path) leaves ONE runnable check behind — the smallest thing that fails if the logic breaks: an `assert`-based `demo()`/`__main__` self-check or one small test. No frameworks, no fixtures, no per-function suites unless asked. Trivial one-liners need no test; YAGNI applies to tests too.
+
+This rule bridges minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works.
 
 ## Rationalizations
 
@@ -75,6 +97,10 @@ These are the load-bearing exception to "smallest step wins" — minimalism appl
 - You're refactoring code the task didn't ask you to touch.
 - You're about to skip input validation, error handling, security checks, or accessibility "to keep it minimal."
 - You've patched the same symptom more than once without checking for a shared root cause.
+- You're changing quote style, adding type hints, or adding docstrings beyond what the task requires (style drift).
+- Your success criterion could be paraphrased as "make it work" — reframe it into something verifiable.
+- Would a senior engineer say this is overcomplicated? If yes, simplify.
+- New code exceeds ~3x the length you'd expect for the task — consider whether a simpler rung was missed.
 
 ## Verification
 
@@ -83,3 +109,56 @@ Every non-trivial code path this skill produces should leave behind one runnable
 ## Output
 
 No fixed template. The test: could someone reading the diff point to the specific rung of the ladder that justified each piece of new code? If a simpler rung would have worked and wasn't tried, the diff isn't minimal yet.
+
+## Continuous Execution
+
+**Principle:** Once you begin executing a workflow, maintain momentum through to completion. The workflow should run as a cohesive unit, not a series of start-stop-check cycles.
+
+### Rules
+
+1. Don't pause to announce what you're about to do — just do it
+2. Don't stop to summarize intermediate progress unless specifically asked
+3. If you hit a blocker, document it and work around it, don't stop
+4. Complete the full workflow before returning to the user
+5. Batch related operations rather than doing them one at a time
+
+### Anti-Patterns
+
+- "Let me check if this is working so far..." → just keep going
+- "Now I'll move on to..." → just move on
+- "Before I continue..." → continue
+- Stopping to explain each step as you go
+
+### Exception
+
+Only pause if you encounter a genuine decision point that requires user input, or if the session health hook warns about context limits.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "It's already small enough" | The 5-tag taxonomy says otherwise — check each tag (`#delete`, `#stdlib`, `#native`, `#yagni`, `#shrink`) before declaring it done. |
+| "I need flexibility for future cases" | Speculative abstraction is exactly what this skill exists to prevent — add it when a second real use case shows up, not before. |
+| "I'm already in this file, might as well clean up more" | Out of scope for this task — note it, don't do it, unless asked. Scope creep disguised as diligence. |
+| "The shortcut works fine, no need to mark it" | Every shortcut without a `// minimal:` comment is invisible debt. Mark it or it rots silently. |
+| "This bug fix is obvious, no need to trace callers" | Grep every caller first — the root cause is often upstream of where the symptom appeared. |
+| "The explanation justifies why this is minimal" | If the explanation is longer than the code, you're smuggling complexity back in as prose. Delete it. |
+
+### Red Flags
+
+- You're about to add a new dependency for something the standard library already does.
+- You're writing a config system or plugin architecture for a single current use case.
+- You're refactoring code the task didn't ask you to touch.
+- You're skipping input validation, error handling, or security checks "to keep it minimal."
+- Your explanation is longer than your code.
+- You've patched the same symptom more than once without checking for a shared root cause.
+- You're changing quote style, adding type hints, or adding docstrings beyond what the task requires.
+- Would a senior engineer say this is overcomplicated? If yes, simplify.
+
+### Anti-Pattern Callouts
+
+- **YAGNI-as-excuse:** YAGNI means "don't build it yet," not "don't build it correctly." The one-check rule still applies.
+- **Minimalism-as-cutting-corners:** Minimalism applies to *how much code exists*, never to *how carefully the code that must exist is written*. Never simplify away validation, security, or accessibility.
+- **Explanation-as-complexity:** A paragraph defending a simplification is complexity smuggled back in as prose. Three short lines maximum.

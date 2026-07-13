@@ -114,3 +114,30 @@ Never surface these terms directly in a checkpoint verdict — translate to cons
 ## Output
 
 No fixed template for build-time use. For `boardroom-design`'s checkpoint verdict, findings feed directly into that agent's existing `## DESIGN VERDICT` block (see `agents/boardroom-design.md`) — this skill supplies the checklist and translation table that verdict is built from.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "It matches what's trendy right now" | Trendy and generic are often the same thing — check it against the anti-slop list regardless of how current it looks. |
+| "It's just a placeholder, doesn't need real review" | Placeholders ship more often than intended — apply the quality/accessibility checklist even to "temporary" UI. |
+| "The founder won't notice this detail" | The founder may not name the problem, but users will feel it (hard-to-read text, cheap-looking layout) — that's what this skill exists to catch on their behalf. |
+| "The design system doesn't apply here, this is a new page" | New pages inherit the existing design system. Introducing a second visual language is the definition of inconsistency. |
+| "Accessibility checks slow me down" | Accessibility defects are defects, not taste calls. Shipping them is a bug, not a shortcut. |
+| "I'll run the checklists at the end" | Running checklists at the end catches less than running them as you build. Checklists are per-component, not per-project. |
+
+### Red Flags
+
+- You're about to ship a design with 3+ items from the anti-slop checklist present.
+- You're about to ship any item from the quality/accessibility checklist — these are defects, not taste calls.
+- You're introducing a new color/font/spacing decision without checking whether the project already has one.
+- You're applying a single "one true aesthetic" regardless of product context.
+- You're about to send a design finding to the founder using unexplained jargon.
+
+### Anti-Pattern Callouts
+
+- **Slop-as-default:** Applying generic AI design patterns (gradients, icon tiles, bounce easing) as the default aesthetic rather than as a deliberate choice. These are tells, not design decisions.
+- **Accessibility-as-taste:** Treating accessibility defects (low contrast, small touch targets, skipped heading levels) as stylistic preferences rather than bugs. They're defects — block, don't note.
+- **Token-amnesia:** Introducing new colors, fonts, or spacing without checking the project's existing design system. Every new token is a consistency risk.

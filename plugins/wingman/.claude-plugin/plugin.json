@@ -1,6 +1,6 @@
 {
   "name": "wingman",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
   "author": {
     "name": "LabLaunchPad"
@@ -20,7 +20,10 @@
     "./commands/telemetry.md",
     "./commands/launch.md",
     "./commands/hotfix.md",
-    "./commands/audit.md"
+    "./commands/audit.md",
+    "./commands/over-engineering-review.md",
+    "./commands/bloat-audit.md",
+    "./commands/debt-ledger.md"
   ],
   "agents": [
     "./agents/boardroom-founder.md",
@@ -39,6 +42,21 @@
     "./skills/design-taste",
     "./skills/department-lead-activation",
     "./skills/evolve-promotion",
-    "./skills/systematic-auditing"
+    "./skills/systematic-auditing",
+    "./skills/ponytail-debt-harvesting",
+    "./skills/platform-native-reference",
+    "./skills/test-driven-development",
+    "./skills/subagent-driven-development",
+    "./skills/verification-loop",
+    "./skills/council",
+    "./skills/anti-rationalization",
+    "./skills/doubt-driven-development",
+    "./skills/interview-one-question-at-a-time",
+    "./skills/evidence-gated-catalog",
+    "./skills/spec-handler",
+    "./skills/definition-of-done",
+    "./skills/security-checklist",
+    "./skills/testing-patterns",
+    "./skills/doc-index"
   ]
 }

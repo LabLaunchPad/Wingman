@@ -20,8 +20,27 @@
 //
 // Pattern adapted from gsd-plugin's secure-phase gate (blocks phase
 // advancement while threats_open > 0) and gstack's plan-ceo-review "EXIT
-// PLAN MODE GATE" (verifies the plan file ends with a required report
-// section before allowing ExitPlanMode). See ATTRIBUTIONS.md.
+// PLAN MODE GATE" (verifies required plan sections exist in the plan file
+// before allowing ExitPlanMode). See ATTRIBUTIONS.md.
+
+// Gstack's required plan sections for the "EXIT PLAN MODE GATE" validation
+// From gstack's plan-ceo-review and plan-eng-review etc.
+const REQUIRED_PLAN_SECTIONS = [
+  // Executive summary section
+  '## Executive Summary',
+  // Current state analysis
+  '## Current State',
+  // Problem statement
+  '## Problem Statement',
+  // Solution approach
+  '## Solution Approach',
+  // Success criteria
+  '## Success Criteria',
+  // Timeline/budget
+  '## Timeline',
+  // Risk assessment
+  '## Risks'
+];
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -113,7 +132,14 @@ function isApprovedCheckpoint(text) {
   if (!text.includes(MARKER)) return false;
   if (/Bottom line:\s*DO NOT SHIP/i.test(text)) return false;
   const m = text.match(/Founder decision:\s*(.+)/i);
-  return !!(m && /^ship it\b/i.test(m[1].trim()));
+  if (!(m && /^ship it\b/i.test(m[1].trim()))) return false;
+  // gstack "EXIT PLAN MODE GATE": an approved checkpoint must also be a
+  // complete plan. Only an *approved* source is held to this bar — a bare plan
+  // text without the marker is simply "not approved", not "missing sections",
+  // so a short inline summary can never over-block a file-based checkpoint.
+  const missing = REQUIRED_PLAN_SECTIONS.filter((s) => !text.includes(s));
+  if (missing.length > 0) return false;
+  return true;
 }
 
 const markedSources = sources.filter((t) => t.includes(MARKER));
@@ -129,7 +155,11 @@ if (markedSources.some((t) => /Bottom line:\s*DO NOT SHIP/i.test(t))) {
   );
 }
 
-// Open only if some source is a fully approved "ship it" checkpoint.
+// Open only if some source is a fully approved "ship it" checkpoint that also
+// satisfies gstack's required-sections gate. Each source is judged on its own
+// (per the header contract: the gate opens if ONE source is a valid approved
+// checkpoint), so a short inline summary without sections cannot veto a
+// file-based checkpoint that has them.
 if (sources.some(isApprovedCheckpoint)) allow();
 
 // Not approved — a bare unmarked plan means the boardroom never ran; a marked
@@ -142,9 +172,24 @@ if (markedSources.length === 0) {
   );
 }
 
+// Marked but not a valid approved checkpoint: either the founder hasn't said
+// "ship it" yet, or an approved-looking plan is missing required sections.
+const missing = [
+  ...new Set(
+    markedSources.flatMap((t) =>
+      REQUIRED_PLAN_SECTIONS.filter((s) => !t.includes(s))
+    )
+  ),
+];
 const decisionMatch = markedSources
   .map((t) => t.match(/Founder decision:\s*(.+)/i))
   .find(Boolean);
+if (missing.length > 0) {
+  deny(
+    `Wingman: the Boardroom-approved plan is missing required sections: ${missing.join(', ')}. ` +
+    `A complete plan must include all required sections before exiting plan mode.`
+  );
+}
 deny(
   `Wingman: the founder hasn't actually approved this plan yet ` +
   `(recorded decision: "${decisionMatch ? decisionMatch[1].trim() : 'none found'}"). ` +

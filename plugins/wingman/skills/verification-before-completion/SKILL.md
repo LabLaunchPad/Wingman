@@ -108,6 +108,42 @@ Skip any step = lying, not verifying
 ❌ Trust agent report
 ```
 
+**The One-Check Rule (from engineering-minimalism):**
+Non-trivial code paths must leave ONE runnable self-check behind — an `assert`-based `demo()`/`__main__` or one small test. This bridges minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works. Trivial one-liners are exempt.
+
+```
+✅ [Code path] → [assert-based self-check that exercises the path] → [run it, see pass]
+❌ "Code works, no test needed for something this simple"
+```
+
+Exception: trivial one-liners (single-expression functions, constant assignments) need no test — YAGNI applies to tests too.
+
+**Deliberate Shortcut Verification (from ponytail-debt-harvesting):**
+Every `// minimal:` comment must be accompanied by a valid ceiling and upgrade path. Verify:
+```
+✅ // minimal: O(n²) scan, switch to index if >1000 users
+❌ // minimal: this works for now
+❌ // TODO: improve later
+```
+
+**The Output Rule (from engineering-minimalism):**
+After any code change, provide at most three short lines explaining what was skipped and when to add it. If the explanation is longer than the code, delete the explanation.
+
+```
+✅ [code] → skipped: [X], add when [Y].
+❌ [code] → [5-paragraph essay defending the simplification]
+```
+
+**The One-Check Rule (from engineering-minimalism):**
+Non-trivial code paths must leave ONE runnable self-check behind — an `assert`-based `demo()`/`__main__` or one small test. This bridges minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works. Trivial one-liners are exempt.
+
+```
+✅ [Code path] → [assert-based self-check that exercises the path] → [run it, see pass]
+❌ "Code works, no test needed for something this simple"
+```
+
+Exception: trivial one-liners (single-expression functions, constant assignments) need no test — YAGNI applies to tests too.
+
 ## Why This Matters in Wingman
 
 Wingman tells a non-technical founder that a stage is done. If that claim is wrong, the founder has no independent way to catch it — they're trusting the plugin. Unverified "done" claims are the single fastest way to destroy that trust and ship broken software to real users.
@@ -129,3 +165,33 @@ Wingman tells a non-technical founder that a stage is done. If that claim is wro
 Run the command. Read the output. THEN claim the result.
 
 This is non-negotiable.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "I can see it works" | You haven't run the command. Seeing is not verifying. Visual inspection is not evidence. |
+| "I'll verify after I finish the next task" | Verification debt compounds. The next task might break what you just built. Verify now. |
+| "The linter passed, so it's fine" | Linter is one gate, not all gates. Tests, builds, and security checks are separate verification claims. |
+| "The agent reported success" | Agent self-reports are not evidence. Check the VCS diff and run the tests yourself. |
+| "I already ran this earlier" | "Earlier" is not "now." Fresh evidence only — the state may have changed. |
+| "Just this once, I'll skip the full cycle" | The first exception is the only one that matters. Run the command. |
+| "Different wording so the rule doesn't apply" | Spirit over letter. If you're finding creative ways to restate a success claim without verification, you're rationalizing. |
+
+### Red Flags
+
+- Using "should," "probably," "seems to" before any completion claim.
+- Expressing satisfaction ("Great!", "Perfect!", "Done!") before running verification.
+- About to commit, push, or create a PR without fresh test output.
+- Trusting a subagent's success report without independent verification.
+- Relying on a partial check when the full check exists.
+- Thinking "just this once" — that phrase is the rationalization flag, not the exception.
+- Claiming requirements are met based on tests passing without re-reading the requirements.
+
+### Anti-Pattern Callouts
+
+- **Verification theater:** Running a command but not reading the output is not verification. Read the full output, check the exit code, count the failures.
+- **Historical evidence:** Citing a previous test run as current evidence. Only fresh runs count.
+- **Proxy verification:** Using one passing check as evidence for a different, unrelated claim (e.g., "linter passed" proving "build succeeds").

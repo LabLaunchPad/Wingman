@@ -53,3 +53,31 @@ Before sending any founder-facing message, check it against the "three things" r
 ## When this applies
 
 Every boardroom agent verdict, every `/wingman:*` stage completion message, and any time this plugin reports status to the user — not just the dedicated `/wingman:boardroom` command.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "The founder can just ask if they don't understand" | They can't evaluate what they don't know is missing — the burden is on the checkpoint, not on the founder to catch the gap. |
+| "This technical detail is important context" | If it's important, translate its consequence; if it can't be translated, it probably wasn't decision-relevant to begin with. |
+| "It's basically fine, no need to hedge" | If you haven't verified it, say what you actually know — false confidence is worse than an honest "not yet checked." |
+| "I'll just explain the technical term, they'll get it" | If you must use a term, define it in the same breath the first time and then never use it again. One definition, then plain consequences. |
+| "The bullet points are clear enough" | A wall of bullet points with no bottom line is not clear. One bottom-line sentence first, details after, only if asked. |
+| "Adding the consequence makes it too long" | Lead with consequence in one sentence. The finding is still short — it's just honest about what it means. |
+
+### Red Flags
+
+- You're about to send a technical term to the founder without defining it in the same sentence.
+- You're about to lead with mechanism ("how it broke") instead of consequence ("what it means for them").
+- You're about to write "looks fine" / "should work" without evidence behind it.
+- The message has no single bottom-line sentence a founder could stop reading after and still know what to do.
+- You're hiding a real risk behind reassurance — "looks fine" is not a verdict.
+- You're using jargon in a founder-facing message that you haven't defined in plain language.
+
+### Anti-Pattern Callouts
+
+- **Jargon-as-communication:** Using technical terms in founder-facing output without translating them to consequences. The founder doesn't need to know what a "race condition" is — they need to know that two people clicking buy at the same time could double-charge one of them.
+- **Mechanism-over-consequence:** Explaining how something broke instead of what it means for the user or business. Founders act on consequences, not mechanisms.
+- **False confidence:** Saying "looks fine" or "should work" without verification evidence. An honest "I haven't checked yet" is more useful than a false positive.

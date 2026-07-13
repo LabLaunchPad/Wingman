@@ -115,3 +115,57 @@ If systematic investigation reveals the issue is truly environmental, timing-dep
 ## Related Skills
 
 - **verification-before-completion** — verify the fix worked, with fresh evidence, before claiming success.
+
+## Continuous Execution
+
+**Principle:** Once you begin executing a workflow, maintain momentum through to completion. The workflow should run as a cohesive unit, not a series of start-stop-check cycles.
+
+### Rules
+
+1. Don't pause to announce what you're about to do — just do it
+2. Don't stop to summarize intermediate progress unless specifically asked
+3. If you hit a blocker, document it and work around it, don't stop
+4. Complete the full workflow before returning to the user
+5. Batch related operations rather than doing them one at a time
+
+### Anti-Patterns
+
+- "Let me check if this is working so far..." → just keep going
+- "Now I'll move on to..." → just move on
+- "Before I continue..." → continue
+- Stopping to explain each step as you go
+
+### Exception
+
+Only pause if you encounter a genuine decision point that requires user input, or if the session health hook warns about context limits.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "The bug is obvious, I don't need the full process" | Simple bugs have root causes too. Process is fast for simple bugs — that's by design. |
+| "It's an emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. The emergency is why you need the process. |
+| "Let me just try this fix first, then investigate" | First fix sets the pattern. Do it right from the start. |
+| "I'll fix multiple things at once to save time" | Can't isolate what worked. Causes new bugs. One change at a time. |
+| "I can see the problem in the code" | Seeing symptoms ≠ understanding root cause. Trace the data flow. |
+| "Two fixes already failed, but I have another idea" | 3+ failures = architectural problem. Question the pattern, don't fix again. |
+| "This doesn't reproduce consistently, so I'll just patch it" | Non-reproducible means you haven't gathered enough data. Add logging, then reproduce. |
+| "I'll investigate later if the fix doesn't work" | First fix sets the pattern. Later is never. Investigate now. |
+
+### Red Flags
+
+- "Quick fix for now, investigate later" — the quick fix becomes the permanent fix.
+- "Just try changing X and see if it works" — that's guessing, not debugging.
+- "Skip the test, I'll manually verify" — manual verification is ad-hoc, not systematic.
+- "It's probably X, let me fix that" — "probably" is a hypothesis, not a conclusion. Test it.
+- "One more fix attempt" after 2+ failures — 3 failures is the architecture-questioning threshold.
+- Proposing solutions before tracing data flow — you're fixing the symptom, not the cause.
+- "I don't fully understand but this might work" — say "I don't understand X" and research more.
+
+### Anti-Pattern Callouts
+
+- **Guess-and-check:** Making changes to see if they work, without a hypothesis, is the definition of thrashing. Each guess creates new state that obscures the root cause.
+- **Fix stacking:** Applying fix #2 on top of fix #1 without reverting #1 means you can't isolate what changed. One fix at a time.
+- **Architectural blindness:** 3+ failed fixes on different parts of the system indicate coupling or design problems. Surface this plainly rather than attempting fix #4.
