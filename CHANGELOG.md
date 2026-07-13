@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.1.7] - 2026-07-13
+
+### Added — gap-closure batch 5 (incident-response skill + command, gap G11)
+- **`skills/incident-response`** + **`commands/incident.md`** (`/wingman:incident`): a calm, ordered runbook for when production is broken or a security event is underway — stabilize, contain (rotate exposed keys), triage, diagnose, communicate, then fix + prevent. Sequencing is the point: stabilize before debugging. Meets the project skill standard.
+- `GAPS.md` (G11) marked shipped; `plugin.json` bumped `0.1.6` → `0.1.7` (33 skills, 19 commands); `CLAUDE.md` command list updated.
+
+### Maintenance
+- 108/108 → 112/112 tests pass (added incident-response skill anatomy + command tests); `validate-structure` → 0 warnings; `check-repo-consistency` → PASS.
+
 ## [0.1.6] - 2026-07-13
 
 ### Added — gap-closure batch 4 (simplify skill, gap G10)
