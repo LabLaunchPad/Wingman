@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.1.6] - 2026-07-13
+
+### Added — gap-closure batch 4 (simplify skill, gap G10)
+- **`skills/simplify`**: a post-change tidy-up pass — remove duplication, collapse indirection, delete dead branches, and undo needless cleverness before code sets. Renders a simplification *plan* and never edits working code silently; pairs with `engineering-minimalism` and `/wingman:harness`'s bloat checks. Adapted from `obra/superpowers`' simplify discipline (MIT), restated in Wingman's own words. Meets the project skill standard.
+- `GAPS.md` (G10) marked shipped; `plugin.json` bumped `0.1.5` → `0.1.6` (32 skills).
+
+### Maintenance
+- 105/105 → 108/108 tests pass (added simplify anatomy tests); `validate-structure` → 0 warnings; `check-repo-consistency` → PASS.
+
 ## [0.1.5] - 2026-07-13
 
 ### Added — gap-closure batch 3 (code-review skill, gap G9)

@@ -36,7 +36,7 @@ Schema per row:
 | G7 | skills/commands | business advisory (cfo/cmo/cro) | P0 | shipped (Batch 1) |
 | G8 | commands | /wingman:advisory orchestrator | P0 | shipped (Batch 1) |
 | G9 | skills | code review | P1 | shipped (Batch 3) |
-| G10 | skills | simplify / refactor | P1 | proposed |
+| G10 | skills | simplify / refactor | P1 | shipped (Batch 4) |
 | G11 | skills/commands | incident response | P1 | proposed |
 | G12 | cross-cutting | secrets management + C-level persona library | P2 | proposed |
 
@@ -133,7 +133,7 @@ Schema per row:
 ### G10 — simplify / refactor (`skill`, proposed)
 - **source**: `obra/superpowers` simplify discipline.
 - **founder-value**: keeps the codebase from rotting as features pile on.
-- **type**: skill `simplify`. **priority**: P1. **status**: proposed.
+- **type**: skill `simplify`. **priority**: P1. **status**: shipped (Batch 4).
 
 ### G11 — incident response (`skill` + `command`, proposed)
 - **source**: ops gap; founders need a runbook when prod breaks.
