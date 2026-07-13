@@ -10,6 +10,19 @@ Wingman is a Claude Code plugin, packaged as a marketplace + plugin under `.clau
 
 **Before making any structural change** (new command, agent, skill, or department), read `docs/ARCHITECTURE.md` first — it explains the hybrid Boardroom/department-lead/specialist model and the reasoning behind it. Read `docs/AGENT-ROSTER.md` before creating any new specialist subagent — it's the canonical candidate catalog and promotion process; specialists should be promoted via `/wingman:evolve` on evidenced need, not created speculatively.
 
+## Commands
+
+```
+node plugins/wingman/scripts/validate-structure.mjs   # plugin-internal invariants (frontmatter, refs)
+node scripts/check-repo-consistency.mjs                # repo-root doc/attribution invariants
+node scripts/check-fixtures.mjs                        # every eval fixture (evals/fixtures/setup-*.sh) still runs clean
+node scripts/wingman-health.mjs                         # read-only dev-health report: built vs. verified vs. gaps
+node evals/run-headless.mjs --dry-run                   # confirms every eval case references an existing fixture, no API key needed
+node evals/run-headless.mjs                              # runs the behavioral eval cases via `claude -p`, needs ANTHROPIC_API_KEY
+```
+
+All three validators must exit 0 before committing a structural change. There is no build step and no unit test runner in the conventional sense — see "Project status" above.
+
 ## Project purpose
 
 Wingman is a Claude Code plugin that gives non-technical founders a full AI SDLC — an "AI Boardroom" of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.
