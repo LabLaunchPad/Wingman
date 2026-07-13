@@ -35,7 +35,7 @@ Schema per row:
 | G6 | skills/commands | deep founder research | P0 | shipped (Batch 1) |
 | G7 | skills/commands | business advisory (cfo/cmo/cro) | P0 | shipped (Batch 1) |
 | G8 | commands | /wingman:advisory orchestrator | P0 | shipped (Batch 1) |
-| G9 | skills | code review | P1 | proposed |
+| G9 | skills | code review | P1 | shipped (Batch 3) |
 | G10 | skills | simplify / refactor | P1 | proposed |
 | G11 | skills/commands | incident response | P1 | proposed |
 | G12 | cross-cutting | secrets management + C-level persona library | P2 | proposed |
@@ -128,7 +128,7 @@ Schema per row:
 ### G9 — code review (`skill`, proposed)
 - **source**: `anthropics/claude-plugins-official` `code-review` skill.
 - **founder-value**: a second pass on code quality before ship, in plain language.
-- **type**: skill `code-review`. **priority**: P1. **status**: proposed.
+- **type**: skill `code-review`. **priority**: P1. **status**: shipped (Batch 3).
 
 ### G10 — simplify / refactor (`skill`, proposed)
 - **source**: `obra/superpowers` simplify discipline.
