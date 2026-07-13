@@ -30,7 +30,7 @@ Schema per row:
 | G1 | hooks | secret-exposure + destructive-command guard | P0 | shipped (Batch 1) |
 | G2 | hooks | autonomous stop-loop guard | P0 | shipped (Batch 1) |
 | G3 | hooks | prompt-injection guard (UserPromptSubmit) | P0 | shipped (Batch 1) |
-| G4 | hooks | output secret-scanner (PostToolUse) | P1 | proposed |
+| G4 | hooks | output secret-scanner (PostToolUse) | P1 | shipped (Batch 2) |
 | G5 | skills | persistent cross-session memory | P0 | shipped (Batch 1) |
 | G6 | skills/commands | deep founder research | P0 | shipped (Batch 1) |
 | G7 | skills/commands | business advisory (cfo/cmo/cro) | P0 | shipped (Batch 1) |
@@ -78,9 +78,12 @@ Schema per row:
 ### G4 — output secret-scanner (`PostToolUse`, proposed)
 - **source**: defense-in-depth complement to G1.
 - **founder-value**: a second net in case a secret leaks in assistant output rather than tool input.
-- **type**: hook (`.mjs`), event `PostToolUse` (matcher `Write`/`Edit`/`NotebookEdit`).
-- **behavior**: redact detected secrets from output; warn the founder.
-- **priority**: P1. **status**: proposed.
+- **type**: hook (`.mjs`), event `PostToolUse`.
+- **behavior**: scans the tool *response* for secrets surfaced by Bash/Read/Write/Edit/NotebookEdit and warns the founder (stderr). WARN-ONLY by design — it must not block legitimate reads (the over-block trap fixed in v12). Complements G1 (which guards the input side).
+- **files**: `plugins/wingman/hooks/secret-scanner.mjs`, wired in `hooks/hooks.json`.
+- **test-plan**: unit test `scan()`/`redact()` (find + redact) + integration test that a dirty Bash response warns and a clean one doesn't.
+- **validation**: `validate-structure` (real hook event `PostToolUse`), `node --test` green.
+- **status**: shipped (Batch 2).
 
 ### G5 — persistent cross-session memory (`skill`, shipped)
 - **source**: founder-lens mining; Wingman had no durable memory across sessions beyond `.wingman/sdd/progress.md`.

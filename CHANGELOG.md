@@ -2,6 +2,16 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.1.4] - 2026-07-13
+
+### Added — gap-closure batch 2 (output secret-scanner, gap G4)
+- **`hooks/secret-scanner.mjs`** (`PostToolUse`, matchers Bash/Read/Write/Edit/NotebookEdit): defense-in-depth companion to `secret-guard` (G1). Scans a tool's *response* for surfaced secrets (AWS keys, GitHub PATs, `sk-` keys, PEM private keys, `ANTHROPIC_API_KEY=`) and warns the founder via stderr. **Warn-only by design** — it never blocks legitimate reads, avoiding the over-block trap fixed in v12. Pure `scan()`/`redact()`/`findSecrets()` are unit-tested.
+- Wired into `hooks/hooks.json` `PostToolUse`.
+- `GAPS.md` (G4) marked shipped; `plugin.json` bumped `0.1.3` → `0.1.4`.
+
+### Maintenance
+- 97/97 → 102/102 tests pass (added secret-scanner hook assertion + unit + integration tests); `validate-structure` → 0 warnings; `check-repo-consistency` → PASS.
+
 ## [0.1.3] - 2026-07-13
 
 ### Added — gap-closure batch 1 (curated founder-lens vendor mining)
