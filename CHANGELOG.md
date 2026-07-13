@@ -2,6 +2,16 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.1.8] - 2026-07-13
+
+### Added — gap-closure batch 6 (cross-cutting: secrets policy + persona library, gap G12)
+- **`references/secrets-policy.md`**: the single secrets-handling reference — never persist live keys, use a secret manager, the `secret-guard`/`secret-scanner`/`prompt-guard` hooks enforce at runtime, rotate-on-exposure (pairs with `/wingman:incident`), `gh secret set` guidance.
+- **`references/persona-template.md`**: copy-paste scaffold for adding future advisor personas (legal/ops/product) with the required anatomy (`name` + `Use when` + Rationalizations/Red Flags/Verification) and the parallel-fan-out command pattern from `/wingman:advisory`.
+- Closes the **last gap (G12)** in the original G1–G12 ledger. `plugin.json` bumped `0.1.7` → `0.1.8`.
+
+### Maintenance
+- 112/112 → 114/114 tests pass (added G12 reference-doc tests); `validate-structure` → 0 warnings; `check-repo-consistency` → PASS.
+
 ## [0.1.7] - 2026-07-13
 
 ### Added — gap-closure batch 5 (incident-response skill + command, gap G11)

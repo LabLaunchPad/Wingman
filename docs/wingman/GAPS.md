@@ -38,7 +38,7 @@ Schema per row:
 | G9 | skills | code review | P1 | shipped (Batch 3) |
 | G10 | skills | simplify / refactor | P1 | shipped (Batch 4) |
 | G11 | skills/commands | incident response | P1 | shipped (Batch 5) |
-| G12 | cross-cutting | secrets management + C-level persona library | P2 | proposed |
+| G12 | cross-cutting | secrets management + C-level persona library | P2 | shipped (Batch 6) |
 
 ## Detailed specs
 
@@ -143,7 +143,7 @@ Schema per row:
 ### G12 — secrets management + C-level persona library (`cross-cutting`, proposed)
 - **source**: gap analysis; no documented secret-handling policy and no reusable persona scaffolding.
 - **founder-value**: a single place to add future advisors (legal, ops, product) without reinventing structure.
-- **type**: cross-cutting — `references/secrets-policy.md` + a `skills/_persona-template` scaffolding doc. **priority**: P2. **status**: proposed.
+- **type**: cross-cutting — `references/secrets-policy.md` (secrets handling policy) + `references/persona-template.md` (copy-paste scaffold for adding future advisors like legal/ops/product). Both live under `references/` (no plugin.json registration needed; `validate-structure` only checks skills/commands/agents). **priority**: P2. **status**: shipped (Batch 6). **The original G1–G12 ledger is now fully closed.**
 
 ## Mining loop (how this catalog stays honest)
 1. Curated vendor set: the 20 submodules in `.gitmodules` (incl. `claude-plugins-official`, `alirezarezvani/claude-skills`, `jeremylongshore/...`, `ComposioHQ/awesome-claude-skills`, `avelikiy/great_cto`).
