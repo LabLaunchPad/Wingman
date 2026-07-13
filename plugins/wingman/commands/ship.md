@@ -17,7 +17,7 @@ Before shipping, confirm all of the following, and stop with a plain-language ex
 
 1. **Verified** — the build stage's tests/checks passed with fresh evidence (see `verification-before-completion`), and the secure stage cleared with no open risks.
 2. **Clean working tree** — no stray uncommitted changes that shouldn't ship (`git status`). If there are unexpected changes, ask the founder before including or discarding them.
-3. **On a feature branch** — not committing straight to the default branch. If not, offer to create one now.
+3. **On a feature branch** — not committing straight to the default branch. `build.md`'s "Before starting" step checks this out before any commit lands, so this should already be satisfied; if it isn't (e.g. a manual commit landed outside the pipeline), stop and offer to create one now rather than shipping straight from the default branch.
 4. **Remote + auth available** — a git remote is configured and, if opening a PR, the `gh` CLI (or the GitHub MCP tools available in this session) can actually create it.
 
 ## Push and open the change for review

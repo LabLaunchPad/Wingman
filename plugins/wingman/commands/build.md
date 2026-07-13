@@ -13,6 +13,8 @@ $ARGUMENTS
 
 Confirm there is an approved plan (from `/wingman:plan`, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:plan`.
 
+Confirm the project is on a feature branch, not the default branch — check out or create one now (e.g. named for the plan's subject) before the first commit. Doing this here, before any work lands, means `ship.md`'s "on a feature branch" preflight check is a no-op confirmation instead of a late catch after work has already accumulated on the default branch.
+
 Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly.
 
 ## Execution discipline
