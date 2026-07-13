@@ -147,9 +147,9 @@ describe('Plugin.json Structure', () => {
     assert.strictEqual(plugin.skills.length, 25);
   });
 
-  it('should have 16 commands', () => {
+  it('should have 18 commands', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.commands.length, 16);
+    assert.strictEqual(plugin.commands.length, 18);
   });
 
   it('should have 5 agents', () => {
@@ -223,14 +223,19 @@ describe('Boardroom Checkpoint Gstack Gate', () => {
     '## Risks',
   ].join('\n');
 
-  // An otherwise-approved boardroom checkpoint (marker + "ship it" decision,
-  // no "DO NOT SHIP"), with the given plan body appended.
+  // An otherwise-approved boardroom checkpoint (marker + "ship it" decision +
+  // Timestamp, no "DO NOT SHIP"), with the given plan body preceding it —
+  // matching the real shape /wingman:boardroom writes (plan content first,
+  // checkpoint block appended at the true end) so the CURRENT-checkpoint
+  // check (nothing but the checkpoint's own fields following the marker)
+  // passes.
   function approvedCheckpoint(body) {
     return (
+      `${body}\n\n` +
       `${MARKER}\n` +
       `Bottom line: GO\n` +
       `Founder decision: ship it\n` +
-      `\n${body}\n`
+      `Timestamp: 2026-01-01T00:00:00Z\n`
     );
   }
 
