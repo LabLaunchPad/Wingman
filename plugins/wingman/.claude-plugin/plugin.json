@@ -1,6 +1,6 @@
 {
   "name": "wingman",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
   "author": {
     "name": "LabLaunchPad"
@@ -64,6 +64,7 @@
     "./skills/research",
     "./skills/founder-cfo",
     "./skills/founder-cmo",
-    "./skills/founder-cro"
+    "./skills/founder-cro",
+    "./skills/code-review"
   ]
 }

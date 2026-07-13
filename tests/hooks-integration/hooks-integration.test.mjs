@@ -172,9 +172,9 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 30 skills', () => {
+  it('should have 31 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 30);
+    assert.strictEqual(plugin.skills.length, 31);
   });
 
   it('should have 18 commands', () => {
@@ -210,6 +210,7 @@ describe('Plugin.json Structure', () => {
       'founder-cfo',
       'founder-cmo',
       'founder-cro',
+      'code-review',
     ];
     
     for (const skill of requiredSkills) {
@@ -547,5 +548,37 @@ describe('Output Secret-Scanner (G4)', () => {
   it('scan(): unit — clean input finds nothing', async () => {
     const { scan } = await import(pathToFileURL(scannerPath).href);
     assert.strictEqual(scan('Bash', 'all good').found.length, 0);
+  });
+});
+
+// ============================================================================
+// New Gap Skill — code-review (gap G9)
+// ============================================================================
+
+describe('Gap Skill Structure — code-review', () => {
+  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'code-review', 'SKILL.md');
+
+  it('SKILL.md exists', () => {
+    assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);
+  });
+
+  it('frontmatter has matching name + Use-when description', () => {
+    const text = fs.readFileSync(skillPath, 'utf-8');
+    const fm = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    assert.ok(fm, 'no frontmatter block');
+    const fields = {};
+    for (const line of fm[1].split(/\r?\n/)) {
+      const m = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
+      if (m) fields[m[1]] = m[2].trim().replace(/^(["'])(.*)\1$/, '$2');
+    }
+    assert.strictEqual(fields.name, 'code-review');
+    assert.match(fields.description, /use when/i, 'description needs a "Use when..." trigger');
+  });
+
+  it('has the self-detection triad (Rationalizations / Red Flags / Verification)', () => {
+    const text = fs.readFileSync(skillPath, 'utf-8');
+    assert.match(text, /##\s*Rationalizations/i);
+    assert.match(text, /##\s*Red Flags/i);
+    assert.match(text, /##\s*Verification/i);
   });
 });
