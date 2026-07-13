@@ -24,6 +24,10 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `multica-ai/andrej-karpathy-skills` | MIT (declared in `plugin.json`, `README.md`, and the `SKILL.md` frontmatter — no standalone `LICENSE` file, corrected 2026-07-08 from an earlier "no license" claim in this doc) | `engineering-minimalism` — assumption-surfacing, verifiable success criteria |
 | `jeffallan/claude-skills` | MIT | The "description trap" finding; two-tier `SKILL.md`/`references/` structure |
 | `addyosmani/agent-skills` | MIT (Addy Osmani) | Skill/Persona/Command model, "personas never call personas," parallel-fan-out-then-merge pattern, Rationalizations/Red-Flags/Verification triad |
+| `alirezarezvani/claude-skills` | MIT (Alireza Rezvani) | Broad skill library — discovery + design reference for `research`, `memory`, `code-review`, `incident-response`, `accessibility` gaps (G6/G9/G11/G12) |
+| `jeremylongshore/claude-code-plugins-plus-skills` | MIT (Jeremy Longshore) | Large plugin/skill catalog — coverage-breadth cross-check for the GAPS mining loop |
+| `ComposioHQ/awesome-claude-skills` | MIT (Composio) | Curated index — discovery source for the curated founder-lens mining loop |
+| `avelikiy/great_cto` | MIT (Anton Velikiy) | CTO-advisory persona model — design inspiration for `founder-cfo`/`founder-cmo`/`founder-cro` business-advisory skills (G7) |
 
 ## Per-file adaptation record
 
@@ -115,3 +119,21 @@ Testing discipline adapted from `affaan-m/ECC` (MIT) — AAA structure, boundary
 
 ### `plugins/wingman/skills/doc-index/SKILL.md`
 Discipline adapted from `wshobson/agents` (MIT, Seth Hobson) — its "doc-index discipline" (maintain a discoverable index of artifacts so they stay findable and don't rot). Restated in Wingman's own words; the concrete trigger was the v10 finding that all 9 `references/*.md` files were uncited until deliberately wired in. Pairs with `references/` and `/ATTRIBUTIONS.md`.
+
+### `plugins/wingman/skills/memory/SKILL.md`
+Original to Wingman — fills gap G5 (persistent cross-session context). Inspiration only from the memory/dispatcher pattern in `anthropics/claude-plugins-official` and the broad skill conventions in `alirezarezvani/claude-skills` (MIT) — no upstream text quoted; written in Wingman's own words. Pairs with `references/context-handoffs.md` and `/wingman:learn` (from `obra/superpowers`).
+
+### `plugins/wingman/skills/research/SKILL.md` and `plugins/wingman/commands/research.md`
+Original to Wingman — fills gap G6 (deep, source-grounded founder research). Design reference from the deep-research pattern in `alirezarezvani/claude-skills` (MIT) and `ComposioHQ/awesome-claude-skills` (MIT, discovery). No upstream text quoted; the methodology is restated in Wingman's own words and wired to the Boardroom checkpoint convention.
+
+### `plugins/wingman/skills/founder-cfo/SKILL.md`, `plugins/wingman/skills/founder-cmo/SKILL.md`, `plugins/wingman/skills/founder-cro/SKILL.md`, `plugins/wingman/commands/advisory.md`
+Original to Wingman — fill gap G7 (Business Advisory for non-technical founders). Persona/model inspiration from `avelikiy/great_cto` (MIT, CTO-advisory persona) and the persona/command split in `addyosmani/agent-skills` (MIT). Three C-level lenses (finance, marketing, revenue) each render plain-language verdicts only, never code, consistent with the Boardroom seats' "verdict, not code" bar. Dispatched in parallel by `commands/advisory.md`.
+
+### `plugins/wingman/hooks/secret-guard.mjs`
+Original to Wingman — fills gap G1 (secret-exposure + destructive-command guard). Closes the `PreToolUse` coverage gap surfaced in the gap analysis (only `ExitPlanMode` had a PreToolUse guard). Scans `Bash`/`Write`/`Edit` inputs for destructive patterns and high-entropy secrets; denies with founder-friendly guidance. Pairs with `commands/secure.md`'s threat register.
+
+### `plugins/wingman/hooks/stop-loop.mjs`
+Original to Wingman — fills gap G2 (autonomous loop guard). Implements the "ralph-loop" Stop-hook pattern (seen in `anthropics/claude-plugins-official` and the broader Stop-hook convention), gated behind an explicit `.wingman/loop.json` opt-in so it never forces looping by default. Pure `evaluate()` logic is unit-tested.
+
+### `plugins/wingman/hooks/prompt-guard.mjs`
+Original to Wingman — fills gap G3 (prompt-injection defense at the prompt boundary). `UserPromptSubmit` hook that flags classic injection patterns (instruction-override, exfiltration, system-prompt reveal). Denies high-risk prompts with plain-language guidance. Pure `evaluate()` logic is unit-tested.
