@@ -65,3 +65,29 @@ Don't assume compression saved anything — the caveman research found real case
 ## Output
 
 No fixed template — this skill governs style, not structure. The test is: could another agent reading this message act correctly on the first read, using only facts, file paths, and next actions? If yes, it's compressed enough. If it had to guess at something dropped, it was compressed too far.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "Terser is always cheaper overall" | Not measured, and not always true — a terse reply that gets misunderstood costs a follow-up round-trip, which is more expensive than one clear message. |
+| "The founder won't read this anyway" | Confirm that assumption before compressing; if there's any chance a human reads it, don't compress. |
+| "I can drop the reasoning, just keep the answer" | Fine for agent-to-agent handoffs with no downstream audit need; not fine if a retro or learn entry needs to reconstruct why. |
+| "Compression always saves tokens" | The caveman research found real cases where added rule overhead made terse output cost MORE net tokens than plain prose. Verify, don't assume. |
+| "This warning is too verbose, I'll shorten it" | Security warnings and irreversible-action descriptions must stay verbatim. Compression here is a liability. |
+
+### Red Flags
+
+- You're about to compress a Boardroom verdict, a checkpoint summary, or anything with `AskUserQuestion` in front of it.
+- You're compressing a security warning or a description of an irreversible action to save space.
+- You genuinely can't tell whether the reader is a person or another agent — treat it as a person.
+- You're dropping reasoning that a future retro or learn entry might need to reconstruct.
+- You're compressing code, commands, error output, file paths, or numbers — these must stay byte-for-byte exact.
+
+### Anti-Pattern Callouts
+
+- **Compression-as-omission:** Dropping a detail that the reader might need is not economy, it's information loss. Compression means removing filler, not facts.
+- **Context-blind compression:** Applying token economy to founder-facing output. This skill is internal-only — the moment a human might read it, plain language wins.
+- **Measured-shorter-vs-cheaper:** Shorter messages are not always cheaper. A terse message that triggers a clarification round-trip costs more than a clear first message.

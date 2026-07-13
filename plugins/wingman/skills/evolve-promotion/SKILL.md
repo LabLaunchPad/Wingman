@@ -78,3 +78,31 @@ Before writing anything: recount the cluster's actual entries (don't trust a rem
 ## Output
 
 No fixed template beyond the `AskUserQuestion` proposal shape described in step 4. The written artifact follows the relevant template (`references/specialist-agent-template.md` for agents; existing plugin files as the shape reference for commands/skills).
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "This one occurrence is clearly going to happen again" | Prediction isn't evidence — wait for the second real occurrence. A single compelling instance is the most dangerous rationalization trigger. |
+| "It's just a file, plugin dir vs. project dir doesn't matter much" | It does — anything written into Wingman's plugin directory can be silently wiped on the next plugin update, and none of these artifacts belong in a shared install. |
+| "The founder will probably say yes, I'll just create it" | The approval step exists precisely so the founder decides what gets added to their own roster — skipping it defeats the purpose of a plain-language gate. |
+| "This pattern is so obvious it doesn't need two occurrences" | The 2-occurrence threshold is fixed by architecture. No exceptions, no matter how obvious. |
+| "I'll create it and tell the founder after" | Creation before approval is a violation of the founder's agency over their own project roster. |
+| "This friction shows up everywhere, it's basically one pattern" | Topical overlap is not the same as the same underlying friction. Cluster carefully — different symptoms from different contexts may not be the same pattern. |
+
+### Red Flags
+
+- You're about to propose a promotion backed by only one entry.
+- You're about to write any promoted command, skill, or specialist agent file into `plugins/wingman/`.
+- You're about to create a file before the founder has responded to the `AskUserQuestion` proposal.
+- You're running this on every single `/wingman:evolve` invocation regardless of whether new signal has actually accumulated.
+- You're rounding down from "close to 2" occurrences to justify a promotion.
+- You're clustering entries by superficial keyword match rather than genuine topical overlap.
+
+### Anti-Pattern Callouts
+
+- **Premature promotion:** Creating a specialist, command, or skill from a single occurrence. The 2-occurrence threshold exists because one occurrence is a coincidence, two is a pattern.
+- **Plugin-directory writes:** Writing any promoted artifact to `plugins/wingman/` instead of the founder's project. Same risk as department-lead-activation — silent loss on update.
+- **Approval skipping:** Creating before the founder approves. The `AskUserQuestion` gate is not optional. The founder controls their own project roster.

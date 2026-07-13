@@ -76,3 +76,31 @@ Before creating a file, confirm: (1) the activation signal is actually true, wit
 ## Output
 
 No founder-facing template beyond the one-sentence notification in step 3. The department-lead file itself follows `references/template.md`.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "Might as well create all 8 now, saves checking later" | This is the literal kitchen-sink anti-pattern the whole hybrid model exists to avoid — see `docs/ARCHITECTURE.md` §2. |
+| "The signal is ambiguous, I'll create it to be safe" | An ambiguous signal is a reason to look closer or ask the founder, not a reason to default to "create." |
+| "It's just a file, no real cost to creating it early" | Every existing agent has some context/discoverability cost, and an unused department lead is exactly the kind of scaffolding `engineering-minimalism` argues against. |
+| "The founder will probably need this department eventually" | Prediction isn't evidence. Create only when the activation signal is true *now*, not when you anticipate it might be. |
+| "I'll create it in the plugin directory for easy access" | Anything written into Wingman's plugin directory can be silently wiped on the next plugin update. Write to the founder's project, never to `plugins/wingman/`. |
+| "The activation check is trivial, I'll skip it" | The check is trivial. The discipline of not creating speculative infrastructure is not. Check the signal. |
+
+### Red Flags
+
+- You're about to write a `dept-*.md` file into `plugins/wingman/` instead of the founder's own `.claude/agents/`.
+- You're about to create a department lead without a true activation signal.
+- You're about to overwrite an existing department-lead file the founder may have customized.
+- You're creating more than one department lead in a single pipeline run without multiple true signals.
+- You're creating the Growth department lead from anything other than an explicit founder request.
+- You're about to skip the `.wingman/state.json` update after creating a department lead.
+
+### Anti-Pattern Callouts
+
+- **Kitchen-sink activation:** Creating all 8 department leads on first run because "we'll need them eventually." The lazy-creation model exists to avoid this exact bloat.
+- **Plugin-directory writes:** Writing department-lead files to `plugins/wingman/` instead of the founder's project. These get wiped on update and don't belong in a shared install.
+- **Silent state desync:** Creating a department-lead file but forgetting to add it to `.wingman/state.json` — the lead becomes invisible to `/wingman:evolve` and fresh sessions.

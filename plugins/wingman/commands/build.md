@@ -40,3 +40,9 @@ Run `/wingman:boardroom diff` against the accumulated changes. This is the found
 
 - If the boardroom returns "ship it": proceed to `/wingman:secure`.
 - If it returns concerns: fix them, then re-run the checkpoint before proceeding.
+
+## References
+
+- `skills/spec-handler` — each task in the plan is a spec; build the handler to its success criteria, then verify against them.
+- `skills/testing-patterns` — follow AAA, mock at boundaries, and cover changed paths (>=80%) as you run the verification suite above.
+- `skills/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.

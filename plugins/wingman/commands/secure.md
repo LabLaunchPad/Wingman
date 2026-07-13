@@ -25,7 +25,15 @@ If this session has access to Claude Code's built-in `/security-review` capabili
 
 If the founder has explicitly asked for deeper scrutiny than this standard checklist (e.g. "audit this thoroughly," "make sure this is production-grade"), use the `systematic-auditing` skill for this pass instead of just the list above.
 
-For every risk found, decide: **CLOSED** (mitigated, or a documented accepted risk) or **OPEN** (nothing done about it yet).
+For every risk found, decide: **CLOSED** (mitigated, or a documented accepted risk) or **OPEN** (nothing done about it yet). Store risk entries in a structured **threat register**:
+
+| ID | Risk Description | Status | Owner | Detection Date | Disposition / Acceptance |
+|----|------------------|--------|-------|----------------|--------------------------|
+| 1 | Hardcoded AWS credentials in source code | OPEN | dept-legal-security | 2026-07-13 | — |
+| 2 | SQL injection vulnerability in user input | CLOSED | dept-engineering | 2026-07-13 | Fixed in PR #42, regression test added |
+| ... | ... | ... | ... | ... | ... |
+
+The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**. This implements gsd-plugin's phase-gate pattern: advancement is BLOCKED while **threats_open > 0**.
 
 ## The gate
 
@@ -40,3 +48,9 @@ This stage does not pass with open risks. If anything is OPEN:
 Run `/wingman:boardroom diff` with a note that this is the security-focused pass, so the `boardroom-security` seat's verdict carries the most weight in the summary. Only an all-clear (or founder-accepted risks) should produce a "ship it" outcome.
 
 Once the boardroom clears this stage, proceed to `/wingman:ship`.
+
+## References
+
+- `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline; run it to produce the concrete risk list above.
+- `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule this stage implements.
+- `skills/definition-of-done` — the security gate is one column of the standing cross-skill DoD; confirm the rest before declaring secure complete.

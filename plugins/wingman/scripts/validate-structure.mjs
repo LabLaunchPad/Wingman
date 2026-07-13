@@ -40,10 +40,13 @@ const VALID_HOOK_EVENTS = new Set([
 
 function parseFrontmatter(filePath) {
   const text = readFileSync(filePath, 'utf-8');
-  const match = text.match(/^---\n([\s\S]*?)\n---/);
+  // Tolerate CRLF line endings (some checkouts don't normalize), so the
+  // frontmatter check doesn't false-fail on a file saved with Windows line
+  // endings rather than on a genuinely missing frontmatter block.
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
   const fields = {};
-  for (const line of match[1].split('\n')) {
+  for (const line of match[1].split(/\r?\n/)) {
     const fieldMatch = line.match(/^([a-zA-Z_-]+):\s*(.*)$/);
     if (fieldMatch) {
       // Strip a single layer of surrounding quotes so `model: "opus"` and

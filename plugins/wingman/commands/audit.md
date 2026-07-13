@@ -29,3 +29,8 @@ Fix the highest-leverage ones now, following the same test-first discipline as `
 ```
 
 Translate every finding through `plain-language-checkpoint`'s bar before it reaches the founder — this report is not the place for raw technical findings.
+
+## References
+
+- `references/orchestration-patterns.md` — the multi-angle parallel audit pattern this command operationalizes.
+- `skills/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.

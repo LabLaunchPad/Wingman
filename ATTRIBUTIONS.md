@@ -9,8 +9,8 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | Repo | License | Used for |
 |---|---|---|
 | `obra/superpowers` | MIT (Jesse Vincent) | `verification-before-completion`, `writing-plans`, `systematic-debugging` |
-| `garrytan/gstack` | MIT (Garry Tan) | Boardroom parallel-review concept, `ExitPlanMode` gate pattern |
-| `jnuyens/gsd-plugin` | MIT | `/wingman:secure` threat-gate pattern, `/wingman:ship` preflight pattern, state-store design reference |
+| `garrytan/gstack` | MIT (Garry Tan) | Boardroom parallel-review concept, `ExitPlanMode` gate pattern — **implemented** in `hooks/boardroom-checkpoint.mjs` as the required-plan-sections "EXIT PLAN MODE GATE" (7 mandatory `##` sections) |
+| `jnuyens/gsd-plugin` | MIT | `/wingman:secure` threat-gate pattern, `/wingman:ship` preflight pattern, state-store design reference — **implemented** in `commands/secure.md` as the `CLOSED`/`OPEN` threat register that blocks advancement while `threats_open > 0` |
 | `affaan-m/ECC` | MIT (Affaan Mustafa) | `/wingman:evolve` and `/wingman:secure` checklist shape |
 | `anthropics/claude-plugins-official` | Apache-2.0 | Immutable-slug convention, LLM-as-gate-reviewer validation |
 | `wshobson/agents` | MIT (Seth Hobson) | Doc-index discipline, agent-name-uniqueness convention, severity-tier findings model |
@@ -19,7 +19,7 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `Leonxlnx/taste-skill` | MIT | `design-taste` — countable-rule checklist discipline |
 | `pbakaus/impeccable` | Apache-2.0 | `design-taste` — slop-vs-quality/accessibility category split |
 | `nextlevelbuilder/ui-ux-pro-max-skill` | MIT | `design-taste` — product-type reference table (condensed, not the full CSV database) |
-| `DietrichGebert/ponytail` | MIT | `engineering-minimalism` — decision ladder, "when NOT to be lazy" carve-out |
+| `DietrichGebert/ponytail` | MIT | `engineering-minimalism` — decision ladder, "when NOT to be lazy" carve-out, intensity levels, one-check rule, `minimal:` comment convention, output rule; `platform-native-reference` — cross-layer native solutions reference; `ponytail-debt-harvesting` — debt ledger, ceiling tracking, harvest protocol; `verification-before-completion` — one-check rule, output rule integration; `/wingman:over-engineering-review` — 5-tag taxonomy; `/wingman:bloat-audit` — whole-repo complexity scan; `/wingman:debt-ledger` — debt status/harvest/add commands |
 | `JuliusBrussee/caveman` | MIT | `token-economy` — scoped to internal-only channels |
 | `multica-ai/andrej-karpathy-skills` | MIT (declared in `plugin.json`, `README.md`, and the `SKILL.md` frontmatter — no standalone `LICENSE` file, corrected 2026-07-08 from an earlier "no license" claim in this doc) | `engineering-minimalism` — assumption-surfacing, verifiable success criteria |
 | `jeffallan/claude-skills` | MIT | The "description trap" finding; two-tier `SKILL.md`/`references/` structure |
@@ -36,6 +36,9 @@ Adapted from `obra/superpowers/skills/writing-plans/SKILL.md` (MIT, Copyright (c
 ### `plugins/wingman/skills/systematic-debugging/SKILL.md`
 Adapted from `obra/superpowers/skills/systematic-debugging/SKILL.md` (MIT, Copyright (c) 2025 Jesse Vincent). Changes: removed references to supporting files not bundled with Wingman (`root-cause-tracing.md`, `defense-in-depth.md`, `condition-based-waiting.md`) and to superpowers' own `test-driven-development` skill; generalized "your human partner" to "the founder or reviewer."
 
+### `plugins/wingman/references/spec-handler-pattern.md`
+Pattern (not code) adapted from `obra/superpowers`' discipline of separating a *spec* (inputs, invariants, success criteria) from a *handler* (implementation), and validating the spec before executing. Restated in Wingman's own words and mapped to how Wingman commands, TDD, subagent contracts, and Boardroom checkpoints each use a spec/contract form.
+
 ### `plugins/wingman/skills/design-taste/SKILL.md`
 Merged from three sources:
 - `Leonxlnx/taste-skill` (MIT, Copyright (c) 2026 Leonxlnx) — the countable/checkable rule discipline and "route to an official design system first" instinct.
@@ -45,7 +48,7 @@ Merged from three sources:
 Explicitly excluded: `ui-ux-pro-max-skill`'s `banner-design` sub-skill (requires a paid Gemini image-generation API) and `impeccable`'s browser extension / local live-overlay server (real running infrastructure) — neither fits a markdown-only Claude Code plugin.
 
 ### `plugins/wingman/skills/engineering-minimalism/SKILL.md`
-Primary source: `DietrichGebert/ponytail` (MIT, Copyright (c) 2026 DietrichGebert) — the decision ladder and "when NOT to be lazy" carve-out are drawn directly from that skill's structure. Secondary source: ideas publicly described by Andrej Karpathy and packaged in `multica-ai/andrej-karpathy-skills` (MIT — declared in that repo's `plugin.json`, `README.md`, and `SKILL.md` frontmatter, though it has no standalone `LICENSE` file; an earlier version of this document incorrectly stated it had no license at all). Its content is still not quoted regardless — the assumption-surfacing and verifiable-success-criteria concepts are restated entirely in Wingman's own words, which remains the right approach independent of the license correction.
+Primary source: `DietrichGebert/ponytail` (MIT, Copyright (c) 2026 DietrichGebert) — the decision ladder, "when NOT to be lazy" carve-out, intensity levels (lite/full/ultra), one-check rule, `// minimal:` comment convention, and output rule are drawn directly from that skill's structure. Secondary source: ideas publicly described by Andrej Karpathy and packaged in `multica-ai/andrej-karpathy-skills` (MIT — declared in that repo's `plugin.json`, `README.md`, and `SKILL.md` frontmatter, though it has no standalone `LICENSE` file; an earlier version of this document incorrectly stated it had no license at all). Its content is still not quoted regardless — the assumption-surfacing and verifiable-success-criteria concepts are restated entirely in Wingman's own words, which remains the right approach independent of the license correction.
 
 ### `plugins/wingman/skills/token-economy/SKILL.md`
 Concept adapted (not literal text) from `JuliusBrussee/caveman` (MIT, Copyright (c) 2026 Julius Brussee). Scope deliberately narrowed from upstream: caveman applies terseness broadly across an entire session; this skill applies it only to channels a founder will never read, and explicitly defers to `plain-language-checkpoint` on any conflict.
@@ -76,3 +79,39 @@ Original to Wingman. Structurally mirrors `commands/secure.md`'s gate pattern (b
 
 ### `plugins/wingman/skills/systematic-auditing/SKILL.md` and `plugins/wingman/commands/audit.md`
 Original to Wingman, no vendor source — codified directly from this project's own build process after noticing that specific founder phrasing ("audit this," "evidence-driven," "test-driven") reliably triggered a multi-angle-parallel-review pattern that found real bugs a single review pass had repeatedly missed. Named in the same paired-skill style as `systematic-debugging` (from `obra/superpowers`) but shares no text or structure with it beyond that naming convention.
+
+### `plugins/wingman/skills/platform-native-reference/SKILL.md`
+Adapted from `DietrichGebert/ponytail` (MIT, Copyright (c) 2026 DietrichGebert) — `docs/platform-native.md`. Cross-layer reference mapping "what you think you need" to "what the platform ships" condensed for Wingman's build-time use. Covers HTML elements, CSS capabilities, JS/Browser APIs, Node.js stdlib, Python stdlib, and database features.
+
+### `plugins/wingman/skills/ponytail-debt-harvesting/SKILL.md`
+Adapted from `DietrichGebert/ponytail` (MIT, Copyright (c) 2026 DietrichGebert) — `skills/ponytail-debt/SKILL.md`. Debt harvesting pattern formalized for Wingman's build-time use: `// minimal:` comment convention, DEBT.md ledger, ceiling tracking, harvest protocol, and debt decay rules.
+
+### `plugins/wingman/skills/verification-before-completion/SKILL.md`
+Enhanced with patterns from `DietrichGebert/ponytail` (MIT): one-check rule, output rule, and deliberate shortcut verification. These additions bridge minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works.
+
+### `plugins/wingman/commands/over-engineering-review.md`
+New command implementing the ponytail-review 5-tag taxonomy (`#delete`, `#stdlib`, `#native`, `#yagni`, `#shrink`) from `DietrichGebert/ponytail` (MIT). Focused surgical audit for over-engineering patterns.
+
+### `plugins/wingman/commands/bloat-audit.md`
+New command implementing the ponytail-audit whole-repo bloat scan pattern from `DietrichGebert/ponytail` (MIT). Ranks files by complexity, identifies simplification opportunities using the 5-tag taxonomy.
+
+### `plugins/wingman/commands/debt-ledger.md`
+New command implementing the ponytail-debt debt ledger management from `DietrichGebert/ponytail` (MIT). Maintains DEBT.md, scans for `// minimal:` comments, flags ceiling hits, and reports debt trends.
+
+### `plugins/wingman/commands/harness.md`
+Enhanced with bloat detection and debt ceiling check from `DietrichGebert/ponytail` (MIT). New checks 6-7 scan for files over 200 lines, functions over 50 lines, and `// minimal:` comments that have hit their ceiling.
+
+### `plugins/wingman/skills/spec-handler/SKILL.md`
+Pattern (not code) adapted from `obra/superpowers`' discipline of separating a *spec* (inputs, invariants, success criteria) from a *handler* (implementation) and validating the spec before executing. Restated in Wingman's own words; pairs with `references/spec-handler-pattern.md`.
+
+### `plugins/wingman/skills/definition-of-done/SKILL.md`
+Original to Wingman — codifies the standing cross-skill quality gate previously only described in `references/definition-of-done.md`, promoting it from an unread doc to an enforced skill. Cross-references `spec-handler`, `testing-patterns`, `security-checklist`, and `verification-before-completion`.
+
+### `plugins/wingman/skills/security-checklist/SKILL.md`
+Security checklist shape adapted from `affaan-m/ECC` (MIT) and the OWASP/STRIDE canon; the enforced `CLOSED`/`OPEN` disposition model (which this skill drives into `secure.md`) is `jnuyens/gsd-plugin`'s phase-gate pattern. Pairs with `references/security-checklist.md` and `references/threat-register.md`.
+
+### `plugins/wingman/skills/testing-patterns/SKILL.md`
+Testing discipline adapted from `affaan-m/ECC` (MIT) — AAA structure, boundary mocking, and a meaningful (>=80%) coverage floor. Pairs with `references/testing-patterns.md` and `skills/test-driven-development`.
+
+### `plugins/wingman/skills/doc-index/SKILL.md`
+Discipline adapted from `wshobson/agents` (MIT, Seth Hobson) — its "doc-index discipline" (maintain a discoverable index of artifacts so they stay findable and don't rot). Restated in Wingman's own words; the concrete trigger was the v10 finding that all 9 `references/*.md` files were uncited until deliberately wired in. Pairs with `references/` and `/ATTRIBUTIONS.md`.

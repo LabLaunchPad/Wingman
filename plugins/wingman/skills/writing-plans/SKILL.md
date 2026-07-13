@@ -194,3 +194,55 @@ Before considering the plan done, re-read it from disk (not from memory of havin
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a spec requirement with no task, add the task.
+
+## Continuous Execution
+
+**Principle:** Once you begin executing a workflow, maintain momentum through to completion. The workflow should run as a cohesive unit, not a series of start-stop-check cycles.
+
+### Rules
+
+1. Don't pause to announce what you're about to do — just do it
+2. Don't stop to summarize intermediate progress unless specifically asked
+3. If you hit a blocker, document it and work around it, don't stop
+4. Complete the full workflow before returning to the user
+5. Batch related operations rather than doing them one at a time
+
+### Anti-Patterns
+
+- "Let me check if this is working so far..." → just keep going
+- "Now I'll move on to..." → just move on
+- "Before I continue..." → continue
+- Stopping to explain each step as you go
+
+### Exception
+
+Only pause if you encounter a genuine decision point that requires user input, or if the session health hook warns about context limits.
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "The engineer can figure out the error handling themselves" | This is exactly what "add appropriate error handling" as a placeholder is banned for — specify the actual handling, or the plan has silently deferred a design decision to whoever executes it. |
+| "This task is basically the same as Task 3, I'll just reference it" | "Similar to Task N" is a banned pattern — the engineer may read tasks out of order and never see Task 3's code. Repeat it in full. |
+| "The spec is vague here, I'll leave it flexible" | Vagueness in the spec is a signal to make an explicit, stated decision in the plan (or flag it for the founder) — not to defer it downstream as an implicit placeholder. |
+| "This is a small plan, the Plain-Language Summary feels like overkill" | Every plan feeds the same Boardroom checkpoint mechanism regardless of size — skipping it breaks the founder-facing gate. |
+| "I'll add the test code later in the step" | A step without the actual test code is a plan failure. Write it now or acknowledge you've deferred a design decision. |
+| "The type signatures are obvious from context" | If a later task uses a function, the "Produces" block of an earlier task must define its exact signature. Obvious-to-you is not obvious-to-the-engineer reading tasks out of order. |
+
+### Red Flags
+
+- You're about to write "TODO," "TBD," "handle edge cases," or any equivalent hedge instead of actual content.
+- You're about to write "Similar to Task N" instead of repeating the real code.
+- You're using a function, type, or property name in a later task that no earlier task's "Produces" list defines.
+- You're about to hand off the plan without running the Self-Review pass.
+- You're finishing a plan with no Plain-Language Summary section.
+- You're writing a step that describes what to do without showing how (code blocks required for code steps).
+- You're referencing types, functions, or methods not defined in any task.
+
+### Anti-Pattern Callouts
+
+- **Deferred design decisions:** Every "handle appropriately" or "add validation" is a design decision you've silently pushed to the executor. The plan is where design decisions get made, not where they get deferred.
+- **Reference-itis:** "Similar to Task N" assumes sequential reading. Engineers read tasks in dependency order, not plan order. Code must be self-contained per task.
+- **Phantom interfaces:** A function signature used in Task 7 that isn't defined in any earlier task's "Produces" block is a bug waiting to happen.
