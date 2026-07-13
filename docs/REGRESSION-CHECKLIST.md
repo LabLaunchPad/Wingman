@@ -4,7 +4,7 @@ Wingman's regression defense is a **hybrid**: mechanize what's crisp and determi
 
 ## Layer 1 — mechanical (run on every change, seconds, deterministic)
 
-Two zero-dependency Node scripts. Both must exit 0 (warnings are allowed, errors are not) before any structural change is committed.
+Two zero-dependency Node scripts. Both must exit 0 (warnings are allowed, errors are not) before any structural change is committed. The plugin's `node --test` suite (currently 85 tests, including the gstack `ExitPlanMode` gate regression) is the third deterministic gate and must also pass.
 
 **`node plugins/wingman/scripts/validate-structure.mjs`** — invariants *inside* the shipped plugin:
 - Every command/agent/skill/hook declared in `plugin.json` exists on disk.
