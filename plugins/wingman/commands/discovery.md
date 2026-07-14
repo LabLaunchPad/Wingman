@@ -19,7 +19,7 @@ Do not ask the founder to make technical decisions (frameworks, data models, fil
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
+Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
 
 ## Step 3: Write the Discovery output
 

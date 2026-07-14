@@ -1,6 +1,6 @@
 ---
 name: management-board-activation
-description: Use immediately after department-lead-activation at the start of /wingman:discovery, /wingman:architecture, /wingman:uxflow, /wingman:build, or /wingman:ship — checks whether this project has crossed the complexity threshold for a Management Board manager and creates one in the founder's own repo if so. Triggers only once a project has 3+ active department leads; never on a fresh or simple project.
+description: Use immediately after department-lead-activation at the start of /wingman:discovery, /wingman:architecture, /wingman:uxflow, /wingman:build, or /wingman:ship — checks whether this project has crossed the complexity threshold for a Management Board manager and creates one in the founder's own repo if so. Triggers only once a project has 3+ active CONDITIONALLY-activated department leads (Design/Data/Legal-Security/DevOps/Growth); never on a fresh or simple project, and never merely because the 3 always-active departments (Product/Engineering/QA) exist.
 ---
 
 # Management Board Activation
@@ -11,15 +11,17 @@ Wingman's Management Board (Engineering, Product, Design, Data, Security, QA, Pl
 
 **Core principle:** a Manager exists only once its corresponding department lead exists *and* the project as a whole has crossed a real complexity threshold — never on day one, never "just in case." This mirrors `department-lead-activation`'s own lazy-growth discipline one layer up; it does not introduce a second, independent gating system.
 
+**Critical: the threshold counts only conditionally-activated department leads** (`dept-design`, `dept-data`, `dept-legal-security`, `dept-devops`, `dept-growth`) — never `dept-product`, `dept-engineering`, or `dept-qa`, which are unconditionally active on every project regardless of complexity (see `department-lead-activation`'s table). Found via a real dogfooding pass (2026-07-14): counting all active leads meant the 3-lead threshold was met by Build time on literally every project, including the simplest possible one (a single health-check endpoint, no UI, no database, no auth) — the "complexity gate" wasn't gating on complexity at all, since those 3 departments exist unconditionally. Counting only the 5 conditional departments restores the actual intent: the Management Board activates when a project has genuinely grown complex (3+ of Design/Data/Legal-Security/DevOps/Growth active), not merely because it reached Build.
+
 ## When To Use
 
 Immediately after `department-lead-activation` runs, at the start of `/wingman:discovery`, `/wingman:architecture`, `/wingman:uxflow`, `/wingman:build`, or `/wingman:ship` — so a manager can be created in the same pass as the department lead that crosses the threshold, not as a separate always-checked gate.
 
 ## Core Workflow
 
-**1. Read `.wingman/state.json`.** If it doesn't exist yet, or `active_department_leads` has fewer than 3 entries, stop here — the complexity threshold isn't met. Do not create any manager. This is the common case for most projects; treat it as the expected, healthy outcome, not a step to work around.
+**1. Read `.wingman/state.json`.** If it doesn't exist yet, stop — there's nothing to check. Otherwise, filter `active_department_leads` to just the **conditionally-activated** departments — `dept-design`, `dept-data`, `dept-legal-security`, `dept-devops`, `dept-growth` — discarding `dept-product`, `dept-engineering`, and `dept-qa` from this count entirely (they're always active and count for nothing here). If that filtered list has fewer than 3 entries, stop — the complexity threshold isn't met. Do not create any manager. This is the common case for most projects, including ones already well into Build; treat it as the expected, healthy outcome, not a step to work around.
 
-**2. If `active_department_leads.length >= 3`, check `.claude/agents/` for existing `mgr-*.md` files.** For each department lead that's active and doesn't yet have a corresponding manager, evaluate whether that manager is relevant to the calling command (mirroring `department-lead-activation`'s per-command department table):
+**2. If the conditional-department count is >= 3, check `.claude/agents/` for existing `mgr-*.md` files.** For **every** department lead currently in `active_department_leads` (including `dept-product`/`dept-engineering`/`dept-qa`, once the conditional-count threshold above is met — their own presence just doesn't count *toward* that threshold) that doesn't yet have a corresponding manager, evaluate whether that manager is relevant to the calling command (mirroring `department-lead-activation`'s per-command department table):
 
 | Manager | Agent name | Corresponds to department lead | Relevant to |
 |---|---|---|---|
@@ -35,7 +37,7 @@ Immediately after `department-lead-activation` runs, at the start of `/wingman:d
 
 **"Relevant to" note (fixed 2026-07-14, found via a real dogfooding pass of the 7-stage pipeline):** this column previously named retired stages (`plan`, `secure`) from before the MVP2 pipeline rename, and Design Manager's row omitted `uxflow` even though `uxflow.md` explicitly checks for it — a real, reproducible inconsistency between the calling command's own instructions and this table. If a department lead is active, the count-of-3 threshold is met, and its manager doesn't exist yet, create it the first time **any** command whose stage appears in that manager's "Relevant to" column runs — do not wait for every possible stage to run first, and do not skip creating a manager just because the currently-running command isn't the *only* one listed for it.
 
-A manager's own activation signal is: **its corresponding department lead is in `active_department_leads` AND the total `active_department_leads` count is 3 or more.** Do not create a manager for a department lead that doesn't exist yet, even once the count-of-3 threshold is met elsewhere in the project.
+A manager's own activation signal is: **its corresponding department lead is in `active_department_leads` AND the count of *conditionally-activated* department leads (Design/Data/Legal-Security/DevOps/Growth only) is 3 or more.** Do not create a manager for a department lead that doesn't exist yet, even once the conditional-count threshold is met elsewhere in the project. Note this applies even to `mgr-product`/`mgr-engineering`/`mgr-qa` themselves — their own departments don't count toward the threshold, but once 3+ conditional departments push the project past it, their managers become eligible the same as any other's.
 
 **3. If a signal is true and `.claude/agents/mgr-<name>.md` doesn't already exist in the founder's project:**
 - Read the template at `references/template.md` in this skill.
@@ -64,20 +66,21 @@ A manager's own activation signal is: **its corresponding department lead is in 
 
 | Excuse | Reality |
 |---|---|
-| "This project has one department lead, might as well add its manager too" | The threshold is 3+ department leads, not 1. A single-department-lead project doesn't need execution-layer coordination — it needs the department lead doing the work. |
+| "This project has one department lead, might as well add its manager too" | The threshold is 3+ *conditionally-activated* department leads, not 1, and never counts `dept-product`/`dept-engineering`/`dept-qa` (always active). A single conditional department lead doesn't need execution-layer coordination — it needs the department lead doing the work. |
+| "This project reached Build, so Product+Engineering+QA are all active — that's 3, might as well activate the Board" | This is the exact miscounting a real dogfooding pass caught: those 3 departments are unconditionally active on every project and must never be counted toward the threshold. Reaching Build is not the same as being complex. |
 | "Managers are cheap, no real cost to creating them early" | Same reasoning `department-lead-activation` already rejects for department leads — every agent file is a context/discoverability cost, and this layer exists specifically to avoid recreating the kitchen-sink problem one level up. |
 | "The project will probably grow into needing this" | Prediction isn't evidence — same standard `department-lead-activation` already holds department leads to. |
 
 ## Red Flags — Stop and Reconsider
 
-- You're about to create a manager when `active_department_leads.length < 3`.
+- You're about to create a manager when the *conditionally-activated* department count is below 3 — including the common trap of counting `dept-product`/`dept-engineering`/`dept-qa` toward that number.
 - You're about to create a manager whose corresponding department lead doesn't exist.
 - You're about to write a `mgr-*.md` file into `plugins/wingman/` instead of the founder's own `.claude/agents/`.
 - You're about to create more than one manager in a single pipeline run without each having its own true signal.
 
 ## Verification
 
-Before creating a file, confirm: (1) `active_department_leads.length >= 3`, read directly from `.wingman/state.json`, not assumed; (2) the corresponding department lead is actually in that array; (3) the target path is under the founder's project's `.claude/agents/`; (4) the file doesn't already exist. After creating it, re-read `.wingman/state.json` to confirm `active_managers` actually includes the new entry and nothing else was dropped.
+Before creating a file, confirm: (1) the count of *conditionally-activated* leads only (`dept-design`/`dept-data`/`dept-legal-security`/`dept-devops`/`dept-growth`, excluding `dept-product`/`dept-engineering`/`dept-qa`) is `>= 3`, read directly from `.wingman/state.json`, not assumed; (2) the corresponding department lead is actually in that array; (3) the target path is under the founder's project's `.claude/agents/`; (4) the file doesn't already exist. After creating it, re-read `.wingman/state.json` to confirm `active_managers` actually includes the new entry and nothing else was dropped.
 
 ## Output
 
@@ -95,7 +98,7 @@ No founder-facing template beyond the one-sentence notification in step 3. The m
 
 ### Red Flags
 
-- You're about to create a manager without checking `active_department_leads.length` first.
+- You're about to create a manager without checking the conditionally-activated department count first, or you're counting an always-active department (Product/Engineering/QA) toward that threshold.
 - You're about to create a Growth or Research manager without `dept-growth` active or a clear plan-stage trigger.
 - You're about to skip the `.wingman/state.json` update after creating a manager.
 
