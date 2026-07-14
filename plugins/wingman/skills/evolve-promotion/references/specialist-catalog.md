@@ -32,9 +32,15 @@ The named vocabulary `evolve-promotion` promotes specialist agents from, so a pr
 | API Contract Specialist | OpenAPI/Swagger schema authoring before coding |
 | Frontend Core Specialist | App scaffolding, routing, state management setup |
 | Frontend Component Builder | Presentational components against the design system |
+| React Engineer | React-specific component/hook/state patterns, when the project's frontend is specifically React (narrower than Frontend Core Specialist's framework-agnostic scope) |
 | Backend Core Specialist | Service orchestration, middleware, request handling |
+| Python Engineer | Python-specific backend patterns (async, typing, packaging), when the project's backend is specifically Python (narrower than Backend Core Specialist's language-agnostic scope) |
 | Business Logic Developer | Functional server code, endpoints, algorithms, webhooks |
 | AI Integration Specialist | RAG pipelines, vector search, LLM guardrails |
+| RAG Engineer | Retrieval pipeline design specifically (chunking, embedding strategy, retrieval-quality tuning) — narrower than AI Integration Specialist's general RAG/vector-search/guardrails scope |
+| LLM Integration Engineer | Prompt/response contract design and model-call integration for LLM-backed features, distinct from RAG's retrieval concern |
+| RL Engineer | Reinforcement-learning system design (reward shaping, training-loop correctness) — only relevant to a project that's actually building an RL system, not Wingman's own operation (Wingman has no RLHF/model-training layer; see `docs/PRD.md` Non-goals) |
+| Prompt Engineer | Prompt authoring/iteration for a project's own LLM-backed features — distinct from `Prompt Security Guard` below, which reviews prompts for injection risk, not authors them |
 | Protocol & RPC Specialist | gRPC/WebSockets/GraphQL transport layers |
 | Legacy Refactoring Specialist | Prevents new tech debt when touching old code |
 | Dependency Management Specialist | Version pinning, conflict prevention |

@@ -17,6 +17,8 @@ Confirm the project is on a feature branch, not the default branch — check out
 
 Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly.
 
+Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-engineering`/`mgr-design`/`mgr-data`/`mgr-qa` may need creating for whichever department leads are actually active.
+
 ## Execution discipline
 
 Work through the plan task-by-task, not all at once:

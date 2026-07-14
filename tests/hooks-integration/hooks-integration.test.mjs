@@ -172,9 +172,9 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 33 skills', () => {
+  it('should have 34 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 33);
+    assert.strictEqual(plugin.skills.length, 34);
   });
 
   it('should have 19 commands', () => {
@@ -182,9 +182,9 @@ describe('Plugin.json Structure', () => {
     assert.strictEqual(plugin.commands.length, 19);
   });
 
-  it('should have 5 agents', () => {
+  it('should have 8 agents', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.agents.length, 5);
+    assert.strictEqual(plugin.agents.length, 8);
   });
 
   it('should have all new skills registered', () => {

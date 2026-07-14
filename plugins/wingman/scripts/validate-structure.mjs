@@ -19,7 +19,19 @@ const warnings = [];
 // the two highest-stakes reviewers (a wrong call is expensive) must run on
 // opus, not inherit. They silently drifted to `inherit` once and only an
 // audit caught it -- mechanizing keeps that from recurring.
-const OPUS_REQUIRED_AGENTS = new Set(['boardroom-engineer', 'boardroom-security']);
+// Renamed from boardroom-engineer/boardroom-security to boardroom-cto/
+// boardroom-ciso in the 7-seat Boardroom expansion (schema_version 2,
+// see docs/DATABASE.md) -- update this set again if the seats are ever
+// renamed further, or this invariant silently stops being checked.
+const OPUS_REQUIRED_AGENTS = new Set(['boardroom-cto', 'boardroom-ciso']);
+
+// Agent Permission Model (read/write/approve/execute/deploy). `approve` is
+// exclusive to Boardroom seats; department leads/managers/specialists must
+// never declare it, and nothing declares `deploy` except dept-devops-
+// dispatched work. This is a documentation-and-consistency check today, not
+// yet a runtime-enforced permission system.
+const VALID_PERMISSIONS = new Set(['read', 'write', 'approve', 'execute', 'deploy']);
+const BOARDROOM_AGENT_PREFIX = 'boardroom-';
 
 // The only real hook events Claude Code's hooks system supports. A wrong
 // event name here fails silently at runtime -- the hook is just never
@@ -121,6 +133,19 @@ for (const relPath of plugin.agents || []) {
     // Model-tier invariant (docs/ARCHITECTURE.md §8).
     if (OPUS_REQUIRED_AGENTS.has(fm.name) && fm.model !== 'opus') {
       errors.push(`agent ${relPath}: "${fm.name}" must be "model: opus" per ARCHITECTURE.md §8 (a wrong call from this seat is expensive), found "model: ${fm.model ?? 'unset'}"`);
+    }
+    // Agent Permission Model (docs/ARCHITECTURE.md §4a): a documentation-and-
+    // consistency check, not yet runtime-enforced. Missing is a warning
+    // (soft rollout); present-but-invalid is an error; "approve" is
+    // Boardroom-exclusive.
+    if (fm.permissions == null) {
+      warnings.push(`agent ${relPath}: missing "permissions" field (Agent Permission Model — one of ${[...VALID_PERMISSIONS].join('/')})`);
+    } else if (!VALID_PERMISSIONS.has(fm.permissions)) {
+      errors.push(`agent ${relPath}: "permissions: ${fm.permissions}" is not one of ${[...VALID_PERMISSIONS].join('/')}`);
+    } else if (fm.permissions === 'approve' && !fm.name?.startsWith(BOARDROOM_AGENT_PREFIX)) {
+      errors.push(`agent ${relPath}: "permissions: approve" is exclusive to Boardroom seats (name must start with "${BOARDROOM_AGENT_PREFIX}")`);
+    } else if (fm.name?.startsWith(BOARDROOM_AGENT_PREFIX) && fm.permissions !== 'approve') {
+      errors.push(`agent ${relPath}: Boardroom seat "${fm.name}" must be "permissions: approve", found "${fm.permissions}"`);
     }
   }
 }

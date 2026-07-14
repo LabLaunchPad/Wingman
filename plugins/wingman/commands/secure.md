@@ -13,6 +13,8 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill to check the Legal & Security activation signal: if this project touches auth, payments, or personal data, create `dept-legal-security` (if it doesn't exist yet) and delegate this pass to it.
 
+Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-security` may need creating (only if `dept-legal-security` is actually active).
+
 Look at what changed since the last checkpoint (or the whole project, if this is the first security pass) and build a short list of concrete risks — not a generic checklist recitation, but specific to what was actually built:
 
 - Secrets or credentials that could leak (hardcoded, logged, committed).

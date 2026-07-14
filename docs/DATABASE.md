@@ -18,15 +18,18 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 
 ```json
 {
+  "schema_version": 2,
   "checkpoint_id": "2026-07-07T14-32-00Z-plan",
   "stage": "plan",
   "scope_ref": "docs/wingman/plans/2026-07-07-billing-integration.md",
   "seats": [
-    { "seat": "founder",  "verdict": "GO",              "summary": "Solves the stated problem, scope is right-sized." },
-    { "seat": "engineer", "verdict": "GO_WITH_CONCERNS", "summary": "No test plan for the webhook retry path yet." },
-    { "seat": "security", "verdict": "GO",              "summary": "No new data exposure identified." },
-    { "seat": "design",   "verdict": "GO",              "summary": "N/A — no user-facing surface in this stage." },
-    { "seat": "cost",     "verdict": "GO",              "summary": "No new paid services introduced." }
+    { "seat": "ceo",      "verdict": "GO",              "summary": "Solves the stated problem, scope is right-sized." },
+    { "seat": "cpo",      "verdict": "GO",              "summary": "Real user need, right-sized slice." },
+    { "seat": "cmo",      "verdict": "GO",              "summary": "N/A — no material input on this checkpoint." },
+    { "seat": "cto",      "verdict": "GO_WITH_CONCERNS", "summary": "No test plan for the webhook retry path yet." },
+    { "seat": "ciso",     "verdict": "GO",              "summary": "No new data exposure identified." },
+    { "seat": "cfo",      "verdict": "GO",              "summary": "No new paid services introduced." },
+    { "seat": "research", "verdict": "GO",              "summary": "N/A — no material input on this checkpoint." }
   ],
   "bottom_line": "GO_WITH_CHANGES",
   "founder_decision": "fix_concerns_first",
@@ -36,28 +39,46 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 ```
 
 **Field notes:**
+- `schema_version`: `2` for the 7-seat Boardroom schema (this document); absent/unmarked entries written before this change are implicitly `schema_version: 1` (the 5-seat schema) — see the migration note below.
 - `checkpoint_id`: `<ISO-8601-timestamp-with-dashes>-<stage>`, unique per line.
 - `stage`: one of `plan`, `build`, `secure`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation.
 - `scope_ref`: path to the plan file reviewed, or `"diff"` if the scope was a git diff rather than a plan file.
+- `seats[].seat`: one of `ceo`, `cpo`, `cmo`, `cto`, `ciso`, `cfo`, `research`, `design` (the `design` entry is omitted when Design was N/A for the checkpoint) — see migration note below for the pre-rename names.
 - `seats[].verdict`: one of `GO`, `GO_WITH_CONCERNS`, `NO_GO` — matches each Boardroom agent's own output contract.
 - `bottom_line`: one of `GO`, `GO_WITH_CHANGES`, `DO NOT SHIP` — the consolidated result, per the gate rule in `docs/ARCHITECTURE.md` §4.
 - `founder_decision`: one of `ship_it`, `fix_concerns_first`, `still_reviewing`.
 
 This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
 
+**Migration note — 7-seat Boardroom rename (schema_version 1 → 2, 2026):** the Boardroom expanded from 5 seats to 7 as part of a deliberate rearchitecture (see `docs/ARCHITECTURE.md` §4/§4a). Seat names changed:
+
+| Old (`schema_version: 1`, unmarked) | New (`schema_version: 2`) |
+|---|---|
+| `founder` | split into `ceo` (vision/strategy/arbitration), `cpo` (user value/feature fit), `cmo` (go-to-market/positioning) |
+| `engineer` | `cto` |
+| `security` | `ciso` |
+| `cost` | `cfo` |
+| `design` | `design` (unchanged) |
+| *(none)* | `research` (new — evidence grounding/competitive awareness; named "Research" not "CRO" to avoid colliding with the `founder-cro` skill, which means Chief *Revenue* Officer) |
+
+This is an **append-only audit log, never rewritten** — existing entries keep their old seat names permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically without assuming a fixed count or fixed names, so `schema_version: 1` and `schema_version: 2` entries coexist safely in the same file.
+
 ### `state.json`
 
-Small, overwritten in place (not append-only). Tracks what a fresh Claude Code session needs to pick up where the last one left off, what department leads (once they exist, per `docs/ARCHITECTURE.md` §5) are active for this project, and what specialists (per §6) have been promoted.
+Small, overwritten in place (not append-only). Tracks what a fresh Claude Code session needs to pick up where the last one left off, what department leads (once they exist, per `docs/ARCHITECTURE.md` §5) are active for this project, what Management Board managers (per §5a, once the project crosses the 3+ department-lead complexity threshold) are active, and what specialists (per §6) have been promoted.
 
 ```json
 {
   "current_stage": "build",
   "active_department_leads": [],
+  "active_managers": [],
   "active_specialists": [],
   "last_checkpoint_id": "2026-07-07T14-32-00Z-plan",
   "updated_at": "2026-07-07T14-32-05Z"
 }
 ```
+
+`active_managers` is new alongside the Management Board addition — a `state.json` written before this change has no `active_managers` key; treat its absence as an empty array (`[]`), same forward-compatible handling as any other array field, rather than an error.
 
 ## Who writes/reads this
 

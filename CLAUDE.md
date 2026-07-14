@@ -33,7 +33,8 @@ Wingman is a Claude Code plugin that gives non-technical founders a full AI SDLC
 
 ## Architecture (see docs/ARCHITECTURE.md for full detail)
 
-- **Boardroom seats** (`plugins/wingman/agents/boardroom-*.md`) — fixed, always-present gate reviewers (founder/business, engineering, security, design, cost). They only render plain-language verdicts, never write code. Dispatched in parallel by `commands/boardroom.md` and consolidated into one go/no-go summary — this is Wingman's substitute for code review.
+- **Boardroom seats** (`plugins/wingman/agents/boardroom-*.md`) — fixed, always-present gate reviewers: CEO, CPO, CMO, CTO, CISO, CFO, Research, and Design (7 C-suite-style seats + Design). They only render plain-language verdicts, never write code. Dispatched in parallel by `commands/boardroom.md` and consolidated into a grouped Business/Technical/Finance/Research summary — this is Wingman's substitute for code review.
+- **Management Board** — 9 manager roles (`mgr-*`, written to the founder's own project), activated only once a project crosses 3+ active department leads (complexity-gated, per `skills/management-board-activation`). They coordinate department-lead work; they never render Boardroom verdicts.
 - **Pipeline commands** (`commands/plan.md`, `build.md`, `secure.md`, `ship.md`) — the core SDLC stages, each ending in a Boardroom checkpoint before advancing.
 - **Adaptive commands** (`commands/retro.md`, `learn.md`, `evolve.md`, `harness.md`, `telemetry.md`, `launch.md`, `hotfix.md`, `audit.md`, `over-engineering-review.md`, `bloat-audit.md`, `debt-ledger.md`, `research.md`, `advisory.md`, `incident.md`) — invoked as needed, not part of the fixed pipeline.
 - **Department leads** — build-time worker subagents, one per corporate department, created lazily per-project only when that department's activation signal is true (see `docs/ARCHITECTURE.md` §5). None exist in a fresh install.
