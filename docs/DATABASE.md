@@ -18,10 +18,11 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 
 ```json
 {
-  "schema_version": 2,
-  "checkpoint_id": "2026-07-07T14-32-00Z-plan",
-  "stage": "plan",
-  "scope_ref": "docs/wingman/plans/2026-07-07-billing-integration.md",
+  "schema_version": 3,
+  "checkpoint_id": "2026-07-14T14-32-00Z-implementation-planning",
+  "stage": ["discovery", "define", "architecture", "uxflow", "implementation-planning"],
+  "bundle": "planning-milestone",
+  "scope_ref": "docs/wingman/plans/2026-07-14-billing-integration.md",
   "seats": [
     { "seat": "ceo",      "verdict": "GO",              "summary": "Solves the stated problem, scope is right-sized." },
     { "seat": "cpo",      "verdict": "GO",              "summary": "Real user need, right-sized slice." },
@@ -39,9 +40,10 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 ```
 
 **Field notes:**
-- `schema_version`: `2` for the 7-seat Boardroom schema (this document); absent/unmarked entries written before this change are implicitly `schema_version: 1` (the 5-seat schema) — see the migration note below.
-- `checkpoint_id`: `<ISO-8601-timestamp-with-dashes>-<stage>`, unique per line.
-- `stage`: one of `plan`, `build`, `secure`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation.
+- `schema_version`: `3` for the 7-stage pipeline schema (this document); `2` marks the 7-seat-Boardroom-but-still-4-stage schema; absent/unmarked entries are implicitly `schema_version: 1` (5-seat, 4-stage) — see the migration notes below.
+- `checkpoint_id`: `<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>`, unique per line.
+- `stage`: one of `discovery`, `define`, `architecture`, `uxflow`, `implementation-planning`, `build`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation — **or an array** of stage names when `bundle` is `"planning-milestone"` (the only case where multiple stages share one checkpoint). Consumers must check whether `stage` is an array before iterating; don't assume scalar.
+- `bundle`: `"planning-milestone"`, `"build"`, or `"ship"` — every `schema_version: 3` checkpoint belongs to exactly one of a project's 3 total bundles. Absent on `schema_version: 2` and earlier entries; treat its absence as "not applicable," never an error.
 - `scope_ref`: path to the plan file reviewed, or `"diff"` if the scope was a git diff rather than a plan file.
 - `seats[].seat`: one of `ceo`, `cpo`, `cmo`, `cto`, `ciso`, `cfo`, `research`, `design` (the `design` entry is omitted when Design was N/A for the checkpoint) — see migration note below for the pre-rename names.
 - `seats[].verdict`: one of `GO`, `GO_WITH_CONCERNS`, `NO_GO` — matches each Boardroom agent's own output contract.
@@ -50,9 +52,20 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 
 This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
 
-**Migration note — 7-seat Boardroom rename (schema_version 1 → 2, 2026):** the Boardroom expanded from 5 seats to 7 as part of a deliberate rearchitecture (see `docs/ARCHITECTURE.md` §4/§4a). Seat names changed:
+**Migration note — 7-stage pipeline (schema_version 2 → 3, 2026):** the pipeline expanded from 4 stages to 7 as part of MVP2 (see `docs/ARCHITECTURE.md` §4b/§10 v14), while *reducing* founder-visible checkpoints from 4 to 3 via bundling. Stage names changed:
 
-| Old (`schema_version: 1`, unmarked) | New (`schema_version: 2`) |
+| Old (`schema_version: 2`, scalar `stage`) | New (`schema_version: 3`) |
+|---|---|
+| `plan` | split into 5 stages (`discovery`, `define`, `architecture`, `uxflow`, `implementation-planning`), bundled into one checkpoint recorded only by `implementation-planning.md`, with `"bundle": "planning-milestone"` and `stage` as an array of all 5 |
+| `build` | `build` (unchanged name; now also runs the folded-in Definition-of-Done gate — see below) |
+| `secure` | retired as a stage — its threat-register discipline moved into `build`'s own Definition-of-Done gate; no `schema_version: 3` checkpoint will ever have `stage: "secure"` |
+| `ship` | `ship` (unchanged) |
+
+This is an **append-only audit log, never rewritten** — existing `schema_version: 2` (and earlier) entries keep their old scalar `stage` values and no `bundle` field, permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and must not assume `stage` is always a scalar, so `schema_version: 1`, `2`, and `3` entries coexist safely in the same file.
+
+**Migration note — 7-seat Boardroom rename (schema_version 1 → 2, 2026):** the Boardroom expanded from 5 seats to 7 as part of a deliberate rearchitecture (see `docs/ARCHITECTURE.md` §4/§5a). Seat names changed:
+
+| Old (`schema_version: 1`, unmarked) | New (`schema_version: 2`+) |
 |---|---|
 | `founder` | split into `ceo` (vision/strategy/arbitration), `cpo` (user value/feature fit), `cmo` (go-to-market/positioning) |
 | `engineer` | `cto` |
@@ -61,7 +74,7 @@ This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE
 | `design` | `design` (unchanged) |
 | *(none)* | `research` (new — evidence grounding/competitive awareness; named "Research" not "CRO" to avoid colliding with the `founder-cro` skill, which means Chief *Revenue* Officer) |
 
-This is an **append-only audit log, never rewritten** — existing entries keep their old seat names permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically without assuming a fixed count or fixed names, so `schema_version: 1` and `schema_version: 2` entries coexist safely in the same file.
+This is an **append-only audit log, never rewritten** — existing entries keep their old seat names permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically without assuming a fixed count or fixed names, so `schema_version: 1` and later entries coexist safely in the same file.
 
 ### `state.json`
 
@@ -82,7 +95,7 @@ Small, overwritten in place (not append-only). Tracks what a fresh Claude Code s
 
 ## Who writes/reads this
 
-Any Wingman command can read or write these files directly with the `Read`/`Write`/`Bash` tools it already has — no special access layer is required. `/wingman:boardroom` appends to `checkpoints.jsonl` and updates `state.json` after every run; `/wingman:plan`'s session-start step reads the latest entries to recover context after a compaction or a new session, the same way `LEARNINGS.md` is read (see `commands/learn.md`).
+Any Wingman command can read or write these files directly with the `Read`/`Write`/`Bash` tools it already has — no special access layer is required. `/wingman:boardroom` appends to `checkpoints.jsonl` and updates `state.json` after every run; `/wingman:discovery`'s session-start step reads the latest entries to recover context after a compaction or a new session, the same way `LEARNINGS.md` is read (see `commands/learn.md`).
 
 ## Why no server yet
 

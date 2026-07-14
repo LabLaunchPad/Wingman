@@ -1,23 +1,25 @@
 ---
-description: Execute an approved Wingman plan task-by-task with test-driven discipline, then hand off to /wingman:secure.
+description: Execute an approved Wingman plan task-by-task with test-driven discipline, clear its own Definition-of-Done gate, then hand off to /wingman:ship.
 argument-hint: "[path to plan file, or leave blank to use the most recent approved plan]"
 ---
 
 # Wingman: Build
 
-Execute the plan approved in `/wingman:plan`. This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint.
+Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implementation-planning`). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint.
 
 $ARGUMENTS
 
 ## Before starting
 
-Confirm there is an approved plan (from `/wingman:plan`, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:plan`.
+Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
 Confirm the project is on a feature branch, not the default branch — check out or create one now (e.g. named for the plan's subject) before the first commit. Doing this here, before any work lands, means `ship.md`'s "on a feature branch" preflight check is a no-op confirmation instead of a late catch after work has already accumulated on the default branch.
 
 Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly.
 
 Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-engineering`/`mgr-design`/`mgr-data`/`mgr-qa` may need creating for whichever department leads are actually active.
+
+Use the `department-lead-activation` skill to check the Legal & Security activation signal too: if this project touches auth, payments, or personal data, create `dept-legal-security` if it doesn't exist yet. Its work now happens inline as part of this stage's Definition-of-Done gate below, rather than as a separate `/wingman:secure` stage — folding a dedicated security pass into Build's own gate, not skipping it (see "Definition-of-Done gate" below).
 
 ## Execution discipline
 
@@ -36,13 +38,49 @@ Before writing new code for any task, check whether something in the codebase al
 
 ## When the plan is fully executed
 
-Run the full verification suite for the project (tests, typecheck, lint — whatever this project actually has). Only once everything passes with fresh evidence, move to the checkpoint.
+Run the full verification suite for the project (tests, typecheck, lint — whatever this project actually has). Only once everything passes with fresh evidence, move to the Definition-of-Done gate.
+
+## Definition-of-Done gate
+
+This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
+
+**Build a threat picture.** Look at what changed since the last checkpoint and build a short list of concrete risks — not a generic checklist recitation, but specific to what was actually built:
+
+- Secrets or credentials that could leak (hardcoded, logged, committed).
+- Unsanitized input reaching a database query, shell command, or rendered template (injection/XSS).
+- Missing or weak authentication/authorization on new endpoints, routes, or actions.
+- Sensitive data (customer data, payment info, PII) being over-exposed, logged, or returned somewhere it shouldn't be.
+- New third-party dependencies or services that expand what could go wrong, without a clear reason.
+
+If this session has access to Claude Code's built-in `/security-review` capability, run it over the diff and fold its findings into this list rather than duplicating the work.
+
+If the founder has explicitly asked for deeper scrutiny than this standard checklist, use the `systematic-auditing` skill for this pass instead of just the list above.
+
+For every risk found, decide: **CLOSED** (mitigated, or a documented accepted risk) or **OPEN** (nothing done about it yet). Store risk entries in a structured **threat register**:
+
+| ID | Risk Description | Status | Owner | Detection Date | Disposition / Acceptance |
+|----|------------------|--------|-------|----------------|--------------------------|
+| 1 | Hardcoded AWS credentials in source code | OPEN | dept-legal-security | 2026-07-13 | — |
+| 2 | SQL injection vulnerability in user input | CLOSED | dept-engineering | 2026-07-13 | Fixed in PR #42, regression test added |
+| ... | ... | ... | ... | ... | ... |
+
+The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**. This implements gsd-plugin's phase-gate pattern: advancement is BLOCKED while **threats_open > 0**.
+
+**Traceability and test presence.** Alongside the threat register, confirm every task this stage executed carries at least one `wingman:req` traceability marker (per `skills/traceability-linking`, minted back in `/wingman:define`/`/wingman:architecture`/`/wingman:uxflow`) and that a corresponding test file exists for every changed non-test source file — an explicit `<!-- wingman:no-test-needed: <reason> -->` marker is the only accepted exception for genuinely test-free changes (docs, config), and it must be logged, not silently assumed.
+
+**The gate.** This stage does not clear with open risks, missing traceability, or missing tests. If anything is OPEN or missing:
+
+1. Fix what can be fixed now (following the same test-then-implement discipline as the rest of this stage).
+2. For a risk that genuinely can't be fixed right now, present it to the founder in plain language via `AskUserQuestion`: what the risk is, what it would take to fix, and what accepting it as-is would mean for the business. Only the founder can accept a business risk — do not decide this on their behalf. Once the founder decides, append a structured entry to `docs/wingman/founder-todos.md` in their project (create it if it doesn't exist yet) — a one-line risk summary, what accepting it means, and the date.
+3. Re-check until every risk is CLOSED (fixed or explicitly accepted) and traceability/tests are complete.
+
+The `dod-structural-gate.mjs` hook mechanically re-checks the threat-register/traceability/test-presence conditions above before `git push` can run in `/wingman:ship` — this section is what makes that check pass, not a separate step to remember later.
 
 ## Boardroom checkpoint
 
-Run `/wingman:boardroom diff` against the accumulated changes. This is the founder's chance to hear, in plain language, whether what got built matches what was promised, whether it's technically sound, and whether anything needs a security pass before shipping.
+Run `/wingman:boardroom diff` against the accumulated changes, once the Definition-of-Done gate above has cleared. This is the founder's chance to hear, in plain language, whether what got built matches what was promised and whether it's technically sound — the dedicated security pass already happened above, as part of this same stage's gate, not as a separate stage still to come.
 
-- If the boardroom returns "ship it": proceed to `/wingman:secure`.
+- If the boardroom returns "ship it": proceed to `/wingman:ship`.
 - If it returns concerns: fix them, then re-run the checkpoint before proceeding.
 
 ## References
@@ -50,3 +88,6 @@ Run `/wingman:boardroom diff` against the accumulated changes. This is the found
 - `skills/spec-handler` — each task in the plan is a spec; build the handler to its success criteria, then verify against them.
 - `skills/testing-patterns` — follow AAA, mock at boundaries, and cover changed paths (>=80%) as you run the verification suite above.
 - `skills/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
+- `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
+- `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule the Definition-of-Done gate implements.
+- `skills/traceability-linking` — the marker convention the Definition-of-Done gate checks for.

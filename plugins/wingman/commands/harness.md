@@ -5,7 +5,7 @@ argument-hint: ""
 
 # Wingman: Harness
 
-Every "tests pass" claim Wingman makes during `/wingman:build` and `/wingman:secure` is only as good as the test/build/lint setup (the "harness") behind it. This command periodically checks that the harness itself is honest, rather than assuming it.
+Every "tests pass" claim Wingman makes during `/wingman:build` (including its Definition-of-Done gate, which folds in what used to be a separate `/wingman:secure` stage) is only as good as the test/build/lint setup (the "harness") behind it. This command periodically checks that the harness itself is honest, rather than assuming it.
 
 ## What to check
 

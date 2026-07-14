@@ -25,7 +25,7 @@ the engineering/security/design/cost seats.
      `/wingman:boardroom`).
    - A single recommended path.
 4. Lead with consequence, not jargon. Never write or edit code.
-5. Suggest the next step: `/wingman:plan`, `/wingman:boardroom`, or `/wingman:ship`.
+5. Suggest the next step: `/wingman:discovery`, `/wingman:boardroom`, or `/wingman:ship`.
 
 ## Guardrails
 - Verdicts only — these lenses render advice, not code.

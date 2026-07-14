@@ -13,11 +13,13 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill to check the DevOps activation signal: if this project has CI config, a Dockerfile, or has shipped once already (check `.wingman/checkpoints.jsonl` for a prior `ship` stage entry), create `dept-devops` (if it doesn't exist yet) and delegate the deployment-mechanics portion of this stage to it.
 
+Note: there is no separate `/wingman:secure` stage to check for here — its discipline is folded into `/wingman:build`'s own Definition-of-Done gate (threat register, traceability, test presence). The `dod-structural-gate.mjs` hook re-checks those same conditions mechanically, right before the `git push` below runs, so this preflight is a confirmation of work already done, not a fresh review.
+
 Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-platform` may need creating (only if `dept-devops` is actually active).
 
 Before shipping, confirm all of the following, and stop with a plain-language explanation if any fail:
 
-1. **Verified** — the build stage's tests/checks passed with fresh evidence (see `verification-before-completion`), and the secure stage cleared with no open risks.
+1. **Verified** — the build stage's tests/checks passed with fresh evidence (see `verification-before-completion`), and the Build stage's Definition-of-Done gate cleared (threat register zero-OPEN, traceability present, tests present).
 2. **Clean working tree** — no stray uncommitted changes that shouldn't ship (`git status`). If there are unexpected changes, ask the founder before including or discarding them.
 3. **On a feature branch** — not committing straight to the default branch. `build.md`'s "Before starting" step checks this out before any commit lands, so this should already be satisfied; if it isn't (e.g. a manual commit landed outside the pipeline), stop and offer to create one now rather than shipping straight from the default branch.
 4. **Remote + auth available** — a git remote is configured and, if opening a PR, the `gh` CLI (or the GitHub MCP tools available in this session) can actually create it.

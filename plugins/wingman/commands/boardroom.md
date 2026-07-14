@@ -80,11 +80,11 @@ Every checkpoint's bottom line maps to who actually needs to act on it — this 
 
 After presenting the summary, use `AskUserQuestion` to get an explicit decision — do not assume silence means approval:
 
-- "Ship it" — proceed with the next pipeline stage (e.g. from `/wingman:build` continue to `/wingman:secure`, from `/wingman:ship` actually ship).
+- "Ship it" — proceed with the next pipeline stage (e.g. from the Planning Milestone continue to `/wingman:build`, from `/wingman:build` continue to `/wingman:ship`, from `/wingman:ship` actually ship).
 - "Fix the concerns first" — go address the listed items, then re-run `/wingman:boardroom` before proceeding.
 - "Let me see the details" — show the full, unabridged output from each seat (this is the only path where the founder sees raw technical detail, and only if they ask for it).
 
-Record the decision so the calling stage command (`plan`/`build`/`secure`/`ship`) knows whether it's clear to continue.
+Record the decision so the calling stage command (`implementation-planning`/`build`/`ship`) knows whether it's clear to continue.
 
 **If a decision genuinely can't be obtained in this turn** — `AskUserQuestion` isn't available in every environment (confirmed missing entirely in headless/print-mode sessions; a `ToolSearch` for it there returns no match), or the session simply ends before the founder answers — do not leave the checkpoint unrecorded and the plan file unmarked indefinitely. Proceed immediately to "Mark the plan file" and "Record the checkpoint" below using `still reviewing` / `"still_reviewing"` as the decision. A real, pending checkpoint that a later session or founder reply can update is strictly better than no record at all — the seven seats already did real work reviewing this, and losing that because the last step of the turn couldn't complete is exactly the "did the work, skipped persisting it" failure mode this project has hit before. Once a real decision does arrive (this turn or a later one), replace the `still reviewing` marker/entry with the actual outcome rather than leaving both on file.
 
@@ -107,9 +107,10 @@ Append one line to `.wingman/checkpoints.jsonl` at the project root with exactly
 
 ```json
 {
-  "schema_version": 2,
-  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage>",
-  "stage": "plan | build | secure | ship | <free-text for an ad-hoc run>",
+  "schema_version": 3,
+  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>",
+  "stage": "discovery | define | architecture | uxflow | implementation-planning | build | ship | <free-text for an ad-hoc run>, OR an array of stage names when bundle is not null (e.g. [\"discovery\",\"define\",\"architecture\",\"uxflow\",\"implementation-planning\"])",
+  "bundle": "planning-milestone | build | ship | null",
   "scope_ref": "<path to the plan file reviewed, \"diff\", or a short description of the directly-passed content and where it's headed (e.g. \"content passed directly: CHANGELOG.md entry + announcement copy\") when the calling command handed over content that's neither a plan nor a diff>",
   "seats": [
     { "seat": "ceo",      "verdict": "GO | GO_WITH_CONCERNS | NO_GO", "summary": "<one line>" },
@@ -128,7 +129,9 @@ Append one line to `.wingman/checkpoints.jsonl` at the project root with exactly
 }
 ```
 
-**Schema note (seat-rename migration, 2026):** `schema_version: 2` marks the 7-seat Boardroom (`ceo`/`cpo`/`cmo`/`cto`/`ciso`/`cfo`/`research`/`design`), replacing the prior 5-seat schema (`founder`/`engineer`/`security`/`design`/`cost`, implicitly `schema_version: 1`, unmarked). Existing `checkpoints.jsonl` entries written before this change keep their old seat names — this is an append-only audit log and is never rewritten. See `docs/DATABASE.md` for the full old→new seat mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and does not assume a fixed seat count or fixed names, so old and new entries coexist safely.
+**Schema note (7-stage pipeline migration, 2026):** `schema_version: 3` marks the 7-stage pipeline (`discovery`/`define`/`architecture`/`uxflow`/`implementation-planning`/`build`/`ship`, replacing `plan`/`build`/`secure`/`ship`) and introduces the `bundle` field: `implementation-planning.md` is the only one of the 5 planning stages that records a checkpoint, reviewing all 5 stages' combined output as one `"bundle": "planning-milestone"` entry with `stage` as an **array** of all 5 stage names — `build` and `ship` keep a scalar `stage` and `bundle` set to their own name (not `null`) for consistency, since every checkpoint now belongs to exactly one of the 3 bundles a project produces. `secure` no longer exists as a stage — its discipline is folded into `build`'s own Definition-of-Done gate (see `commands/build.md`). Existing `schema_version: 2` entries keep a scalar `stage` and no `bundle` field at all — treat its absence on an older entry as "not applicable," never as an error. This remains an append-only audit log, never rewritten; see `docs/DATABASE.md` for the full old→new stage mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) must not assume `stage` is always a scalar — check whether it's an array before iterating.
+
+**Schema note (seat-rename migration, 2026):** `schema_version: 2`+ marks the 7-seat Boardroom (`ceo`/`cpo`/`cmo`/`cto`/`ciso`/`cfo`/`research`/`design`), replacing the prior 5-seat schema (`founder`/`engineer`/`security`/`design`/`cost`, implicitly `schema_version: 1`, unmarked). Existing `checkpoints.jsonl` entries written before this change keep their old seat names — this is an append-only audit log and is never rewritten. See `docs/DATABASE.md` for the full old→new seat mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and does not assume a fixed seat count or fixed names, so old and new entries coexist safely.
 
 Create `.wingman/` and the file if they don't exist yet. This is a plain append (`>>`), never a rewrite — it's an audit log.
 

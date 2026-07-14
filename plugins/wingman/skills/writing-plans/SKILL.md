@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use when you have a spec or requirements for a multi-step task, before touching code. Triggers whenever /wingman:plan is about to write an implementation plan.
+description: Use when you have a spec or requirements for a multi-step task, before touching code. Triggers whenever /wingman:implementation-planning is about to write an implementation plan.
 ---
 
 <!--

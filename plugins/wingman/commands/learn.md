@@ -5,7 +5,7 @@ argument-hint: "<what was learned, in your own words>"
 
 # Wingman: Learn
 
-A tiny, low-ceremony memory system: one file, plain language, append-only. This is not a database or a service — it's a `LEARNINGS.md` at the project root that every future Wingman session reads at the start of `/wingman:plan`.
+A tiny, low-ceremony memory system: one file, plain language, append-only. This is not a database or a service — it's a `LEARNINGS.md` at the project root that every future Wingman session reads at the start of `/wingman:discovery`.
 
 $ARGUMENTS
 

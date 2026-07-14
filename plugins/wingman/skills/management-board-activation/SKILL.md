@@ -1,6 +1,6 @@
 ---
 name: management-board-activation
-description: Use immediately after department-lead-activation at the start of /wingman:plan, /wingman:build, /wingman:secure, or /wingman:ship — checks whether this project has crossed the complexity threshold for a Management Board manager and creates one in the founder's own repo if so. Triggers only once a project has 3+ active department leads; never on a fresh or simple project.
+description: Use immediately after department-lead-activation at the start of /wingman:discovery, /wingman:architecture, /wingman:uxflow, /wingman:build, or /wingman:ship — checks whether this project has crossed the complexity threshold for a Management Board manager and creates one in the founder's own repo if so. Triggers only once a project has 3+ active department leads; never on a fresh or simple project.
 ---
 
 # Management Board Activation
@@ -13,7 +13,7 @@ Wingman's Management Board (Engineering, Product, Design, Data, Security, QA, Pl
 
 ## When To Use
 
-Immediately after `department-lead-activation` runs, at the start of `/wingman:plan`, `/wingman:build`, `/wingman:secure`, or `/wingman:ship` — so a manager can be created in the same pass as the department lead that crosses the threshold, not as a separate always-checked gate.
+Immediately after `department-lead-activation` runs, at the start of `/wingman:discovery`, `/wingman:architecture`, `/wingman:uxflow`, `/wingman:build`, or `/wingman:ship` — so a manager can be created in the same pass as the department lead that crosses the threshold, not as a separate always-checked gate.
 
 ## Core Workflow
 

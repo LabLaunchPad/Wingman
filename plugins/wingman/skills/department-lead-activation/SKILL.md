@@ -1,6 +1,6 @@
 ---
 name: department-lead-activation
-description: Use at the start of /wingman:plan, /wingman:build, /wingman:secure, or /wingman:ship — checks whether a department lead is needed for this project and creates it in the founder's own repo if so. Triggers whenever a pipeline stage command is about to delegate build-time work and needs to know which department leads exist or should be created.
+description: Use at the start of /wingman:discovery, /wingman:architecture, /wingman:uxflow, /wingman:build, or /wingman:ship — checks whether a department lead is needed for this project and creates it in the founder's own repo if so. Triggers whenever a pipeline stage command is about to delegate build-time work and needs to know which department leads exist or should be created.
 ---
 
 # Department Lead Activation
@@ -13,7 +13,7 @@ Wingman's department leads (Product, Design, Engineering, Data, QA, Legal/Securi
 
 ## When To Use
 
-At the start of `/wingman:plan` (checks Product, always), `/wingman:build` (checks Design, Engineering, Data, QA), `/wingman:secure` (checks Legal/Security), and `/wingman:ship` (checks DevOps).
+At the start of `/wingman:discovery` (checks Product, always), `/wingman:architecture` (checks Engineering, always), `/wingman:uxflow` (checks Design), `/wingman:build` (checks Design, Engineering, Data, QA, and Legal/Security — Legal/Security's dedicated review now happens inline as part of Build's own Definition-of-Done gate, not a separate `/wingman:secure` stage), and `/wingman:ship` (checks DevOps).
 
 ## Core Workflow
 

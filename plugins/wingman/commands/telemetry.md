@@ -17,7 +17,7 @@ Look for existing error tracking (e.g. Sentry-style setup), analytics, or struct
 
 1. **Errors are visible** — if this feature fails in production, will anyone find out, or will it fail silently?
 2. **Usage is visible** — if this feature is meant to be used, is there any signal (even a simple log line or count) that it's actually being used, so the founder can tell if it landed or if nobody's touching it?
-3. **No sensitive data leaks into logs/telemetry** — cross-check with `/wingman:secure` concerns; never log secrets, credentials, or raw customer PII.
+3. **No sensitive data leaks into logs/telemetry** — cross-check with `/wingman:build`'s Definition-of-Done gate concerns; never log secrets, credentials, or raw customer PII.
 
 ## If gaps exist
 
