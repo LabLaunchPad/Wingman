@@ -19,8 +19,8 @@ contain, diagnose, communicate, then fix — in that order, not all at once.
    switch, scale up, or take the affected surface offline. A contained outage
    beats a widening one. Do not debug before you stabilize.
 2. **Contain a security event.** If a key leaked, rotate it *now* via the secret
-   manager (pair with the `security-checklist` skill and `/wingman:secure`'s
-   threat register). Assume exposed until proven otherwise.
+   manager (pair with the `security-checklist` skill and `/wingman:build`'s
+   Definition-of-Done gate threat register). Assume exposed until proven otherwise.
 3. **Triage.** One sentence: what's broken, who's affected, since when. Scope it
    before fixing.
 4. **Diagnose** with the smallest safe step — check the last change, the logs,

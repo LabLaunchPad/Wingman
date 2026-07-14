@@ -1,6 +1,6 @@
 {
   "name": "wingman",
-  "version": "0.1.8",
+  "version": "0.3.0",
   "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
   "author": {
     "name": "LabLaunchPad"
@@ -8,9 +8,12 @@
   "license": "MIT",
   "keywords": ["sdlc", "founders", "boardroom", "plan-review", "security", "orchestration"],
   "commands": [
-    "./commands/plan.md",
+    "./commands/discovery.md",
+    "./commands/define.md",
+    "./commands/architecture.md",
+    "./commands/uxflow.md",
+    "./commands/implementation-planning.md",
     "./commands/build.md",
-    "./commands/secure.md",
     "./commands/ship.md",
     "./commands/boardroom.md",
     "./commands/retro.md",
@@ -29,11 +32,14 @@
     "./commands/incident.md"
   ],
   "agents": [
-    "./agents/boardroom-founder.md",
-    "./agents/boardroom-engineer.md",
-    "./agents/boardroom-security.md",
-    "./agents/boardroom-design.md",
-    "./agents/boardroom-cost.md"
+    "./agents/boardroom-ceo.md",
+    "./agents/boardroom-cto.md",
+    "./agents/boardroom-cpo.md",
+    "./agents/boardroom-ciso.md",
+    "./agents/boardroom-cfo.md",
+    "./agents/boardroom-cmo.md",
+    "./agents/boardroom-research.md",
+    "./agents/boardroom-design.md"
   ],
   "skills": [
     "./skills/plain-language-checkpoint",
@@ -44,6 +50,8 @@
     "./skills/engineering-minimalism",
     "./skills/design-taste",
     "./skills/department-lead-activation",
+    "./skills/management-board-activation",
+    "./skills/traceability-linking",
     "./skills/evolve-promotion",
     "./skills/systematic-auditing",
     "./skills/ponytail-debt-harvesting",

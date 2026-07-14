@@ -1,6 +1,6 @@
 ---
 name: security-checklist
-description: Use when running /wingman:secure or any security pass — work the STRIDE + OWASP + prompt-injection defense checklist and record every risk in the gsd-plugin threat register before allowing advancement. The security gate, not a recitation.
+description: Use when running /wingman:build's Definition-of-Done gate or any security pass — work the STRIDE + OWASP + prompt-injection defense checklist and record every risk in the gsd-plugin threat register before allowing advancement. The security gate, not a recitation.
 ---
 
 <!--
@@ -19,7 +19,7 @@ A security pass is not a generic checklist recitation — it is a concrete risk 
 
 ## When To Use
 
-During `/wingman:secure` and any time code that touches a trust boundary, data, secrets, or an LLM is changed.
+During `/wingman:build`'s Definition-of-Done gate and any time code that touches a trust boundary, data, secrets, or an LLM is changed.
 
 ## Core Workflow
 

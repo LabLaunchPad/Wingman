@@ -21,7 +21,7 @@ goes one level deeper on the actual changes.
 2. Review across four lenses, in founder terms:
    - **Correctness** — does it do what it claims? Edge cases, error paths.
    - **Security** — secrets, injection, authz, untrusted input (pair with the
-     `security-checklist` skill and `/wingman:secure`'s threat register).
+     `security-checklist` skill and `/wingman:build`'s Definition-of-Done gate threat register).
    - **Simplicity** — could it be smaller/clearer? (pair with
      `engineering-minimalism`; flag `#yagni`/`#shrink` candidates).
    - **Tests** — is the behavior covered? Does a change need a new test?

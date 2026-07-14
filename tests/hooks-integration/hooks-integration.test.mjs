@@ -172,19 +172,19 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 33 skills', () => {
+  it('should have 35 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 33);
+    assert.strictEqual(plugin.skills.length, 35);
   });
 
-  it('should have 19 commands', () => {
+  it('should have 22 commands', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.commands.length, 19);
+    assert.strictEqual(plugin.commands.length, 22);
   });
 
-  it('should have 5 agents', () => {
+  it('should have 8 agents', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.agents.length, 5);
+    assert.strictEqual(plugin.agents.length, 8);
   });
 
   it('should have all new skills registered', () => {
@@ -366,15 +366,16 @@ describe('Boardroom Checkpoint Gstack Gate', () => {
 // Secure Command — gsd-plugin threat register (CLOSED/OPEN gate)
 // ============================================================================
 
-describe('Secure Command gsd Threat Register', () => {
+describe('Build Command gsd Threat Register (folded in from the former secure.md, MVP2)', () => {
+  const buildPath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'build.md');
   const securePath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'secure.md');
 
-  it('should exist', () => {
-    assert.ok(fs.existsSync(securePath));
+  it('secure.md no longer exists as a standalone command', () => {
+    assert.ok(!fs.existsSync(securePath));
   });
 
-  it('implements the gsd-plugin threat register with CLOSED/OPEN dispositions', () => {
-    const content = fs.readFileSync(securePath, 'utf-8');
+  it('build.md implements the gsd-plugin threat register with CLOSED/OPEN dispositions', () => {
+    const content = fs.readFileSync(buildPath, 'utf-8');
     assert.match(content, /threat register/i);
     assert.match(content, /CLOSED/i);
     assert.match(content, /OPEN/i);

@@ -16,73 +16,86 @@ An enterprise-scale AI organization (dozens of narrow specialist agents across 8
 
 **The hybrid resolves this:** keep the corporate hierarchy as the permanent organizing metaphor and naming scheme, but implement the agent population as **two tiers that grow lazily**, gated by real signals from the project — not a fixed roster shipped on install.
 
-## 3. The two-tier agent model
+## 3. The agent model (Boardroom → Management Board → department leads → specialists)
 
 | Tier | Role | Count | When it exists |
 |---|---|---|---|
-| **Boardroom seats** | Gate reviewers. Never write code — only render a plain-language verdict at a checkpoint. | Fixed: 5 | Every project, from install |
+| **Boardroom seats** | Gate reviewers. Never write code — only render a plain-language verdict at a checkpoint. | Fixed: 7 | Every project, from install |
+| **Management Board** | Execution-layer coordinators. Turn Boardroom strategy into execution guidance for department leads — they coordinate and prioritize, never produce or approve. | Grows 0 → 9 | Created only once a project has **3+ active department leads** *and* the corresponding department lead exists (§5a) |
 | **Department leads** | Build-time workers. One per corporate department, each covering that department's full remit via its own skills/checklists. | Grows 0 → 8 | Created the first time its department's activation signal is true for the project (§5) |
-| **Specialists** | Narrow sub-roles (the full 56-role catalog in `docs/AGENT-ROSTER.md`). | Grows 0 → N | Only created by `/wingman:evolve`, after a department lead shows *repeated* (2+) friction in one narrow area |
+| **Specialists** | Narrow sub-roles (the 56+-role candidate catalog in `docs/AGENT-ROSTER.md`, uncapped and growing as evidenced need arises). | Grows 0 → N, uncapped | Only created by `/wingman:evolve`, after a department lead shows *repeated* (2+) friction in one narrow area |
 
-This mirrors how an actual seed-stage company staffs itself: a handful of generalists doing everything, specialists hired only once a function is a proven bottleneck.
+This mirrors how an actual company staffs itself as it grows: a handful of generalists and a review board doing everything at first, an execution-coordination layer added only once there's enough simultaneous work to actually need coordinating, specialists hired only once a function is a proven bottleneck. (Expanded from a two-tier to this four-tier model, and from 5 to 7 Boardroom seats, in the 2026 rearchitecture — see §10.)
 
-## 4. The Boardroom (fixed, 5 seats)
+## 4. The Boardroom (fixed, 7 seats)
 
-Every checkpoint runs all five seats in parallel and consolidates them into one plain-language verdict (see `plugins/wingman/commands/boardroom.md`).
+Every checkpoint runs all seven seats in parallel and consolidates them into one plain-language, grouped-header verdict (see `plugins/wingman/commands/boardroom.md`).
 
-| Seat | File | Lens | Absorbs |
+| Group | Seat | File | Lens |
 |---|---|---|---|
-| Founder | `agents/boardroom-founder.md` | Business/product/market fit | CEO + CPO + CMO — a founder-stage company doesn't need three separate C-suite personas negotiating with each other |
-| Engineer | `agents/boardroom-engineer.md` | Correctness, architecture, test coverage | CTO |
-| Security | `agents/boardroom-security.md` | Data safety, injection, auth, secrets | Legal & Compliance (license, privacy/GDPR/CCPA) — folded in as checklist items, not a separate seat |
-| Design | `agents/boardroom-design.md` | Usability, consistency, dev-experience | — |
-| Cost | `agents/boardroom-cost.md` | Compute/token spend, hosting cost, new paid dependencies | CFO |
+| Business | CEO | `agents/boardroom-ceo.md` | Vision/strategy fit, cross-seat arbitration |
+| Business | CPO | `agents/boardroom-cpo.md` | User value, feature scope, market fit |
+| Business | CMO | `agents/boardroom-cmo.md` | Go-to-market, positioning, audience |
+| Technical | CTO | `agents/boardroom-cto.md` | Correctness, architecture, scalability |
+| Technical | CISO | `agents/boardroom-ciso.md` | Security, compliance, privacy — absorbs Legal & Compliance as checklist items, not a separate seat |
+| Finance | CFO | `agents/boardroom-cfo.md` | Compute/token spend, hosting cost, new paid dependencies |
+| Research | Research | `agents/boardroom-research.md` | Evidence grounding, competitive/landscape awareness — named "Research," not "CRO," to avoid colliding with the `founder-cro` skill (Chief *Revenue* Officer) |
 
-**Gate rule:** any single `NO_GO` verdict makes the consolidated bottom line `DO NOT SHIP`, regardless of the other four. Any `GO_WITH_CONCERNS` (with no `NO_GO`) yields `GO WITH CHANGES`. Only all-`GO` is a clean `GO`. The founder always makes the final call via `AskUserQuestion` — the boardroom informs the decision, it doesn't make it.
+`boardroom-design.md` (usability/consistency/dev-experience) is dispatched alongside these seven whenever the scope has a user-facing or developer-facing surface, using its existing "N/A" fast-path otherwise; it isn't grouped under a C-suite header since it doesn't map to one cleanly.
+
+**Expanded from 5 seats in 2026** (Founder/Engineer/Security/Design/Cost → the 7 above): the former Founder seat, which absorbed CEO+CPO+CMO, is now split back into three since the added review depth was judged worth the extra dispatch cost for this rearchitecture's goals; Engineer/Security/Cost renamed to CTO/CISO/CFO with unchanged scope; Research is genuinely new. This was a deliberate reversal of this document's own earlier "a founder-stage company doesn't need three separate C-suite personas negotiating with each other" reasoning — see §2's three original reasons, which still apply in full to why this expansion stops at 7 fixed seats rather than growing further, and to why the Management Board (§5a) below is complexity-gated rather than always-on.
+
+**Gate rule:** any single `NO_GO` verdict makes the consolidated bottom line `DO NOT SHIP`, regardless of the others. Any `GO_WITH_CONCERNS` (with no `NO_GO`) yields `GO WITH CHANGES`. Only all-`GO` is a clean `GO`. This predicate is seat-count-agnostic — unchanged by the seat count going from five to seven. The founder always makes the final call via `AskUserQuestion` — the boardroom informs the decision, it doesn't make it.
+
+### Human Escalation Framework
+
+Every checkpoint's bottom line maps to an explicit risk tier and who acts on it (formalizes what the gate rule above already implied):
+
+| Risk tier | Pattern | Who acts |
+|---|---|---|
+| Low | Clean `GO` | Proceeds automatically |
+| Medium | `GO WITH CHANGES`, no `NO_GO` | The relevant Management Board manager (once one exists) or the calling command fixes and re-runs the checkpoint |
+| High | `DO NOT SHIP` from a single seat, or repeated `GO WITH CHANGES` on the same concern | Full Boardroom review (already happened) — the founder decides via `AskUserQuestion` |
+| Critical | `DO NOT SHIP` touching security/data-safety, or a one-way-door business decision | Explicit founder `AskUserQuestion`, phrased with the specific irreversible consequence named |
+
+### Agent Permission Model
+
+Every agent/manager/department-lead/specialist template declares a `permissions:` frontmatter field: one of `read`/`write`/`approve`/`execute`/`deploy`. `approve` is exclusive to Boardroom seats (mechanically enforced by `validate-structure.mjs`); department leads and specialists get `read`+`write` (they produce); Management Board managers get `read` (they coordinate and recommend, never approve); `deploy` is reserved for `dept-devops`-dispatched work, and only after a Boardroom approval has already happened. This is a documentation-and-consistency field today, not yet a runtime-enforced permission check — it exists to make autonomy boundaries explicit and auditable as the agent population grows, directly de-risking any future autonomous-action capability (e.g. a self-healing system) by construction rather than by convention alone.
 
 ### Checkpoint audit log
 
-Every boardroom run appends one line to `.wingman/checkpoints.jsonl` at the project root (git-committed, human-readable):
-
-```json
-{
-  "checkpoint_id": "2026-07-07T14-32-00Z-plan",
-  "stage": "plan",
-  "scope_ref": "docs/wingman/plans/2026-07-07-billing-integration.md",
-  "seats": [
-    { "seat": "founder",  "verdict": "GO",              "summary": "Solves the stated problem, scope is right-sized." },
-    { "seat": "engineer", "verdict": "GO_WITH_CONCERNS", "summary": "No test plan for the webhook retry path yet." },
-    { "seat": "security", "verdict": "GO",              "summary": "No new data exposure identified." },
-    { "seat": "design",   "verdict": "GO",              "summary": "N/A — no user-facing surface in this stage." },
-    { "seat": "cost",     "verdict": "GO",              "summary": "No new paid services introduced." }
-  ],
-  "bottom_line": "GO_WITH_CHANGES",
-  "founder_decision": "fix_concerns_first",
-  "founder_notes": "",
-  "next_stage": "build"
-}
-```
+Every boardroom run appends one line to `.wingman/checkpoints.jsonl` at the project root (git-committed, human-readable) — see `docs/DATABASE.md` for the full schema, the `schema_version: 2` migration note, and the old→new seat-name mapping from the 5-seat schema.
 
 This is deliberately **not cryptographically signed**. Signing solves multi-party adversarial trust (departments that might lie to each other) — a problem Wingman doesn't have, since there is exactly one trust root: the founder. A plain, git-tracked, append-only log gives a full audit trail without security theater.
 
+## 4b. Definition-of-Done structural gate
+
+Every discipline skill this project has (`spec-handler`, `definition-of-done`, `verification-before-completion`, `security-checklist`, `testing-patterns`) was, until MVP2, enforced purely by prose cross-reference in a command's References section — compliance depended entirely on the executing agent remembering to apply them, with zero deterministic backing. `hooks/dod-structural-gate.mjs` closes that gap the same way `secret-guard.mjs` already closes it for destructive commands and secret-writing: a hook that checks artifact **presence**, never semantic **quality** (whether a test is actually good stays a Boardroom/human judgment call).
+
+Two narrowly-scoped registrations, deliberately avoiding the class of false-positive over-block `boardroom-checkpoint.mjs` itself hit once (its v12.1 fix):
+- **`PreToolUse`/`ExitPlanMode`** (sibling to `boardroom-checkpoint.mjs`, not merged into it): a light traceability-only check, and only engages when the plan text contains `## Planning Milestone checkpoint` — a heading unique to `commands/implementation-planning.md` — so it never touches an unrelated `ExitPlanMode` call, including this project's own dev-planning sessions.
+- **`PreToolUse`/`Bash`** matching a real `git push`: the full 4-point check (traceability via `check-traceability.mjs`; test-file presence with a logged `<!-- wingman:no-test-needed: <reason> -->` escape hatch; the project's own test suite actually passing, detected generically across common manifest conventions — not just Node.js, since Wingman builds arbitrary founder projects; threat-register zero-`OPEN`) against the most recent Build-stage entry in `.wingman/checkpoints.jsonl`. If no such checkpoint exists yet, the hook allows — it never blocks ordinary git usage in a project not using Wingman's pipeline. The test-execution check was added after a real eval (`evals/cases/seven-stage-pipeline-e2e.md`) caught the exact gap presence-only checking left open: a test file existing is not the same as it passing.
+
+Every deny names the specific check and file/ID that failed, matching `secret-guard.mjs`'s and `boardroom-checkpoint.mjs`'s own discipline of never returning a generic "gate failed."
+
 ## 5. Department leads (grow 0 → 8, per project)
 
-One lead subagent per corporate department. Each lead covers its department's *entire* remit through its own skills/checklists — it is not itself split into the 56 sub-roles; those are specialist promotions (§6).
+One lead subagent per corporate department. Each lead covers its department's *entire* remit through its own skills/checklists — it is not itself split into the 56+ sub-roles; those are specialist promotions (§6).
 
 | # | Department | Lead agent | Activation signal | Delegating command |
 |---|---|---|---|---|
-| 1 | Product Management | `dept-product` | Always — every project has requirements | `/wingman:plan` |
+| 1 | Product Management | `dept-product` | Always — every project has requirements | `/wingman:discovery` |
 | 2 | UX/UI & Brand | `dept-design` | Project has any user-facing surface | `/wingman:build` |
 | 3 | Tech & Engineering | `dept-engineering` | Always | `/wingman:build` |
 | 4 | Data & Analytics | `dept-data` | Codebase has (or the plan introduces) a schema/migrations directory | `/wingman:build` |
 | 5 | QA & Peer Review | `dept-qa` | Always | `/wingman:build`'s verification step |
-| 6 | Legal, Security & Compliance | `dept-legal-security` | Project touches auth, payments, or personal data | `/wingman:secure` |
+| 6 | Legal, Security & Compliance | `dept-legal-security` | Project touches auth, payments, or personal data | `/wingman:build` (its Definition-of-Done gate — see §4b; there is no separate `/wingman:secure` stage as of MVP2) |
 | 7 | DevOps & SRE | `dept-devops` | Project has CI config, a Dockerfile, or has shipped once already | `/wingman:ship` |
 | 8 | Revenue, Marketing & Ops | `dept-growth` | Founder requests docs/SEO/launch copy | `/wingman:launch` |
 
-**Boardroom seats vs. department leads are different roles by design:** a boardroom seat reviews and gates; a department lead produces the thing being reviewed. This avoids the 1:1 redundancy in a literal corporate org chart (e.g. a CPO *and* a separate Requirements Analyst covering overlapping ground) — in Wingman, the Founder seat reviews what `dept-product` produces, full stop.
+**Boardroom seats vs. department leads are different roles by design:** a boardroom seat reviews and gates; a department lead produces the thing being reviewed. This avoids the 1:1 redundancy in a literal corporate org chart (e.g. a CPO *and* a separate Requirements Analyst covering overlapping ground) — in Wingman, the CPO seat reviews what `dept-product` produces, full stop.
 
-Department-lead files don't exist in a fresh install. Each of the four delegating commands checks its relevant activation signals above at the start of its run and creates the relevant lead file (from the standard template in `skills/department-lead-activation/references/template.md`) the first time it's actually warranted. Once created, it persists for the life of the project.
+Department-lead files don't exist in a fresh install. Each of the four delegating commands checks its relevant activation signals above at the start of its run — immediately followed by a `management-board-activation` check (§5a) — and creates the relevant lead file (from the standard template in `skills/department-lead-activation/references/template.md`) the first time it's actually warranted. Once created, it persists for the life of the project.
 
 **Where these files actually live is load-bearing, not incidental.** Department-lead agents are written to **`.claude/agents/dept-<name>.md` in the founder's own project repository — never into Wingman's own plugin installation directory.** Two reasons:
 1. Wingman's plugin files live under Claude Code's plugin cache, resynced from the marketplace source; anything written there by a running session risks silent loss on the next plugin update, and there's no guaranteed way to make a freshly-written *plugin* agent file discoverable within the same session without a reload.
@@ -90,12 +103,22 @@ Department-lead files don't exist in a fresh install. Each of the four delegatin
 
 The mechanism for detecting signals and writing these files is `skills/department-lead-activation`, shared by all four delegating commands rather than duplicated in each.
 
-## 6. Specialists (grow 0 → N, per project, via `/wingman:evolve`)
+## 5a. Management Board (grows 0 → 9, per project, complexity-gated)
 
-The full 56-role catalog from the original corporate blueprint lives in `docs/AGENT-ROSTER.md` as **candidates**, organized under their department. None of them are files until `/wingman:evolve` promotes one:
+Sits between the 7-seat Boardroom and department leads: nine execution-layer coordinator roles (Engineering/Product/Design/Data/Security/QA/Platform/Research/Growth Manager) that turn Boardroom strategy into execution guidance — roadmaps, resource allocation, prioritization, dependencies. They coordinate; they do not produce (that's department leads) or approve (that's the Boardroom).
+
+**Activation is two-part, not just "a department lead exists":** a manager is only created once (a) its corresponding department lead is active, **and** (b) the project has **3+ active department leads overall**. This is deliberately more conservative than department-lead activation itself — a Management Board on a project with one or two department leads would recreate the exact always-on-org problem §2 rejected, just one layer higher. See `skills/management-board-activation` for the shared mechanism (structurally identical to `skills/department-lead-activation`, one layer up) and `docs/AGENT-ROSTER.md` for the full manager-to-department mapping.
+
+Manager files are written to `.claude/agents/mgr-<name>.md` in the founder's own project — identical placement rule and identical reasoning to department leads (above) and specialists (§6).
+
+## 6. Specialists (grow 0 → N, uncapped, per project, via `/wingman:evolve`)
+
+The specialist candidate catalog (56+ roles, growing as new candidate roles are added to `docs/AGENT-ROSTER.md` — e.g. React/Python/RAG/LLM Integration/RL/Prompt Engineer, added 2026) lives there as **candidates**, organized under their department. None of them are files until `/wingman:evolve` promotes one:
 
 - A department lead repeatedly hits friction in one narrow sub-task (2+ occurrences logged via `/wingman:learn`, surfaced in `docs/wingman/retros.md`, or visible as repeated `GO_WITH_CONCERNS`/`NO_GO` on the same topic in `.wingman/checkpoints.jsonl`).
 - `/wingman:evolve` (via the `skills/evolve-promotion` mechanism) proposes splitting that sub-task into its own dedicated specialist subagent, names the specific candidate role from the catalog (or a new one if the catalog doesn't cover it), and asks the founder to approve before creating it.
+
+**"Uncapped" means the catalog has no fixed ceiling, not that promotion has no gate.** The 2+-occurrence, founder-approved gate in `skills/evolve-promotion` is unchanged and applies identically regardless of how many candidate rows exist — growing the catalog's *vocabulary* doesn't loosen the *bar* for actually creating one.
 
 **Every artifact `/wingman:evolve` promotes — specialist agent, command, or skill — follows the exact same placement rule as department leads (§5): written into the founder's own project under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate), never into Wingman's own plugin directory.** "Wingman's plugin directory" means the founder's locally-installed copy, which gets resynced from the marketplace source — every one of these artifacts is specific to this founder's own project/patterns anyway, not a general-purpose Wingman capability, so the plugin directory is never the right home for them.
 
@@ -106,15 +129,15 @@ This means two different Wingman-managed projects end up with different speciali
 | Corporate concept | Wingman mechanism |
 |---|---|
 | Boardroom meeting / phase gateway | `/wingman:boardroom` — parallel dispatch of the 5 seats, consolidated verdict, `.wingman/checkpoints.jsonl` record (§4) |
-| Cross-departmental PR loop (QA + Security run together; Security can block and reassign) | `/wingman:build`'s closing verification step and `/wingman:secure`'s gate. Read-only review passes (`dept-qa`, `boardroom-security`) dispatch in parallel — same one-message/multiple-Task-call pattern `/wingman:boardroom` already uses. |
+| Cross-departmental PR loop (QA + Security run together; Security can block and reassign) | `/wingman:build`'s closing verification step and its own Definition-of-Done gate (§4b) — Security's dedicated pass now happens inline here rather than in a separate `/wingman:secure` stage. Read-only review passes (`dept-qa`, `boardroom-ciso`) dispatch in parallel — same one-message/multiple-Task-call pattern `/wingman:boardroom` already uses. |
 | Automated error-correction loop (prod error → root-cause → hotfix → re-verify) | `/wingman:hotfix`: founder pastes a production error (or it arrives via an error-tracking MCP connector wired up through `/wingman:telemetry`) → `systematic-debugging` skill investigates → `dept-engineering` fixes → `dept-qa` verifies → boardroom checkpoint → `/wingman:ship`. |
 
 ## 8. Model tiering
 
 Claude Code subagents support a `model:` frontmatter field. Assign by how expensive a wrong call is, not by department:
 
-- **Opus-tier** (`model: opus`) — `boardroom-engineer`, `boardroom-security`, and `dept-engineering` when doing architecture or threat-modeling work.
-- **Sonnet-tier** (`model: inherit`, default) — `boardroom-founder`, `boardroom-design`, `boardroom-cost`, and most department-lead build work.
+- **Opus-tier** (`model: opus`) — `boardroom-cto`, `boardroom-ciso`, and `dept-engineering` when doing architecture or threat-modeling work.
+- **Sonnet-tier** (`model: inherit`, default) — `boardroom-ceo`, `boardroom-cpo`, `boardroom-cmo`, `boardroom-research`, `boardroom-cfo`, `boardroom-design`, and most department-lead build work. Management Board managers (§5a) also default to this tier — coordination work, not architecture-risk or threat-modeling.
 - **Haiku-tier** (`model: haiku`) — high-volume, low-risk text generation: changelog/PR copy, `/wingman:learn` log entries, `dept-growth`'s routine copywriting.
 
 ## 9. Relationship to vendored reference repositories
@@ -158,6 +181,8 @@ Not every skill traces to a vendor repo. `skills/systematic-auditing` (paired wi
 - **v11 (built)**: closed the remaining wshobson gap and the eval-coverage open item. (1) Promoted `wshobson/agents`' **doc-index discipline** into `skills/doc-index` — the governance skill that keeps every reference/doc discoverable and wired into an owning command/skill/agent (directly operationalizing the v10 dead-doc finding), registered as the 25th skill. (2) Authored the 6 missing behavioral eval cases (`learn`, `telemetry`, `plain-language-checkpoint`, `design-taste`, `engineering-minimalism`, `token-economy`) in `evals/cases/`, bringing the suite to 25 cases — each defined to the verified-case format with a pending-grading run log (behavioral grading requires `ANTHROPIC_API_KEY` + `/bin/bash`, unavailable in the authoring environment; the deterministic `check-fixtures.mjs` gate runs them on every PR). 84 tests passing.
 - **v12 (maintenance, recommended by the project's own rules)**: brought the plugin to a **fully check-clean** state and reconciled the stale status doc. (1) The 5 skills that violated the skill-anatomy standard (`ponytail-debt-harvesting`, `platform-native-reference`, `verification-loop`, `interview-one-question-at-a-time`, `evidence-gated-catalog`) now carry `Use when…` trigger clauses in their `description` (also fixing the "description trap" auto-routing risk) and `interview-one-question-at-a-time` gained its missing `## Verification` section — `validate-structure.mjs` now emits **zero** warnings. (2) `docs/PROJECT.md` was stale (claimed "13 commands / 10 skills / all 10 eval cases") and now matches reality (16 commands, 25 skills, 25 eval cases, v9–v11 recorded) — per the project's "stale status is worse than no status doc" rule. 84 tests passing; `validate-structure` and `check-repo-consistency` both PASS with no warnings.
 - **v12.1 (2026-07-13)**: merged the v8–v12 vendor-pattern integration as **PR #12** (`plugin.json` → `0.1.2`), then a `systematic-auditing` pass (4 parallel file-scoped subagents) found a critical defect in `boardroom-checkpoint.mjs`: it validated the 7 required `ExitPlanMode` report sections against *every* source — including inline plan text that has no section headers — so `isApprovedCheckpoint` always saw missing sections and **denied every `ExitPlanMode`** (a fail-closed over-block, the inverse of the earlier false-deny). Fixed so each source is judged independently and an approved checkpoint requires the marker + `ship it` + all 7 sections; added a regression test (`tests/hooks-integration/hooks-integration.test.mjs`). Full suite now **85/85**; both structural validators PASS. Created `CHANGELOG.md` and `ANNOUNCEMENT.md`. Branch-protection for `main` could not be set via the authenticated token (GitHub 404s on the write) — remains a web-UI action in `docs/HUMAN-TODOS.md`; `ANTHROPIC_API_KEY` still pending the token (gates real eval grading).
+- **v13 (MVP1, this rearchitecture)**: hard cutover of the Boardroom from 5 seats to 7 (§4) — `boardroom-founder`/`boardroom-engineer`/`boardroom-security`/`boardroom-cost` replaced by `boardroom-ceo`/`boardroom-cto`/`boardroom-ciso`/`boardroom-cfo`, plus 2 new seats (`boardroom-cpo`, `boardroom-cmo`) and a 7th (`boardroom-research`, deliberately not "CRO" — see §4's naming note). `boardroom-design` unchanged. `commands/boardroom.md` dispatches all 7 in parallel and consolidates into grouped Business/Technical/Finance/Research summary headers instead of a flat list, plus an explicit Human Escalation Framework tier table. New **Management Board** layer (§5a): 9 manager roles, activated only once a project crosses 3+ active department leads (complexity-gated, deliberately stricter than department-lead activation itself), via the new `management-board-activation` skill, wired into `plan.md`/`build.md`/`secure.md`/`ship.md` immediately after each command's existing department-lead check. New **Agent Permission Model**: a `permissions:` frontmatter field (`read`/`write`/`approve`/`execute`/`deploy`) on every agent template — `approve` is exclusive to Boardroom seats, managers get `read` only, department leads/specialists get `read`+`write`. `checkpoints.jsonl` gains `schema_version: 2` for the new seat names (old entries keep their old names permanently — see `docs/DATABASE.md`'s migration note); `state.json` gains `active_managers: []`. Specialist catalog (`docs/AGENT-ROSTER.md` + the runtime copy) extended with 6 new candidate rows (React/Python/RAG/LLM Integration/RL/Prompt Engineer). `validate-structure.mjs` updated: `OPUS_REQUIRED_AGENTS` now checks `boardroom-cto`/`boardroom-ciso`, plus new permission-field validation (missing → warning; invalid value or `approve` outside `boardroom-*` → error; `boardroom-*` without `approve` → error). This is a deliberate, confirmed reversal of this document's own earlier "a founder-stage company doesn't need three separate C-suite personas" reasoning (§4) — see the founder-decision trail in `docs/PROJECT.md`'s decisions log. MVP2–5 (7-stage pipeline, evaluation harness, learning loop, local vector search, self-healing, 10 enterprise-governance systems) are scoped as a roadmap but explicitly deferred to their own future planning passes, not part of this rollout.
+- **v14 (MVP2)**: replaced the 4-stage `plan`/`build`/`secure`/`ship` pipeline with 7 named stages — `discovery`/`define`/`architecture`/`uxflow`/`implementation-planning`/`build`/`ship` — while *reducing* founder-visible checkpoints from 4 to 3, not increasing them: the 5 new planning stages (Discovery through Implementation Planning) run without their own Boardroom checkpoint, bundling into one "Planning Milestone" checkpoint at the end of `implementation-planning.md` (`"bundle": "planning-milestone"`, `stage` as an array of all 5 names in `checkpoints.jsonl`). `secure.md` is retired as a standalone command; its threat-register discipline moved verbatim into `build.md`'s new "Definition-of-Done gate" section, not diluted — Build and Ship each keep their own single checkpoint (`"bundle": "build"` / `"bundle": "ship"`). New **traceability engine** (`skills/traceability-linking`, `<!-- wingman:req DEF-001 -->`-style markers minted per stage with a `DISC-`/`DEF-`/`ARCH-`/`UX-`/`IP-` prefix scheme, tracked in `.wingman/traceability.json`) plus a shippable validator, `plugins/wingman/scripts/check-traceability.mjs`, usable both in this repo's own CI and by a founder's installed plugin. New **deterministic Definition-of-Done structural gate** (§4b): `hooks/dod-structural-gate.mjs`, mechanically enforcing artifact *presence* (not quality) for the first time across the 5 prose-only discipline skills that previously had zero hook backing — registered on `ExitPlanMode` (traceability only, narrowly scoped to Planning Milestone checkpoints) and on `Bash` matching `git push` (the full traceability/test-presence/threat-register check). CFO seat extended with a budget/alert-threshold check (still one seat, no new department, per the original MVP-tiered roadmap's lock). `checkpoints.jsonl` bumped to `schema_version: 3` — see `docs/DATABASE.md`'s migration note for the old→new stage mapping and the scalar-to-array `stage` shape change.
 
 ## 11. CI/CD (`.github/workflows/`)
 

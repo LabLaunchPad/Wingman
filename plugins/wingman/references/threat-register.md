@@ -1,6 +1,6 @@
 # Threat Register (gsd-plugin pattern)
 
-Adapted from `jnuyens/gsd-plugin`'s phase-gate pattern: a threat register with explicit `CLOSED`/`OPEN` dispositions that blocks advancement while `threats_open > 0`. In Wingman this lives inside `/wingman:secure` — the secure stage does not pass while any threat is `OPEN`.
+Adapted from `jnuyens/gsd-plugin`'s phase-gate pattern: a threat register with explicit `CLOSED`/`OPEN` dispositions that blocks advancement while `threats_open > 0`. In Wingman this lives inside `/wingman:build`'s Definition-of-Done gate (folded in from a formerly-separate `/wingman:secure` stage) — Build does not pass while any threat is `OPEN`.
 
 ## The rule
 

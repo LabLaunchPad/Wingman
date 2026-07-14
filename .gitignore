@@ -1,3 +1,6 @@
 
 # Headless eval transcripts (CI artifact, not committed)
 evals/.artifacts/
+
+# Scratch git worktrees for isolated background agents (transient, not committed)
+.claude/worktrees/

@@ -12,7 +12,25 @@ A role only gets built when `/wingman:evolve` promotes it — after a department
 
 ## Executive Leadership Team → The Boardroom
 
-Not a department — the 5 fixed gate-reviewer seats, always present. See `ARCHITECTURE.md` §4 for the full mapping (Founder seat absorbs CEO+CPO+CMO; Engineer seat = CTO; Security seat absorbs Legal & Compliance; Design seat unchanged; Cost seat = CFO, planned).
+Not a department — the 7 fixed gate-reviewer seats, always present (expanded from 5 in the 7-seat Boardroom rearchitecture). See `ARCHITECTURE.md` §4 for the full mapping: `boardroom-ceo` (business alignment/vision/strategy, split from the former Founder seat), `boardroom-cpo` (user value/feature fit, new), `boardroom-cmo` (go-to-market/positioning, new), `boardroom-cto` (renamed from Engineer), `boardroom-ciso` (renamed from Security, still absorbs Legal & Compliance), `boardroom-cfo` (renamed from Cost), `boardroom-research` (evidence/competitive-landscape lens, new — named "Research" not "CRO" to avoid colliding with the Growth department's Chief Revenue Officer advisory skill below), plus `boardroom-design` (unchanged).
+
+---
+
+## Management Board (Layer 2, complexity-gated)
+
+Not a department — 9 execution-layer coordinator roles that sit between the Boardroom and department leads, created lazily and only once a project has **3+ active department leads** (see `skills/management-board-activation`). Unlike department leads, these coordinate and prioritize; they never produce the work themselves.
+
+| Manager role | Agent name | Corresponds to |
+|---|---|---|
+| Engineering Manager | `mgr-engineering` | `dept-engineering` |
+| Product Manager | `mgr-product` | `dept-product` |
+| Design Manager | `mgr-design` | `dept-design` |
+| Data Manager | `mgr-data` | `dept-data` |
+| Security Manager | `mgr-security` | `dept-legal-security` |
+| QA Manager | `mgr-qa` | `dept-qa` |
+| Platform Manager | `mgr-platform` | `dept-devops` |
+| Research Manager | `mgr-research` | (activates alongside Product once threshold is met) |
+| Growth Manager | `mgr-growth` | `dept-growth` |
 
 ---
 
@@ -44,9 +62,15 @@ Not a department — the 5 fixed gate-reviewer seats, always present. See `ARCHI
 | API Contract Specialist | OpenAPI/Swagger schema authoring before coding | candidate |
 | Frontend Core Specialist | App scaffolding, routing, state management setup | candidate |
 | Frontend Component Builder | Presentational components against the design system | candidate |
+| React Engineer | React-specific component/hook/state patterns (narrower than Frontend Core Specialist) | candidate |
 | Backend Core Specialist | Service orchestration, middleware, request handling | candidate |
+| Python Engineer | Python-specific backend patterns (narrower than Backend Core Specialist) | candidate |
 | Business Logic Developer | Functional server code, endpoints, algorithms, webhooks | candidate — largely covered inline by `/wingman:build` today |
 | AI Integration Specialist | RAG pipelines, vector search, LLM guardrails | candidate |
+| RAG Engineer | Retrieval pipeline design specifically (narrower than AI Integration Specialist) | candidate |
+| LLM Integration Engineer | Prompt/response contract design and model-call integration | candidate |
+| RL Engineer | Reinforcement-learning system design — for a founder's own project, never for Wingman itself (no RLHF/training layer here; see `docs/PRD.md` Non-goals) | candidate |
+| Prompt Engineer | Prompt authoring/iteration for a project's own LLM features (distinct from Prompt Security Guard below, which reviews for injection risk) | candidate |
 | Protocol & RPC Specialist | gRPC/WebSockets/GraphQL transport layers | candidate |
 | Legacy Refactoring Specialist | Prevents new tech debt when touching old code | candidate |
 | Dependency Management Specialist | Version pinning, conflict prevention | candidate |

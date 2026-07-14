@@ -11,7 +11,7 @@ A solo founder with no engineering background, running Claude Code (directly or 
 ## Goals
 
 1. Run a complete SDLC — plan, build, secure, ship — inside Claude Code, with the founder making every consequential decision in plain language.
-2. Replace code review with a **Boardroom checkpoint**: a fixed panel of specialist reviewers (business, engineering, security, design, cost) that gates every stage and hands the founder one short, jargon-free go/no-go summary.
+2. Replace code review with a **Boardroom checkpoint**: a fixed panel of specialist reviewers (CEO, CPO, CMO, CTO, CISO, CFO, Research, Design) that gates every stage and hands the founder one short, jargon-free go/no-go summary.
 3. Keep the agent population **lean by default** — a small fixed Boardroom, department leads created only when a project's real complexity calls for them, specialists promoted only on evidenced, repeated need.
 4. Stay a **Claude Code plugin, and only a Claude Code plugin** — no hosted backend, no separate service the founder has to run or pay for beyond what they already use Claude Code for.
 
@@ -25,10 +25,10 @@ A solo founder with no engineering background, running Claude Code (directly or 
 ## Key features
 
 ### The Boardroom (built)
-Five fixed seats — founder, engineer, security, design, cost — dispatched in parallel by `/wingman:boardroom`, consolidated into one plain-language verdict (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`). Enforced by a hook: `ExitPlanMode` is blocked until a Boardroom verdict is recorded in the plan file (see `docs/ARCHITECTURE.md` §4 and `docs/DATABASE.md`).
+Seven fixed C-suite-style seats — CEO, CPO, CMO, CTO, CISO, CFO, Research — plus Design, dispatched in parallel by `/wingman:boardroom`, consolidated into one plain-language verdict (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`) under grouped Business/Technical/Finance/Research summary headers. Enforced by hooks: `ExitPlanMode` is blocked until a Boardroom verdict is recorded in the plan file (see `docs/ARCHITECTURE.md` §4 and `docs/DATABASE.md`), and `dod-structural-gate.mjs` mechanically checks artifact presence (traceability, tests, a clean threat register) before a real `git push`.
 
 ### Pipeline commands (built)
-`/wingman:plan` → `/wingman:build` → `/wingman:secure` → `/wingman:ship`, each ending in a Boardroom checkpoint before advancing.
+7 planning/build stages, only 3 of which produce a founder-visible Boardroom checkpoint: `/wingman:discovery` → `/wingman:define` → `/wingman:architecture` → `/wingman:uxflow` → `/wingman:implementation-planning` (bundled into one "Planning Milestone" checkpoint) → `/wingman:build` (its own checkpoint, folding in what used to be a separate `/wingman:secure` stage as a Definition-of-Done gate) → `/wingman:ship` (final checkpoint). Fewer checkpoints than the original 4-stage pipeline despite more named stages — see `docs/ARCHITECTURE.md` §4b.
 
 ### Adaptive commands (built)
 `/wingman:retro`, `/wingman:learn`, `/wingman:evolve`, `/wingman:harness`, `/wingman:telemetry` — invoked as needed, not part of the fixed pipeline.

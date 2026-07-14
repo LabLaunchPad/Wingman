@@ -20,7 +20,7 @@ founder-facing entry point to the `research` skill.
 4. Synthesize a brief: bottom-line paragraph, bulleted findings each with a
    source link, and a confidence note (high/medium/low).
 5. End with a plain-language recommendation and any open gaps.
-6. If the question implies a build/plan decision, suggest `/wingman:plan` or
+6. If the question implies a build/plan decision, suggest `/wingman:discovery` or
    `/wingman:advisory` as the next step — do not skip the Boardroom checkpoint
    convention.
 
