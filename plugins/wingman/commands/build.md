@@ -56,7 +56,7 @@ If this session has access to Claude Code's built-in `/security-review` capabili
 
 If the founder has explicitly asked for deeper scrutiny than this standard checklist, use the `systematic-auditing` skill for this pass instead of just the list above.
 
-For every risk found, decide: **CLOSED** (mitigated, or a documented accepted risk) or **OPEN** (nothing done about it yet). Store risk entries in a structured **threat register**:
+For every risk found, decide: **CLOSED** (mitigated, or a documented accepted risk) or **OPEN** (nothing done about it yet). **Append the threat register as a new section directly to the same plan file `implementation-planning.md` wrote** (e.g. `## Build Threat Register`, below the Boardroom checkpoint marker) — do not create a separate file for it. `dod-structural-gate.mjs` only reads the plan file it can find via `docs/wingman/plans/`; a threat register kept anywhere else is invisible to that mechanical check, silently defeating the gate:
 
 | ID | Risk Description | Status | Owner | Detection Date | Disposition / Acceptance |
 |----|------------------|--------|-------|----------------|--------------------------|

@@ -107,6 +107,29 @@ function findMostRecentPlanFile(cwd) {
   }
 }
 
+// build.md's convention is to append the threat register directly to the
+// plan file findMostRecentPlanFile() above already reads -- but a real
+// dogfooding run proved a project can still end up with it in a separate
+// file (e.g. docs/wingman/build/<slug>-threat-register.md), which the single
+// most-recent-plan-file check silently never sees, defeating the gate on
+// exactly the risk it exists to catch. This is a defensive backstop, not the
+// primary mechanism: also scan docs/wingman/build/ (one level deep) for any
+// markdown file and check each one too, rather than trusting only the
+// documented convention held.
+function findAllBuildArtifactTexts(cwd) {
+  const texts = [];
+  const planText = findMostRecentPlanFile(cwd);
+  if (planText) texts.push(planText);
+  const buildDir = join(cwd, 'docs', 'wingman', 'build');
+  try {
+    for (const f of readdirSync(buildDir)) {
+      if (!f.endsWith('.md')) continue;
+      try { texts.push(readFileSync(join(buildDir, f), 'utf-8')); } catch { /* skip unreadable */ }
+    }
+  } catch { /* no build/ dir -- fine, plan file (if any) is all there is */ }
+  return texts;
+}
+
 // --- ExitPlanMode check: traceability only, narrowly scoped ---
 
 export function checkPlanningMilestoneTraceability(planText) {
@@ -158,6 +181,16 @@ export function checkTestPresence(cwd, changedFiles) {
 export function checkThreatRegisterClean(planText) {
   if (!planText) return { ok: true }; // no plan/build artifact found — nothing to check against
   return { ok: !OPEN_ROW.test(planText) };
+}
+
+// Checks every build-artifact text found (plan file + anything under
+// docs/wingman/build/), not just one -- an OPEN row in ANY of them fails the
+// gate. See findAllBuildArtifactTexts()'s comment for why this exists.
+export function checkThreatRegisterCleanAcrossArtifacts(texts) {
+  for (const text of texts) {
+    if (OPEN_ROW.test(text)) return { ok: false };
+  }
+  return { ok: true };
 }
 
 // Detect the project's own declared test command generically -- Wingman
@@ -305,9 +338,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       );
     }
 
-    // 4. Threat register — zero OPEN rows in the most recent plan/build artifact.
-    const planText = findMostRecentPlanFile(cwd);
-    const threatResult = checkThreatRegisterClean(planText);
+    // 4. Threat register — zero OPEN rows across every plan/build artifact found
+    // (plan file AND anything under docs/wingman/build/, not just one of them).
+    const artifactTexts = findAllBuildArtifactTexts(cwd);
+    const threatResult = checkThreatRegisterCleanAcrossArtifacts(artifactTexts);
     if (!threatResult.ok) {
       deny(
         `Wingman dod-structural-gate: the threat register still has an OPEN row. ` +
