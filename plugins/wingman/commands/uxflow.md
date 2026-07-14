@@ -13,7 +13,7 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the flow-design portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
 
-Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-design` may need creating.
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-design` may need creating.
 
 ## Design the flow
 

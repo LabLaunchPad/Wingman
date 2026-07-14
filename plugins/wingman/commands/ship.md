@@ -15,7 +15,7 @@ Use the `department-lead-activation` skill to check the DevOps activation signal
 
 Note: there is no separate `/wingman:secure` stage to check for here — its discipline is folded into `/wingman:build`'s own Definition-of-Done gate (threat register, traceability, test presence). The `dod-structural-gate.mjs` hook re-checks those same conditions mechanically, right before the `git push` below runs, so this preflight is a confirmation of work already done, not a fresh review.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ active-department-lead complexity threshold — if so, `mgr-platform` may need creating (only if `dept-devops` is actually active).
+Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-platform` may need creating (only if `dept-devops` is actually active).
 
 Before shipping, confirm all of the following, and stop with a plain-language explanation if any fail:
 

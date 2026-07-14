@@ -1,5 +1,24 @@
 # Retros
 
+## Retro: Second dogfooding pass — the simple path, and a real complexity-gate bug — 2026-07-14/15
+
+Deliberately picked the smallest possible real feature this time ("add a `GET /health` endpoint" to a tiny internal status API — no UI, no database, no auth, no external dependency) to test the *other* side of the Management Board's complexity gate: does it correctly stay dormant on a genuinely simple project, not just correctly activate on a complex one (the first retro's subject)?
+
+**What went well:**
+- The founder-in-the-loop `AskUserQuestion` flow, real TDD (a genuine red step, then green), and the Definition-of-Done gate all worked cleanly on the simple path, mirroring the first pass's mechanics at a smaller scale.
+- A minor, honest hiccup along the way: my own first test for `GET /health` hung the test runner for a full 2 minutes because the assertion failure path never called `server.close()`, leaving an open socket handle. Root-caused directly (isolated the hang to a missing `try/finally`, not an environment issue) and fixed with proper cleanup — a genuine, if mundane, reminder that `verification-before-completion` cuts both ways: it's not just "did you check," it's also "did your check itself leave the harness in a bad state."
+
+**The real finding — a serious bug, not a documentation nit:**
+- By the time this trivial project reached Build, `active_department_leads` already had exactly 3 entries: `dept-product`, `dept-engineering`, `dept-qa` — the 3 departments `department-lead-activation`'s own table marks **unconditionally always-active**, regardless of project complexity. Since the Management Board's threshold was "3+ active department leads, no filtering," this meant the "complexity gate" was satisfied by Build time on **every single project**, trivial or not — directly contradicting the gate's own stated purpose (`docs/ARCHITECTURE.md`: "never on day one, never just in case," "most projects should never need this layer").
+- Confirmed this wasn't a one-off: the first dogfooding pass's project also had these same 3 departments active, but its *conditional* departments (Design, Legal-Security) pushed the total to 5, masking the always-active 3 from view. Only a genuinely minimal second project exposed that the always-active 3 *alone* were doing all the threshold-crossing work.
+- **Fix, confirmed with the user before applying** (this is a real design change, not a typo fix): the threshold now counts only the 5 *conditionally*-activated departments (Design/Data/Legal-Security/DevOps/Growth) — Product/Engineering/QA's own presence never counts toward it, though their managers remain eligible once the conditional count independently crosses 3. Verified directly: re-running the same trivial project's full pipeline with the fix applied shows `active_managers: []` throughout, as it should.
+
+**What we'd do differently next time:**
+- This bug existed through the entire first dogfooding pass and both merged PRs without being caught, because that project's complexity happened to mask it. The lesson: a "does the common/simple case stay clean" run is not optional follow-up polish after testing the complex case — it needs to run *before* trusting a complexity gate's threshold logic, since simple cases are exactly where miscounted "always-on" baselines get exposed.
+
+**Anything for you to know:**
+- Fix already committed and pushed (branch `claude/multi-domain-audit-benchmarks-7u9nrw`) alongside a promoted `management-board-activation` eval case (now `verified`) documenting this exact run.
+
 ## Retro: First real dogfooding pass of the 7-stage pipeline (MVP2) — 2026-07-14
 
 Genuinely ran the whole `/wingman:discovery` → `/wingman:ship` sequence against a throwaway real project ("Tip Jar," a one-time Stripe tip feature), as a founder would — not a scripted eval with a pre-known correct answer. Real founder-in-the-loop `AskUserQuestion` decisions, real `dept-*`/`mgr-*` file creation, a real 8-seat Boardroom dispatch at the Planning Milestone checkpoint, real test-driven implementation, and a real `dod-structural-gate.mjs` hook run at `git push` time.
