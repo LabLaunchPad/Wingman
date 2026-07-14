@@ -1,5 +1,25 @@
 # Retros
 
+## Retro: First real dogfooding pass of the 7-stage pipeline (MVP2) — 2026-07-14
+
+Genuinely ran the whole `/wingman:discovery` → `/wingman:ship` sequence against a throwaway real project ("Tip Jar," a one-time Stripe tip feature), as a founder would — not a scripted eval with a pre-known correct answer. Real founder-in-the-loop `AskUserQuestion` decisions, real `dept-*`/`mgr-*` file creation, a real 8-seat Boardroom dispatch at the Planning Milestone checkpoint, real test-driven implementation, and a real `dod-structural-gate.mjs` hook run at `git push` time.
+
+**What went well:**
+- The 3-checkpoint bundling design held up under a real build, not just a synthetic one: exactly 3 lines in `checkpoints.jsonl` (Planning Milestone, Build, Ship) across 7 named stages, matching the design intent.
+- The 8-seat Boardroom found 6 independent, genuine issues in the plan on the very first real dispatch (missing home-page link to the new feature, no server-side payment verification before showing success, a possible reflected-XSS, a missing test-writing task, an unconsidered simpler alternative — Stripe Payment Links — and an underspecified trust signal) — none of these were seeded or expected in advance; they were caught fresh. Two more real, genuine bugs (hardcoded `localhost` Stripe redirect URLs) were caught independently by the CTO and CISO seats at the *Build*-stage diff review, converging on the same root cause from different angles.
+- `dod-structural-gate.mjs`'s new test-execution check (added in the prior MVP2 pass after a different eval caught a similar gap) worked correctly the whole way through: it denied a `git push` when a genuine `OPEN` threat-register row existed, and allowed once the project was actually clean.
+
+**What was harder than expected — 2 real bugs found and fixed, permanently, in the plugin itself, not just this run:**
+- `dod-structural-gate.mjs`'s threat-register check only ever read the single most recent file under `docs/wingman/plans/` — but `build.md` never specified where the Build-stage threat register should physically live, so this dogfood run put it in a separate `docs/wingman/build/` file by reasonable inference. Proved concretely (by deliberately introducing a real `OPEN` row there) that the hook silently missed it and wrongly allowed the push. Fixed two ways: `build.md` now names an exact convention (append to the same plan file), and the hook now also defensively scans `docs/wingman/build/` so a register kept elsewhere still can't slip through.
+- `management-board-activation`'s "Relevant to" table still named stages retired by this same MVP2 rearchitecture (`plan`, `secure`), and Design Manager's own row never listed `uxflow` even though `uxflow.md` explicitly instructs checking for it there — hit this exact inconsistency for real when `dept-design`'s activation crossed the 3-department-lead threshold during the UX Flow stage. Fixed the table and added an explicit note that a manager should be created the first time *any* of its relevant stages runs, not withheld waiting for a stage that may never come (e.g. Product/Research managers were gated on a `plan` stage that no longer exists at all).
+
+**What we'd do differently next time:**
+- Run a second real dogfood pass on a project that legitimately never crosses the 3-department-lead Management Board threshold, to confirm the "common case" (no manager ever created) still reads as clean and unremarkable, not as a code path nobody exercises.
+- The traceability check surfaced a genuine, non-blocking design nuance worth a future look: `IP-*` task IDs (and any requirement whose only downstream reference is itself, not something further along the chain) will *always* show as "unlinked" under the current script, since nothing is ever expected to reference the terminal stage's own ID, and the check isn't transitive (a `DEF-*` ID covered only via an `ARCH-*` marker several links downstream still shows unlinked unless it's also directly re-referenced). Worth clarifying in the skill's docs as expected/non-blocking, or making the checker transitive, in a future pass — not fixed now since it's a warning, not a blocking error, and didn't affect this run's real outcome.
+
+**Anything for you to know:**
+- Both fixes above are already committed and pushed to the PR (`e8e1314`, `75446fc`) — this dogfooding pass didn't just generate a report, it directly hardened the shipped plugin against exactly the failure modes it surfaced, verified by re-running the fix against the actual broken fixture that found it.
+
 ## Retro: Wingman vendor-pattern integration (v9–v12) — 2026-07-13
 
 **What went well:**
