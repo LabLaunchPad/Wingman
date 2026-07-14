@@ -24,14 +24,16 @@ Immediately after `department-lead-activation` runs, at the start of `/wingman:d
 | Manager | Agent name | Corresponds to department lead | Relevant to |
 |---|---|---|---|
 | Engineering Manager | `mgr-engineering` | `dept-engineering` | `build` |
-| Product Manager | `mgr-product` | `dept-product` | `plan` |
-| Design Manager | `mgr-design` | `dept-design` | `build` |
+| Product Manager | `mgr-product` | `dept-product` | `discovery` |
+| Design Manager | `mgr-design` | `dept-design` | `uxflow`, `build` |
 | Data Manager | `mgr-data` | `dept-data` | `build` |
-| Security Manager | `mgr-security` | `dept-legal-security` | `secure` |
+| Security Manager | `mgr-security` | `dept-legal-security` | `build` (folded in from the former `secure` stage — see `commands/build.md`'s Definition-of-Done gate) |
 | QA Manager | `mgr-qa` | `dept-qa` | `build` |
 | Platform Manager | `mgr-platform` | `dept-devops` | `ship` |
-| Research Manager | `mgr-research` | `dept-product` (no dedicated Research department lead exists — this manager rides on Product's activation) | `plan` |
-| Growth Manager | `mgr-growth` | `dept-growth` | `launch`, and `plan` when `dept-growth` is active |
+| Research Manager | `mgr-research` | `dept-product` (no dedicated Research department lead exists — this manager rides on Product's activation) | `discovery` |
+| Growth Manager | `mgr-growth` | `dept-growth` | `launch`, and `discovery` when `dept-growth` is active |
+
+**"Relevant to" note (fixed 2026-07-14, found via a real dogfooding pass of the 7-stage pipeline):** this column previously named retired stages (`plan`, `secure`) from before the MVP2 pipeline rename, and Design Manager's row omitted `uxflow` even though `uxflow.md` explicitly checks for it — a real, reproducible inconsistency between the calling command's own instructions and this table. If a department lead is active, the count-of-3 threshold is met, and its manager doesn't exist yet, create it the first time **any** command whose stage appears in that manager's "Relevant to" column runs — do not wait for every possible stage to run first, and do not skip creating a manager just because the currently-running command isn't the *only* one listed for it.
 
 A manager's own activation signal is: **its corresponding department lead is in `active_department_leads` AND the total `active_department_leads` count is 3 or more.** Do not create a manager for a department lead that doesn't exist yet, even once the count-of-3 threshold is met elsewhere in the project.
 
