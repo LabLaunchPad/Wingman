@@ -26,9 +26,13 @@ every later reader has to decrypt it. Adapted from the simplify discipline in
    - **Size** — a function over ~50 lines or a file over ~200 → split or trim
      (the same thresholds `/wingman:harness` flags).
 3. Produce a short plan: each change as "delete / extract / collapse X because Y."
-4. **Do not silently rewrite.** Hand the plan back (or apply it visibly) so the
-   founder/builder approves the simplification — shrinking working code can hide
-   a behavior change.
+4. **Do not silently rewrite.** Show the plan, then apply it in the same pass —
+   never a silent edit with no reasoning shown alongside it. "Silently" is the
+   operative word, not "immediately": the plan and the diff travel together, so
+   whoever reads the result sees both the reasoning and the change, never the
+   change alone. Verify behavior is unchanged (same inputs → same outputs,
+   confirmed by re-running the existing tests before and after) as part of the
+   same pass, not a separate later step.
 5. Lead with the one big win, not a laundry list of nits.
 
 ## Rationalizations

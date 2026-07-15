@@ -43,6 +43,12 @@ instead of being pushed to, which is slightly less immediate but works identical
 - `/wingman:ship`'s "Push and open the change for review" step (see `commands/ship.md`).
 - Any time a `git push` to a branch is rejected as non-fast-forward and that branch previously had
   a PR merged — the near-universal cause is a squash-merge (see Rationalizations).
+- **Also** any time a branch that previously had a PR merged pushes *successfully* but you haven't
+  independently confirmed it actually descends from the current base branch — a stale remote branch
+  ref (never deleted after the earlier merge) can make a push to that same ref name trivially
+  fast-forward even though the branch's own history has silently diverged from `main`. A clean push
+  is not proof of anything here; check `git merge-base --is-ancestor <base> <branch>` before trusting
+  it, the same real gap a direct eval run of this skill hit (see Verification).
 - Any time a founder or another agent asks "is the PR ready yet" / "watch until CI passes."
 
 ## Core Workflow
@@ -117,6 +123,21 @@ the steps it prints yourself.
   content, and correctly no-ops (exit 0, "nothing to resync") when the branch is already
   up to date. This exact failure mode was hit for real twice in this project's own development
   history (`docs/wingman/retros.md`) before this script existed.
+- **A fresh, un-briefed subagent dispatch** (given only `commands/ship.md` and this skill's own
+  `SKILL.md`, not told which script to use) hit a real squash-merge situation and correctly
+  diagnosed and resolved it — but the scenario played out slightly differently than this skill's
+  original "When To Use" wording described: the push *succeeded* (a stale remote branch ref made it
+  trivially fast-forward) rather than being rejected, and the actual signal was the branch silently
+  no longer descending from current `main`. The subagent correctly recognized this from
+  `git log --graph --all` rather than trusting a successful push, and used the right script. It also
+  found a real, reproducible bug in the script's own printed finishing instructions: they assumed
+  the calling agent started somewhere other than the branch being resynced, and failed with "used by
+  worktree" when that assumption didn't hold (a very common case — sitting on the exact stale branch
+  is the normal starting point for hitting this at all). Both findings are now fixed: this skill's
+  "When To Use" section covers the successful-but-silently-stale case explicitly, and the script no
+  longer suggests checking out the original branch before deleting it (unnecessary, since the script
+  already leaves you on the temp branch after the cherry-pick — re-verified against the identical
+  "sitting on the stale branch" scenario after the fix, confirmed clean).
 - `scripts/watch-pr-until-green.sh` was tested against a mock `gh` binary covering all-pass,
   one-failed, pending-then-pass, no-checks-reported, and timeout-while-pending scenarios — all
   five produced the documented exit code and message. **Not yet verified against a real `gh` CLI
