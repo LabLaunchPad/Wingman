@@ -15,6 +15,8 @@ Confirm there is an approved plan (from `/wingman:implementation-planning`'s Pla
 
 Confirm the project is on a feature branch, not the default branch — check out or create one now (e.g. named for the plan's subject) before the first commit. Doing this here, before any work lands, means `ship.md`'s "on a feature branch" preflight check is a no-op confirmation instead of a late catch after work has already accumulated on the default branch.
 
+If this is a JS/TS project about to need a package manager for the very first time (no lock file, no `package.json` `packageManager` field yet), use the `package-manager-selection` skill before running any install command. This never applies to a project that already has a lock file — that choice is respected, not revisited.
+
 Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly.
 
 Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-engineering`/`mgr-design`/`mgr-data`/`mgr-qa`/`mgr-security` may need creating for whichever department leads are actually active (including `mgr-security`, once `dept-legal-security` is created just below).
