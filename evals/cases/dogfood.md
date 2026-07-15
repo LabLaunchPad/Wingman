@@ -2,9 +2,11 @@
 
 Tests `plugins/wingman/commands/dogfood.md` — does its mode-detection correctly distinguish
 Wingman's own dev-repo checkout (maintainer mode, where `dogfood-gap-classification` may write to
-`plugins/wingman/`) from a founder's installed copy (founder mode, where it never does), and does a
+`plugins/wingman/`) from a founder's installed copy (founder mode, where it never does), does a
 real maintainer-mode run actually exercise the pipeline end to end and produce the structured
-output the gap-classification skill depends on?
+output the gap-classification skill depends on, and does a real founder-mode run correctly stay
+inside its own project's boundary — never invoking `dogfood-gap-classification`, never writing to
+`plugins/wingman/` — even across multiple real Boardroom checkpoint dispatches?
 
 ## Fixtures
 
@@ -27,6 +29,13 @@ output the gap-classification skill depends on?
 4. Independently verify: the structured JSON run record exists and has the right shape, the
    `gates_expected_*`/`gates_actual_*` fields match what the fixture's signals imply, and a retro
    entry was written regardless of whether a gap was found.
+5. Separately, spawn a fresh subagent with only `commands/dogfood.md`, instructed to run in
+   **founder mode** against a fresh `setup-dogfood-simple.sh` fixture (a directory with no
+   `scripts/validate-structure.mjs`) — the full 7-stage pipeline, real Boardroom dispatch, real TDD.
+   Independently verify (not trusted from self-report): check `git status --short` on Wingman's own
+   repo root at least 3 times during the run (start, mid-run, end) and confirm no new
+   modified/untracked entries ever appear as a result of the subagent's own actions, and confirm the
+   `dogfood-gap-classification` skill is never invoked or referenced anywhere in its work.
 
 ## Expectations
 
@@ -39,14 +48,17 @@ output the gap-classification skill depends on?
 | Structured output | `evals/dogfood-runs/<timestamp>-<path>.json` exists, valid JSON, matches the schema in `commands/dogfood.md` |
 | Retro entry | `docs/wingman/retros.md` gets a new `## Retro:` entry for the run, even if `observed_gaps` is empty |
 | No `plugins/wingman/` writes without a gap | If `observed_gaps` is empty, `dogfood-gap-classification` is never invoked and nothing under `plugins/wingman/` changes |
+| Founder-mode run | Mode correctly detected as founder mode; `dogfood-gap-classification` never invoked; `git status` on Wingman's own repo shows zero new entries at every checkpoint during the run; the subagent's own retro entry lives inside the fixture's project, never in Wingman's real `docs/wingman/retros.md` |
 
 ## Trust level
 
-`verified` (2026-07-15) — passed both a positive scenario (complex path: gates correctly activate,
+`verified` (2026-07-15) — passed a positive scenario (complex path: gates correctly activate,
 conditional department count reaches 4, management-board-activation fires, structured output and
-gap classification all work) and a negative scenario (simple path: gates correctly stay dormant on
-a zero-signal project), independently checked against the real fixture filesystems and
-`.wingman/state.json` rather than trusted from either subagent's self-report.
+gap classification all work), a negative scenario (simple path: gates correctly stay dormant on
+a zero-signal project), and a third, differently-shaped scenario testing the mode boundary itself
+(a real founder-mode run staying entirely inside its own project, confirmed via repeated direct
+`git status` checks on Wingman's own repo rather than trusted from the subagent's self-report) —
+all three independently checked against real filesystems, not self-report.
 
 ## Run log
 
@@ -79,3 +91,35 @@ and re-tested live. Found 5 genuine `observed_gaps`, all classified via `dogfood
 and fixed (see `docs/wingman/retros.md`'s 2026-07-15 entry for the full list) — none were hook
 candidates, so none required cooling-off. Structured JSON records:
 `evals/dogfood-runs/2026-07-15T01-00-00Z-{simple,complex}.json`.
+
+### Run 2 — 2026-07-15 (founder-mode, fresh — promotes the mode-boundary claim)
+
+A fresh subagent, given only `commands/dogfood.md`, ran the full 7-stage pipeline in founder mode
+against a fresh `setup-dogfood-simple.sh` fixture with a genuinely new feature (`GET /jobs/:id`,
+deliberately different from an earlier founder-mode pass's `GET /health`, to make this a real
+differently-shaped run rather than a repeat). This run specifically re-exercised the current,
+post-fix version of `commands/dogfood.md` (which now instructs synchronous, non-background
+Boardroom/department-lead dispatch, added after two earlier runs stalled by dispatching seats as
+background calls and ending their own turn on a vague "waiting for results" message instead of
+finishing).
+
+Confirmed: mode detection correct (no `scripts/validate-structure.mjs` in the fixture → founder
+mode). Real TDD (genuine red — a bare-text 404 causing a JSON-parse `SyntaxError` in the test —
+then green, 4/4 passing). Three full Boardroom checkpoint rounds — Planning Milestone (8 seats),
+Build-diff (8 seats, returned `GO WITH CHANGES` on a real, genuine finding: `/jobs/:id`'s JSON 404
+was inconsistent with the catch-all route's bare-text 404), and a re-check after the fix (2 seats,
+documented as a deliberate scoped re-check rather than a full 8-seat re-run, since the fix was two
+lines outside the other six seats' lenses) — **18 total `Agent`-tool dispatches, every one
+`run_in_background:false`, every one returning a real result directly in the same turn.** No stall,
+no vague "waiting" message, anywhere in the run — the fix held up under real, repeated exercise.
+Ship correctly stopped at preflight (no git remote, no `gh` CLI in this sandbox) rather than faking
+a push, logged as environment friction, not a pipeline defect.
+
+**Mode-boundary verification — the actual point of this run**: `git status --short` on Wingman's
+own repo root was checked 3 times during the run (start, mid-run after the Planning Milestone
+checkpoint, end after Ship). All three were clean. A staged change set briefly visible between
+checks 2 and 3 was correctly traced by the subagent itself to a concurrent, unrelated process in
+the shared container (this session's own `package-manager-selection` work landing at the same
+time) — not to any action the subagent took, confirmed against its own action log (every
+`Write`/`Edit` targeted only the fixture directory). `dogfood-gap-classification` was never
+invoked, referenced, or considered anywhere in the run.

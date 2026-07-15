@@ -57,7 +57,6 @@ fi
 
 echo "Branch '$BRANCH' is behind origin/$BASE (likely due to an earlier squash-merge) -- resyncing."
 
-CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 TEMP_BRANCH="${BRANCH}-resync-$$"
 
 git branch "$TEMP_BRANCH" "origin/$BASE"
@@ -71,9 +70,12 @@ if ! git cherry-pick "$COMMIT_RANGE"; then
 fi
 
 echo ""
-echo "Cherry-pick succeeded. Before finishing, verify this project's own validators/tests pass on '$TEMP_BRANCH'."
+echo "Cherry-pick succeeded. HEAD is now on '$TEMP_BRANCH' (already off of '$BRANCH', so it's"
+echo "always safe to delete '$BRANCH' next, whether you started this script sitting on it or not --"
+echo "a fixed 'checkout your original branch first' step would fail here if your original branch"
+echo "and '$BRANCH' were the same one, since git refuses to delete the branch you're currently on."
+echo "Before finishing, verify this project's own validators/tests pass on '$TEMP_BRANCH'."
 echo "Once verified, finish the resync yourself:"
-echo "  git checkout '$CURRENT_BRANCH' 2>/dev/null || true"
 echo "  git branch -D '$BRANCH'"
 echo "  git branch -M '$TEMP_BRANCH' '$BRANCH'"
 echo "  git push --force-with-lease -u origin '$BRANCH'"

@@ -75,6 +75,9 @@ Original to Wingman — no single vendor source. Informed by the general pattern
 ### `plugins/wingman/skills/evolve-promotion/`
 Original to Wingman, extending `department-lead-activation`'s own file-placement precedent (specialist agents go to the founder's `.claude/agents/`, never Wingman's plugin directory) to the specialist-promotion mechanism described in `docs/AGENT-ROSTER.md`. Fixes an inconsistency in the original `evolve.md`/`AGENT-ROSTER.md` text, written before that precedent was established, which had instructed writing promoted specialists into Wingman's own plugin directory.
 
+### `plugins/wingman/skills/package-manager-selection/`
+Design-adapted (not copied) from `affaan-m/ECC`'s `scripts/lib/package-manager.js` (MIT, Copyright (c) 2026 Affaan Mustafa) — specifically its detection-priority ordering (lock file → `package.json` `packageManager` field → config → default) and its explicit warning against spawning child processes to probe for installed package managers during hot paths (a documented cause of session/hook slowdowns in that repo's own history). Adapted as prose/procedure for a Wingman skill rather than ported as executable code, since Wingman's own scripts stay dependency-free and this decision belongs to founder-generated projects, not Wingman's own repo. Adds a corepack-pinned-version requirement and an automatic-npm-fallback rule not present in the original, per this project's own Boardroom review (`docs/PROJECT.md` decisions log, 2026-07-15).
+
 ### `plugins/wingman/commands/launch.md`
 Original to Wingman. Structurally mirrors `commands/ship.md` (preflight/activation → do the work → plain-language report → Boardroom checkpoint → suggest next steps), per the pattern shared across all Wingman pipeline commands.
 

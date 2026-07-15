@@ -37,13 +37,27 @@ const DEPTH_COUNTS = { quick: 1, standard: 3, deep: Infinity };
 const wanted = DEPTH_COUNTS[depthArg] ?? DEPTH_COUNTS.standard;
 
 // Discover cases and the fixture each references (first setup-*.sh mention).
+// A case may explicitly declare it doesn't need a synthetic fixture via
+// `<!-- eval:no-fixture-needed: <reason> -->` -- for cases whose real evidence
+// comes from a consolidated/shared real run or from already-produced project
+// history rather than a dedicated setup-*.sh script (see e.g.
+// evals/cases/research.md). This is a disclosed, logged exception, not a
+// silent skip: it still shows up in the plan as "no fixture (declared)" rather
+// than passing invisibly, and it must be the case doc's own explicit claim,
+// never inferred from the absence of a fixture reference alone.
+const NO_FIXTURE_MARKER = /<!--\s*eval:no-fixture-needed:\s*(.*?)\s*-->/i;
 const cases = readdirSync(casesDir)
   .filter((f) => f.endsWith('.md'))
   .sort()
   .map((f) => {
     const body = readFileSync(join(casesDir, f), 'utf-8');
     const fx = body.match(/setup-[a-z0-9-]+\.sh/i);
-    return { name: f.replace(/\.md$/, ''), fixture: fx ? fx[0] : null };
+    const noFixture = body.match(NO_FIXTURE_MARKER);
+    return {
+      name: f.replace(/\.md$/, ''),
+      fixture: fx ? fx[0] : null,
+      noFixtureReason: noFixture ? noFixture[1] : null,
+    };
   });
 
 const selected = cases.slice(0, wanted === Infinity ? cases.length : wanted);
@@ -61,9 +75,18 @@ summaryLine(`Selected ${selected.length}/${cases.length} case(s).`);
 // Integrity check (runs in every mode): every selected case must reference a
 // fixture that exists on disk.
 const missing = [];
+const declaredNoFixture = [];
 for (const c of selected) {
-  if (!c.fixture) { missing.push(`${c.name}: no fixture referenced in case doc`); continue; }
+  if (!c.fixture) {
+    if (c.noFixtureReason) { declaredNoFixture.push(`${c.name}: ${c.noFixtureReason}`); continue; }
+    missing.push(`${c.name}: no fixture referenced in case doc`);
+    continue;
+  }
   if (!existsSync(join(fixturesDir, c.fixture))) missing.push(`${c.name}: references ${c.fixture}, which does not exist`);
+}
+if (declaredNoFixture.length) {
+  summaryLine(`\n${declaredNoFixture.length} case(s) declare no fixture needed:`);
+  for (const d of declaredNoFixture) summaryLine(`- ${d}`);
 }
 if (missing.length) {
   summaryLine(`\n**Integrity failures:**`);
@@ -75,7 +98,10 @@ summaryLine(`Fixture integrity: OK (every selected case references a real fixtur
 
 if (dryRun) {
   summaryLine(`\nDry-run plan (no ANTHROPIC_API_KEY / --dry-run): would run —`);
-  for (const c of selected) summaryLine(`- ${c.name} against ${c.fixture}`);
+  for (const c of selected) {
+    if (c.fixture) summaryLine(`- ${c.name} against ${c.fixture}`);
+    else summaryLine(`- ${c.name}: no fixture (declared) — not driven by this headless runner`);
+  }
   summaryLine(`\nPASS (dry-run: nothing executed)`);
   process.exit(0);
 }
@@ -84,8 +110,13 @@ if (dryRun) {
 // transcript. Best-effort — a per-case error is recorded, not fatal, so one
 // flaky case doesn't sink the scheduled run.
 mkdirSync(artifactsDir, { recursive: true });
-let ran = 0, errored = 0;
+let ran = 0, errored = 0, skipped = 0;
 for (const c of selected) {
+  if (!c.fixture) {
+    skipped++;
+    summaryLine(`- skipped ${c.name}: declared no-fixture-needed, not driven by this headless runner`);
+    continue;
+  }
   const target = mkdtempSync(join(tmpdir(), `wingman-eval-${c.name}-`));
   const out = join(artifactsDir, `${c.name}.txt`);
   try {
@@ -113,7 +144,7 @@ for (const c of selected) {
   }
 }
 
-summaryLine(`\nRan ${ran}, errored ${errored}. Transcripts uploaded as an artifact for human grading.`);
+summaryLine(`\nRan ${ran}, errored ${errored}, skipped ${skipped} (declared no-fixture-needed). Transcripts uploaded as an artifact for human grading.`);
 // The scheduled run is informational; a per-case error shouldn't fail the job
 // (a real behavioral regression is judged by a human reading the transcript).
 process.exit(0);
