@@ -84,7 +84,7 @@ Wingman's core architecture—consisting of a **7-seat Boardroom**, a **complexi
 * **Harness Integrity**:
   * Standard-depth dry-run of behavioral cases passes cleanly.
   * Deep-depth dry-run (`--depth deep`) flagged 15 case files as failing the integrity check because they didn't reference a synthetic `.sh` fixture. This was a legacy/structural backlog because these cases represent deterministic, script-only logic or conceptual guidelines verified in unit tests or inline scenarios.
-  * **Direct Patch**: In this session, we have resolved this by backfilling the standard `no-fixture-needed` marker to all 15 files. `package-manager-selection` contains planned fixtures (`new-node-project-setup.sh` and `existing-npm-project-setup.sh`) which have been named to avoid false matches with the headless runner's `setup-[a-z0-9-]+\.sh` regex while waiting for their first dynamic run, which also correctly declares `no-fixture-needed` for the time being.
+  * **Direct Patch**: In this session, we have resolved this by backfilling the standard `no-fixture-needed` marker to all 15 files. `package-manager-selection` already contains the correct references to existing setup scripts, and thus needs no `no-fixture-needed` marker.
 
 ---
 
@@ -103,7 +103,6 @@ Below is the structured, comprehensive catalog of all audited items.
 | `evals/cases/dod-structural-gate.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Backfilled accurate marker & reason) |
 | `evals/cases/engineering-minimalism.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Backfilled `no-fixture-needed` marker) |
 | `evals/cases/over-engineering-review.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Backfilled `no-fixture-needed` marker) |
-| `evals/cases/package-manager-selection.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Added `no-fixture-needed` with renamed planned scripts to bypass regex) |
 | `evals/cases/plain-language-checkpoint.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Backfilled `no-fixture-needed` marker) |
 | `evals/cases/platform-native-reference.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Backfilled `no-fixture-needed` marker) |
 | `evals/cases/ponytail-debt-harvesting.md` | Should-Fix | Harness Integrity | Missing fixture reference; fails `--depth deep` dry-run integrity check. | **Resolved** (Backfilled `no-fixture-needed` marker) |

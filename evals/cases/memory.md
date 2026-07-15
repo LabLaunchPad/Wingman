@@ -27,7 +27,29 @@ output of the other 7 skills' real work in this same run.
 
 ## Trust level
 
-`provisional` — one real run, all 3 files written in the specified layout with genuinely useful,
-non-fabricated content. Not yet `verified`: needs a second, differently-shaped scenario — a later
-session actually reading this memory store back and confirming it changes that session's behavior
-correctly (e.g. not re-investigating the ruled-out `isValidEmail(null)` hypothesis).
+`verified` — Run 1 confirmed the write path; Run 2 confirmed the previously-unproven read-back
+half (see below). Together, both directions of the skill's core claim (write a durable fact, have
+a later session actually use it) are now directly evidenced.
+
+## Run 2 — 2026-07-15 (read-back half, closing Run 1's named gap)
+
+Token-efficient design: Run 1 already proved the *write* path works, so this run tested only the
+*read-back* half, by constructing the memory store directly (`.wingman/memory/MEMORY.md` +
+`decisions.md`, a real, specific, testable decision — "use `date-fns`, not `moment`/`dayjs`, for
+all date formatting") rather than re-running a full write session, then dispatching one fresh,
+un-briefed subagent (given only `SKILL.md` and the fixture, not the eval's expected answer) with a
+task that plausibly needs prior context but was never explicitly told to check memory — "add a
+date-formatting utility function," with instructions to use its own judgment about what to look at
+first.
+
+**Result: PASS.** The agent read `.wingman/memory/MEMORY.md` and `decisions.md` before writing any
+code, explicitly cited the recorded decision's exact reasoning (date-fns over moment/dayjs) as the
+reason for its implementation choice, and stated directly that a fresh session with no memory of
+the decision "would otherwise have been equally likely to reach for `Intl.DateTimeFormat` or
+`dayjs`" — a clear, self-aware distinction between coincidental library selection and genuine
+read-back-driven behavior. Independently re-verified against the real files (not trusted from
+self-report): `src/index.js` contains a real `formatEventDate` function using `date-fns`'s
+`format`, actually runs and prints `"July 10, 2026"` for the given test date, and the memory files
+themselves were left untouched (only `src/index.js` and install byproducts changed).
+
+This closes the specific, named gap from Run 1's trust-level note.
