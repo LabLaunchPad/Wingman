@@ -34,3 +34,4 @@ Translate every finding through `plain-language-checkpoint`'s bar before it reac
 
 - `references/orchestration-patterns.md` — the multi-angle parallel audit pattern this command operationalizes.
 - `skills/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.
+- `commands/dogfood.md` — a different, complementary operation: `/wingman:audit` reviews *existing* project state; `/wingman:dogfood` generates and runs a fixture/feature through the real pipeline end to end.

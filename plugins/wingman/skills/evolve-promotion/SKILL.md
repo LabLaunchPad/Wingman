@@ -11,6 +11,8 @@ Wingman's pipeline should get sharper the more it's used on a given project, wit
 
 **Core principle:** promote only what's shown up more than once, with concrete evidence, and only after the founder explicitly approves what's about to be created.
 
+**Scope note:** this skill promotes *founder-project* friction into the founder's own `.claude/` directory and never writes to `plugins/wingman/`. For the mirror-image mechanism — promoting a genuine *pipeline-behavior* gap found via real dogfooding into Wingman's own plugin content — see `skills/dogfood-gap-classification`, which runs only from Wingman's own dev-repo checkout, never from a founder's installed copy.
+
 ## When To Use
 
 At the start of `/wingman:evolve`'s run, and nowhere else — this is a rare, on-demand operation, not something invoked from the regular pipeline commands.
