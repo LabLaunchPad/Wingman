@@ -128,6 +128,21 @@ Not a department — 9 execution-layer coordinator roles that sit between the Bo
 
 ---
 
+## Deferred mechanism ideas (not roles — architectural proposals awaiting evidence)
+
+Unlike the candidate roles above (specialist agents, gated by the 2+-occurrence rule below), the
+entries here are proposals for new *kinds* of mechanism — a new subsystem, not a new persona. They
+get the same evidence-gate `ARCHITECTURE.md` already applies to MVP2-5's dropped placeholders
+(local vector search, self-healing, enterprise-governance systems): logged so the idea isn't lost,
+built only if a real dogfood run or founder session surfaces genuine, repeated friction that
+nothing existing already solves.
+
+| Idea | Proposed by | Why deferred |
+|---|---|---|
+| Swarm-intelligence predictive layer (PSO/ACO/GWO/OASIS-style multi-agent simulation for predicting refactor risk, dependency cascades, specialist-promotion evidence) | Pasted research document, 2026-07-15 | No dogfood run or retro in this project's history has ever surfaced a need for predictive simulation of code-change risk — every real risk caught so far (SQL injection, plaintext passwords, missing tests) was found by the existing Boardroom/DoD-gate review path operating directly on the real diff, not a simulated one. Building a PSO/ACO/OASIS layer now would be exactly the premature-abstraction pattern `ARCHITECTURE.md`'s evidence-gate exists to block — a large, complex, unvalidated addition with zero current signal it solves a real problem this plugin's actual founder-user base has. Revisit only if a real dogfood run or founder complaint shows the existing single-pass review genuinely misses cascading/emergent risk that a simulation layer would have caught. |
+
+---
+
 ## How promotion actually happens
 
 1. A department lead (or a pipeline command working inline before a lead exists) logs friction via `/wingman:learn` — a gotcha, a repeated workaround, a decision that had to be re-made.

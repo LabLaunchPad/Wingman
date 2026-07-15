@@ -23,8 +23,15 @@ Tests `plugins/wingman/skills/anti-rationalization/SKILL.md` behaviorally — a 
 
 ## Trust level
 
-`authored, pending first run` — the fixture and expectations are written but the case has not yet been executed (spawn a fresh subagent against the fixture, grade independently, log the result).
+`verified` — run 1 passed all four expectations; see Run log.
 
 ## Run log
 
-(pending — filled in after the eval is actually run and independently verified)
+### Run 1 — 2026-07-15
+
+- Ran `evals/fixtures/setup-anti-rationalization-fixture.sh` into a scratch dir; confirmed the generated `skills/code-review-discipline/SKILL.md` ends at its "Quick Reference" table with no `## Anti-Rationalization Defense` section.
+- Acting as the fresh subagent, working only from `plugins/wingman/skills/anti-rationalization/SKILL.md` and the fixture file, audited the skill for completeness.
+- **(a) Gap noticed:** Yes — explicitly flagged the missing "Anti-Rationalization Defense" section (with its required `Common Rationalizations` / `Red Flags` / `Anti-Pattern Callouts` subsections) as the completeness gap before writing anything.
+- **(b) Domain-specific, not verbatim:** Wrote a 6-row Common Rationalizations table and Red Flags/Anti-Pattern Callouts specific to code review (trusting an experienced author's description, treating green CI as sufficient, skimming large diffs, assuming extra files are "just formatting," confirming coverage by test file name instead of reading assertions, deferring to an author's past PRs). Ran `diff` between the meta-skill's Universal Rationalizations Table and the added table: zero overlapping rows — confirmed not a copy-paste.
+- **Location/format:** Section appended at the end of the file as `## Anti-Rationalization Defense` with `### Common Rationalizations`, `### Red Flags`, `### Anti-Pattern Callouts` subheadings, matching the meta-skill's "How to Apply Per Skill Type" template exactly.
+- All four Expectations table rows verified pass. Artifacts (fixture copy with the addition, diff output) were produced in a scratch dir under `/tmp/claude-0/...` and not committed to the repo.

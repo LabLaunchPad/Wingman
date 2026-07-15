@@ -125,6 +125,8 @@ Durable decisions only — not every turn-level choice. Newest first.
 - **Boardroom seats never call other agents.** Adopted verbatim from `addyosmani-agent-skills`' persona/command distinction: only commands (`boardroom.md`, the pipeline stages) orchestrate and merge; agents (personas) only ever report back.
 <!-- wingman:log type=decision category=hooks status=resolved -->
 - **Checkpoint enforcement is a deterministic hook, not an LLM judgment call.** The `boardroom-checkpoint` hook checks for a marker string, not the plan's actual content — the LLM reasoning happens earlier, in `/wingman:boardroom` itself. This keeps the safety backstop auditable and testable independent of model behavior.
+<!-- wingman:log type=decision category=evidence-gate status=resolved -->
+- **A pasted swarm-intelligence (PSO/ACO/GWO/OASIS) research document proposing a predictive multi-agent simulation layer was logged as a deferred candidate, not built.** Same evidence-gate `ARCHITECTURE.md` already applies to MVP2-5's dropped placeholders: no dogfood run or retro anywhere in this project's history has ever surfaced a need for simulated/predicted risk — every real risk this project's own history caught (SQL injection, plaintext passwords, missing tests) was found by the existing Boardroom/DoD-gate review operating directly on the real diff. See `docs/AGENT-ROSTER.md`'s new "Deferred mechanism ideas" section for the full entry and revisit condition.
 
 ## Roadmap
 
