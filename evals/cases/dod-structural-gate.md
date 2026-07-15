@@ -14,6 +14,7 @@ Five small real git repos, each with a `.wingman/checkpoints.jsonl` recording a 
 4. **Open threat**: a compliant test setup, but `plan.md`'s threat register has an `OPEN` row. Expected: deny.
 5. **No prior checkpoint**: an ordinary git repo with no `.wingman/` state at all. Expected: allow — the hook must never block ordinary git usage in a project not using Wingman's pipeline.
 6. **Test file present but actually failing** (added in Run 2, see below): a marked source file with a real, executable test file that exists (satisfying check #2) but genuinely fails when run. Expected: deny — this is the fixture that directly re-creates the real bug `seven-stage-pipeline-e2e.md`'s Run 1 found, where a test file's mere *existence* wasn't enough to catch a genuinely broken implementation.
+7. **Recorded a blocking Boardroom verdict** (added in Run 3, see below): a Build checkpoint whose `bottom_line` is `"DO NOT SHIP"` (and, as a defense-in-depth variant, one where only a single seat recorded `NO_GO` while `bottom_line` stayed non-blocking) — otherwise identical to the Compliant fixture (traceability/tests/threat-register all clean). Expected: deny — this is the fixture from `docs/wingman/architecture-audit-2026-07-15.md`'s Proven finding #2: a checkpoint entry *existing* is not the same as it having actually *passed*, and the gate previously never read the verdict fields at all.
 
 A sixth check (not a fixture): `ExitPlanMode` with plan text that doesn't contain the `## Planning Milestone checkpoint` heading must be ignored entirely (allow), proving the ExitPlanMode registration is correctly scoped and won't fire on unrelated plan-mode exits — including this project's own dev-planning sessions, which have zero `wingman:req` markers by design and would otherwise have been wrongly blocked by an unscoped check.
 
@@ -34,11 +35,12 @@ A sixth check (not a fixture): `ExitPlanMode` with plan text that doesn't contai
 | 4. Open threat | Exit 2, deny | The folded-in threat register (from the former `secure.md`) still blocks |
 | 5. No prior checkpoint | Exit 0, allow | Never blocks ordinary git usage outside Wingman's pipeline |
 | 6. Test file present but failing | Exit 2, deny naming the failing test command and tail output | Presence alone is not correctness — the gate runs the suite for real, not just checks the file exists |
-| 7. Unrelated ExitPlanMode | Exit 0, allow | The ExitPlanMode registration is narrowly scoped, doesn't touch unrelated plan-mode exits |
+| 7. Recorded blocking Boardroom verdict | Exit 2, deny naming which field blocked (`bottom_line` or the specific seat) | A checkpoint existing is not the same as it having actually passed — closes the audit-found governance gap |
+| 8. Unrelated ExitPlanMode | Exit 0, allow | The ExitPlanMode registration is narrowly scoped, doesn't touch unrelated plan-mode exits |
 
 ## Trust level
 
-`verified` — all 6 scenarios ran and were independently checked against actual exit codes and exact output text on the first pass, covering both directions of the risk this hook was built to manage (catches a real gap; doesn't over-block a legitimate case) plus the scope-narrowing design decision for its ExitPlanMode registration.
+`verified` — all 8 scenarios ran and were independently checked against actual exit codes and exact output text, covering both directions of the risk this hook was built to manage (catches a real gap; doesn't over-block a legitimate case) plus the scope-narrowing design decision for its ExitPlanMode registration, plus (Run 3) the audit-found Boardroom-verdict governance gap.
 
 ## Run log
 
@@ -67,3 +69,14 @@ Promoted directly to `verified` given all 6 differently-shaped scenarios — spa
 **A second real gap surfaced and fixed in the same pass**: adding this check first tripped the *existing* test-presence check (#2) instead, incorrectly reporting `src/waitlist.js` as missing a test — because that fixture's tests live under a top-level `test/` directory, a convention `checkTestPresence`'s candidate list never included (it only checked same-directory and `__tests__/`-subdirectory variants). Fixed by adding `test/<name>.test.<ext>` and `tests/<name>.test.<ext>` (plus `.spec.` and `test_` variants) to the candidate list. Re-verified all 5 original scenarios plus the new failing-suite scenario together after both fixes — all 6 pass exactly as expected (see Expectations table above), with no regression on the escape-hatch or no-checkpoint allow paths.
 
 This run is the direct, load-bearing link between a real defect found in one eval (`seven-stage-pipeline-e2e.md`) and a permanent, deterministic fix in this project's mechanical enforcement layer — the kind of fix that holds regardless of which agent or session builds the next feature, not a one-off correction to that specific run's output.
+
+### Run 3 — 2026-07-15 (closing the audit-found Boardroom-verdict governance gap)
+
+`docs/wingman/architecture-audit-2026-07-15.md` (Proven finding #2) found that `findLatestBuildCheckpoint` only checked that a Build-stage checkpoint *entry existed* — it never read the entry's `bottom_line` or `seats[].verdict` fields, so a recorded `NO_GO`/`DO NOT SHIP` that somehow survived past the `ExitPlanMode` gate would not be re-checked at `git push` time. Closed by adding a new exported pure function, `checkBoardroomVerdictClean(checkpoint)`, wired in as the first check in the `git push` branch (before traceability/test-presence/test-suite/threat-register), reusing the Boardroom's own consolidation rule ("any `NO_GO` anywhere overrides any approval elsewhere," per `evals/cases/boardroom-gate-rule.md`) as defense-in-depth: it checks both the top-level `bottom_line` string and every individual seat's `verdict`, not just one or the other.
+
+**Verification, both unit and integration**, added to `tests/hooks-integration/hooks-integration.test.mjs`'s new "DoD Gate — Boardroom Verdict Check" describe block:
+- Direct unit tests of `checkBoardroomVerdictClean`: no checkpoint → allow; clean `GO` bottom_line with all-`GO`/`GO_WITH_CONCERNS` seats → allow; `bottom_line: "DO NOT SHIP"` → deny naming "bottom line"; a single seat recording `NO_GO` while `bottom_line` stayed non-blocking → deny naming that exact seat (the defense-in-depth case, confirming consolidation-didn't-propagate is still caught).
+- One full-hook integration test (`spawnSync`, real temp git repo + a real `.wingman/checkpoints.jsonl`): a Build checkpoint with `bottom_line: "DO NOT SHIP"` correctly blocks `git push` with exit 2 and a message naming the blocking verdict.
+- Manually re-verified by hand outside the test suite (not just via the automated tests) that a clean `GO` checkpoint still falls through and allows the push in a minimal real git repo — confirming the new check adds no false-positive block on the legitimate path.
+
+All 71 tests in `hooks-integration.test.mjs` pass (5 new, 66 pre-existing, zero regressions). This closes the exact gap the audit named — a checkpoint existing is no longer treated as equivalent to it having actually passed.

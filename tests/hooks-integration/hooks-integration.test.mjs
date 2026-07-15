@@ -690,3 +690,97 @@ describe('Gap G12 — cross-cutting reference docs', () => {
     assert.match(text, /Use when/i, 'scaffold should include the Use-when trigger');
   });
 });
+
+// ============================================================================
+// DoD Gate — Boardroom Verdict Check (audit-found gap: a checkpoint existing
+// is not the same as it having actually passed)
+// ============================================================================
+
+describe('DoD Gate — Boardroom Verdict Check', () => {
+  const dodHookPath = path.join(process.cwd(), 'plugins', 'wingman', 'hooks', 'dod-structural-gate.mjs');
+
+  describe('checkBoardroomVerdictClean (unit)', () => {
+    it('allows when there is no checkpoint at all', async () => {
+      const { checkBoardroomVerdictClean } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkBoardroomVerdictClean(null);
+      assert.strictEqual(result.ok, true);
+    });
+
+    it('allows a clean GO bottom_line with all-GO seats', async () => {
+      const { checkBoardroomVerdictClean } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkBoardroomVerdictClean({
+        bottom_line: 'GO',
+        seats: [{ seat: 'cto', verdict: 'GO' }, { seat: 'ciso', verdict: 'GO_WITH_CONCERNS' }],
+      });
+      assert.strictEqual(result.ok, true);
+    });
+
+    it('denies when bottom_line is "DO NOT SHIP"', async () => {
+      const { checkBoardroomVerdictClean } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkBoardroomVerdictClean({ bottom_line: 'DO NOT SHIP', seats: [] });
+      assert.strictEqual(result.ok, false);
+      assert.match(result.reason, /bottom line/i);
+    });
+
+    it('denies when a single seat recorded NO_GO, even with a non-blocking bottom_line', async () => {
+      // Defense-in-depth case: consolidation didn't propagate the seat-level NO_GO into
+      // bottom_line — this is the "belt" half of belt-and-suspenders, worth its own test.
+      const { checkBoardroomVerdictClean } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkBoardroomVerdictClean({
+        bottom_line: 'GO_WITH_CHANGES',
+        seats: [{ seat: 'ciso', verdict: 'NO_GO' }, { seat: 'cto', verdict: 'GO' }],
+      });
+      assert.strictEqual(result.ok, false);
+      assert.match(result.reason, /"ciso"/);
+      assert.match(result.reason, /NO_GO/);
+    });
+  });
+
+  describe('git push branch (integration)', () => {
+    const tempDir = path.join(process.cwd(), '.test-temp-dod-verdict-gate');
+
+    function writeCheckpoint(entry) {
+      const wingmanDir = path.join(tempDir, '.wingman');
+      fs.mkdirSync(wingmanDir, { recursive: true });
+      fs.writeFileSync(path.join(wingmanDir, 'checkpoints.jsonl'), JSON.stringify(entry) + '\n');
+    }
+
+    function runPushHook() {
+      const res = spawnSync(
+        'node',
+        [dodHookPath],
+        {
+          input: JSON.stringify({
+            tool_name: 'Bash',
+            tool_input: { command: 'git push origin main' },
+            cwd: tempDir,
+          }),
+          encoding: 'utf-8',
+        }
+      );
+      return { status: res.status, stderr: res.stderr, stdout: res.stdout };
+    }
+
+    beforeEach(() => {
+      if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+      fs.mkdirSync(tempDir, { recursive: true });
+      execSync('git init -q', { cwd: tempDir });
+      execSync('git config user.email test@example.com', { cwd: tempDir });
+      execSync('git config user.name Test', { cwd: tempDir });
+      fs.writeFileSync(path.join(tempDir, 'README.md'), '# temp\n');
+      execSync('git add -A && git commit -q -m init', { cwd: tempDir });
+    });
+
+    afterEach(() => {
+      if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+
+    it('blocks git push when the Build checkpoint recorded "DO NOT SHIP"', () => {
+      writeCheckpoint({ bundle: 'build', bottom_line: 'DO NOT SHIP', seats: [{ seat: 'ciso', verdict: 'NO_GO' }] });
+      const { status, stderr } = runPushHook();
+      assert.notStrictEqual(status, 0, 'a DO NOT SHIP checkpoint must block the push');
+      assert.match(stderr, /blocking verdict/i);
+      assert.match(stderr, /DO NOT SHIP/);
+    });
+  });
+});
