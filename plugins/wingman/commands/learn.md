@@ -32,7 +32,8 @@ Do **not** log routine facts, one-time transient errors, or anything already obv
 ```
 
    The marker is a plain HTML comment — invisible when rendered, ignored by any human reading the
-   file. It exists so `/wingman:evolve`'s clustering step can count genuine repeated `category`
+   file. Quote a `category` value if it needs a space (`category="ci cd setup"`) — an unquoted
+   value is read only up to the first space. It exists so `/wingman:evolve`'s clustering step can count genuine repeated `category`
    occurrences exactly, instead of only ever eyeballing free text. Use `status=superseded` instead
    of `active` if a later entry replaces this one, rather than deleting the old entry outright.
 

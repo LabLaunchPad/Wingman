@@ -30,7 +30,8 @@ Append to `docs/wingman/retros.md` at the project root (create it with a one-lin
 The marker line is a plain HTML comment (invisible when rendered) that lets `/wingman:evolve`'s
 clustering step count genuine repeated `category` occurrences exactly rather than only ever
 reading free text — same convention `/wingman:learn` now uses. Pick whatever tag genuinely fits;
-it's an open vocabulary, not a fixed list.
+it's an open vocabulary, not a fixed list. Quote a `category` value if it needs a space
+(`category="ci cd setup"`) — an unquoted value is read only up to the first space.
 
 Keep it short. A retro that takes longer to read than the feature took to explain has failed its own purpose.
 

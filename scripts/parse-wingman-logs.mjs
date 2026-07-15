@@ -22,11 +22,14 @@ const read = (rel) => { try { return readFileSync(join(repoRoot, rel), 'utf-8');
 
 const MARKER_RE = /^<!--\s*wingman:log\s+(.*?)\s*-->$/;
 
+// `category` is documented as free-text, so a bare \S+ value would silently truncate at the
+// first space (e.g. "category=ci cd" would drop "cd" instead of erroring) -- support a quoted
+// form ("category=\"ci cd\"") for any value that needs a space, found during Boardroom review.
 function parseFields(fieldStr) {
   const fields = {};
-  const re = /(\w+)=(\S+)/g;
+  const re = /(\w+)=(?:"([^"]*)"|(\S+))/g;
   let m;
-  while ((m = re.exec(fieldStr))) fields[m[1]] = m[2];
+  while ((m = re.exec(fieldStr))) fields[m[1]] = m[2] !== undefined ? m[2] : m[3];
   return fields;
 }
 
