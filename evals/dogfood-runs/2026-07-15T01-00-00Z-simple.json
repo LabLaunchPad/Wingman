@@ -1,0 +1,30 @@
+{
+  "run_id": "2026-07-15T01-00-00Z-simple",
+  "mode": "maintainer",
+  "path": "simple",
+  "fixture": "evals/fixtures/setup-dogfood-simple.sh",
+  "stages_run": ["discovery", "define", "architecture", "uxflow (skipped, no user-facing surface)", "implementation-planning", "build", "ship"],
+  "gates_expected_dormant": ["department-lead-activation (conditional: design/data/legal-security/devops/growth)", "management-board-activation"],
+  "gates_expected_active": ["department-lead-activation (unconditional: product/engineering/qa)"],
+  "gates_actual_dormant": ["department-lead-activation (conditional)", "management-board-activation"],
+  "gates_actual_active": ["dept-product", "dept-engineering", "dept-qa"],
+  "observed_gaps": [
+    {
+      "description": "Multi-ID traceability markers on one line (`// wingman:req ARCH-002 ARCH-003`) silently drop all but the first ID — check-traceability.mjs's regex captures exactly one ID per `wingman:req` occurrence, and traceability-linking's docs never specified the required syntax.",
+      "stage": "build",
+      "evidence": "check-traceability.mjs reported ARCH-003 as an unlinked requirement despite a marker visibly referencing it; splitting into two separate `// wingman:req <ID>` lines resolved it."
+    },
+    {
+      "description": "Boardroom diff-checkpoints are not deterministic across repeated dispatches of near-identical scope, with real consequences — Build's checkpoint returned a clean 8/8 GO, then Ship's own re-dispatch of the same personas over almost the same diff caught two substantive findings (a latent NODE_ENV-gated backdoor, a missing production write path) that Build's pass hadn't raised. Not wrong behavior, but nothing set the expectation that a cleared checkpoint could be relitigated later.",
+      "stage": "build-to-ship",
+      "evidence": ".wingman/checkpoints.jsonl entries 2026-07-15T01:21:30Z-build (all GO) vs. 2026-07-15T01:26:00Z-ship (cto/ciso raised new concerns)"
+    }
+  ],
+  "shortcuts_disclosed": [
+    "This sandbox's Agent tool cannot dynamically dispatch named dept-*/boardroom-* subagent types (confirmed: 'Agent type not found') — every dispatch used a general-purpose agent explicitly loaded with the real persona file.",
+    "AskUserQuestion tool unavailable in this sandbox (confirmed via ToolSearch) — founder decisions made as explicit stood-in reasoning.",
+    "git push skipped — fixture has no configured remote."
+  ],
+  "classification_outcome": "4 gaps classified via dogfood-gap-classification and approved: (1) traceability-linking SKILL.md doc fix (skill-content addition), (2) boardroom.md re-litigation-expectation doc fix (command-instruction addition), (3) define/architecture/uxflow.md output-file convention (command-instruction addition), (4) management-board-activation creation/dispatch decoupling (skill-logic fix). None were hook candidates, so none require cooling-off.",
+  "timestamp": "2026-07-15T01:00:00Z"
+}

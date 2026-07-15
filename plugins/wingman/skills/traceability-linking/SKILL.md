@@ -30,6 +30,24 @@ Whenever `/wingman:define`, `/wingman:architecture`, `/wingman:uxflow`, or `/win
 
 **3. Every downstream reference uses the marker `<!-- wingman:req <ID> -->`** — an HTML comment in Markdown (requirement tables, plan files), or the equivalent comment-token variant in source code (`// wingman:req DEF-001` for JS/TS, `# wingman:req DEF-001` for Python, etc.). A task or code change may reference more than one ID if it genuinely satisfies more than one requirement — do not merge two distinct requirements into a single ID to save a marker.
 
+**Multi-ID references: list every ID after one `wingman:req` token, space-separated.**
+`scripts/check-traceability.mjs`'s marker pattern accepts one or more space-separated IDs
+following a single `wingman:req` token on the same line:
+
+```js
+// wingman:req ARCH-<N> ARCH-<M>
+```
+
+A separate marker line per ID (`// wingman:req ARCH-<N>` then `// wingman:req ARCH-<M>`) also
+works — both forms register every ID. **Earlier versions of the checker only captured the first ID
+in a space-separated list and silently dropped the rest, with no warning** (found during a real
+dogfooding pass, see `docs/wingman/retros.md`) — this is fixed now, but if you're ever unsure
+whether a multi-ID marker actually registered every ID, verify directly (see below) rather than
+assuming the fix still holds.
+
+Verify by re-running `check-traceability.mjs` after adding a multi-ID reference — if any ID you
+intended to reference doesn't show up in its "distinct ID(s) referenced" count, something is wrong.
+
 **4. Never invent an ID reference to something that doesn't exist.** A marker referencing `DEF-004` when only `DEF-001`–`DEF-003` exist is a broken link, not a shortcut — `scripts/check-traceability.mjs` treats this as an error, not a warning.
 
 **5. Verify with `${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs` before treating a stage as done** — it confirms every requirement has at least one downstream marker and every marker resolves to a real ID (see script for full behavior).

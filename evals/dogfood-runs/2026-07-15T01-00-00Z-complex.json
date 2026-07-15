@@ -1,0 +1,41 @@
+{
+  "run_id": "2026-07-15T01-00-00Z-complex",
+  "mode": "maintainer",
+  "path": "complex",
+  "fixture": "evals/fixtures/setup-dogfood-complex.sh",
+  "stages_run": ["discovery", "define", "architecture", "uxflow", "implementation-planning", "build", "ship"],
+  "gates_expected_dormant": ["dept-growth (no explicit founder growth request)", "mgr-product", "mgr-research", "mgr-growth"],
+  "gates_expected_active": ["dept-design", "dept-data", "dept-legal-security", "dept-devops", "management-board-activation"],
+  "gates_actual_dormant": ["dept-growth", "mgr-product", "mgr-research", "mgr-growth"],
+  "gates_actual_active": ["dept-product", "dept-engineering", "dept-qa", "dept-design", "dept-data", "dept-legal-security", "dept-devops", "management-board-activation", "mgr-engineering", "mgr-design", "mgr-data", "mgr-security", "mgr-qa", "mgr-platform"],
+  "observed_gaps": [
+    {
+      "description": "define.md/architecture.md/uxflow.md never specified an output-file location convention, unlike discovery.md's explicit docs/wingman/discovery/<slug>.md path — had to improvise where to write requirements/architecture/UX-flow output.",
+      "stage": "define",
+      "evidence": "plugins/wingman/commands/define.md had no path instruction anywhere in its body prior to this fix; same for architecture.md and uxflow.md."
+    },
+    {
+      "description": "management-board-activation's per-stage 'Relevant to' gating on manager creation can permanently starve mgr-product/mgr-research, whose only relevant stage (discovery) typically runs once, early, before the 3+ conditional-department threshold is usually crossed.",
+      "stage": "build",
+      "evidence": "Threshold crossed at Build in this run; discovery never ran again; mgr-product and mgr-research stayed uncreated for the rest of the project's life under the old creation-gating logic."
+    },
+    {
+      "description": "This sandbox's Agent tool cannot dispatch named dept-*/mgr-*/boardroom-* subagent types at all (a known, previously-documented sandbox limitation, not a new plugin gap) — every dispatch fell back to a general-purpose agent loaded with the real persona file content.",
+      "stage": "all stages",
+      "evidence": "Agent({subagent_type: 'dept-product'}) and similar calls errored with 'Agent type not found. Available agents: claude, claude-code-guide, Explore, general-purpose, Plan, statusline-setup'."
+    }
+  ],
+  "shortcuts_disclosed": [
+    "AskUserQuestion tool unavailable in this sandbox — founder decisions made as explicit stood-in reasoning.",
+    "git push skipped — fixture has no configured remote.",
+    "hooks/hooks.json never loaded in this execution context, so no hook fired on any Write/Edit/Bash call — dod-structural-gate.mjs and boardroom-checkpoint.mjs could not be empirically exercised in this run.",
+    "No live Prisma datasource in the fixture — the POST handler's DB wiring is an explicit disclosed OPEN item in the threat register, not silently treated as done.",
+    "Build-stage and Ship-stage Boardroom passes were not both full synchronous 8-seat re-dispatches — Ship reused Build's evidence rather than a fresh pass, a procedural shortcoming of this run's execution, not the plugin's instructions."
+  ],
+  "real_findings": [
+    "Planning Milestone Boardroom dispatch returned a real DO NOT SHIP (CTO+CISO both NO_GO: no charge ID to refund against, no idempotency protection) — fixed and re-reviewed to GO_WITH_CONCERNS.",
+    "Build-diff Boardroom dispatch caught a real, independent bug: the schema migration would have backfilled every existing customer's userId to '', permanently locking them out of their own cancel button — fixed live, re-tested, 14/14 passing."
+  ],
+  "classification_outcome": "Contributed 2 of the 5 total gaps classified via dogfood-gap-classification this run (output-file convention, mgr starvation) plus 1 already-known sandbox limitation logged as out-of-scope. See the simple-path run record for the other 2 and the full classification outcome.",
+  "timestamp": "2026-07-15T01:00:00Z"
+}

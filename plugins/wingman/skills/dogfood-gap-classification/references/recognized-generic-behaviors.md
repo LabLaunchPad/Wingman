@@ -7,5 +7,4 @@ matches something already here, it's `out-of-scope` again, not a new finding.
 
 Format: one line per entry, dated, with a one-sentence reason.
 
-- *(none logged yet — this file grows as real dogfood runs surface genuine "not Wingman's job"
-  observations; do not pre-populate it speculatively)*
+- **2026-07-15 — named custom subagent_type dispatch (dept-*/mgr-*/boardroom-*) unavailable in this sandbox's Agent tool.** Already documented independently across multiple prior sessions (`docs/PROJECT.md`'s decisions log, several eval case run logs) as a testing-environment limitation, not a plugin defect — the plugin's own instructions correctly specify dispatching by named agent type; the sandbox this repo happens to be dogfooded in just falls back to a `general-purpose` agent loaded with the real persona file. Re-surfaced during the 2026-07-15 complex-path dogfood run; classified `out-of-scope` again, consistent with the existing record.

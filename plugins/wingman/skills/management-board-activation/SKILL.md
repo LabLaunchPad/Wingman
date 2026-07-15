@@ -21,7 +21,7 @@ Immediately after `department-lead-activation` runs, at the start of `/wingman:d
 
 **1. Read `.wingman/state.json`.** If it doesn't exist yet, stop — there's nothing to check. Otherwise, filter `active_department_leads` to just the **conditionally-activated** departments — `dept-design`, `dept-data`, `dept-legal-security`, `dept-devops`, `dept-growth` — discarding `dept-product`, `dept-engineering`, and `dept-qa` from this count entirely (they're always active and count for nothing here). If that filtered list has fewer than 3 entries, stop — the complexity threshold isn't met. Do not create any manager. This is the common case for most projects, including ones already well into Build; treat it as the expected, healthy outcome, not a step to work around.
 
-**2. If the conditional-department count is >= 3, check `.claude/agents/` for existing `mgr-*.md` files.** For **every** department lead currently in `active_department_leads` (including `dept-product`/`dept-engineering`/`dept-qa`, once the conditional-count threshold above is met — their own presence just doesn't count *toward* that threshold) that doesn't yet have a corresponding manager, evaluate whether that manager is relevant to the calling command (mirroring `department-lead-activation`'s per-command department table):
+**2. If the conditional-department count is >= 3, check `.claude/agents/` for existing `mgr-*.md` files.** For **every** department lead currently in `active_department_leads` (including `dept-product`/`dept-engineering`/`dept-qa`, once the conditional-count threshold above is met — their own presence just doesn't count *toward* that threshold) that doesn't yet have a corresponding manager, **create the file regardless of whether the calling command's own stage appears in that manager's "Relevant to" column below** — creation eligibility is just "department lead active + threshold met," full stop. Use the table only to decide, in step 5, whether to actually dispatch that manager's coordination work *this turn*:
 
 | Manager | Agent name | Corresponds to department lead | Relevant to |
 |---|---|---|---|
@@ -37,6 +37,20 @@ Immediately after `department-lead-activation` runs, at the start of `/wingman:d
 
 **"Relevant to" note (fixed 2026-07-14, found via a real dogfooding pass of the 7-stage pipeline):** this column previously named retired stages (`plan`, `secure`) from before the MVP2 pipeline rename, and Design Manager's row omitted `uxflow` even though `uxflow.md` explicitly checks for it — a real, reproducible inconsistency between the calling command's own instructions and this table. If a department lead is active, the count-of-3 threshold is met, and its manager doesn't exist yet, create it the first time **any** command whose stage appears in that manager's "Relevant to" column runs — do not wait for every possible stage to run first, and do not skip creating a manager just because the currently-running command isn't the *only* one listed for it.
 
+**"Relevant to" no longer gates creation — it only describes when a manager's coordination work
+gets dispatched (fixed after a second real dogfooding pass, 2026-07-15).** The rule above has a
+real gap: `mgr-product` and `mgr-research`'s only "Relevant to" entry is `discovery`, a stage that
+typically runs exactly once, early, before a project has usually accumulated the 3+ conditional
+department leads this threshold requires. Confirmed directly in that dogfood run: the threshold
+crossed at Build, `discovery` never ran again, and both managers stayed permanently uncreated for
+the rest of the project's life — not because their signal was ever false, but because the *only*
+command that ever checks their eligibility had already run and won't run again. Fixed: **every**
+command that invokes this skill checks **every** currently-missing manager whose corresponding
+department lead is active, not just the ones whose "Relevant to" column names the currently-running
+stage. The "Relevant to" table still matters for step 5 (only dispatch a manager's actual
+coordination work when its own stage is genuinely in scope this turn) — it just no longer decides
+whether the manager's file gets created in the first place.
+
 A manager's own activation signal is: **its corresponding department lead is in `active_department_leads` AND the count of *conditionally-activated* department leads (Design/Data/Legal-Security/DevOps/Growth only) is 3 or more.** Do not create a manager for a department lead that doesn't exist yet, even once the conditional-count threshold is met elsewhere in the project. Note this applies even to `mgr-product`/`mgr-engineering`/`mgr-qa` themselves — their own departments don't count toward the threshold, but once 3+ conditional departments push the project past it, their managers become eligible the same as any other's.
 
 **3. If a signal is true and `.claude/agents/mgr-<name>.md` doesn't already exist in the founder's project:**
@@ -48,7 +62,7 @@ A manager's own activation signal is: **its corresponding department lead is in 
 
 **4. If the file already exists, use it as-is** — don't regenerate or overwrite a manager that's already been created and possibly customized for this project.
 
-**5. Do the actual delegated coordination work this turn regardless of file-creation timing**, same as `department-lead-activation` step 5 — dispatch via the Task tool using the `mgr-<name>` agent type, discovered the same way any other project-scoped subagent is.
+**5. Dispatch a manager's actual coordination work this turn only if its own stage is relevant to the calling command** (per the "Relevant to" column) — a manager created in step 3 because the threshold was crossed by a *different* stage's department lead doesn't need dispatching until its own relevant stage actually runs. This is the one place the "Relevant to" table still matters: it gates *dispatch*, not *creation* (see the step 2 note above). Dispatch via the Task tool using the `mgr-<name>` agent type, discovered the same way any other project-scoped subagent is.
 
 ## Constraints
 

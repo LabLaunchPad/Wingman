@@ -17,6 +17,13 @@ Figure out what's in scope, in this order of preference:
 3. Otherwise, if there are uncommitted changes, review `git diff` (and `git diff --staged`).
 4. Otherwise, ask the user what they want reviewed.
 
+**A cleared checkpoint is not a permanent guarantee against a later one.** A real dogfooding pass
+(see `docs/wingman/retros.md`) found this directly: a Build-stage diff cleared 8/8 `GO`, and a
+later Ship-stage checkpoint over nearly the same diff caught two real, valid findings the earlier
+pass had missed. That's the review working as intended, not a contradiction to explain away — each
+checkpoint is a fresh, independent look, not a rubber stamp carried forward from the last one. Do
+not treat an earlier `GO` as a reason to skip or soften a later checkpoint's own scrutiny.
+
 ## Run the boardroom
 
 Dispatch all seven boardroom seats **in parallel** (single message, multiple Task/Agent calls) against the same scope, each as its own subagent so their reviews don't bias each other. Per the `addyosmani-agent-skills` orchestration pattern this plugin follows: boardroom seats never call each other or any other agent — only this command orchestrates and merges.

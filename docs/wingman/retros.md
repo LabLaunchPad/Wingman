@@ -1,5 +1,68 @@
 # Retros
 
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved -->
+## Retro: First real dogfood-of-the-dogfood run (`/wingman:dogfood`, both paths) — 2026-07-15
+
+Ran the newly-built `/wingman:dogfood` maintainer-mode command for real against both fixtures —
+this is the mandatory first exercise of the dogfooding subsystem itself, required before that
+feature could be considered done (not exercising the 7-stage pipeline directly by hand, as the two
+prior retros below did, but the formalized command wrapping that same process).
+
+**What went well:**
+- Both paths ran the full real 7-stage pipeline end to end: real `Agent`-tool dispatch (worked
+  around this sandbox's lack of named-subagent-type resolution by loading a `general-purpose`
+  agent with the actual persona file — disclosed, not hidden), real TDD (captured actual red
+  failures before green), a real Definition-of-Done gate, and real `git commit`s (real `git push`
+  disclosed as skipped — no remote on either local fixture).
+- Gate dormancy/activation both confirmed correctly: the simple path's `.claude/agents/` ended up
+  with only the 3 unconditionally-active department leads and zero managers; the complex path
+  correctly activated 7 of 8 department leads (`dept-growth` correctly stayed dormant) and 6 of 9
+  managers (`mgr-product`/`mgr-research`/`mgr-growth` correctly stayed dormant), with the
+  conditional-department count landing at 4, matching the fixture's seeded signals.
+- The Boardroom caught two real, independent bugs during the complex-path run: a first-pass
+  `DO NOT SHIP` (no charge ID to refund against, no idempotency protection) and, later at Build, a
+  schema-migration backfill bug that would have permanently locked every real existing customer out
+  of their own cancel button (`userId` backfilled to `''`). Both fixed live, re-tested clean.
+
+**The real findings — 5 genuine `observed_gaps`, classified via `dogfood-gap-classification`:**
+1. Multi-ID traceability markers on one line (a single `wingman:req` token followed by more than
+   one space-separated ID) silently dropped every ID after the first — undocumented, and the
+   checker's regex only ever captured one. Fixed both the checker (`check-traceability.mjs` now
+   captures the full space-separated ID list, not just the first) and the docs
+   (`traceability-linking/SKILL.md` now documents the supported syntax explicitly).
+2. Boardroom diff-checkpoints aren't deterministic across repeated dispatches of near-identical
+   scope — Build's checkpoint cleared 8/8, then Ship's own re-dispatch of the same personas caught
+   two things Build's pass missed. A real safety property, but nothing set that expectation. Fixed:
+   `boardroom.md` now states plainly that a cleared checkpoint isn't a permanent guarantee.
+3. `define.md`/`architecture.md`/`uxflow.md` never specified an output-file convention, unlike
+   `discovery.md`'s explicit path — forced improvisation. Fixed: all three now name
+   `docs/wingman/<stage>/<slug>.md`.
+4. `management-board-activation`'s per-stage "Relevant to" gating on manager *creation* could
+   permanently starve `mgr-product`/`mgr-research`, since their only relevant stage (`discovery`)
+   typically runs once, early, before the threshold is usually crossed — confirmed directly in
+   this run (threshold crossed at Build, `discovery` never ran again). Fixed: creation is now
+   decoupled from stage-relevance (every invocation checks every missing manager whose department
+   lead is active); the "Relevant to" table now only gates *dispatch* of a manager's coordination
+   work, not whether its file gets created.
+5. This sandbox's `Agent` tool can't dispatch named `dept-*`/`mgr-*`/`boardroom-*` subagent types —
+   already documented in prior sessions as an environment limitation, not a plugin defect. Logged
+   again in `references/recognized-generic-behaviors.md` so future runs don't re-flag it.
+
+None of the 4 real fixes were hook candidates (all were doc/skill-content/logic clarifications to
+existing skills/commands), so none required the cooling-off period — all were classified,
+approved, implemented, and verified in this same pass.
+
+**What we'd do differently next time:**
+- The complex-path subagent twice ended its own turn with a vague "waiting for X" message instead
+  of actually finishing a Boardroom dispatch it had started as background calls — had to be
+  explicitly told to redo the dispatch synchronously. Worth a note in `dogfood.md` itself (or the
+  general subagent-dispatch guidance) that a dogfood run's own internal Boardroom checkpoints
+  should be dispatched synchronously, not as further background agents, to avoid this exact stall.
+
+**Anything for you to know:**
+- Both runs' structured JSON records live at `evals/dogfood-runs/2026-07-15T01-00-00Z-{simple,complex}.json`.
+- Founder-mode verification and the final PR for the dogfooding subsystem are the next steps.
+
 <!-- wingman:log type=retro category=management-board-activation status=resolved occurrence=2 -->
 ## Retro: Second dogfooding pass — the simple path, and a real complexity-gate bug — 2026-07-14/15
 

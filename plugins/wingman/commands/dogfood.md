@@ -51,7 +51,12 @@ never ships to a founder's installed copy of the plugin.
    founder for every `AskUserQuestion` the pipeline calls for. Answer as a real founder would,
    don't assume or pre-script an answer.
 2. Real `Agent`-tool dispatch for every Boardroom seat, department lead, and Management Board
-   manager the pipeline activates — never a simulated or hand-written verdict.
+   manager the pipeline activates — never a simulated or hand-written verdict. Dispatch these
+   synchronously (not as further background agents) and wait for each result directly before
+   continuing — a real dogfood run stalled twice on 2026-07-15 by dispatching a checkpoint's seats
+   as background calls and then ending its own turn with a vague "waiting for the results" message
+   instead of actually finishing. There is no other process advancing a dogfood run forward; it
+   must drive its own dispatches to completion in the same turn.
 3. Real test-driven implementation during Build: a real failing test, a real fix, a real passing
    test — never write the passing version first.
 4. A real `git push` from inside the fixture, through the actual installed hooks

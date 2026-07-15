@@ -42,7 +42,11 @@ output the gap-classification skill depends on?
 
 ## Trust level
 
-`authored, pending first run` — the fixtures and command are written and the fixtures independently confirmed to run cleanly (see Run 0 below), but the full maintainer-mode subagent run (steps 3-4 above) has not yet executed. See the task list / `docs/wingman/retros.md` for the mandatory first real dogfood-of-the-dogfood run this plan requires before this case can be graded.
+`verified` (2026-07-15) — passed both a positive scenario (complex path: gates correctly activate,
+conditional department count reaches 4, management-board-activation fires, structured output and
+gap classification all work) and a negative scenario (simple path: gates correctly stay dormant on
+a zero-signal project), independently checked against the real fixture filesystems and
+`.wingman/state.json` rather than trusted from either subagent's self-report.
 
 ## Run log
 
@@ -55,3 +59,23 @@ signals (Design/Data/Legal-Security/DevOps) as documented. This is fixture-level
 only — the actual behavioral run (mode detection under real pipeline execution, structured output,
 gap classification) is still pending and is the subject of the mandatory first real
 dogfood-of-the-dogfood run tracked separately.
+
+### Run 1 — 2026-07-15 (full behavioral run, both paths — promotes to `verified`)
+
+Two fresh subagents, each given only `commands/dogfood.md` (not this case doc), ran the real
+7-stage pipeline end to end against their fixture in maintainer mode. **Simple path**: confirmed
+`management-board-activation` and the 5 conditional `department-lead-activation` signals all
+stayed dormant — `.claude/agents/` ended up with exactly the 3 unconditionally-active leads
+(`dept-product`, `dept-engineering`, `dept-qa`), zero conditional leads, zero managers, matching
+the expectation table exactly. Real TDD (captured genuine red-then-green), a real Definition-of-
+Done gate, a real `git commit` (real `git push` disclosed as skipped, no remote on the local
+fixture). **Complex path**: confirmed 7 of 8 department leads activated (`dept-growth` correctly
+stayed dormant, no explicit growth signal) and 6 of 9 managers activated once the conditional
+count reached 4 (`mgr-product`/`mgr-research`/`mgr-growth` correctly stayed dormant) — a real,
+independently-verified positive activation case. The Boardroom caught two real, independent bugs
+during this run (a first-pass `DO NOT SHIP` on missing refund-idempotency protection, and a
+schema-migration bug that would have permanently locked out every existing customer), both fixed
+and re-tested live. Found 5 genuine `observed_gaps`, all classified via `dogfood-gap-classification`
+and fixed (see `docs/wingman/retros.md`'s 2026-07-15 entry for the full list) — none were hook
+candidates, so none required cooling-off. Structured JSON records:
+`evals/dogfood-runs/2026-07-15T01-00-00Z-{simple,complex}.json`.

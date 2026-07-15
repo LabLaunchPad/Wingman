@@ -21,6 +21,10 @@ Before proposing anything new, look at the existing codebase for related functio
 
 For each `DEF-*` requirement in scope, decide: what data model changes are needed, what module/file boundaries this touches, and whether an existing abstraction can be extended instead of a new one introduced. Tag each design decision with the `ARCH-` traceability prefix (via the `traceability-linking` skill) pointing back to the `DEF-*` requirement(s) it satisfies.
 
+Append this section to a scratch architecture doc (`docs/wingman/architecture/<short-slug>.md` in
+the founder's project, creating the directory if needed — same slug as Discovery/Define's files,
+same convention):
+
 ```markdown
 ## Architecture decisions
 
