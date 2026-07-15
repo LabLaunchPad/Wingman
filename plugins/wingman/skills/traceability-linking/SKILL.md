@@ -64,6 +64,17 @@ Whenever `/wingman:define`, `/wingman:architecture`, `/wingman:uxflow`, or `/win
 
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs` — it must report zero orphaned markers (references to IDs that don't exist) and zero unlinked requirements (a `DEF-*`/`ARCH-*`/`UX-*` ID with no downstream marker anywhere).
 
+**Expected, non-blocking exception**: `IP-*` (Implementation Planning) IDs — and any ID whose only
+downstream coverage is several hops away rather than a direct marker — will routinely show as
+"unlinked," because nothing is ever expected to reference the terminal stage's own ID, and the
+checker isn't transitive (a `DEF-*` covered only via an intermediate `ARCH-*` marker several links
+downstream still shows unlinked unless something also references it directly). This is a real,
+known design limitation of the current checker, not a sign the pipeline actually has an orphaned
+requirement — don't chase it as if it were a genuine gap. Found and logged during this project's
+own first real dogfooding pass (see `docs/wingman/retros.md`, 2026-07-14); documented here rather
+than fixed, since it's a warning, not a blocking error, and making the checker transitive is a
+real but separate future improvement, not something to speculatively build now.
+
 ## Output
 
 No founder-facing template — this is an internal linking convention. The founder never needs to see raw IDs; they surface only if `dod-structural-gate.mjs` denies a checkpoint and needs to name the specific missing link.

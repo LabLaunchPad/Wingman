@@ -1,5 +1,6 @@
 # Retros
 
+<!-- wingman:log type=retro category=management-board-activation status=resolved occurrence=2 -->
 ## Retro: Second dogfooding pass — the simple path, and a real complexity-gate bug — 2026-07-14/15
 
 Deliberately picked the smallest possible real feature this time ("add a `GET /health` endpoint" to a tiny internal status API — no UI, no database, no auth, no external dependency) to test the *other* side of the Management Board's complexity gate: does it correctly stay dormant on a genuinely simple project, not just correctly activate on a complex one (the first retro's subject)?
@@ -19,6 +20,7 @@ Deliberately picked the smallest possible real feature this time ("add a `GET /h
 **Anything for you to know:**
 - Fix already committed and pushed (branch `claude/multi-domain-audit-benchmarks-7u9nrw`) alongside a promoted `management-board-activation` eval case (now `verified`) documenting this exact run.
 
+<!-- wingman:log type=retro category=seven-stage-pipeline status=resolved occurrence=1 -->
 ## Retro: First real dogfooding pass of the 7-stage pipeline (MVP2) — 2026-07-14
 
 Genuinely ran the whole `/wingman:discovery` → `/wingman:ship` sequence against a throwaway real project ("Tip Jar," a one-time Stripe tip feature), as a founder would — not a scripted eval with a pre-known correct answer. Real founder-in-the-loop `AskUserQuestion` decisions, real `dept-*`/`mgr-*` file creation, a real 8-seat Boardroom dispatch at the Planning Milestone checkpoint, real test-driven implementation, and a real `dod-structural-gate.mjs` hook run at `git push` time.
@@ -39,6 +41,7 @@ Genuinely ran the whole `/wingman:discovery` → `/wingman:ship` sequence agains
 **Anything for you to know:**
 - Both fixes above are already committed and pushed to the PR (`e8e1314`, `75446fc`) — this dogfooding pass didn't just generate a report, it directly hardened the shipped plugin against exactly the failure modes it surfaced, verified by re-running the fix against the actual broken fixture that found it.
 
+<!-- wingman:log type=retro category=vendor-integration status=resolved occurrence=1 -->
 ## Retro: Wingman vendor-pattern integration (v9–v12) — 2026-07-13
 
 **What went well:**

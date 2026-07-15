@@ -42,7 +42,11 @@ this skill classifies real, evidenced gaps, not speculative ones.
 
 **1. Read the `observed_gaps` entry** (`description`, `stage`, `evidence`) from the dogfood run's
 JSON record. Confirm the evidence is real — a file path, command output, or exit code you can
-independently check, not a remembered impression.
+independently check, not a remembered impression. Since this skill only ever runs from Wingman's
+own dev-repo checkout (never a founder's installed copy), `node scripts/parse-wingman-logs.mjs` is
+safely available here — run it (or its `recurringCategories()` export) to check whether a gap in
+the same category has already been logged as a `learning`/`retro`/`decision` before, instead of
+relying on a remembered impression of this project's own history.
 
 **2. Classify using this decision tree, in order:**
 
