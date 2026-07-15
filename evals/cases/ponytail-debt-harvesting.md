@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived debt-harvesting skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: ponytail-debt-harvesting
 
 Tests `plugins/wingman/skills/ponytail-debt-harvesting/SKILL.md` — its debt harvesting pattern, `// minimal:` comment format, and DEBT.md ledger — against a fixture with intentional debt patterns.

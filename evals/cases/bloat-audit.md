@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived command, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: bloat-audit
 
 Tests `plugins/wingman/commands/bloat-audit.md` — its whole-repo scan, complexity ranking, and 5-tag classification — against a fixture with intentional bloat patterns.

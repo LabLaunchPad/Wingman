@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived verification-loop skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: verification-loop
 
 Tests `plugins/wingman/skills/verification-loop/SKILL.md` behaviorally. This skill runs a comprehensive 8-phase verification after code changes.

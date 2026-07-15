@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived command, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: debt-ledger
 
 Tests `plugins/wingman/commands/debt-ledger.md` — its status/harvest/add commands and `// minimal:` comment format — against a fixture with intentional debt patterns.

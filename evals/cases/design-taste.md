@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: cognitive design-taste and UI-taste skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: design-taste
 
 Tests `plugins/wingman/skills/design-taste/SKILL.md` — its anti-slop UI/UX quality bar: avoids generic, template-derived interfaces and pushes for deliberate hierarchy, consistency, and restraint.

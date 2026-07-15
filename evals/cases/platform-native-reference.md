@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived reference skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: platform-native-reference
 
 Tests `plugins/wingman/skills/platform-native-reference/SKILL.md` — its cross-layer reference mapping "what you think you need" to "what the platform ships" — against scenarios where native solutions exist.

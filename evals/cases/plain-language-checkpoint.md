@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: cognitive plain-language-checkpoint translation skill, verified in unit tests and inline rather than a standalone shell script -->
+
 # Eval: plain-language-checkpoint
 
 Tests `plugins/wingman/skills/plain-language-checkpoint/SKILL.md` — its bar for translating technical findings into jargon-free, founder-actionable decisions (leading with consequence, not mechanism).

@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived discipline skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: engineering-minimalism
 
 Tests `plugins/wingman/skills/engineering-minimalism/SKILL.md` — its "smallest step that solves the problem" discipline: refuse speculative abstraction, surface assumptions, mark shortcuts, and follow the output rule.

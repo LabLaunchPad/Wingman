@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: deterministic script validator, verified exhaustively against inline test directories rather than a standalone shell script -->
+
 # Eval: traceability-validator
 
 Tests `plugins/wingman/scripts/check-traceability.mjs` (and by extension the `traceability-linking` skill's marker convention it enforces) — does it correctly find every requirement/marker cross-reference, correctly warn (not error) on a legitimately unlinked-so-far requirement, and correctly error on a marker that references an ID that was never minted?

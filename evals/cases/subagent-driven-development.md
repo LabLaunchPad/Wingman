@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: cognitive agent orchestration skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: subagent-driven-development
 
 Tests `plugins/wingman/skills/subagent-driven-development/SKILL.md` behaviorally. This skill orchestrates parallel task execution with fresh subagents, task reviews, and progress tracking.

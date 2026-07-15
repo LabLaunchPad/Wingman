@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: deterministic script hook, verified exhaustively in hooks-integration.test.mjs against inline mock git repos rather than a standalone shell script -->
+
 # Eval: dod-structural-gate
 
 Tests `plugins/wingman/hooks/dod-structural-gate.mjs` — the new deterministic hook that mechanically enforces artifact *presence* (traceability, tests, a clean threat register) before a real `git push`, closing the gap that 5 discipline skills were previously enforced only by prose. This is the highest-risk piece of MVP2's design: the plan explicitly flagged that the test-presence heuristic is the likeliest source of a false-positive over-block (the same failure shape `boardroom-checkpoint.mjs`'s own v12.1 fix had to correct once), so this case exists specifically to prove that risk does *not* materialize.
@@ -44,7 +46,7 @@ A sixth check (not a fixture): `ExitPlanMode` with plan text that doesn't contai
 
 ### Run 1 — 2026-07-14
 
-**Result: PASS on all 6 scenarios**, plus one real bug caught and fixed: the git-push registration's `getChangedFiles` fell back to `HEAD~20` when no commit SHA was recorded on the checkpoint, but in any fixture with fewer than 20 commits `git diff HEAD~20..HEAD` fails outright — the original code caught that failure and silently returned an empty file list, meaning the test-presence check would run against **zero files** and always pass, a silent false-negative in exactly the direction this hook exists to prevent. Fixed by trying a sequence of fallback base refs (the repository's actual first commit via `git rev-list --max-parents=0 HEAD`, then git's canonical empty-tree hash as a last resort) before giving up, so a diff range is always resolvable in a real repo regardless of commit count.
+**Result: PASS on all 6 scenarios**, plus one real bug caught and fixed along the way: the git-push registration's `getChangedFiles` fell back to `HEAD~20` when no commit SHA was recorded on the checkpoint, but in any fixture with fewer than 20 commits `git diff HEAD~20..HEAD` fails outright — the original code caught that failure and silently returned an empty file list, meaning the test-presence check would run against **zero files** and always pass, a silent false-negative in exactly the direction this hook exists to prevent. Fixed by trying a sequence of fallback base refs (the repository's actual first commit via `git rev-list --max-parents=0 HEAD`, then git's canonical empty-tree hash as a last resort) before giving up, so a diff range is always resolvable in a real repo regardless of commit count.
 
 After the fix, direct verification of all 6:
 1. **Compliant** — `{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"allow"}}`, exit 0.

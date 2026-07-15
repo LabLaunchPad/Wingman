@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived TDD discipline skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: test-driven-development
 
 Tests `plugins/wingman/skills/test-driven-development/SKILL.md` behaviorally. This skill encodes the red-green-refactor TDD discipline that is mandatory for all implementation work in Wingman.

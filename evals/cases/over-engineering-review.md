@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: ponytail-derived command, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: over-engineering-review
 
 Tests `plugins/wingman/commands/over-engineering-review.md` — its 5-tag taxonomy and surgical audit process — against a fixture with intentional over-engineering patterns.

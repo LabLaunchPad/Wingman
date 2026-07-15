@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: package-manager selection skill, verified in unit tests and inline scenario review rather than a standalone shell script -->
+
 # Eval: package-manager-selection
 
 Tests `plugins/wingman/skills/package-manager-selection/SKILL.md` — does it correctly default a

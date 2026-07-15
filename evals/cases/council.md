@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: dynamic advisory consensus skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: council
 
 Tests `plugins/wingman/skills/council/SKILL.md` behaviorally. This skill convenes a four-voice decision council for ambiguous decisions.

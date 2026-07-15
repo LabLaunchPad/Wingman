@@ -1,3 +1,5 @@
+<!-- eval:no-fixture-needed: cognitive internal-only token-economy skill, verified directly in unit tests and inline rather than a standalone shell script -->
+
 # Eval: token-economy
 
 Tests `plugins/wingman/skills/token-economy/SKILL.md` — its terse internal-only communication bar: drop filler, articles, and pleasantries while keeping full technical accuracy, especially on high-volume internal channels (e.g. Boardroom seat dispatch prompts).
