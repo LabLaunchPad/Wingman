@@ -51,3 +51,7 @@ Walk every item; for each, either confirm it holds with evidence or explicitly r
 ## Verification
 
 The gate is itself verifiable: each item above should have a traceable artifact (a test, a CLOSED threat row, a doc edit, a plain-language summary). If an item can't point to evidence, it isn't done. See `verification-before-completion`.
+
+## References
+
+- `references/fablize-pattern.md` — the wiring/logic separation discipline this gate's own mechanical enforcement (`hooks/dod-structural-gate.mjs`, `scripts/dod-pre-push-check.mjs`) follows; consult it when adding a new mechanical check to understand why the decision logic stays generic-signal-based rather than tool-name-based.

@@ -29,6 +29,17 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `ComposioHQ/awesome-claude-skills` | MIT (Composio) | Curated index — discovery source for the curated founder-lens mining loop |
 | `avelikiy/great_cto` | MIT (Anton Velikiy) | CTO-advisory persona model — design inspiration for `founder-cfo`/`founder-cmo`/`founder-cro` business-advisory skills (G7) |
 
+## Non-vendored attribution (design principle only, not a pinned submodule)
+
+Unlike the repositories above, `github.com/fivetaku/fablize` is not vendored under `vendor/` —
+nothing from it is copied, executed, or pinned as a submodule. It was fetched directly (web fetch
+of its public `hooks.json`/`router.sh`/`gate_stop.py`/`gate_post_tool.py`) at the user's direct
+request to study its hook design and apply a reusable principle to Wingman's own hooks.
+
+| Repo | License | Used for |
+|---|---|---|
+| `fivetaku/fablize` | Not verified in this pass (fetched web content only, no LICENSE file reviewed) — attribution recorded on a design-principle basis regardless | The wiring/logic separation discipline (harness-specific event wiring kept separate from generic-signal decision logic) — see `plugins/wingman/references/fablize-pattern.md` for the full writeup. Confirmed Wingman's own `hooks/dod-structural-gate.mjs` already follows this discipline; the concrete artifact produced is `plugins/wingman/scripts/dod-pre-push-check.mjs`, a git-`pre-push`-runnable fallback reusing the exact same exported functions. |
+
 ## Per-file adaptation record
 
 ### `plugins/wingman/skills/verification-before-completion/SKILL.md`
@@ -77,6 +88,9 @@ Original to Wingman, extending `department-lead-activation`'s own file-placement
 
 ### `plugins/wingman/skills/package-manager-selection/`
 Design-adapted (not copied) from `affaan-m/ECC`'s `scripts/lib/package-manager.js` (MIT, Copyright (c) 2026 Affaan Mustafa) — specifically its detection-priority ordering (lock file → `package.json` `packageManager` field → config → default) and its explicit warning against spawning child processes to probe for installed package managers during hot paths (a documented cause of session/hook slowdowns in that repo's own history). Adapted as prose/procedure for a Wingman skill rather than ported as executable code, since Wingman's own scripts stay dependency-free and this decision belongs to founder-generated projects, not Wingman's own repo. Adds a corepack-pinned-version requirement and an automatic-npm-fallback rule not present in the original, per this project's own Boardroom review (`docs/PROJECT.md` decisions log, 2026-07-15).
+
+### `plugins/wingman/scripts/dod-pre-push-check.mjs`
+Original to Wingman; the design principle behind why it exists (see above) is reverse-engineered from `fivetaku/fablize`'s hook architecture, not copied from it. Pure reuse of `dod-structural-gate.mjs`'s own already-exported, already-tested functions — no new decision logic.
 
 ### `plugins/wingman/commands/launch.md`
 Original to Wingman. Structurally mirrors `commands/ship.md` (preflight/activation → do the work → plain-language report → Boardroom checkpoint → suggest next steps), per the pattern shared across all Wingman pipeline commands.
