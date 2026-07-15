@@ -1,6 +1,38 @@
 # Retros
 
 <!-- wingman:log type=retro category=dogfooding-mechanism status=resolved -->
+## Retro: Fresh founder-mode dogfood run confirms the synchronous-dispatch fix holds — 2026-07-15
+
+Ran a second, fresh founder-mode `/wingman:dogfood` pass specifically to re-exercise the current
+`commands/dogfood.md` after adding an instruction (in the same PR as `git-pr-workflow`) telling it
+to dispatch Boardroom/department-lead seats synchronously (`run_in_background:false`) rather than
+as further background agents — a fix added because two earlier runs stalled by doing the opposite,
+ending their own turn on a vague "waiting for results" message instead of actually finishing.
+
+**What went well:** The fix held up completely under real, repeated exercise — 18 total `Agent`-
+tool dispatches across 3 checkpoint rounds (Planning Milestone: 8 seats, Build-diff: 8 seats, a
+post-fix re-check: 2 seats), every single one synchronous and returning a real result directly in
+the same turn. Zero stalls, zero vague "waiting" messages. Real TDD (genuine red — a bare-text 404
+causing a JSON-parse error in the test — then green), and a real bug caught by the Build-diff
+Boardroom pass (an inconsistent 404 response shape between the new `/jobs/:id` route and the
+catch-all route), fixed test-first and re-verified. Ship correctly stopped at preflight (no git
+remote, no `gh` CLI) rather than faking a push.
+
+**A genuinely interesting moment**: mid-run, the subagent's own `git status` check on Wingman's
+real repo showed a staged change set it hadn't produced — this session's own concurrent
+`package-manager-selection` work landing in the same shared container. Rather than panic or
+silently ignore it, the subagent correctly reasoned from its own action log (every `Write`/`Edit`
+it had issued targeted only the fixture directory) that this wasn't its own doing, continued the
+run, and by the final check the transient state was gone again. This is exactly the kind of
+distinction a verification step needs to make — "something changed" isn't automatically "I caused
+it" — and it got that right without being told to.
+
+**What we'd do differently next time:** none — this was specifically a confirmation run for an
+already-identified fix, not a search for new gaps, and it found none. `evals/cases/dogfood.md`
+promoted with this as its third, differently-shaped scenario (the mode-boundary itself, not just
+gate-activation/dormancy).
+
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved -->
 ## Retro: First real dogfood-of-the-dogfood run (`/wingman:dogfood`, both paths) — 2026-07-15
 
 Ran the newly-built `/wingman:dogfood` maintainer-mode command for real against both fixtures —
