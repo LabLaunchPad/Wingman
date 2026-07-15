@@ -167,6 +167,23 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 - **Sonnet-tier** (`model: inherit`, default) — `boardroom-ceo`, `boardroom-cpo`, `boardroom-cmo`, `boardroom-research`, `boardroom-cfo`, `boardroom-design`, and most department-lead build work. Management Board managers (§5a) also default to this tier — coordination work, not architecture-risk or threat-modeling.
 - **Haiku-tier** (`model: haiku`) — high-volume, low-risk text generation: changelog/PR copy, `/wingman:learn` log entries, `dept-growth`'s routine copywriting.
 
+## 8a. Agent-harness portability (what's agent-agnostic vs. Claude-Code-coupled)
+
+`docs/wingman/architecture-audit-2026-07-15.md`'s Proven finding #4: this plugin is **not** portable to a different coding-agent harness (Codex CLI, Gemini CLI, OpenHands, Cline) as a whole, and that should be stated plainly rather than left as an unexamined assumption behind a general "agent-agnostic" label.
+
+**Genuinely portable today** — two skills, built deliberately this way, with no Claude-Code-only dependency:
+- `skills/git-pr-workflow` — built on plain `git` + the `gh` CLI, not a platform-specific tool-calling interface; its own `SKILL.md` states this explicitly.
+- `skills/package-manager-selection` — pure detection logic over `package.json`/lockfiles; contains no Claude-Code tool reference.
+
+**Hard-coupled to Claude Code's tool surface** — the Boardroom/governance core, confirmed by direct citation, not assumed:
+- `AskUserQuestion` (`commands/boardroom.md`) — already self-disclosed as unavailable in headless/print-mode sessions.
+- `ExitPlanMode` plus its two gating hooks (`boardroom-checkpoint.mjs`, `dod-structural-gate.mjs`) — both key off that exact tool name via `PreToolUse` matchers.
+- `Task`/`Agent` parallel subagent dispatch — the mechanism the entire 7-seat Boardroom review depends on to run all seats in one message.
+
+**Partially portable**: model tiering (§8) is conceptually vendor-agnostic — risk-cost-based model assignment is a portable idea — but the actual field values (`opus`/`inherit`/`haiku`) are literal Anthropic model names with no indirection layer; they'd need editing, not just reinterpreting, under a different vendor's harness.
+
+**What this means in practice**: a claim that "Wingman is agent-agnostic" is true only for the two skills named above, not for the plugin as a whole. No portability work is scheduled for the Boardroom/hook core absent real, evidenced demand to run Wingman under a non-Claude-Code harness — building a ports-and-adapters abstraction for these three couplings speculatively, with zero current demand, would be exactly the premature-abstraction pattern `engineering-minimalism` warns against.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 16 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
