@@ -124,6 +124,33 @@ The specialist candidate catalog (56+ roles, growing as new candidate roles are 
 
 This means two different Wingman-managed projects end up with different specialist rosters — a fintech project accumulates Legal/Security specialists fast (PCI, fraud review); a content site may never need one. That's intentional: the roster should reflect what the company actually does, not a template applied uniformly regardless of fit.
 
+### 6a. The structured knowledge layer (dev-repo-only)
+
+The 2+-occurrence gate above, and `skills/dogfood-gap-classification`'s decision tree, both need
+the same mechanical fact: has this specific friction genuinely shown up before, and how many times.
+`LEARNINGS.md`, `docs/wingman/retros.md`, and `docs/PROJECT.md`'s decisions log carry a
+`<!-- wingman:log type=... category=... status=... -->` marker above every entry; `docs/wingman/GAPS.md`
+already ships as a structured table. `scripts/parse-wingman-logs.mjs` turns all of that into one
+JSON view, and `scripts/query-wingman-knowledge.mjs` is the queryable interface on top of it —
+filter by type/category/status, or ask `--recurring` for exactly which categories have crossed the
+2+-occurrence threshold — rather than every consumer re-reading prose by eye or writing its own
+one-off regex.
+
+**This is dev-repo-only tooling, by construction**, not a runtime capability of the shipped plugin:
+both scripts live under `/scripts` (repo-root), which is never part of the plugin bundle a founder
+installs (only `plugins/wingman/scripts/` ships). This is exactly why `skills/evolve-promotion`
+(runs inside *any* founder's installed project) deliberately does **not** depend on it — it falls
+back to a plain read/grep of the marker lines instead — while `skills/dogfood-gap-classification`
+(runs only from Wingman's own dev-repo checkout) correctly does. Don't "fix" that asymmetry; it's
+intentional.
+
+**Scope, explicitly**: this stays strictly intra-repo — it queries this project's own already-written
+docs and nothing else. It has no bearing on `docs/CROSS-USER-LEARNING.md`'s ruled-out cross-user/
+telemetry scope (no phone-home, opt-in only, human-gated) — that document's concerns are about data
+leaving this repo; this layer never does. It's also unrelated to `skills/memory`'s
+`.wingman/memory/*.md` files, which are a founder-project's own per-project memory, not this
+project's dev history.
+
 ## 7. Cross-departmental protocols
 
 | Corporate concept | Wingman mechanism |

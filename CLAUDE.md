@@ -10,7 +10,7 @@ Wingman is a Claude Code plugin, packaged as a marketplace + plugin under `.clau
 
 There's no unit-test runner to point at a single test: the closest equivalent is a single behavioral eval case in `evals/cases/*.md`, exercised by hand (spawn a fresh subagent against the named fixture, grade its output against the case's expectations, append to the run log) per `evals/README.md` — grading stays human/independent by design, not scripted.
 
-**For a current-state snapshot** (plugin surface size, eval coverage by trust level, which commands/skills still have no dedicated eval case), run `node scripts/wingman-health.mjs` — it's read-only and reads only flat files (no network, no DB). Cross-check its numbers against `docs/PROJECT.md` (the durable decisions log and roadmap) before trusting stale counts in other docs, since prose summaries (e.g. README's command/skill counts) drift as the plugin grows and this script doesn't.
+**For a current-state snapshot** (plugin surface size, eval coverage by trust level, which commands/skills still have no dedicated eval case), run `node scripts/wingman-health.mjs` — it's read-only and reads only flat files (no network, no DB). Cross-check its numbers against `docs/PROJECT.md` (the durable decisions log and roadmap) before trusting stale counts in other docs, since prose summaries (e.g. README's command/skill counts) drift as the plugin grows and this script doesn't. **For structured queries** over the `wingman:log` markers in `LEARNINGS.md`/`docs/wingman/retros.md`/`docs/PROJECT.md`'s decisions log/`docs/HUMAN-TODOS.md` (by category/type/status, or which categories have crossed the 2+-occurrence threshold), run `node scripts/query-wingman-knowledge.mjs` — dev-repo-only tooling, see `docs/ARCHITECTURE.md` §6a for why it never ships with the plugin.
 
 **Before making any structural change** (new command, agent, skill, or department), read `docs/ARCHITECTURE.md` first — it explains the hybrid Boardroom/department-lead/specialist model and the reasoning behind it. Read `docs/AGENT-ROSTER.md` before creating any new specialist subagent — it's the canonical candidate catalog and promotion process; specialists should be promoted via `/wingman:evolve` on evidenced need, not created speculatively.
 
@@ -22,6 +22,7 @@ node scripts/check-repo-consistency.mjs                # repo-root doc/attributi
 node scripts/check-fixtures.mjs                        # every eval fixture (evals/fixtures/setup-*.sh) still runs clean
 node plugins/wingman/scripts/check-traceability.mjs     # requirement/marker cross-referencing (also shippable, runs in founder projects)
 node scripts/wingman-health.mjs                         # read-only dev-health report: built vs. verified vs. gaps
+node scripts/query-wingman-knowledge.mjs                # dev-repo-only: query the wingman:log markers by type/category/status, or --recurring
 node evals/run-headless.mjs --dry-run                   # confirms every eval case references an existing fixture, no API key needed
 node evals/run-headless.mjs                              # runs the behavioral eval cases via `claude -p`, needs ANTHROPIC_API_KEY
 ```
