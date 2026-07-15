@@ -93,6 +93,23 @@ function findLatestBuildCheckpoint(cwd) {
   return null;
 }
 
+// A checkpoint entry existing is not the same as it having actually passed — the Boardroom's own
+// consolidation rule is "any NO_GO anywhere overrides any approval elsewhere" (see
+// docs/ARCHITECTURE.md's v7 note and evals/cases/boardroom-gate-rule.md), so check both the
+// top-level bottom_line AND every individual seat's verdict as defense-in-depth, in case
+// consolidation didn't propagate a seat-level NO_GO up into bottom_line correctly.
+export function checkBoardroomVerdictClean(checkpoint) {
+  if (!checkpoint) return { ok: true };
+  if (String(checkpoint.bottom_line || '').trim().toUpperCase() === 'DO NOT SHIP') {
+    return { ok: false, reason: `its recorded bottom line was "DO NOT SHIP"` };
+  }
+  const noGoSeat = (checkpoint.seats || []).find((s) => String(s.verdict || '').toUpperCase() === 'NO_GO');
+  if (noGoSeat) {
+    return { ok: false, reason: `its "${noGoSeat.seat}" seat recorded a NO_GO verdict` };
+  }
+  return { ok: true };
+}
+
 function findMostRecentPlanFile(cwd) {
   const plansDir = join(cwd, 'docs', 'wingman', 'plans');
   try {
@@ -301,6 +318,17 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const cwd = input.cwd || process.cwd();
     const checkpoint = findLatestBuildCheckpoint(cwd);
     if (!checkpoint) allow(); // no Build-stage checkpoint recorded yet — not this hook's concern
+
+    // 0. Boardroom verdict — a checkpoint existing is not the same as it having passed.
+    const verdictResult = checkBoardroomVerdictClean(checkpoint);
+    if (!verdictResult.ok) {
+      deny(
+        `Wingman dod-structural-gate: the most recent Build-stage Boardroom checkpoint recorded a ` +
+        `blocking verdict — ${verdictResult.reason}. Do not push until this is resolved (fix the ` +
+        `concern and get a clean re-check, or get explicit founder override recorded in a new ` +
+        `checkpoint) — a checkpoint existing is not the same as it having actually passed.`
+      );
+    }
 
     // 1. Traceability — delegate to check-traceability.mjs against the whole project.
     const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
