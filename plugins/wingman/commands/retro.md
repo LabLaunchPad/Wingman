@@ -18,6 +18,7 @@ Before writing anything, look at real evidence from this work: commit history, t
 Append to `docs/wingman/retros.md` at the project root (create it with a one-line header if it doesn't exist yet — same append-only convention as `LEARNINGS.md`). Retros scattered across individual plan files can't be reliably found later, including by `/wingman:evolve`'s clustering step, so this is the one canonical location:
 
 ```markdown
+<!-- wingman:log type=retro category=<short free-text tag matching what this retro is mainly about> status=resolved -->
 ## Retro: <what was built> — <YYYY-MM-DD>
 
 **What went well:** <1-3 concrete things, plain language>
@@ -25,6 +26,12 @@ Append to `docs/wingman/retros.md` at the project root (create it with a one-lin
 **What we'd do differently next time:** <concrete, actionable — not "be more careful">
 **Anything for you to know:** <only if there's a genuine business-relevant takeaway — a cost, a timeline lesson, a decision that needs revisiting>
 ```
+
+The marker line is a plain HTML comment (invisible when rendered) that lets `/wingman:evolve`'s
+clustering step count genuine repeated `category` occurrences exactly rather than only ever
+reading free text — same convention `/wingman:learn` now uses. Pick whatever tag genuinely fits;
+it's an open vocabulary, not a fixed list. Quote a `category` value if it needs a space
+(`category="ci cd setup"`) — an unquoted value is read only up to the first space.
 
 Keep it short. A retro that takes longer to read than the feature took to explain has failed its own purpose.
 

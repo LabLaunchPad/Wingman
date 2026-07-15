@@ -11,6 +11,8 @@ Wingman's pipeline should get sharper the more it's used on a given project, wit
 
 **Core principle:** promote only what's shown up more than once, with concrete evidence, and only after the founder explicitly approves what's about to be created.
 
+**Scope note:** this skill promotes *founder-project* friction into the founder's own `.claude/` directory and never writes to `plugins/wingman/`. For the mirror-image mechanism — promoting a genuine *pipeline-behavior* gap found via real dogfooding into Wingman's own plugin content — see `skills/dogfood-gap-classification`, which runs only from Wingman's own dev-repo checkout, never from a founder's installed copy.
+
 ## When To Use
 
 At the start of `/wingman:evolve`'s run, and nowhere else — this is a rare, on-demand operation, not something invoked from the regular pipeline commands.
@@ -18,8 +20,8 @@ At the start of `/wingman:evolve`'s run, and nowhere else — this is a rare, on
 ## Core Workflow
 
 **1. Gather signal from all three sources:**
-- `LEARNINGS.md` — dated entries, each a short title + 1-3 sentence body (see `commands/learn.md`'s exact format). Free text; clustering here is topical/semantic, not a field match.
-- `docs/wingman/retros.md` — `## Retro: <title> — <date>` blocks (see `commands/retro.md`'s exact format). Same free-text clustering approach.
+- `LEARNINGS.md` — dated entries, each a short title + 1-3 sentence body (see `commands/learn.md`'s exact format). `commands/learn.md` now writes a `<!-- wingman:log type=learning category=<tag> status=... -->` marker directly above each new entry — if entries in this project's `LEARNINGS.md` carry that marker, use it to count genuine `category` repetition exactly (a plain read/grep of the marker lines, no script needed — this project's founder-facing files never depend on a script that isn't part of what ships). Older entries without a marker, or a project that predates this convention, fall back to free-text topical/semantic clustering exactly as before — never block on the marker being absent.
+- `docs/wingman/retros.md` — `## Retro: <title> — <date>` blocks (see `commands/retro.md`'s exact format), same marker convention and same fallback rule as above.
 - `.wingman/checkpoints.jsonl` — structured, one JSON object per line (see `docs/DATABASE.md`'s schema). Group by `seats[].seat` plus repeated keywords in `seats[].summary` or `bottom_line` across multiple lines — e.g. the `security` seat returning `GO_WITH_CONCERNS` about the same narrow topic (auth, a specific integration) more than once is exactly the kind of structured signal this file can surface that free-text sources can't.
 
 **2. Cluster by genuine topical overlap, not superficial keyword match.** Group entries (from any combination of the three sources) that describe the *same underlying friction*, even if worded differently. A cluster is only a candidate if it has **2 or more entries** — this threshold is fixed by `docs/ARCHITECTURE.md` §6 and `docs/AGENT-ROSTER.md`; do not round down from "close to 2" or promote on a single strong occurrence, no matter how compelling it looks.

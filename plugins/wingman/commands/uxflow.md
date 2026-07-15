@@ -19,6 +19,10 @@ Immediately after (only if `dept-design` is active), use the `management-board-a
 
 For each `ARCH-*` decision that touches a user-facing surface, sketch the screens/states/transitions a user actually moves through — not visual polish (that's `design-taste`'s job at build time), just the shape of the experience: what a user sees, in what order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing back to the `ARCH-*`/`DEF-*` chain it satisfies.
 
+Append this section to a scratch UX-flow doc (`docs/wingman/uxflow/<short-slug>.md` in the
+founder's project, creating the directory if needed — same slug as the earlier stages' files,
+same convention):
+
 ```markdown
 ## UX flow
 

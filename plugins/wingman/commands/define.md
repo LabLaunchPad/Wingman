@@ -13,6 +13,10 @@ $ARGUMENTS
 
 Read the Discovery output (from `/wingman:discovery`, or the path given in `$ARGUMENTS`). Break the problem down into a short list of concrete requirements — not an exhaustive spec, just enough that "what are we actually building" is unambiguous. Each requirement gets its own row and its own ID, minted via the `traceability-linking` skill (prefix `DEF-`, e.g. `DEF-001`) so later stages, tasks, and code changes can point back to exactly which requirement they satisfy.
 
+Append this section to a scratch define doc (`docs/wingman/define/<short-slug>.md` in the
+founder's project, creating the directory if needed — same slug as Discovery's own file, same
+convention):
+
 ```markdown
 ## Requirements
 

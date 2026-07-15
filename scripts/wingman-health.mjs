@@ -14,6 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseAll } from './parse-wingman-logs.mjs';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const read = (rel) => { try { return readFileSync(join(repoRoot, rel), 'utf-8'); } catch { return null; } };
@@ -44,10 +45,9 @@ const isCovered = (name) => caseNames.some((c) => c === name || c.startsWith(nam
 const uncoveredCommands = commands.filter((c) => !isCovered(c));
 const uncoveredSkills = skills.filter((s) => !isCovered(s));
 
-// --- Learnings/decisions volume (a rough activity signal, not a score) ---
-const project = read('docs/PROJECT.md') || '';
-const decisionsSection = project.split(/##\s*Decisions log/i)[1] || '';
-const decisionCount = (decisionsSection.match(/^- \*\*/gm) || []).length;
+// --- Learnings/decisions volume, from the structured wingman:log markers, not a prose regex ---
+const logs = parseAll();
+const decisionCount = logs.decisions.length;
 
 // --- Report ---
 const line = (s = '') => console.log(s);
@@ -65,6 +65,10 @@ for (const [name, t] of Object.entries(trust).sort()) {
 line();
 if (uncoveredCommands.length) line(`Commands with no dedicated eval case (${uncoveredCommands.length}): ${uncoveredCommands.join(', ')}`);
 if (uncoveredSkills.length) line(`Skills with no dedicated eval case (${uncoveredSkills.length}): ${uncoveredSkills.join(', ')}`);
+line();
+const { totalHeadings, markedHeadings } = logs.coverage;
+const pctMarked = totalHeadings ? Math.round((markedHeadings / totalHeadings) * 100) : 100;
+line(`Structural log coverage: ${markedHeadings}/${totalHeadings} entries (${pctMarked}%) across LEARNINGS.md/retros.md/PROJECT.md-decisions/HUMAN-TODOS.md carry a machine-parseable wingman:log marker (see scripts/parse-wingman-logs.mjs).`);
 line();
 // Overall one-line verdict, in the plain-language spirit the project holds
 // its own outputs to.

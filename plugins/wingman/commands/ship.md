@@ -26,9 +26,15 @@ Before shipping, confirm all of the following, and stop with a plain-language ex
 
 ## Push and open the change for review
 
-1. Push the branch.
+Use the `git-pr-workflow` skill for the mechanics below — it's written to work with plain `git`
+and the `gh` CLI, so it holds up regardless of which coding agent is actually driving this session.
+
+1. Push the branch. If the push is rejected as non-fast-forward and this branch previously had a
+   merged PR, this is very likely a squash-merge — see `git-pr-workflow`'s branch-resync procedure
+   rather than force-pushing blindly.
 2. Generate a pull request description written for two audiences at once: a short plain-language summary at the top (what this does, why it matters, what to watch for), followed by the normal technical summary/test plan for anyone who does read code. Follow this repository's PR template if one exists.
-3. Open the PR.
+3. Open the PR as a draft (per `git-pr-workflow`'s draft-first default), then poll until checks are
+   green before marking it ready for review — never mark it ready while checks are still pending.
 
 ## Report in plain language
 

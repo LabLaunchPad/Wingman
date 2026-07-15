@@ -16,6 +16,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseAll } from './parse-wingman-logs.mjs';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const errors = [];
@@ -78,7 +79,18 @@ if (attributions && vendorEntries.length) {
   }
 }
 
-console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md`);
+// --- Structural log markers: every entry in LEARNINGS.md/retros.md/PROJECT.md's decisions
+// log/HUMAN-TODOS.md carries a preceding `wingman:log` marker ---
+// Mirrors how check-traceability.mjs enforces its own req-marker convention: an unenforced
+// backfill just rots the first time someone appends a new entry without a marker, so this check
+// exists specifically to keep the AI-native structured-log layer from quietly decaying back into
+// pure prose.
+const { coverage } = parseAll();
+if (coverage.markedHeadings < coverage.totalHeadings) {
+  warnings.push(`structural-log-drift: ${coverage.totalHeadings - coverage.markedHeadings} entr${coverage.totalHeadings - coverage.markedHeadings === 1 ? 'y' : 'ies'} in LEARNINGS.md/retros.md/PROJECT.md-decisions/HUMAN-TODOS.md is missing a wingman:log marker (see scripts/parse-wingman-logs.mjs) — a new entry was likely appended without one`);
+}
+
+console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings})`);
 
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);

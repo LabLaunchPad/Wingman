@@ -2,6 +2,14 @@
 
 Wingman's regression defense is a **hybrid**: mechanize what's crisp and deterministic (cheap, run-every-time), and route what's genuinely semantic to the `systematic-auditing` skill (expensive, run-on-meaningful-change). This doc is the single source of truth for both layers, and which checks live where — so nothing silently falls between them the way this project's real bugs once did.
 
+## Layer 0 — runtime pipeline-behavior gaps (found via `/wingman:dogfood`, maintainer mode only)
+
+Layer 1 and Layer 2 both check the plugin's own *files* — frontmatter, orphans, hook-event names, prose consistency. Neither covers a different, upstream question: does the pipeline's actual **runtime behavior**, when it genuinely runs end to end, match what a careful agent would actually do? Two real dogfooding passes (`docs/wingman/retros.md`, 2026-07-14/15) found exactly this class of gap — not a malformed file, but a rule that was *structurally* wrong (a threat-register check that only ever looked in one directory; a complexity threshold that counted departments that are always active regardless of real complexity). Both were only findable by actually running the pipeline, not by reading its files.
+
+**`/wingman:dogfood`** (maintainer mode; see `commands/dogfood.md` and `skills/dogfood-gap-classification`) is the mechanism: run the real 7-stage pipeline end to end against a throwaway fixture — a "simple path" (zero conditional signals, proves gates stay dormant) and a "complex path" (deliberate conditional signals, proves gates correctly activate) — and classify anything found into a hook, a skill, a command-instruction addition, or explicitly out-of-scope (generic agent competence Wingman shouldn't re-teach). A found gap lands here first, as a Layer 0 entry, before any fix is proposed.
+
+**Graduation**: once a Layer 0 finding is classified as a hook candidate, implemented, and — critically — has cleared the cooling-off requirement (a second, separate real dogfood run confirming it doesn't over-block; see `dogfood-gap-classification`'s Constraints), it becomes a literal new Layer 1 entry below, following the exact same graduation rule Layer 2 already uses ("When a Layer-2 bug is found" §, unchanged — this is the same rule one tier up). A skill or command-instruction finding doesn't graduate to Layer 1 (it's not mechanically checkable), but still gets logged here and in `docs/PROJECT.md`'s decisions log.
+
 ## Layer 1 — mechanical (run on every change, seconds, deterministic)
 
 Two zero-dependency Node scripts. Both must exit 0 (warnings are allowed, errors are not) before any structural change is committed. The plugin's `node --test` suite (currently 85 tests, including the gstack `ExitPlanMode` gate regression) is the third deterministic gate and must also pass.
@@ -28,6 +36,6 @@ These were deliberately *not* mechanized, because a naive keyword check on any o
 - **Plain-language bar** — every founder-facing output clearing `plain-language-checkpoint`'s standard. Inherently semantic.
 - **Cross-doc consistency of prose** — `CLAUDE.md` / `ARCHITECTURE.md` / `PROJECT.md` telling the same story about what's built and why (beyond the mechanical command-name check).
 
-## When a Layer-2 bug is found
+## When a Layer-0 or Layer-2 finding graduates
 
-If an audit finds a semantic regression that turns out to *be* mechanizable without noise, move it up to Layer 1 and delete its Layer-2 entry — that's how the hook-event, orphan, and model-tier checks got here. If it's genuinely un-mechanizable, keep it in Layer 2 and make sure the audit actually runs on the changes that could trigger it.
+If an audit finds a semantic regression that turns out to *be* mechanizable without noise, move it up to Layer 1 and delete its Layer-2 entry — that's how the hook-event, orphan, and model-tier checks got here. If it's genuinely un-mechanizable, keep it in Layer 2 and make sure the audit actually runs on the changes that could trigger it. The same rule applies one tier down: a Layer 0 finding that clears `dogfood-gap-classification`'s hook-promotion checklist and cooling-off requirement graduates to a new Layer 1 entry; a Layer 0 finding classified as a skill or command-instruction addition stays a Layer 0/`docs/PROJECT.md` record, since it's not mechanically checkable.

@@ -30,3 +30,7 @@ Every "tests pass" claim Wingman makes during `/wingman:build` (including its De
 ## If gaps are found
 
 Offer to fix the highest-leverage gap now (following the same test-first discipline as `/wingman:build`), or log it via `/wingman:learn` if it's a known tradeoff being accepted for now rather than fixed immediately.
+
+## See also
+
+`/wingman:harness` audits whether *existing* test/build/lint state is honest. `/wingman:dogfood` is a different, complementary operation — it generates and runs a fixture/feature through the real pipeline end to end, to find gaps in the pipeline's own behavior rather than in a project's existing harness.

@@ -35,7 +35,12 @@ const root = process.argv[2] ? resolve(process.cwd(), process.argv[2]) : process
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'vendor', '.wingman', 'evals']);
 const ID_PATTERN = /\b(DISC|DEF|ARCH|UX|IP)-\d+\b/;
 const TABLE_ROW_PATTERN = /^\s*\|\s*(DISC|DEF|ARCH|UX|IP)-\d+\s*\|/;
-const MARKER_PATTERN = /wingman:req\s+((?:DISC|DEF|ARCH|UX|IP)-\d+)/g;
+// Matches one `wingman:req` token followed by one or more space-separated IDs on the
+// same line -- found via real dogfooding (docs/wingman/retros.md, 2026-07-15): the
+// original single-ID pattern silently dropped every ID after the first when a task
+// genuinely satisfied more than one requirement,
+// with no warning that anything had been missed.
+const MARKER_PATTERN = /wingman:req((?:\s+(?:DISC|DEF|ARCH|UX|IP)-\d+)+)/g;
 
 function walk(dir, files = []) {
   let entries;
@@ -71,9 +76,12 @@ for (const file of files) {
   let m;
   MARKER_PATTERN.lastIndex = 0;
   while ((m = MARKER_PATTERN.exec(content))) {
-    const id = m[1];
-    if (!referencedIds.has(id)) referencedIds.set(id, new Set());
-    referencedIds.get(id).add(relPath);
+    // m[1] may hold one or more space-separated IDs (e.g. " ARCH-002 ARCH-003") when a
+    // single wingman:req token covers multiple IDs -- split and record each one.
+    for (const id of m[1].trim().split(/\s+/)) {
+      if (!referencedIds.has(id)) referencedIds.set(id, new Set());
+      referencedIds.get(id).add(relPath);
+    }
   }
 }
 
