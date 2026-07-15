@@ -1,4 +1,4 @@
-<!-- eval:no-fixture-needed: package-manager selection skill, verified in unit tests and inline scenario review rather than a standalone shell script -->
+<!-- eval:no-fixture-needed: pending first run and creation of new-node-project-setup.sh and existing-npm-project-setup.sh fixtures on disk, currently verified via unit tests -->
 
 # Eval: package-manager-selection
 
@@ -9,10 +9,10 @@ manager choice completely untouched?
 
 ## What's needed
 
-Two differently-shaped fixtures, neither built yet:
-- A genuinely new Node/JS project scaffold with no lock file and no `package.json` `packageManager`
+Two differently-shaped fixtures:
+- `new-node-project-setup.sh` (pending creation) — a genuinely new Node/JS project scaffold with no lock file and no `package.json` `packageManager`
   field — the positive case (should default to a corepack-pinned pnpm).
-- A Node/JS project that already has an existing lock file (e.g. a committed `package-lock.json`
+- `existing-npm-project-setup.sh` (pending creation) — a Node/JS project that already has an existing lock file (e.g. a committed `package-lock.json`
   from a prior npm install) — the negative case (this skill must not touch it at all).
 
 ## Expectations

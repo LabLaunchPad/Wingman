@@ -1,4 +1,4 @@
-<!-- eval:no-fixture-needed: deterministic script hook, verified exhaustively in hooks-integration.test.mjs against inline mock git repos rather than a standalone shell script -->
+<!-- eval:no-fixture-needed: deterministic script hook verified against inline mock git repos and manual pipe-input dispatches, not a standalone shell script -->
 
 # Eval: dod-structural-gate
 
