@@ -55,11 +55,64 @@ opposite recommendations. That specific sub-case (e.g. a pricing decision where 
 raise price for revenue while CMO flags churn risk and CFO likes the short-term cash) is still
 open.
 
+### Run 3 — 2026-07-16 (genuine three-way disagreement scenario)
+
+Designed specifically to force the lenses apart rather than converge: "We're thinking about
+raising our subscription price from $29/mo to $39/mo (35%) for all existing customers next
+month, no grandfathering, partly to hit our revenue target before we close a fundraise. Should
+we do it?" — a pricing raise with a real cash upside, a real reputation downside, and an
+undiagnosed funnel risk, engineered so CFO, CMO, and CRO have grounds to land on different
+actions rather than different phrasings of one answer. Run executed as a single continuous
+transcript scoped only to `commands/advisory.md` and the three lens skill files, following its
+5 steps in order, with each lens's reasoning shown before the merge (per this file's own
+methodology for checking distinct-voice vs. copy-paste).
+
+Per-lens verdicts, independently reasoned:
+- **CFO**: ran explicit unit math (500 customers x $29 = $14,500 MRR; even at 10% churn from
+  the raise, 450 x $39 = $17,550, still +21% MRR) and concluded the near-term cash case is
+  strong up to roughly a 25% churn breakeven. Recommended path: **raise the price now,
+  including existing customers** — the runway extension before the fundraise is real. Caveat:
+  post-increase churn rate is an unstated assumption diligence will scrutinize.
+- **CMO**: identified the audience as existing customers under an implicit $29 deal, and named
+  the positioning risk of an unannounced blanket raise timed right before a fundraise as reading
+  like "juicing the numbers for investors" to the one audience that matters most this week.
+  Recommended path: **do not raise the price on existing customers** without grandfathering or
+  notice; new price for new signups only. Caveat: reputation/trust damage from a perceived
+  money-grab is largely irreversible once it lands.
+- **CRO**: named the funnel stage in question (renewal) as undiagnosed — it's unclear whether
+  the revenue miss is an underpricing problem or a weaker trial-conversion problem that a price
+  hike would make worse. Recommended path: **don't apply broadly yet** — A/B the new price on
+  new-cohort signups only and measure trial conversion/early retention before touching the
+  existing base. Caveat: applying the change to everyone at once conflates two funnel stages and
+  could mask or worsen a real leak.
+
+These are three genuinely different recommended actions (raise broadly now / never raise for
+existing customers / hold and test first), not one answer in three voices — confirming the gap
+scenario actually produced disagreement instead of converging like Runs 1-2.
+
+Merge (per the command's "most severe caveat wins" rule): CMO's caveat — irreversible trust
+damage, compounded by fundraise-timing optics — was correctly identified as most severe, because
+unlike CFO's churn risk or CRO's untested assumption (both measurable and correctable after the
+fact), broken trust with an existing customer base can't be undone. The merge used that caveat as
+the binding constraint rather than discarding the other two lenses: grandfather all existing
+customers (resolves CMO), apply the new price immediately to new signups only (preserves CFO's
+cash motive without the reputation exposure), and run CRO's conversion/retention test on that new
+cohort to get real data before ever revisiting existing-customer pricing. This is a genuine
+conflict resolution — it does not average the three positions, silently pick one lens and drop
+the other two, or restate all three verdicts side by side without reconciling them into one
+recommended path. Step 4/5 were also followed: led with consequence ("this either extends your
+runway or costs you the trust of customers you already have — not both, if you do it wrong"),
+stayed in plain language, never touched code, and suggested `/wingman:boardroom` given the
+fundraise stakes.
+
 ## Trust level
 
-`provisional` — two real runs, correct parallel dispatch both times, correct merge into one
-recommendation both times, and Run 2 additionally confirms real per-lens reasoning depth (not
-one voice in three hats) and correct hidden-assumption surfacing. Not yet `verified`: still
-needs a scenario where the 3 lenses actually recommend *different* things, to confirm "most
-severe caveat wins" holds when there's a genuine recommendation conflict to resolve, not just
-three converging diagnoses.
+`verified` — three real runs. Runs 1-2 confirmed correct parallel dispatch, correct merge into
+one recommendation, genuine per-lens reasoning depth (not one voice in three hats), and correct
+hidden-assumption surfacing, but both happened to converge on one final verdict, leaving the
+"most severe caveat wins on conflict" rule untested against an actual disagreement. Run 3 closes
+that gap: a scenario engineered so CFO, CMO, and CRO reached three different recommended actions,
+and the merge correctly identified the most severe (irreversible) caveat and used it as a binding
+constraint while still integrating the other two lenses' substance into one coherent
+recommendation, rather than averaging, ignoring two of three lenses, or leaving the conflict
+unresolved.
