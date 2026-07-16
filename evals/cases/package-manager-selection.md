@@ -23,10 +23,16 @@ manager choice completely untouched?
 
 ## Trust level
 
-`provisional` (2026-07-15) — one real run of each of the two differently-shaped scenarios, both
-independently verified against the real filesystem, not trusted from self-report alone. Promote to
-`verified` after a second, differently-shaped run per scenario (e.g. a genuine pnpm/corepack
-failure forcing the npm-fallback path, never yet exercised).
+`verified` (2026-07-16) — Run 1 already covered a positive (new project → pinned pnpm) and a
+negative (existing npm project left untouched) scenario, satisfying the letter of the
+positive-plus-negative bar. Promoting on that basis alone was judged insufficient, though: Run 1's
+negative case only ever exercised npm, and the skill's own detection logic (Core Workflow step 1)
+is written generically over *any* existing lock file, not npm-specifically — an un-exercised
+generalization is exactly the kind of gap a second, genuinely-differently-shaped scenario is meant
+to catch, per this convention. Run 2 (below) closes that gap with a third package manager (yarn),
+confirming the "respect what's already there" rule isn't accidentally npm-only. The
+never-yet-exercised pnpm/corepack-failure fallback path noted in Run 1 remains genuinely untested —
+flagged here explicitly as a known residual gap, not swept under the `verified` label.
 
 ## Run log
 
@@ -67,3 +73,28 @@ version to pin (`corepack pnpm --version`) is not a side-effect-free query in th
 running it silently triggers the same real network fetch that `pnpm install` would trigger anyway.
 Harmless, and not a reason to change the skill, but worth noting for anyone assuming "checking the
 version" and "first network fetch" are two separate events.
+
+### Run 2 — 2026-07-16 (negative, third package manager, un-briefed)
+
+Fixture built fresh for this run (not one of the two `evals/fixtures/setup-*.sh` scripts, since
+neither covers yarn): a small real project with a genuine, `yarn install`-produced `yarn.lock` (v1
+lockfile format, resolving `kleur@4.1.5`) and no `packageManager` field, committed to a throwaway
+git repo so a clean working tree could be confirmed afterward. A fresh subagent was given only
+`SKILL.md` (not this case doc) and told to apply the skill's logic to the project as if mid-build,
+un-briefed about what the "right" answer was.
+
+**Result — PASS.** The agent correctly stopped at Core Workflow step 1's lock-file check the moment
+it found `yarn.lock`, took zero action (no `corepack enable`, no `packageManager` field added, no
+install run, no npm/pnpm lock file created alongside it), and correctly reasoned this fell under the
+"Override-the-existing-choice" anti-pattern the skill explicitly warns against. It also correctly
+concluded no founder-facing sentence applies, since Core Workflow step 3's notification is scoped to
+the first-time pnpm-or-npm decision, not to a no-op.
+
+Independently re-verified, not trusted from self-report: SHA-256 checksums of `package.json` and
+`yarn.lock` taken before and after the subagent's run were identical
+(`ed8b67776f901378f5ff2c2d15206dd9cd240a83e3f11a231898f1abcf2a5083` /
+`cc6eaca666712185987e53bd096b256113085aca89b9cac031ed1b0f0d955816`), `git status` showed a clean
+working tree afterward, and a directory listing confirmed no `package-lock.json` or
+`pnpm-lock.yaml` was created alongside the existing `yarn.lock`. This closes the genuine gap Run 1
+left open: the skill's "respect an existing choice" rule generalizes to a package manager the skill
+itself never defaults to (yarn), not just to the npm case Run 1 happened to test.
