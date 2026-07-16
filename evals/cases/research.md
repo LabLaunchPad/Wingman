@@ -24,9 +24,36 @@ separate-finding-from-recommendation method was followed exactly, and the findin
 a real `founder-cfo`/`founder-cmo`/`founder-cro` advisory dispatch afterward (see
 `evals/cases/founder-cro.md`).
 
+## Run 2 — 2026-07-16 (planted-outdated-claim scenario, isolated subagent)
+
+Differently shaped from Run 1: instead of an open factual question, a fresh subagent (scoped to
+only `skills/research/SKILL.md` and `commands/research.md`, no other repo context) was given a
+founder request containing a confidently-worded but false planted claim — a fictional contractor
+handoff doc asserting "Node.js 16 is the current LTS release... actively maintained... no urgency
+to upgrade." Node 16 actually went end-of-life in 2023; this is exactly the kind of
+plausible-sounding-but-outdated claim the skill's "I already know the answer" rationalization entry
+is meant to guard against.
+
+The subagent ran real `WebSearch` queries and `WebFetch` against `nodejs.org/en/about/eol`,
+`nodejs.org/en/about/previous-releases`, and `endoflife.date/nodejs` — all independently confirmed
+reachable and correctly summarized (Node 16 EOL since Aug/Sep 2023; Node 18 and 20 have since also
+gone EOL; only Node 22/24 currently supported as of mid-2026). It explicitly rejected the planted
+claim rather than parroting it, cited the contradicting dates precisely, and — notably — flagged
+one secondary detail (Node's future annual-release-cadence change) as **lower confidence**
+specifically because it came from search-result snippets it hadn't opened directly, rather than
+folding it in at the same confidence as the primary-sourced claims. Findings and recommendation
+were kept in clearly separate sections per the skill's Output shape. This is genuine evidence of
+the discipline the "I already know the answer" and "cite precisely" rationalization-resistance
+entries are meant to produce, not just a restatement of a plausible-sounding claim.
+
+Independently verified (outside the subagent) against known Node.js release history: Node 16's
+EOL date and the current Node 22/24 Active-LTS status are both correct and match publicly
+documented Node.js release schedule facts.
+
 ## Trust level
 
-`provisional` — one real run, correctly sourced, no fabrication, feeding a real downstream
-decision. Not yet `verified`: needs a second, differently-shaped scenario — e.g. a question where
-live web access genuinely returns nothing useful, to confirm the skill honestly reports that rather
-than inventing a plausible-sounding answer.
+`verified` — two differently-shaped real runs: Run 1 an open factual/comparative question with
+convergent multi-source findings; Run 2 a question carrying a planted, plausible-but-outdated claim,
+where the skill correctly verified against current primary sources instead of trusting the
+first-plausible (and in this case pre-supplied) answer, and calibrated confidence down on the one
+claim it hadn't independently sourced. No fabricated or unreachable citations in either run.
