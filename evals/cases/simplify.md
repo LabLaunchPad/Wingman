@@ -24,10 +24,40 @@ tightening for consistency across different agents/sessions. Fixed: step 4 now s
 together in the same pass, with before/after test verification as part of that same pass, not a
 separate later step or a different sanctioned path.
 
+## Run 2 — 2026-07-16 (negative case)
+
+A fresh subagent, given only `simplify/SKILL.md`, reviewed a differently-shaped, deliberately clean
+diff: a new "slug-utils" project (`src/slugify.js`, a single 13-line `slugify` function; plus
+`test/slugify.test.js`, 5 passing scenarios — plain word, accented characters, mixed punctuation
+and whitespace, already-hyphenated input, all-punctuation input). The diff was constructed to be
+genuinely appropriately simple: one flat chain of string-method calls, no duplication anywhere in
+the diff, no wrapper-around-wrapper indirection, no dead branches (every step in the chain is
+exercised by a distinct test), well under the ~50-line function / ~200-line file size thresholds,
+and its one terse regex (Unicode combining-mark stripping after NFKD normalization) already carries
+an inline comment explaining it.
+
+The subagent correctly walked the skill's ordered checklist (duplication → indirection → dead
+branches → cleverness → size), concluded none of the five applied, and made **zero edits** —
+explicitly declining to invent an extraction or restructuring just to have something to report,
+citing the skill's own "extracting a shared helper used only once" and "shrinking so far the intent
+is lost" red flags as the reasoning for leaving it alone.
+
+Independently verified against the actual fixture, not just the subagent's self-report:
+`git status`/`git diff HEAD --stat` after the run still show only the original two new files with no
+modifications, `md5sum` on both files matches their pre-run content, and `npm test` still passes
+5/5 both before and after. The subagent's stated reasoning (no duplication, no dead branches, size
+far under threshold) also holds up against a direct read of the 13-line function itself.
+
+This is the negative-direction scenario Run 1's trust-level note called for: confirms the skill
+does not manufacture churn or "simplifications" on code that's already appropriately simple, as a
+genuinely different edge from Run 1's over-complicated-diff case.
+
 ## Trust level
 
-`provisional` — one real run, correct simplification, correct behavior-preservation, and it
-directly surfaced and helped fix a real ambiguity in the skill's own wording. Not yet `verified`:
-needs a second, differently-shaped scenario re-run against the now-clarified step 4 to confirm the
-disambiguation actually produces consistent behavior, plus a negative case (code with nothing worth
-simplifying, confirming the skill doesn't manufacture a change to have something to report).
+`verified` — Run 1 found a genuine, correctly-targeted simplification in an over-complicated diff,
+verified behavior-preserving via real before/after tests, and directly surfaced (and helped fix) a
+real ambiguity in the skill's own step-4 wording. Run 2, run against the now-clarified wording,
+confirms the opposite edge: given a diff with nothing genuinely worth simplifying, the skill
+correctly recognizes that and makes zero edits rather than manufacturing busywork — independently
+confirmed against the actual fixture state (git status, file hashes, and passing tests unchanged),
+not just the subagent's own report.
