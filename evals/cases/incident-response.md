@@ -29,9 +29,50 @@ This is genuine evidence the runbook's sequencing (triage → diagnose, never gu
 as designed — a less disciplined process could easily have "fixed" the hinted (non-existent) null
 regex issue, declared victory, and left the real crash live.
 
+## Run 2 — 2026-07-16 (correlation-vs-causation, fresh subagent)
+
+Differently-shaped from Run 1: instead of a planted-but-wrong *hint* about the mechanism, this run
+tested a genuine **misleading correlation** — a real, unrelated change that happened to land at the
+same timestamp as the incident, which the incident report itself (mimicking on-call's own leading
+theory) named as the prime suspect.
+
+Fixture built at
+`/tmp/claude-0/-home-user-Wingman/ce30667c-52f4-5242-baf9-f99967a6a993/scratchpad/eval-incident-response-run2/`:
+a small Node "order-service" with `src/gateway.js` (mock payment gateway), `src/charge.js`
+(`chargeCustomer`, with a genuine pre-existing bug), and `src/analytics.js` (an event logger bumped
+from 2.3.1 → 2.4.0 in the same deploy, purely cosmetic — adds a `source` tag to logged events, no
+control-flow interaction with charging at all). `deploy-log.txt` records only that one-line version
+bump at 14:00 UTC. `incident-report.md` describes customers being double-charged since shortly after
+that deploy and states on-call's working theory that the analytics-logger bump is the cause "since
+the timing lines up almost exactly." `repro.js` reproduces the real bug independently of any of
+that: `chargeCustomer` retries on `gateway.TimeoutError` without checking whether the gateway had
+already recorded the charge before the ack was lost (a real "charge succeeded, ack timed out"
+scenario) — so a flaky ack always produced a second real charge. Confirmed the repro reproduced
+(2 charge records, exit code 1) before handing anything to the subagent.
+
+A fresh subagent was spawned with access to only the skill file, the fixture directory, and the
+incident report (no knowledge of this framing) and asked to diagnose and fix per the runbook.
+**Result: it correctly identified the actual root cause and did not touch the correlated-but-innocent
+analytics-logger change.** It traced the real data flow through `gateway.js`/`charge.js`, explicitly
+reasoned that `analytics.js`'s `logEvent` calls are one-way side effects consumed by nothing in the
+charge path and have no control-flow interaction with the gateway call, and named the timing overlap
+with the 14:00 UTC deploy as coincidental rather than causal. It fixed `chargeCustomer` to check
+`gateway.getCharges(orderId)` before retrying and only retry if no charge was already recorded,
+verified with `node repro.js` before (2 charges, bug reproduced) and after (1 charge, no duplicate),
+and proposed keeping `repro.js` as a permanent regression test. Independently re-verified outside the
+subagent: read the diff, confirmed `analytics.js` was left untouched, and re-ran `node repro.js`
+myself — 1 charge, exit code 0.
+
+This is genuine evidence the runbook holds up against a *different* failure mode than Run 1: not
+just resisting a wrong hint about mechanism, but resisting a real, temporally-correlated but causally
+unrelated change dressed up as the leading theory in the incident report itself.
+
 ## Trust level
 
-`provisional` — one real run, correctly resisted a plausible-but-wrong lead and found the actual
-bug. Not yet `verified`: needs a second, differently-shaped scenario — ideally one where the
-obvious/hinted cause *is* correct, to confirm the runbook doesn't over-correct into needless
-extra investigation when the first hypothesis is actually right.
+`verified` — two real runs, each testing a differently-shaped edge. Run 1: a planted-but-wrong
+mechanistic hint (the runbook kept investigating past a hypothesis that didn't reproduce and found
+the actual crash). Run 2: a genuine correlation-vs-causation trap (an unrelated change that landed at
+the same time as the incident and was explicitly named as on-call's leading theory; the runbook
+traced actual data flow instead, correctly ruled the correlated change out, and fixed the real,
+independently-reproducible bug). Both runs show the "diagnose before fixing" discipline holding
+under different kinds of pressure to fix the first plausible-looking thing.
