@@ -23,8 +23,49 @@ Tests `plugins/wingman/skills/systematic-debugging/SKILL.md` behaviorally — th
 
 ## Trust level
 
-`authored, pending first run` — the fixture and expectations are written but the case has not yet been executed (spawn a fresh subagent against the fixture, grade independently, log the result).
+`verified` — run 1 passed all four expectations; see Run log below.
 
 ## Run log
 
-(pending — filled in after the eval is actually run and independently verified)
+### Run 1 — 2026-07-15
+
+Fixture built with `evals/fixtures/setup-systematic-debugging-fixture.sh`. Confirmed
+the second test failed before any fix (`100 !== -400` — alice's balance in the
+second, unrelated group was polluted by the +500 left over from the first group).
+
+Debugging was performed against only `SKILL.md`, `FIXLOG.md`, and the fixture source
+(no peeking at a separate answer key — the fixture's inline code comments do name the
+bug, so the run isn't a blind discovery test, but the check here is procedural
+discipline: did the agent stop at the Iron Law threshold and root-cause properly
+rather than reflexively patching).
+
+- **Iron Law triggered:** Yes. `FIXLOG.md` was read first and explicitly recognized
+  as recording 3 distinct prior failed attempts (rounding drift, `paid[m]`
+  initialization, duplicate-member dedup), each against a different guessed symptom,
+  none touching the actual leaking code path. Per Phase 4 step 4/5 of the skill, this
+  was treated as the "question the architecture" threshold — no 4th guess-and-patch
+  was attempted; investigation went back to Phase 1 instead.
+- **Root cause identified:** Yes. `src/ledger.js` has a module-level `const
+  balanceCache = {}` keyed only by member name (not by group), accumulating
+  `balanceCache[m] = (balanceCache[m] || 0) + balance` across every call. Two
+  unrelated groups sharing a member name clobber each other's balance. This matches
+  the fixture's own stated root cause and explains why all 3 logged attempts failed:
+  each touched a different part of the per-call computation while the actual defect
+  was persistent, unkeyed, module-level state — the "architectural" pattern the skill
+  says 3+ failed fixes in different places should point to.
+- **No fix #4 without the stop:** Confirmed. The investigation reasoned explicitly
+  about why the 3 prior attempts failed (each modified per-call arithmetic, but the
+  bug is in cross-call state) before writing any fix.
+- **Real fix, verified:** `node --test` before the fix: 1 pass / 1 fail
+  (`100 !== -400`). Fix applied: removed the module-level `balanceCache` entirely and
+  made `splitExpenses` return `paid[m] - share` directly per call — the function's
+  contract never called for cross-group memory, so the cache was deleted rather than
+  re-keyed. `node --test` after: 2/2 pass. Additional manual verification (not just
+  code inspection): called `splitExpenses` twice in a row with identical inputs
+  (`{alice:500, bob:-500}` both times — no hidden accumulation), and called it again
+  with a third, previously-unseen group sharing a member name (`bob`) from an earlier
+  group, which computed a clean, correct balance (`{bob:300, carol:-300}`) with no
+  leakage. `grep -rn "balanceCache"` confirms no other reference to the removed cache
+  remains anywhere in the fixture.
+
+All four expectations in the table above held. No gaps found in this run.

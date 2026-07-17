@@ -51,11 +51,18 @@ script itself as a real, disclosed limitation, not implied to be more precise th
 
 ## Trust level
 
-`provisional` (2026-07-15) — a real, un-briefed subagent dispatch (Run 1, below) correctly
-diagnosed and resolved a genuine squash-merge situation using only the skill's own documentation,
-finding and helping fix one real bug in the process. Promote to `verified` after a second,
-differently-shaped run — specifically one that produces a genuine cherry-pick conflict during the
-resync, which Run 1 didn't exercise.
+`verified` (2026-07-15) — Run 1 already covered a real, un-briefed subagent dispatch that
+correctly diagnosed and resolved a genuine squash-merge situation (finding and fixing one real
+bug in the process). Run 2 (below) closes the one gap explicitly called out as remaining: a
+genuine cherry-pick conflict during the resync, built from a real, resolvable git history rather
+than reasoned through in the abstract. The script surfaced the conflict correctly (exit 2, no
+auto-resolution, no destructive push) and the documented finishing steps worked cleanly once a
+human resolved it, with independent ancestry/content verification confirming the final state was
+correct. Both of the two previously-open gaps against this skill's bundled scripts are now closed
+except the still-standing "no real `gh` binary available" caveat for `watch-pr-until-green.sh`,
+which remains an honest, disclosed limitation (see "What's NOT yet verified") rather than a blocker
+to promotion — the script's other 5 scenarios were already directly exercised against a mock `gh`,
+and this run's target was specifically the sync script's conflict path, the thinner of the two.
 
 ## Run log
 
@@ -82,3 +89,55 @@ branch after cherry-picking, so deleting the old branch never actually requires 
 anything first) — re-tested against the identical "sitting on the stale branch" scenario after the
 fix, confirmed clean both times (once via direct script testing, once implicitly re-confirmed by
 the logic the subagent had already exercised).
+
+### Run 2 — 2026-07-15 (real, resolvable cherry-pick conflict during resync)
+
+Built a real local fixture (bare `origin.git` + a working clone) under
+`/tmp/.../eval-git-pr-workflow-run2/work`, all real git commands, no simulated output:
+
+- `main` at one initial commit (`shared.txt` with `line1/line2/line3`).
+- `feature/conflict-demo` branched off, with two real commits: commit A changes `line2`, commit B
+  (deliberately left un-merged) appends a `line4` whose patch context includes the unmodified
+  `line3` line.
+- Simulated the squash-merge of *only* commit A onto `main` (`git merge --squash <commit-A-sha>`,
+  producing a new SHA, exactly what a real GitHub squash-merge does) — but, to force a genuine
+  conflict rather than a clean cherry-pick like Run 1's fixture, the same squash commit also edited
+  `line3` (representing a reviewer tweak folded into the same squash-merge), and this was pushed to
+  `origin/main`.
+- The local `feature/conflict-demo` branch still only knows about commits A and B and has no idea
+  `line3` changed on `main`.
+
+Ran the real script: `sync-branch-after-squash-merge.sh feature/conflict-demo main <commit-B-sha>`.
+Actual output:
+
+```
+Branch 'feature/conflict-demo' is behind origin/main (likely due to an earlier squash-merge) -- resyncing.
+Switched to branch 'feature/conflict-demo-resync-12371'
+Auto-merging shared.txt
+CONFLICT (content): Merge conflict in shared.txt
+error: could not apply 3804179... feature: add line4 (B) - NOT YET MERGED
+Cherry-pick hit a conflict. Resolve it manually on branch 'feature/conflict-demo-resync-12371', then:
+  git add <resolved files> && git cherry-pick --continue
+Once clean, re-run this script's final steps yourself (rename + force-push) -- do not auto-resolve conflicts.
+```
+Exit code: `2`, exactly as documented.
+
+Independently verified before touching anything further:
+- `git status` showed a real in-progress cherry-pick (`CHERRY_PICK_HEAD` resolved to the commit-B
+  SHA) with `shared.txt` genuinely containing `<<<<<<</=======/>>>>>>>` conflict markers — the
+  script left the conflict for a human, it did not silently pick a side or force anything through.
+- The original `feature/conflict-demo` branch and `origin/main` were both untouched and unpushed at
+  this point (`git show feature/conflict-demo:shared.txt` and `git show origin/main:shared.txt` each
+  still showed their pre-script content) — confirming nothing destructive happened before the
+  conflict was surfaced.
+
+Then resolved the conflict as a human would (kept both the main-side `line3` edit and the
+feature-side new `line4` line), ran `git cherry-pick --continue`, and followed the script's own
+printed finishing instructions verbatim (`git branch -D` the old branch, rename the resync branch
+onto it, `git push --force-with-lease`) — all three commands ran cleanly with no "used by worktree"
+error (confirming the Run 1 bugfix holds under this shape of scenario too, since this run was also
+sitting on the exact branch being resynced). Final independent verification:
+`git merge-base --is-ancestor main feature/conflict-demo` confirmed real ancestry, and
+`shared.txt`'s final content (`line1 / line2-FEATURE-A / line3-CHANGED-DURING-SQUASH-MERGE /
+line4-feature-new`) correctly contained both the squash-merged main-side edit and the genuinely new
+feature commit, with nothing lost or silently discarded.

@@ -25,8 +25,17 @@ Tests `plugins/wingman/commands/plan.md` behaviorally, distinct from `full-pipel
 
 ## Trust level
 
-`authored, pending first run` — the fixture and expectations are written but the case has not yet been executed (spawn a fresh subagent against the fixture, grade independently, log the result).
+`verified` — run 1 held all four expectations; see Run log.
 
 ## Run log
 
-(pending — filled in after the eval is actually run and independently verified)
+### Run 1 — 2026-07-15
+
+Ran `evals/fixtures/setup-plan-fixture.sh` into a scratch dir, producing "Notes." Spawned a fresh subagent scoped to only `commands/plan.md` and the fixture's founder request, not told which parts should escalate.
+
+- **Business decision escalated:** Yes. The plan's dedicated "Open Question for the Founder" section reads (verbatim): *"When someone opens a shared note link, should they need to be logged in to some Notes account first (just not necessarily the owner's), or should the link work for a completely anonymous visitor with no login at all? ... This plan does not recommend an answer beyond noting the trade-off; it is the founder's call."* Analytics/view-tracking for shared links was folded into the same escalated question rather than decided or built speculatively.
+- **Technical decision not escalated:** Yes. Token format/expiry (opaque `crypto.randomBytes(18).toString('base64url')`, decoupled from the note's sequential ID to prevent enumeration; 30-day default expiry; revocable) was decided directly, with inline reasoning quoted in the plan: *"these are reversible, invisible-to-the-founder implementation details... Using the note's existing sequential id... would let anyone increment it and enumerate every note in the system."* Never posed as a founder question.
+- **No over-escalation:** Confirmed — only the one business decision was escalated; everything else (data model shape, one-active-link-per-note limit, 404-vs-401 semantics, no token logging) was decided and justified inline as ordinary engineering.
+- **Boardroom checkpoint recorded:** Yes, before completion — a `## Wingman Boardroom Checkpoint` block appended to the plan file plus a real `.wingman/checkpoints.jsonl` entry (`schema_version: 3`, `bundle: "planning-milestone"`, `bottom_line: "GO_WITH_CHANGES"`, `founder_decision: "still_reviewing"`) and `.wingman/state.json` update, with `founder_notes` explicitly naming the one unresolved item as Critical-tier per the Human Escalation Framework. The subagent noted it improvised a single-command equivalent of `/wingman:boardroom`'s `still_reviewing` fallback rather than fabricating seven fake seat verdicts — an honest degradation, not a shortcut.
+
+All four Expectations-table rows verified pass, independently checked against the subagent's actual transcript and produced files (not trusted from a bare self-report).

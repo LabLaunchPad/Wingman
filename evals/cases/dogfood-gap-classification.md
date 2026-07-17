@@ -35,17 +35,43 @@ the "hook candidate" bucket despite hook-shaped mechanical checkability being av
 least gap #1 and #3 — the skill's own "classify by what the gap actually needs, not the strongest-
 sounding enforcement" principle held under real pressure to close the loop quickly.
 
-## What's genuinely still untested
+## Run 2 — 2026-07-15 (closing the hook-candidate gap)
 
-**No real hook-candidate gap has been classified yet**, so the cooling-off mechanism (holding a
-hook promotion at `pending-second-opinion` until a second, separate dogfood run confirms it) has
-never actually fired in a real run — it's implemented and reasoned through, but not yet exercised
-end-to-end. This needs a future dogfood run that surfaces a genuinely mechanical, safety-critical
-gap to close.
+Constructed a real, plausible gap the prior 5 never covered: a `git-pr-workflow` script
+(`sync-branch-after-squash-merge.sh`) crashing with `fatal: not a valid ref: HEAD` when invoked from
+a detached-HEAD worktree — a mechanical, binary-checkable precondition failure, not a judgment call.
+A fresh subagent, given only the skill file and this gap description, was asked to classify it
+through the full decision tree and walk the 3 named safeguard questions (generalization,
+negative-case requirement, historical-bug check) rather than just naming a bucket.
+
+**Result**: correctly classified as **hook candidate** (the check — `git symbolic-ref -q HEAD`
+succeeds or doesn't — is purely mechanical, zero quality/intent judgment), correctly held at
+`pending-second-opinion` per the cooling-off rule rather than finalized on one occurrence, and
+correctly reasoned through all 3 safeguards: (1) generalizes across all project types since it's
+pure git-plumbing, no per-stack sniffing needed; (2) explicitly named that a negative-case fixture
+(a normal, branch-attached repo where the guard must stay silent) is still required before this
+promotes further — didn't skip that requirement just because the positive case was clear; (3)
+flagged the historically-relevant risk directly: since the *original* bug was itself a bad
+precondition assumption, a naive fix that auto-remediates (e.g., silently `git checkout`-ing back
+to a branch) risks the same class of bug in a new place if the detached-HEAD worktree carries
+uncommitted work — correctly recommended fail-fast-with-actionable-message over silent
+auto-remediation, consistent with the same script's own existing "never auto-resolve, let the
+calling agent decide" convention for cherry-pick conflicts. Also correctly distinguished this from
+a skill-candidate framing (no situational judgment remains once the guard exists) and from a
+command-instruction-only fix (a mechanical guard clause is the load-bearing fix; prose is at best a
+belt-and-suspenders addition, not a substitute).
+
+This is the differently-shaped scenario the trust-level note called out as the specific remaining
+gap: the hook-candidate branch, its cooling-off gate, and all 3 safeguard questions, exercised for
+real rather than only reasoned through in the abstract.
 
 ## Trust level
 
-`provisional` — 5 real, independent classification decisions across 2 separate runs, with a
-correctly-reused `out-of-scope` re-classification on the 3rd, is strong direct evidence the
-decision tree works as designed for 4 of its 5 branches. Not yet `verified`: the hook-candidate
-branch and its cooling-off gate have never been exercised by a real gap that actually needed it.
+`verified` — 6 real, independent classification decisions across 3 separate runs now span all 5
+decision-tree branches: out-of-scope (correctly reused on re-encounter, not re-litigated as new),
+hook candidate (this run, correctly held at `pending-second-opinion` with all 3 safeguards answered
+rather than skipped), skill candidate, and command-instruction addition, each shipped directly with
+no forced escalation to a stronger-sounding bucket than the gap actually needed. The one item still
+genuinely open — an actual negative-case fixture proving the detached-HEAD guard stays silent on a
+normal repo — is a follow-up to the *fix*, not to this skill's classification behavior, which is
+what this eval tests.

@@ -23,8 +23,35 @@ constraint — the finding fed directly into a real `simplify` pass afterward (s
 `evals/cases/simplify.md`), the two skills working together exactly as designed (review finds it,
 simplify fixes it, code-review itself never touches code).
 
+## Run 2 — 2026-07-15
+
+A fresh subagent, given only `code-review/SKILL.md`, reviewed a differently-shaped diff: a
+deliberately well-built "cart-utils" discount-code feature (`src/discount.js` + `test/discount.test.js`,
+6 scenarios — happy path, case-insensitivity, floor-rounding, unknown code, no code, both invalid-input
+error paths, all passing) alongside one incidental, easy-to-miss change: `package.json`'s test script
+switched from `"node --test test/"` to `"node --test test/*.js"`.
+
+Independently verified against the real code before trusting the review: this is a genuine,
+non-manufactured finding, not a frivolous one — Node's test runner already recurses a bare directory
+argument and discovers `*.test.js` files on its own, so the glob change is functionally redundant
+today, but `test/*.js` is a shell glob that only expands under a POSIX shell; under plain `cmd.exe`
+(no Git Bash/WSL) npm passes the literal unexpanded string through and `node --test` finds no
+matching files — a real cross-platform regression risk, correctly calibrated as "Should-fix," not
+inflated to a blocker. The other two findings (`DISCOUNT_CODES` exported mutably; discount codes not
+`.trim()`-ed before comparison) were correctly labeled "Nit" — real but genuinely low-severity,
+not artificially escalated to pad the review. Bottom line rendered: "Almost there — fix one
+Should-fix... rest is clean and ready to ship" — not a rubber-stamp "looks fine," and not inventing
+issues with the actually-clean 6-test discount-logic implementation itself. Zero code edits made,
+matching the skill's report-only constraint.
+
+This is the differently-shaped scenario the Run 1 gap called for: a genuinely solid, well-tested
+feature diff rather than one with an obvious flaw, and the skill neither missed the one real subtle
+issue present nor manufactured noise around the parts that were actually fine.
+
 ## Trust level
 
-`provisional` — one real run, found a genuine issue, correctly report-only. Not yet `verified`:
-needs a second, differently-shaped scenario — e.g. a change with no real issues, to confirm the
-skill doesn't manufacture a finding just to have something to say.
+`verified` — Run 1 found a genuine, obvious issue (unnecessary indirection) in a change with a clear
+flaw; Run 2 found one genuine, subtle issue (a non-portable test-script glob) in an otherwise
+well-built, well-tested feature, correctly calibrating severity (Should-fix vs. Nit) rather than
+either rubber-stamping or manufacturing findings. Both runs confirmed zero code edits, matching the
+skill's report-only constraint.

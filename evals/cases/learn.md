@@ -25,10 +25,18 @@ Tests `plugins/wingman/commands/learn.md` — its low-ceremony `LEARNINGS.md` ca
 
 ## Trust level
 
-`provisional` — passed at least one real run (single scenario), manually graded. Promote to `verified` after a negative case confirms it refuses to log an obvious/transient fact.
+`verified` — passed one positive run (new learning captured correctly) and one negative run (duplicate correctly recognized and not double-logged).
 
 ## Run log
 
 ### Pending — scheduled behavioral eval workflow
 
 Graded via `.github/workflows/evals.yml` (requires `ANTHROPIC_API_KEY` + `/bin/bash`, unavailable in this authoring environment). Case defined to the verified-case format above; grade on next weekly run and record the actual result here.
+
+### Run 2 (2026-07-16) — negative case: duplicate/repeat, not a new learning
+
+Manually graded, ad hoc fixture (not `evals/fixtures/`): a scratch Node "waitlist app" project seeded with an existing `LEARNINGS.md` already containing one dated entry — "Mailgun sandbox domain silently caps outbound mail at 5/hour" (2026-05-14), plus `src/mailer.js`/`src/waitlist.js` reflecting that same constraint in code. A fresh subagent, scoped only to `learn.md` and this fixture, was told (in a founder's own words, differently phrased, no mention of Mailgun/5-per-hour/sandbox) about a new incident: welcome emails silently stopped sending during manual load testing, no errors logged, requests still returned 200.
+
+The subagent correctly traced the incident to the same underlying Mailgun sandbox cap already on file, judged it a repeat rather than a new learning, and made **no edit** to `LEARNINGS.md` — consistent with `learn.md`'s instruction not to log facts already captured. Independently verified by diffing `LEARNINGS.md` byte-for-byte against the pre-run fixture (identical, confirmed via `md5sum`) and confirming no files outside the scratch fixture were touched (`git status --porcelain` on the Wingman repo came back empty). The subagent's own summary named the exact existing entry it matched against, rather than a vague "seems familiar" — good evidence it read and reasoned over the existing file rather than guessing.
+
+This confirms `learn.md` avoids the double-logging trap seen elsewhere in this project (`evolve-promotion`) — at least for a duplicate that is textually and mechanistically obvious once read. It does not test a harder paraphrase (e.g. same root cause described with no shared nouns at all, or a duplicate buried among many existing entries), which would be a reasonable next case if this command shows drift later.
