@@ -31,9 +31,21 @@ same convention):
 | UX-001 | <screen or state name> | <the actions available here> | ARCH-001 |
 ```
 
+## Show the flow, not just the table
+
+Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
+actual flow diagram — detect the session's rendering tier first, then follow
+`references/visual-output-templates.md`'s UX-flow template (Tier B: a Mermaid flowchart appended to
+the same `docs/wingman/uxflow/<short-slug>.md` file; Tier A: a low-fidelity HTML wireframe per key
+screen, published as an Artifact). The table stays exactly as written above — it's what
+`check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
+never instead of it.
+
 Hand off directly to `/wingman:implementation-planning` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
 
 ## References
 
 - `skills/traceability-linking` — the `UX-*` ID convention.
 - `skills/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
+  diagram above; consult before choosing a rendering tier.

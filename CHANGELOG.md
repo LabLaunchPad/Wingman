@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.6] - 2026-07-17
+
+### Added
+- **`skills/visual-founder-output`** (38 → 39 skills): adaptive visual layer on top of `plain-language-checkpoint` — detects the current session's rendering capability (an Artifact-capable surface vs. a plain terminal) before choosing between a real rendered wireframe/dashboard (Tier A) or a universal Mermaid/ASCII fallback (Tier B), never assumes. Extends `commands/uxflow.md` (a real flow diagram alongside the existing `UX-*` table) and `commands/boardroom.md` (a "Where you are" pipeline-status view rendered fresh from `.wingman/state.json`/`checkpoints.jsonl`, plus an optional seat-verdict grid).
+- **`references/visual-output-templates.md`**: the concrete Mermaid/ASCII/Tier-A templates the new skill uses.
+
+### Maintenance
+- `plugin.json` bumped `0.5.5` → `0.5.6` (39 skills).
+
 ## [0.1.8] - 2026-07-13
 
 ### Added — gap-closure batch 6 (cross-cutting: secrets policy + persona library, gap G12)

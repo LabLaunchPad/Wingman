@@ -78,6 +78,27 @@ Two narrowly-scoped registrations, deliberately avoiding the class of false-posi
 
 Every deny names the specific check and file/ID that failed, matching `secret-guard.mjs`'s and `boardroom-checkpoint.mjs`'s own discipline of never returning a generic "gate failed."
 
+## 4c. Visual founder output (adaptive Tier A/B)
+
+Every founder-facing report template in this plugin was, until this addition, uniformly prose or a
+flat markdown table — including content that's structurally a flow (`uxflow.md`'s screens/
+transitions) or a status (which of the 3 real checkpoints a founder has cleared, never shown
+anywhere). `skills/visual-founder-output` closes this the same way `git-pr-workflow` and
+`package-manager-selection` already close it for tool availability: **detect the actual capability
+of the current session before choosing a format, never assume.**
+
+Two tiers: **Tier A** (an Artifact-publishing tool is genuinely present this session) renders a real
+low-fidelity wireframe or status view; **Tier B** (the universal default when unsure) uses Mermaid
+fenced code blocks and ASCII trees — readable as structured plain text in a terminal, rendered as
+real diagrams on GitHub's web UI or in an Artifact-capable session. `plain-language-checkpoint`'s
+prose bar (jargon-free, consequence-first, one bottom line) is unchanged and still leads in both
+tiers — this is a visual layer added on top, never a relaxation of it. Wired into `uxflow.md`
+(flow diagram, additive to the existing `UX-*` table) and `boardroom.md` (a "Where you are"
+pipeline-status view rendered fresh from `.wingman/state.json`/`checkpoints.jsonl`, plus an optional
+seat-verdict grid) — see `references/visual-output-templates.md` for the concrete templates. Other
+command templates are deliberately left untouched for now; extend on evidenced need, not
+speculatively.
+
 ## 5. Department leads (grow 0 → 8, per project)
 
 One lead subagent per corporate department. Each lead covers its department's *entire* remit through its own skills/checklists — it is not itself split into the 56+ sub-roles; those are specialist promotions (§6).

@@ -54,6 +54,12 @@ Before sending any founder-facing message, check it against the "three things" r
 
 Every boardroom agent verdict, every `/wingman:*` stage completion message, and any time this plugin reports status to the user — not just the dedicated `/wingman:boardroom` command.
 
+## References
+
+- `skills/visual-founder-output` — the visual-layer companion to this skill, for output whose
+  underlying content is structurally a flow, tree, or grid (a diagram/tree can help; this skill's
+  own bar governs the words either way, and always leads).
+
 ## Anti-Rationalization Defense
 
 ### Common Rationalizations
