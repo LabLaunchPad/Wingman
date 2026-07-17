@@ -1,0 +1,96 @@
+name: Bug report
+description: A command, skill, hook, or validator isn't doing what it says it does.
+title: "[bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wingman's "code" is markdown (commands/agents/skills) plus a hooks config — most bugs here are
+        *behavioral* (a skill's instructions don't produce the behavior they claim) or *structural*
+        (a hook registered under the wrong event name, a broken cross-reference, a stale doc). Both are
+        real bugs. See `CLAUDE.md` and `docs/ARCHITECTURE.md` if you're not sure which surface is involved.
+
+        **This issue can be filed by a human or by an AI coding agent** (including a Claude Code session
+        that found the bug while dogfeeding or auditing this repo). If an agent is filing it, say so in
+        the last field — that's a disclosure, not a disqualifier, but every claim below still needs to be
+        something you actually observed, not inferred.
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface is affected?
+      options:
+        - Command (plugins/wingman/commands/*.md)
+        - Boardroom seat / agent (plugins/wingman/agents/*.md)
+        - Skill (plugins/wingman/skills/*)
+        - Hook (plugins/wingman/hooks/*.mjs)
+        - Mechanical validator/script (scripts/*.mjs, plugins/wingman/scripts/*.mjs)
+        - Eval case or fixture (evals/*)
+        - Documentation (docs/*, README, CLAUDE.md)
+        - Something else / not sure
+    validations:
+      required: true
+
+  - type: input
+    id: file
+    attributes:
+      label: Exact file(s) involved
+      description: The specific path(s), e.g. `plugins/wingman/hooks/context-monitor.mjs` or `plugins/wingman/commands/build.md`.
+      placeholder: plugins/wingman/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened — quote the exact instruction/claim this contradicts, if there is one.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened. For a hook/script bug, paste real command output. For a skill bug, describe what a real agent run did (not a guess).
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: |
+        Exact steps, or the exact command that surfaces it. For structural bugs, which of the four
+        mechanical validators (if any) should have caught this but didn't:
+        `validate-structure.mjs` / `check-repo-consistency.mjs` / `check-fixtures.mjs` / `check-traceability.mjs`
+      placeholder: |
+        1. Run `node plugins/wingman/scripts/validate-structure.mjs`
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence (command output, diff, or eval run log)
+      description: Paste real output — a self-report ("it seems broken") isn't enough per this repo's own `verification-before-completion` standard.
+      render: shell
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Claude Code version, OS, and whether this was found via a live session, `/wingman:dogfood`, or `/wingman:audit`.
+      placeholder: "Claude Code x.y.z, macOS/Linux, found via /wingman:audit"
+
+  - type: checkboxes
+    id: authorship
+    attributes:
+      label: Authorship disclosure
+      options:
+        - label: This issue was filed (or drafted) by an AI coding agent, and a human has reviewed the evidence above before submitting.
+          required: false
+        - label: I independently verified the evidence above against the real filesystem/output, not just a subagent or tool's self-report.
+          required: true
