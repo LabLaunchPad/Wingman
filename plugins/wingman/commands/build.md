@@ -23,6 +23,8 @@ Immediately after, use the `management-board-activation` skill to check whether 
 
 Use the `department-lead-activation` skill to check the Legal & Security activation signal too: if this project touches auth, payments, or personal data, create `dept-legal-security` if it doesn't exist yet. Its work now happens inline as part of this stage's Definition-of-Done gate below, rather than as a separate `/wingman:secure` stage — folding a dedicated security pass into Build's own gate, not skipping it (see "Definition-of-Done gate" below).
 
+Use `skills/visual-founder-output` to show the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone done, Build now the current stage.
+
 ## Execution discipline
 
 Work through the plan task-by-task, not all at once:
@@ -93,3 +95,5 @@ Run `/wingman:boardroom diff` against the accumulated changes, once the Definiti
 - `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
 - `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule the Definition-of-Done gate implements.
 - `skills/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown at the start of this stage.
