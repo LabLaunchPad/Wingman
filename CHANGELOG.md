@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.5] - 2026-07-17
+
+### Fixed
+- `validate-structure.mjs`'s hook-event whitelist had a fake event (`StopFailure`) and was missing 3 real ones (`Notification`/`SubagentStop`/`PreCompact`).
+- `context-monitor.mjs`'s scope-creep detector read `toolInput.filePath` instead of Claude Code's real snake_case `file_path` field, so it never fired.
+- `council`/`verification-loop` skills still pointed at the retired `wingman:secure` command; repointed to `build.md`'s Definition-of-Done gate.
+- Removed an exact duplicated section in `verification-before-completion/SKILL.md`; minor consistency fixes in `engineering-minimalism`, `ponytail-debt-harvesting`, and `traceability-linking`.
+- Retired `evals/cases/plan.md` (tested a command that no longer exists), matching the existing `secure.md` pattern.
+
 ## [0.5.4] - 2026-07-15
 
 ### Fixed
