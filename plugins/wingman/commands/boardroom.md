@@ -48,7 +48,11 @@ The dispatch prompt to each seat is an internal, agent-to-agent channel (no foun
 
 ## Consolidate into one founder-facing summary
 
-Do not just concatenate seven reports — a founder should never have to read seven separate verdicts to figure out what to do. Group by the four headers above (plus Design when it returned substantive input) so the summary stays skimmable as the seat count grows. Synthesize into this exact structure:
+Do not just concatenate seven reports — a founder should never have to read seven separate verdicts to figure out what to do. Group by the four headers above (plus Design when it returned substantive input) so the summary stays skimmable as the seat count grows.
+
+Before formatting, use `skills/visual-founder-output` to detect this session's rendering tier (Tier
+A: Artifact-capable; Tier B: universal Mermaid/ASCII fallback — see that skill's Core Workflow). Then
+synthesize into this exact structure:
 
 ```
 # Boardroom Checkpoint: <one-line description of what was reviewed>
@@ -57,12 +61,16 @@ Do not just concatenate seven reports — a founder should never have to read se
 
 <2-4 plain-English sentences: what this does, whether it's safe and worth shipping, and why. No jargon. If you must use a technical word, define it in the same sentence.>
 
+## Where you are
+<the pipeline-status view from references/visual-output-templates.md §2 — Tier B: the ASCII tree; Tier A: the rendered status strip — generated fresh from .wingman/state.json and checkpoints.jsonl, never hand-authored.>
+
 ## What each seat said
 **Business** — 👔 CEO: <one line> · 🎯 CPO: <one line> · 📣 CMO: <one line>
 **Technical** — 🛠️ CTO: <one line> · 🔒 CISO: <one line>
 **Finance** — 💰 CFO: <one line>
 **Research** — 🔍 Research: <one line>
 <🎨 Design: <one line>, only if Design returned substantive (non-N/A) input>
+<Optionally, the seat-verdict grid from references/visual-output-templates.md §3 immediately after the text line above — additive only, the text line stays as written since it already reads cleanly with zero rendering.>
 
 ## If you want to ship this
 <Either "Nothing else needed — approve below to continue." OR a short numbered list of the specific things that need fixing first, in plain language, ordered by how much they matter.>
@@ -150,3 +158,4 @@ Then update `.wingman/state.json`. **Read the existing file first if it exists**
 
 - `references/plan-review-checklist.md` — the required plan sections the gstack `EXIT PLAN MODE GATE` enforces before `ExitPlanMode`; the same shape each seat should find present in the plan it reviews.
 - `skills/spec-handler` — every plan under review is a spec; judge it against its stated success criteria, not its volume.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the "Where you are" pipeline status and the optional seat-verdict grid; consult before formatting the consolidated summary above.
