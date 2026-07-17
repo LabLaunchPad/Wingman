@@ -82,7 +82,7 @@ flowchart TD
     classDef noGo fill:#fdd,stroke:#a33
     CEO["👔 CEO: GO"]:::go
     CPO["🎯 CPO: GO"]:::go
-    CMO["📣 CMO: GO WITH CHANGES"]:::changes
+    CMO["📣 CMO: GO_WITH_CONCERNS"]:::changes
     CTO["🛠️ CTO: GO"]:::go
     CISO["🔒 CISO: GO"]:::go
     CFO["💰 CFO: GO"]:::go

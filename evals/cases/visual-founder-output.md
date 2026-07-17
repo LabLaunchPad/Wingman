@@ -72,11 +72,40 @@ bottom-line verdict in advance (it must derive `GO WITH CHANGES` itself from the
 
 ## Trust level
 
-`authored, pending first run` — both scenarios are specified but not yet executed. Run per
-`evals/README.md`: spawn each subagent fresh, grade independently against the real output (the
-actual scratch file content for Scenario 1; the actual tool-call record and report text for
-Scenario 2), not the subagent's own claim of what it did.
+`verified` — both differently-shaped scenarios (Tier B forced by real tool absence, Tier A backed
+by a real published Artifact) passed on first run, independently checked against the real
+filesystem/output rather than either subagent's self-report, per `evals/README.md` and
+`verification-before-completion`.
 
 ## Run log
 
-(pending — filled in after both scenarios are actually run and independently verified)
+### Run 1 — 2026-07-17 (both scenarios, real dispatch)
+
+**Scenario 1 (Tier B, `Explore` subagent — genuinely has no Artifact tool, not simulated):**
+correctly detected the absence by searching its own real tool surface ("searched explicitly for
+'artifact publish create render'... contains nothing capable of publishing a rendered Artifact"),
+concluded Tier B, and produced a Mermaid flowchart per `references/visual-output-templates.md`'s
+template. **Independently verified**: `diff`'d the resulting file against the original table —
+byte-identical except a blank-line separator before the new heading (correct markdown practice, not
+a content change); the diagram's 3 nodes and 2 edges match the table's `UX-*` rows and "User
+can..." actions; no raw jargon in labels.
+
+**Scenario 2 (Tier A, `general-purpose` subagent — genuinely has a working Artifact tool):**
+correctly detected Tier A by actually calling the Artifact tool and getting a real result back
+(not assuming availability from context), derived `GO WITH CHANGES` itself from the 6-GO/1-
+GO_WITH_CONCERNS/0-NO_GO input per `boardroom.md`'s own rule, and produced both the required plain-
+text report and a real Tier A Artifact. **Independently verified**: fetched the live Artifact URL
+(`https://claude.ai/code/artifact/55086d9f-58ed-44e3-8507-25f40c8c0bde`) directly — confirmed it's
+a real, rendered page (not a 404/error), the pipeline-status strip matches the given
+`state.json`/`checkpoints.jsonl` exactly (Planning Milestone done, Build current, Ship not started,
+nothing invented), and the bottom line leads before any visual in the plain-text report.
+
+**Real bug found and fixed as a direct result of this run**: Scenario 2's Artifact reproduced a
+seat-verdict vocabulary error — the CMO card read "GO WITH CHANGES" (the aggregate bottom-line
+scale) instead of the correct per-seat verdict "GO_WITH_CONCERNS" (visibly disagreeing with the
+adjacent plain-text line for the same seat). This traced back to a genuine bug in
+`references/visual-output-templates.md` §3's own example, caught independently by a parallel
+`code-review` pass on PR #31 the same session and fixed before this log entry — Scenario 2's run
+predates the fix and is direct, concrete evidence the bug was real and would have propagated into
+actual founder-facing output, not just a theoretical review nitpick. Re-inspection of the (now
+corrected) template confirms a fresh run would no longer reproduce this.

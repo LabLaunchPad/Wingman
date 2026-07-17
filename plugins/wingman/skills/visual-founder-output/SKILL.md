@@ -32,10 +32,11 @@ three unrelated bullet points is noise, not clarity.
 
 ## Core Workflow
 
-**1. Detect the rendering tier for this session, before formatting anything.** Check whether an
-Artifact-publishing tool is actually present in this session's tool surface right now (the same kind
-of concrete check `git-pr-workflow` does with `command -v gh` — a real check, not an assumption from
-context or from what a *previous* session had). Two tiers result:
+**1. Detect the rendering tier for this session, before formatting anything.** Check the concrete,
+checkable equivalent of `git-pr-workflow`'s `command -v gh`: look at this session's actual available
+tools (its tool list, or a `ToolSearch` query for "artifact publish render" if tools are deferred and
+not yet loaded) for a tool that can genuinely publish a rendered Artifact — not whether the docs
+mention one, not what a *previous* session had. Two tiers result:
 
    - **Tier A — Artifact-capable.** An Artifact-publishing tool is genuinely available. Produce a
      real rendered visual: a low-fidelity HTML wireframe per key screen for a UX flow (boxes and
