@@ -14,7 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseAll, recurringCategories } from './parse-wingman-logs.mjs';
+import { parseAll } from './parse-wingman-logs.mjs';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const read = (rel) => { try { return readFileSync(join(repoRoot, rel), 'utf-8'); } catch { return null; } };
@@ -48,7 +48,6 @@ const uncoveredSkills = skills.filter((s) => !isCovered(s));
 // --- Learnings/decisions volume, from the structured wingman:log markers, not a prose regex ---
 const logs = parseAll();
 const decisionCount = logs.decisions.length;
-const recurring = recurringCategories();
 
 // --- Report ---
 const line = (s = '') => console.log(s);
@@ -70,7 +69,6 @@ line();
 const { totalHeadings, markedHeadings } = logs.coverage;
 const pctMarked = totalHeadings ? Math.round((markedHeadings / totalHeadings) * 100) : 100;
 line(`Structural log coverage: ${markedHeadings}/${totalHeadings} entries (${pctMarked}%) across LEARNINGS.md/retros.md/PROJECT.md-decisions/HUMAN-TODOS.md carry a machine-parseable wingman:log marker (see scripts/parse-wingman-logs.mjs).`);
-line(`Recurring themes: ${recurring.length} categor${recurring.length === 1 ? 'y has' : 'ies have'} 2+ occurrences across learnings/retros/decisions${recurring.length && recurring.length <= 5 ? ` (${recurring.map((r) => `${r.category} ×${r.count}`).join(', ')})` : ''} — see scripts/query-wingman-knowledge.mjs.`);
 line();
 // Overall one-line verdict, in the plain-language spirit the project holds
 // its own outputs to.

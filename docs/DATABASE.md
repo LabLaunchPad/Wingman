@@ -8,18 +8,9 @@ All Wingman state lives under `.wingman/` at the root of the founder's project (
 
 ```
 .wingman/
-├── checkpoints.jsonl     # append-only log of every Boardroom checkpoint
-├── state.json            # current project-level state (small, overwritten in place)
-├── traceability.json     # next-available-ID counter per requirement/decision/flow prefix
-└── memory/
-    ├── MEMORY.md         # evergreen facts: project name, stack, constraints, preferences
-    ├── decisions.md      # dated decision log (what was decided, why, by whom)
-    └── tried.md          # approaches already attempted and their outcome
+├── checkpoints.jsonl   # append-only log of every Boardroom checkpoint
+└── state.json          # current project-level state (small, overwritten in place)
 ```
-
-(This file tree previously omitted `traceability.json` and `memory/` — an audit,
-`docs/wingman/architecture-audit-2026-07-15.md`, found both were real files real skills already
-write, with no corresponding entry here. Documented below.)
 
 ### `checkpoints.jsonl`
 
@@ -101,44 +92,6 @@ Small, overwritten in place (not append-only). Tracks what a fresh Claude Code s
 ```
 
 `active_managers` is new alongside the Management Board addition — a `state.json` written before this change has no `active_managers` key; treat its absence as an empty array (`[]`), same forward-compatible handling as any other array field, rather than an error.
-
-### `traceability.json`
-
-Small, overwritten in place. Written by `skills/traceability-linking`, which mints
-`<!-- wingman:req ID -->`-style markers per pipeline stage — this file is the single source of
-truth for the next available ID per prefix, so two sessions never mint the same ID for two
-different things.
-
-```json
-{ "next_id": { "DISC": 1, "DEF": 1, "ARCH": 1, "UX": 1, "IP": 1 } }
-```
-
-Created on first use if it doesn't exist yet; a project that hasn't run any pipeline stage with
-traceability markers has no `traceability.json` at all — that's expected, not an error.
-
-### `memory/`
-
-Three separate Markdown files (not JSON/JSONL, unlike everything else under `.wingman/`), written
-and read by `skills/memory` per the founder's own explicit "remember"/"note that" instructions or
-when a session is about to lose important context:
-
-- `MEMORY.md` — evergreen facts (project name, stack, constraints, preferences).
-- `decisions.md` — a dated decision log (what was decided, why, by whom).
-- `tried.md` — approaches already attempted and their outcome, so they aren't retried blind.
-
-Unlike `checkpoints.jsonl` (Boardroom verdicts only, no rationale beyond a one-line seat summary)
-and `state.json` (current-stage pointers only), this is the one place a project's own decision
-*rationale* is meant to live in prose — though as of `evals/cases/memory.md`'s Run 1, this remains
-`provisional`: no run yet demonstrates a later session actually reading this store back and
-changing its behavior as a result, only that the write path works. Treat it as write-verified,
-not yet read-loop-verified.
-
-**No single file or view here unifies `checkpoints.jsonl`, `state.json`, `traceability.json`, and
-`memory/*.md` into one "what has this project decided and why" surface** — reconstructing that
-today means reading all four separately, in three different formats. This is a known, named gap
-(`docs/wingman/architecture-audit-2026-07-15.md`'s central finding), not an oversight to silently
-work around; any future unification work should be evidence-gated (a real dogfooding prototype),
-not spun up speculatively.
 
 ## Who writes/reads this
 
