@@ -25,6 +25,7 @@ const SECRET = [
   /\bsk-[A-Za-z0-9]{20,}\b/,              // OpenAI / Anthropic-style keys
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,   // PEM private key
   /\bANTHROPIC_API_KEY\s*=\s*\S+/i,       // literal key assignment
+  /(?:password|passwd|secret|token|api[_-]?key)\s*[:=]\s*['"]?[A-Za-z0-9\/+_]{20,}/i,  // generic key assignment
 ];
 
 export function findSecrets(text = '') {
