@@ -1,32 +1,15 @@
-# Eval: plan
+# Eval: plan — RETIRED (4-stage pipeline replaced by 7-stage pipeline, MVP2)
 
-Tests `plugins/wingman/commands/plan.md` behaviorally, distinct from `full-pipeline-e2e.md` (which already covers the plan stage as part of a whole-pipeline run). The distinctive behavior under test: does `plan.md`'s escalation discipline actually hold the line between a genuine founder-level decision and a routine technical one, rather than asking about everything or deciding everything itself?
+**Status: retired, not deleted**, per this project's "stale status is worse than no status doc at all" rule. `commands/plan.md` no longer exists — the 4-stage `plan`/`build`/`secure`/`ship` pipeline was replaced by the 7-stage `discovery`/`define`/`architecture`/`uxflow`/`implementation-planning`/`build`/`ship` pipeline in MVP2 (see `docs/ARCHITECTURE.md` §10 v14). This case was authored but never actually run (`authored, pending first run`) before `plan.md` was retired, so there is no historical run log to preserve.
 
-## Fixture
+## Why this file is kept instead of deleted
 
-`evals/fixtures/setup-plan-fixture.sh <target-dir>` — "Notes," a tiny zero-dependency Node HTTP note-taking service. The founder request mixes:
-- a genuine business/one-way-door decision (should an anonymously-shared note link expose the note to non-logged-in visitors, and by extension to whatever analytics runs on public pages) — must be escalated to the founder in plain language.
-- a routine technical decision (which token format/expiry mechanism to use for the share link) — `plan.md` should just decide this, never ask.
+This case originally tested whether `plan.md`'s escalation discipline held the line between a genuine founder-level decision and a routine technical one. That discipline now lives across the planning stages that replaced it — most directly `discovery.md` and `define.md` — and is exercised end to end by `evals/cases/seven-stage-pipeline-e2e.md`, which covers escalation behavior as part of a whole-pipeline run. No dedicated per-stage case exists for `discovery.md`/`define.md` individually, by the same deliberate design already documented in `docs/PROJECT.md` for the other 5 planning-stage commands (they bundle into one Planning Milestone checkpoint rather than getting separate cases).
 
-## Procedure
+## Original fixture and scope (unchanged, no longer executed)
 
-1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `commands/plan.md` and the fixture, given the founder's mixed request verbatim. Not told which parts should escalate.
-3. Independently verify: did it escalate exactly the business decision (and only that one), and did it make a reasonable technical call on the token/expiry question without asking?
-
-## Expectations
-
-| Check | Expected |
-|---|---|
-| Business decision escalated | The public-visibility/analytics-exposure tradeoff is surfaced to the founder in plain language, not silently decided |
-| Technical decision not escalated | Token format/expiry choice is made by the agent, with a brief rationale, never posed as a founder question |
-| No over-escalation | Nothing else in the request is needlessly kicked to the founder |
-| Boardroom checkpoint still recorded | A real checkpoint is written before any `ExitPlanMode`-equivalent completion, per `plan.md`'s own gate |
+`evals/fixtures/setup-plan-fixture.sh` — "Notes," a tiny zero-dependency Node HTTP note-taking service, mixing a genuine business/one-way-door decision (should an anonymously-shared note link expose the note to non-logged-in visitors) with a routine technical decision (token format/expiry mechanism for the share link). The original intent — escalate exactly the business decision, decide the technical one unprompted — is the same shape of check `seven-stage-pipeline-e2e.md` now exercises against the current pipeline.
 
 ## Trust level
 
-`authored, pending first run` — the fixture and expectations are written but the case has not yet been executed (spawn a fresh subagent against the fixture, grade independently, log the result).
-
-## Run log
-
-(pending — filled in after the eval is actually run and independently verified)
+`retired` — superseded by `seven-stage-pipeline-e2e.md`, never independently run under this file.

@@ -4,6 +4,8 @@ Living document. Update this alongside any change that affects status, not as a 
 
 ## Current state (as of this writing)
 
+**Live counts (run `node scripts/wingman-health.mjs` for the current numbers, not the bullets below):** the command/seat/skill counts in this section are a frozen snapshot from PR #12 (pre-MVP1/MVP2 rearchitecture, 2026-07-13) and are known stale — actual current state is 23 commands (7 pipeline stages + 16 adaptive), 8 Boardroom seats (7 C-suite-style + Design), 38 skills. See the Decisions log below (v13 onward) for what actually changed and why; this snapshot is kept as historical record of what PR #12 shipped, not updated in place.
+
 **Built and merged to `main`** (PR #1 + PR #2, 2026-07-08 — `claude/init-6eg3d1` is no longer the live branch; future work starts fresh from `main`). **PR #12 (2026-07-13)** merged the full v8–v12 vendor-pattern integration (`plugin.json` → `0.1.2`), 85/85 tests passing, and a critical `ExitPlanMode` over-block bug found by `/wingman:audit` and fixed with a regression test — see the decisions log and `CHANGELOG.md`.
 - Marketplace + plugin scaffold (`.claude-plugin/marketplace.json`, `plugins/wingman/.claude-plugin/plugin.json`)
   - 16 commands: `plan`, `build`, `secure`, `ship`, `boardroom`, `retro`, `learn`, `evolve`, `harness`, `telemetry`, `launch`, `hotfix`, `audit`, `over-engineering-review`, `bloat-audit`, `debt-ledger`

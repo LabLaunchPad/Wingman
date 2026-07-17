@@ -75,12 +75,8 @@ function saveMonitorState(statePath, state) {
 function extractEditedPaths(toolName, toolInput) {
   const paths = [];
 
-  if (toolName === "Edit" && toolInput.filePath) {
-    paths.push(toolInput.filePath);
-  } else if (toolName === "Write" && toolInput.filePath) {
-    paths.push(toolInput.filePath);
-  } else if (toolName === "MultiEdit" && Array.isArray(toolInput.filePath)) {
-    paths.push(...toolInput.filePath);
+  if ((toolName === "Edit" || toolName === "Write") && toolInput.file_path) {
+    paths.push(toolInput.file_path);
   }
 
   return paths;

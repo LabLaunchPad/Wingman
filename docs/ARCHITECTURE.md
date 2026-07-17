@@ -95,13 +95,13 @@ One lead subagent per corporate department. Each lead covers its department's *e
 
 **Boardroom seats vs. department leads are different roles by design:** a boardroom seat reviews and gates; a department lead produces the thing being reviewed. This avoids the 1:1 redundancy in a literal corporate org chart (e.g. a CPO *and* a separate Requirements Analyst covering overlapping ground) — in Wingman, the CPO seat reviews what `dept-product` produces, full stop.
 
-Department-lead files don't exist in a fresh install. Each of the four delegating commands checks its relevant activation signals above at the start of its run — immediately followed by a `management-board-activation` check (§5a) — and creates the relevant lead file (from the standard template in `skills/department-lead-activation/references/template.md`) the first time it's actually warranted. Once created, it persists for the life of the project.
+Department-lead files don't exist in a fresh install. Each of the six delegating commands (`discovery`, `architecture`, `uxflow`, `build`, `ship`, `launch`) checks its relevant activation signals above at the start of its run — immediately followed by a `management-board-activation` check (§5a) in all but `launch` (its `dept-growth` signal is the invocation itself, not a complexity threshold to re-check) — and creates the relevant lead file (from the standard template in `skills/department-lead-activation/references/template.md`) the first time it's actually warranted. Once created, it persists for the life of the project.
 
 **Where these files actually live is load-bearing, not incidental.** Department-lead agents are written to **`.claude/agents/dept-<name>.md` in the founder's own project repository — never into Wingman's own plugin installation directory.** Two reasons:
 1. Wingman's plugin files live under Claude Code's plugin cache, resynced from the marketplace source; anything written there by a running session risks silent loss on the next plugin update, and there's no guaranteed way to make a freshly-written *plugin* agent file discoverable within the same session without a reload.
 2. Claude Code natively supports **project-scoped** subagents — `.claude/agents/*.md` in a project, auto-discovered with no manifest — which is exactly the right scope for a per-project, lazily-grown roster. It also matches intent: each founder's project accumulates its *own* department-lead roster in *their* repo, not a shared one baked into Wingman.
 
-The mechanism for detecting signals and writing these files is `skills/department-lead-activation`, shared by all four delegating commands rather than duplicated in each.
+The mechanism for detecting signals and writing these files is `skills/department-lead-activation`, shared by all six delegating commands rather than duplicated in each.
 
 ## 5a. Management Board (grows 0 → 9, per project, complexity-gated)
 

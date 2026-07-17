@@ -56,7 +56,7 @@ Maintain a `DEBT.md` (or `DEBT.json`) in the project root. Every `// minimal:` c
 
 ### 4. Debt Decay Rule
 
-A `// minimal:` comment older than **one release cycle** without being upgraded needs a status review:
+A `// minimal:` comment older than **one release cycle** without being upgraded needs a status review — this is the earlier, softer trigger; the audit's harder 2-cycle flag below is for debt nobody reviewed even once:
 - **Still relevant?** Update the ceiling and date.
 - **Never going to be hit?** Remove the comment and simplify — you don't need a ladder to the roof if you're never going to the roof.
 - **Already hit?** Upgrade now, or justify the debt with a time-boxed plan in DEBT.md.
