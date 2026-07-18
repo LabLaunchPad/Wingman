@@ -48,10 +48,11 @@ project-specific behavior.
 
 ## Trust level
 
-`provisional` — passed one real run covering the write path, the successful-retrieval path, and the
-negative (nonexistent-checkpoint) path; still needs a second, differently-shaped run (e.g. a
-`schema_version: 3` legacy entry with no `details_ref` at all, confirming `expand` reports "full
-detail not available" rather than erroring) before promotion to `verified`.
+`verified` — Run 1 covered the write path, the successful-retrieval path, and the negative
+(nonexistent-checkpoint) path; Run 2 covered the remaining differently-shaped scenario, a legacy
+`schema_version: 3` checkpoint with no `details_ref` field at all, confirming `expand` degrades to
+"full detail not available" rather than erroring, fabricating detail, or leaving any trace of a write
+against a pure-retrieval request.
 
 ## Run log
 
@@ -86,6 +87,31 @@ requested one is not), closing the ambiguity a code-review pass on this diff fla
 no fabricated verdict text either way.
 
 **No bugs found this run** — the write/read pair behaved exactly as specified in `boardroom.md` on
-first try. Still open before `verified`: a `schema_version: 3` legacy-entry (no `details_ref` at all)
-scenario, confirming `expand` reports "full detail not available" rather than erroring — see Trust
-level above.
+first try.
+
+### Run 2 — 2026-07-18 (legacy `schema_version: 3`, no `details_ref`, real dispatch)
+
+**Setup:** a fresh fixture directory (`boardroom-expand-legacy-fixture`, hand-authored — not run
+through `setup-boardroom-gate-fixture.sh`, since this scenario tests a pre-existing legacy record
+rather than a fresh write) with a single hand-written `.wingman/checkpoints.jsonl` line:
+`checkpoint_id: "2026-06-01T09-00-00Z-build"`, `schema_version: 3`, 7 seat summaries, no
+`details_ref` field anywhere in the line — matching what a real checkpoint recorded before this
+feature existed would look like.
+
+**Retrieve (fresh `general-purpose` subagent, given only `boardroom.md`, no other context):** told to
+run `expand 2026-06-01T09-00-00Z-build`. It read the real entry first, correctly identified the
+missing `details_ref` as the `schema_version < 4` case from step 2 of "Expand a past checkpoint," and
+returned the specified fallback — a plain statement that full detail isn't available, followed by the
+existing one-line-per-seat summary table (all 7 seats, verbatim from the record) and the bottom line.
+It did not error, did not invent expanded reasoning, and did not silently show nothing.
+
+**Independently verified** (real filesystem, not the subagent's self-report): `find .wingman -type f`
+showed only `checkpoints.jsonl` and `state.json` — no `checkpoint-details/` directory was created;
+`wc -l checkpoints.jsonl` was `1` both before and after (unchanged); `grep -o details_ref
+checkpoints.jsonl` found nothing, confirming the fixture's premise held and the subagent's fallback
+was actually triggered by a genuinely absent field, not assumed.
+
+**No bugs found this run.** Both differently-shaped scenarios (a fresh `schema_version: 4` write/read
+round-trip in Run 1, and a legacy `schema_version: 3` no-`details_ref` degrade-gracefully case in Run
+2) passed on first try, independently verified against the real filesystem in every instance rather
+than any subagent's self-report. Promoted to `verified`.
