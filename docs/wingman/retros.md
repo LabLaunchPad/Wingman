@@ -1,5 +1,53 @@
 # Retros
 
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=1 -->
+## Retro: Maintainer-mode simple-path dogfood run — gate dormancy confirmed clean — 2026-07-18
+
+Ran the real 7-stage pipeline (`/wingman:discovery` through `/wingman:ship`) against a fresh
+`setup-dogfood-simple.sh` fixture (`internal-status-api`, a tiny Node.js HTTP API with zero
+conditional signals). Stood in as founder for the one real decision (a minimal liveness `/health`
+check vs. a deeper readiness probe — chose minimal, since the service has no dependencies yet to
+check). Dispatched 24 real Boardroom seat reviews (8 seats x 3 checkpoints: Planning Milestone,
+Build, Ship) via the `Agent` tool with each `boardroom-*.md` persona pasted in full — no
+custom `boardroom-*`/`dept-*` subagent type is registered in this environment, only
+`general-purpose` and a few other built-ins, consistent with prior dogfood runs' disclosed
+limitation. All 24 seat verdicts came back clean `GO`. Implemented the feature for real with TDD:
+wrote a failing test first (confirmed 404 for the right reason), then the minimal
+`GET /health` route, then confirmed 2/2 tests green.
+
+**What went well:**
+- The gate this path exists to prove held completely: `dept-design`, `dept-data`,
+  `dept-legal-security`, `dept-devops`, and `dept-growth` all stayed dormant end to end (0 of the 5
+  conditional signals ever fired — no user-facing surface, no schema, no auth/payments, no CI
+  config, no explicit growth request), and `management-board-activation` never triggered since it
+  requires 3+ of those five. Only the 2 unconditional leads (`dept-product`, `dept-engineering`)
+  were created, exactly as the simple-path fixture is designed to prove.
+- `uxflow.md` correctly identified this project has no user-facing surface and was skipped in one
+  plain sentence rather than manufacturing screens.
+- The Build-stage Definition-of-Done gate (threat register, traceability markers, test presence)
+  cleared cleanly on the first pass — 3 risks assessed, all CLOSED, no founder escalation needed.
+
+**What was harder than expected:**
+- `build.md` names `dept-qa` as always-active alongside `dept-engineering`, but this run never
+  created a `dept-qa` lead file — the single-task TDD work was executed directly rather than
+  delegated through a dispatched QA lead. For a genuinely one-task plan this reads as proportionate,
+  but the command's own language ("delegate each task to the relevant department lead rather than
+  doing all the work as this command directly") doesn't carve out a small-plan exception. Logged as
+  an observed gap in the structured run output rather than silently working around it; not fixed in
+  this pass since it's a single low-severity occurrence, not yet a repeated pattern.
+
+**What we'd do differently next time:**
+- Deliberately have a maintainer-mode session actually invoke a real `dept-*` Task-tool dispatch
+  (not just author the persona file and then do the work inline) to see whether project-scoped
+  agents under `.claude/agents/` really are discoverable mid-session the way
+  `department-lead-activation` claims, rather than continuing to route around the question.
+
+**Anything for you to know:**
+- Structured run output recorded at `evals/dogfood-runs/2026-07-18T03-11-34Z-simple.json`. No
+  `observed_gaps` entry rose to the level of needing `dogfood-gap-classification` — the one real
+  friction found (missing `dept-qa` dispatch) is a single occurrence, tracked for a future repeat
+  rather than acted on immediately.
+
 <!-- wingman:log type=retro category=dogfooding-mechanism status=resolved -->
 ## Retro: Fresh founder-mode dogfood run confirms the synchronous-dispatch fix holds — 2026-07-15
 
