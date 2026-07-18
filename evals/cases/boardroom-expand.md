@@ -77,10 +77,13 @@ exactly, not a re-summarized approximation; its own report confirms no seat agen
 no new checkpoint was recorded (this is retrieval-only, per spec).
 
 **Negative case (Subagent 3, given a fabricated `checkpoint_id` not present in the file):** correctly
-found no match in `checkpoints.jsonl`, stated so plainly ("I couldn't find a checkpoint with ID
-... there's nothing to expand"), even proactively named the one real checkpoint_id that *does* exist
-as a likely-intended alternative — without guessing that it was the same request. No file writes, no
-fabricated verdict text.
+found no match in `checkpoints.jsonl` and stated so plainly ("I couldn't find a checkpoint with ID
+... there's nothing to expand") — it never treated any existing checkpoint as a match for the
+fabricated ID. It additionally suggested the one real `checkpoint_id` that does exist as a "did you
+mean" pointer, phrased as a question, not a substitution. `boardroom.md`'s "expand" section has since
+been reworded to explicitly distinguish this (a suggestion is fine; treating a near match as the
+requested one is not), closing the ambiguity a code-review pass on this diff flagged. No file writes,
+no fabricated verdict text either way.
 
 **No bugs found this run** — the write/read pair behaved exactly as specified in `boardroom.md` on
 first try. Still open before `verified`: a `schema_version: 3` legacy-entry (no `details_ref` at all)
