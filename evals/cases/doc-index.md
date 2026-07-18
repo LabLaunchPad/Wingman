@@ -46,11 +46,18 @@ case:
 
 ## Trust level
 
-`provisional` — passed a single-scenario run (one real orphan among two
-correctly-wired docs). Not yet tested against a negative case (a project
-where every doc is already correctly wired, confirming the skill doesn't
-manufacture an orphan finding) — a natural second run for promotion to
-`verified`.
+`verified` — passed two differently-shaped scenarios. Run 1 was a single
+real orphan among two correctly-wired docs (an easy discovery case). Run 2
+(below) was structurally harder: three *pre-existing* orphans of different
+flavors in one project, forcing the skill to discriminate rather than
+pattern-match "found an orphan, wire it in" — two had a genuine existing
+owner and were fixed, one had no genuine owner and was correctly left
+unfixed with an explicit flag rather than forced into a fabricated citation
+or silently deleted. That discrimination is the closest available proxy for
+the negative case originally proposed here (a project where nothing needs
+fixing) — it proves the skill doesn't over-fix as reliably as a from-scratch
+"everything's fine" fixture would, but a literal zero-orphan fixture is
+still a cheap future addition if this ever needs re-confirming.
 
 ## Run log
 
@@ -84,3 +91,57 @@ discipline, and:
 - No false positives: the two correctly-wired docs were left alone.
   `git status --porcelain` in the Wingman repo confirmed nothing under
   `plugins/wingman/` was touched.
+
+### Run 2 — 2026-07-16
+
+**Scenario (genuinely different shape from Run 1):** a fresh scratch fixture,
+"Notionly" (`commands/onboard.md`, `skills/api-versioning/SKILL.md`,
+`references/{style-guide,deprecation-policy,webhook-retry-strategy}.md`,
+`docs/DATABASE.md`), built with **three pre-existing orphans already in the
+tree** rather than Run 1's single "add one new doc" case — and, critically,
+the three orphans were deliberately not uniform: one (`deprecation-policy.md`)
+has an obvious existing owner (`api-versioning`'s deprecation-window step),
+one (`docs/DATABASE.md`) is a `docs/`-tree orphan per the skill's own
+canonical-index definition rather than a `references/` one, and one
+(`webhook-retry-strategy.md`) has **no genuine owner anywhere in the
+project** — nothing in `commands/` or `skills/` touches webhooks at all — to
+test whether the skill would fabricate a forced citation rather than
+correctly flagging it.
+
+A fresh subagent, given only `skills/doc-index/SKILL.md` and the fixture
+path (not told which docs were orphaned or how many), was asked to run a
+documentation audit/pass.
+
+**Result: PASS on every expectation, independently re-verified against the
+real filesystem** (not the subagent's self-report):
+- Correctly identified `references/style-guide.md` as already properly
+  cited by `commands/onboard.md` — not falsely flagged. Re-grep confirmed
+  it is still cited exactly once, untouched.
+- Correctly found all three orphans by grepping each `references/*.md` (and
+  `docs/DATABASE.md`, per the skill's own step 3 canonical-index scope, not
+  just `references/`) across `commands/` and `skills/`.
+- Discriminated rather than pattern-matched a single response for all three:
+  - `references/deprecation-policy.md` — fixed. Added a real `##
+    References` section to `skills/api-versioning/SKILL.md` citing it with
+    a genuine "when to consult" note tying it to the skill's own deprecation-
+    window and retirement steps. Re-grep confirmed the citation exists with
+    real content, not a bare filename.
+  - `docs/DATABASE.md` — fixed. Added a second `## References` entry to
+    `commands/onboard.md` (the natural owner — walking a new engineer
+    through the codebase before their first schema-touching change) with a
+    genuine "when to consult" note. Re-grep confirmed.
+  - `references/webhook-retry-strategy.md` — correctly left uncited.
+    Recognized no command or skill in the project has any relationship to
+    webhooks, so it explicitly flagged the doc for the project owner as a
+    scope judgment call (build a real owning skill, or delete the doc) per
+    the skill's own "wire it in or delete it" guidance, rather than forcing
+    a fabricated citation into an unrelated file or silently leaving it
+    unresolved. Re-grep confirmed it remains at zero citations by design,
+    not by omission.
+- Scope respected: `git status --porcelain` in the Wingman repo returned
+  nothing — only the scratch fixture outside the repo was modified.
+
+This is a harder and differently-shaped test than Run 1 (multiple
+simultaneous pre-existing orphans instead of one, plus a doc with no valid
+owner at all) and the skill held up: no false positives, no forced/fabricated
+citations, correct fix-vs-flag discrimination on each of the three.

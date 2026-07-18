@@ -34,12 +34,57 @@ directly, not by grading a subagent.
 
 ## Trust level
 
-`provisional` (2026-07-15) — one real run against this repo's own current, real docs, independently
-cross-checked by hand. Not yet `verified`: only run against this project's own real data so far, no
-second differently-shaped run (e.g. against a deliberately smaller/edited fixture copy of the
-marked files) to confirm behavior on a shape other than "this repo's own current history."
+`verified` (2026-07-16) — two real runs against this repo's own current, real docs, both
+independently cross-checked by hand. Run 1 confirmed field filtering and one occurrence count
+(inclusion side); Run 2 exercised the threshold logic's exclusion side and boundary condition,
+plus `--json`/table row-equivalence for a filter query, which Run 1 didn't cover.
 
 ## Run log
+
+### Run 2 — 2026-07-16
+
+Differently-shaped from Run 1: instead of re-checking an already-recurring category, this run
+targeted the parts of `--recurring`'s threshold logic Run 1 left unverified — correct **exclusion**
+of single-occurrence categories, and the exact **boundary** at a threshold equal to a real count.
+
+**Current default `--recurring` (threshold 2)** now reports 9 categories (docs have grown since
+Run 1's 8): `environment` (2), `hooks` (13), `dogfooding-mechanism` (2), `governance` (2, new since
+Run 1), `tooling-proposal` (2), `evolve` (4), `eval` (10), `boardroom` (3), `general` (2).
+
+**Exclusion check**: ran `--recurring=1 --json` to see every category down to count 1, then picked
+6 categories present at threshold 1 but absent from the default (threshold-2) output — `process`,
+`security`, `pipeline`, `audit`, `install`, `evidence-gate` — and manually grep-counted each across
+all three files:
+
+```
+process:        LEARNINGS=1 retros=0 PROJECT=0  total=1
+security:        LEARNINGS=1 retros=0 PROJECT=0  total=1
+pipeline:        LEARNINGS=1 retros=0 PROJECT=0  total=1
+audit:           LEARNINGS=0 retros=0 PROJECT=1  total=1
+install:         LEARNINGS=0 retros=0 PROJECT=1  total=1
+evidence-gate:   LEARNINGS=0 retros=0 PROJECT=1  total=1
+```
+
+All 6 are genuinely single-occurrence and correctly excluded from the default `--recurring` output
+— confirms the threshold filter isn't just inclusive-correct (Run 1) but exclusive-correct too.
+
+**Boundary check**: ran `--recurring=13` (exactly equal to `hooks`'s real count) — returned only
+`hooks` (count 13), confirming the comparison is `>=` and applied precisely at the boundary, not
+off-by-one in either direction (a category at exactly the threshold is included; `eval` at 10 and
+everything below is excluded).
+
+**Inclusion cross-check on a category not sampled in Run 1**: manually grep-counted `boardroom`
+(`LEARNINGS=0, retros=0, PROJECT=3` → total 3) and the new `governance` category (`LEARNINGS=0,
+retros=0, PROJECT=2` → total 2) — both match the script's reported counts exactly.
+
+**`--json` vs. table equivalence for a filter query** (not explicitly shown in Run 1): ran
+`--category=governance --json` and the default table for the same query — both returned the same 2
+rows, same `file:line` (`docs/PROJECT.md:46`, `docs/PROJECT.md:52`). Spot-checked line 46 against
+the real file: the heading text ("Mechanical, low-risk fixes with existing direct test coverage
+don't require a retroactive Boardroom review.") matches the actual entry verbatim.
+
+No bugs found. No discrepancies between script output and manual counts in any of the 8 categories
+checked across both runs.
 
 ### Run 1 — 2026-07-15
 

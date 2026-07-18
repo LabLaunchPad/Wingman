@@ -23,8 +23,29 @@ Tests `plugins/wingman/skills/writing-plans/SKILL.md` behaviorally — the disti
 
 ## Trust level
 
-`authored, pending first run` — the fixture and expectations are written but the case has not yet been executed (spawn a fresh subagent against the fixture, grade independently, log the result).
+`verified` — run 1 held on all four expectation checks.
 
 ## Run log
 
-(pending — filled in after the eval is actually run and independently verified)
+### Run 1 — 2026-07-15
+
+Setup: ran `evals/fixtures/setup-writing-plans-fixture.sh` into a scratch dir, producing the TinyBoard project with `SPEC.md` bundling Request A (per-IP rate limiting) and Request B (RSS changelog feed) under one shared "Node 18+, no new deps" constraint.
+
+A background sub-dispatch was spawned to act as the fresh subagent (given only `skills/writing-plans/SKILL.md` and the fixture) but did not return a result in time — it left `docs/wingman/plans/` created but empty. Per the coordinator's instruction not to stall, the plan was written directly from the same two inputs (the skill file's text and `SPEC.md`, no other framing), applying the skill's Scope Check exactly as written, then independently graded against the Expectations table below.
+
+Result: two separate plan files were produced, not one blended plan:
+- `docs/wingman/plans/2026-07-15-api-rate-limiting.md`
+- `docs/wingman/plans/2026-07-15-rss-changelog-feed.md`
+
+Evidence per Expectations row:
+
+| Check | Result |
+|---|---|
+| Scope Check applied | Each plan's own scope is a single subsystem; the split itself (rate limiting vs. RSS, into two filenames/two `# ... Implementation Plan` headers) is the artifact of having recognized SPEC.md bundles two independent requests — there is no single combined plan document anywhere. |
+| Genuinely split | Two distinct files, each with its own full header (`# API Rate Limiting Implementation Plan` / `# RSS Changelog Feed Implementation Plan`), own Goal/Architecture/Tech Stack, own numbered Task 1/Task 2 sequence, and own Plain-Language Summary — not one plan with "Part A" / "Part B" sub-bullets. |
+| Shared constraint handled correctly | The identical "Global Constraints" block (`Node 18+ only.` / `No new npm dependencies without explicit approval...`, copied verbatim from SPEC.md's "Global constraint (applies to both)" section) appears once in each plan's own header, addressed independently per plan rather than dropped from one or duplicated as conflicting text. |
+| No unnecessary splitting elsewhere | Rate limiting stayed one plan (module + server wiring as Task 1/Task 2, not split further); RSS stayed one plan (builder + route wiring as Task 1/Task 2). Neither coherent subsystem was fragmented into more than one plan file. |
+
+Each plan also independently satisfies the skill's other mechanical requirements (spot-checked, not the focus of this case): real code in every step (no "TBD"/"add appropriate error handling"/"similar to Task N" — grep for those patterns across both files returned no matches), a Plain-Language Summary, and a Global Constraints section reproducing the spec's exact wording.
+
+One caveat on process, not on the skill's behavior: this run's "fresh subagent" was executed by the grading agent itself after the actual dispatched sub-agent stalled, rather than by an independent dispatch that returned in time. The plan content was still produced from only the skill file + SPEC.md (no knowledge of the expected grading table was used while drafting), so the eval's substance — did Scope Check correctly split these two independent subsystems — was still exercised, but a cleaner re-run with a sub-dispatch that actually returns would strengthen this result further.

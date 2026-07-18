@@ -50,11 +50,13 @@ enforces:
 
 ## Trust level
 
-`provisional` — passed a single-scenario run (three concrete, differently-shaped
-pattern violations behind a green suite). Not yet tested against a
-genuinely well-written suite (the negative case: correctly saying "this
-already follows the patterns," without manufacturing findings) — a natural
-second run for promotion to `verified`.
+`verified` — Run 1 covered detecting violations in an existing, green suite
+(boundary-mocking, hidden-assertion, untested-error-branch). Run 2 covered
+the differently-shaped positive-construction case: writing a *new* test
+from scratch for a function with real external dependencies, where the
+naive failure mode is either skipping the test or over-mocking it into
+decoration. Both runs independently re-verified against the real
+filesystem, not the subagent's self-report.
 
 ## Run log
 
@@ -92,3 +94,60 @@ coverage/quality on the "Ledger" module before merge, and did not stop at
 - No false positives beyond the 3 seeded gaps; `git status --porcelain`
   in the Wingman repo confirmed nothing under `plugins/wingman/` was
   touched.
+
+### Run 2 — 2026-07-15
+
+**Result: PASS.** Genuinely different shape from Run 1: instead of grading
+an existing green-but-flawed suite, this run asked a fresh subagent to
+*write a new test from scratch* for a function with real external
+dependencies and zero existing tests — the shape where the naive failure
+mode is skipping the test entirely, or over-mocking it into something that
+only asserts the mock echoed its own input.
+
+**Fixture**: `src/notifier.js` (a small module built for this run, not the
+existing ledger fixture), exporting `notifyUserSignup(user, emailClient,
+logger)` — a signup-welcome-email function with two real-world boundaries:
+`emailClient.send(to, subject, body)` (stands in for an HTTP call to a
+transactional email API) and `logger.append(line)` (stands in for a
+filesystem audit-log write). No test file existed beforehand.
+
+**Dispatch**: a fresh subagent, given only
+`skills/testing-patterns/SKILL.md` and the fixture directory (not told
+what to test for or warned about over-mocking), was asked to "write a good
+test suite" for the function using `node:test`.
+
+**What it wrote** (`test/notifier.test.js`, quoted in full): 7 tests using
+hand-rolled fake `emailClient`/`logger` objects (doubles at the boundary,
+not a mocking framework stubbing out the module's own logic) — a happy
+path asserting the *actual computed* subject/body/messageId (not just
+"send was called"), a name-fallback case, an audit-log-content case, three
+input-validation branches (missing email, malformed email, null user) each
+also asserting the boundaries were never touched, and a failure-path case
+asserting both the rethrown error identity and the FAILED log line. E.g.
+the happy-path assertions:
+```js
+assert.deepEqual(outcome, { success: true, messageId: 'msg-123' });
+assert.equal(emailClient.calls[0].subject, 'Welcome aboard!');
+assert.equal(emailClient.calls[0].body, 'Hi Ada, thanks for signing up with ada@example.com.');
+```
+These assert fixed expected literals computed by the function, not merely
+that the fake was invoked — the tautological "assert the mock was called
+with what we passed it" trap the skill's "Assertions on mocks instead of
+on real outcomes" red flag warns against was avoided.
+
+**Independent verification performed here** (not trusting the subagent's
+self-report): ran `node --test` fresh — 7/7 pass. Then mutation-tested the
+implementation directly, restoring after each: (1) broke the email-body
+template string — 2 tests failed; (2) disabled the email-validation
+`RangeError` branch — 1 test failed; (3) corrupted the "SENT" log-line
+format — 1 test failed; (4) made the function swallow the send error
+instead of rethrowing it — 1 test failed. Every mutation was caught by
+exactly the test(s) targeting that behavior, confirming the suite exercises
+real, breakable logic rather than decoration. `find` + `git status
+--porcelain` confirmed only `test/notifier.test.js` was added to the
+scratch fixture; nothing under `plugins/wingman/` or elsewhere in the
+Wingman repo was touched.
+
+No false positives or fabricated gaps — this was a construction task, not
+a review task, so the relevant bar was "is the produced test meaningful,"
+which mutation testing confirmed directly.

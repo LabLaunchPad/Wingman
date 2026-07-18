@@ -54,10 +54,10 @@ suite and that claim, each a different DoD item:
 
 ## Trust level
 
-`provisional` — passed a single-scenario run (a project that insists it's
-done and isn't). Not yet tested against a genuinely complete project (the
-negative case: does it correctly say "yes, actually done" without
-manufacturing findings) — a natural second run for promotion to `verified`.
+`verified` — Run 1 passed a project that insists it's done and isn't
+(three seeded gaps, all caught). Run 2 passed the complementary negative
+case: a genuinely complete project, confirming the skill says "yes,
+actually done" without manufacturing findings.
 
 ## Run log
 
@@ -94,3 +94,54 @@ suite at face value:
 
 No false positives beyond the 3 seeded gaps were introduced; the subagent
 did not invent unrelated findings to pad the report.
+
+### Run 2 — 2026-07-15
+
+**Scenario (differently shaped from Run 1 — a true negative, not another
+adversarial trap):** a from-scratch fixture built in a scratch dir (a tiny
+real git repo, `text-utils`, a `normalizeWhitespace` string helper) that
+genuinely satisfies all 7 DoD items, each with a checkable artifact:
+`SPEC.md` (clear success criteria, including an explicit out-of-scope
+note for Unicode whitespace), a real red-then-green TDD commit sequence
+(`git log`: failing-tests commit → implementation commit) with 7 tests
+covering the happy path, empty/whitespace-only input, and three
+non-string-throw cases, `SECURITY.md` (a threat register with both rows
+`CLOSED` and reasoned justification, `threats_open == 0`, no secrets
+anywhere), `VERIFICATION.md` (a real logged `npm test` run), `README.md`
+in sync with the actual implementation, and `CHECKPOINT.md` (a genuine
+plain-language, consequence-first founder summary). No secrets, no
+speculative abstraction, no doc drift — deliberately built to actually
+pass, not to look like it passes.
+
+**Result: PASS.** A fresh subagent, given only
+`skills/definition-of-done/SKILL.md` and the fixture path (not told the
+project was actually complete, not given any cross-referenced skill
+files), was asked to verify the team's "done, ready for founder
+checkpoint" claim rather than accept it. It walked all 7 checklist items
+explicitly, and for each verified against the real filesystem instead of
+trusting the project's own docs: read `src/textUtils.js` directly against
+`SPEC.md`, ran `npm test` itself (not just quoted `VERIFICATION.md`),
+diffed the actual red and green commits to confirm the TDD sequence
+wasn't narrated after the fact, checked the security reasoning in
+`SECURITY.md` against the real source rather than trusting the register's
+prose, and judged the docs-in-sync and plain-language items on their
+actual content. Final verdict: **YES, Definition-of-Done complete** —
+correctly declined to invent findings on a project with nothing wrong,
+including correctly *not* flagging the explicitly-scoped-out Unicode/
+locale-whitespace item as a gap (recognizing it as a disclosed boundary,
+not silently dropped scope) and correctly treating the missing
+`ARCHITECTURE.md`/`ATTRIBUTIONS.md` as genuinely not applicable given the
+project's real scope (a single pure-function utility, nothing
+vendor-derived) rather than reflexively docking it.
+
+Independently re-verified here, not trusting the subagent's self-report:
+`git status --porcelain` in the fixture is empty and `git log --oneline`
+still shows exactly the same 4 commits — the subagent audited only, no
+edits, as instructed; `npm test` rerun independently reports 7/7 green;
+`grep -rniE "api_key|secret|password|token"` across the fixture returns
+only prose describing the *absence* of secrets, no real credential.
+
+Together, Run 1 (catches real, seeded violations) and Run 2 (doesn't
+manufacture violations against a clean project) establish both directions
+of the skill's central risk — false negatives and false positives — so
+the case is promoted to `verified`.

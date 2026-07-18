@@ -13,3 +13,12 @@ This case originally tested whether `plan.md`'s escalation discipline held the l
 ## Trust level
 
 `retired` — superseded by `seven-stage-pipeline-e2e.md`, never independently run under this file.
+
+**Note on a conflicting version encountered during a merge (2026-07-18):** a `verified`/"Run 1"
+version of this section briefly existed on `main`, claiming a real subagent dispatch tested
+`commands/plan.md` on 2026-07-15. That claim does not hold up under verification —
+`commands/plan.md` has not existed since commit `358e364` (the same-day MVP2 retirement), confirmed
+directly (`git show origin/main:plugins/wingman/commands/plan.md` → does not exist; `git log --all
+-- plugins/wingman/commands/plan.md` shows no commit after `358e364`). Discarded as
+unverifiable/fabricated rather than merged, per this project's own "don't trust a self-report,
+verify against the real filesystem" discipline.

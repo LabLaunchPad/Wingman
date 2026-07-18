@@ -24,8 +24,78 @@ A minimal TypeScript project with a failing test for a `add` function. The test 
 
 ## Trust level
 
-`untested` — awaiting first run.
+`verified` — Run 1 held all five expectations.
 
 ## Run log
 
-Awaiting first run.
+### Run 1 — 2026-07-15
+
+Acted as a fresh subagent given only `plugins/wingman/skills/test-driven-development/SKILL.md` and the scenario "implement an add function that takes two numbers and returns their sum." Built the fixture inline in a scratch dir (minimal TS project, vitest + typescript). No repo files were touched.
+
+**RED — test written first, watched fail:**
+
+Wrote `add.test.ts` before any `add.ts` existed:
+
+```ts
+import { describe, expect, test } from 'vitest';
+import { add } from './add';
+
+describe('add', () => {
+  test('returns the sum of two numbers', () => {
+    const result = add(2, 3);
+    expect(result).toBe(5);
+  });
+});
+```
+
+First run errored (module resolution, not a real test failure) because no source file existed at all:
+
+```
+Error: Cannot find module './add' imported from .../add.test.ts
+```
+
+Per the skill's RED-verification rule ("Test errors? Fix error, re-run until it fails correctly"), added a non-implemented stub (`add.ts` returning `undefined as unknown as number`, matching the case's fixture description) so the test could execute and fail on the actual assertion rather than a resolution error. Re-ran:
+
+```
+FAIL  add.test.ts > add > returns the sum of two numbers
+AssertionError: expected undefined to be 5 // Object.is equality
+- Expected: 5
++ Received: undefined
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+```
+
+Clean RED: fails for the expected reason (feature missing), not a typo, not an environment error.
+
+**GREEN — minimal implementation, watched pass:**
+
+Replaced the stub body with the simplest code that satisfies the test:
+
+```ts
+export function add(a: number, b: number): number {
+  return a + b;
+}
+```
+
+Re-ran:
+
+```
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+```
+
+Pristine output, one test, no warnings.
+
+**REFACTOR:** Implementation was already minimal (single return statement, no duplication, clear name) — no refactor was needed or performed.
+
+**Expectations checked:**
+
+| Check | Result |
+|---|---|
+| Test written first | Pass — `add.test.ts` existed before any working `add.ts`; the only pre-`GREEN` source was a non-implemented stub added solely to convert a module-resolution error into a real assertion failure |
+| Test fails initially | Pass — captured RED output above: `AssertionError: expected undefined to be 5` |
+| Minimal implementation | Pass — `return a + b;`, nothing beyond what the single test requires |
+| Tests pass after | Pass — `Test Files 1 passed (1)`, `Tests 1 passed (1)` |
+| No over-engineering | Pass — no input validation, no generics, no class wrapper, no extra exports beyond `add` |
+
+All five expectations held. The skill's RED-phase guidance ("Test errors? Fix error, re-run until it fails correctly") was actually exercised, not just theoretical — the first run genuinely errored rather than failed, and the skill's own distinction between "errors" and "fails" correctly routed the next action.

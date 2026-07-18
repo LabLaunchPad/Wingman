@@ -172,9 +172,9 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 38 skills', () => {
+  it('should have 39 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 38);
+    assert.strictEqual(plugin.skills.length, 39);
   });
 
   it('should have 23 commands', () => {
@@ -504,6 +504,11 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
     assert.strictEqual(evaluate({ enabled: false, completionPromise: 'DONE' }, ''), 'stop');
     assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'still working'), 'continue');
     assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'all done DONE'), 'stop');
+    // Max iteration cap tests
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 49), 'continue');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 50), 'stop');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 9), 'continue');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 10), 'stop');
   });
 
   it('prompt-guard evaluate(): unit', async () => {
@@ -552,6 +557,12 @@ describe('Output Secret-Scanner (G4)', () => {
   it('scan(): unit — clean input finds nothing', async () => {
     const { scan } = await import(pathToFileURL(scannerPath).href);
     assert.strictEqual(scan('Bash', 'all good').found.length, 0);
+  });
+
+  it('scan(): unit — detects generic key assignment', async () => {
+    const { scan } = await import(pathToFileURL(scannerPath).href);
+    const result = scan('Bash', 'password = "a1b2c3d4e5f6g7h8i9j0k1l2"');
+    assert.ok(result.found.length >= 1);
   });
 });
 

@@ -77,7 +77,7 @@ function deny(reason) {
   process.exit(2);
 }
 
-function findLatestBuildCheckpoint(cwd) {
+export function findLatestBuildCheckpoint(cwd) {
   const file = join(cwd, '.wingman', 'checkpoints.jsonl');
   if (!existsSync(file)) return null;
   let lines;
@@ -133,7 +133,7 @@ function findMostRecentPlanFile(cwd) {
 // primary mechanism: also scan docs/wingman/build/ (one level deep) for any
 // markdown file and check each one too, rather than trusting only the
 // documented convention held.
-function findAllBuildArtifactTexts(cwd) {
+export function findAllBuildArtifactTexts(cwd) {
   const texts = [];
   const planText = findMostRecentPlanFile(cwd);
   if (planText) texts.push(planText);
@@ -261,7 +261,7 @@ export function runTestSuite(cwd, testCmd) {
   }
 }
 
-function getChangedFiles(cwd, baseRef) {
+export function getChangedFiles(cwd, baseRef) {
   // A bad or unreachable baseRef (e.g. HEAD~20 in a repo with fewer commits)
   // must not silently degrade to "no changed files" -- that would skip the
   // test-presence check entirely rather than fail it, the opposite of this

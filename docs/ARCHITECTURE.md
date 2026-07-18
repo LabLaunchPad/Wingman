@@ -78,6 +78,27 @@ Two narrowly-scoped registrations, deliberately avoiding the class of false-posi
 
 Every deny names the specific check and file/ID that failed, matching `secret-guard.mjs`'s and `boardroom-checkpoint.mjs`'s own discipline of never returning a generic "gate failed."
 
+## 4c. Visual founder output (adaptive Tier A/B)
+
+Every founder-facing report template in this plugin was, until this addition, uniformly prose or a
+flat markdown table — including content that's structurally a flow (`uxflow.md`'s screens/
+transitions) or a status (which of the 3 real checkpoints a founder has cleared, never shown
+anywhere). `skills/visual-founder-output` closes this the same way `git-pr-workflow` and
+`package-manager-selection` already close it for tool availability: **detect the actual capability
+of the current session before choosing a format, never assume.**
+
+Two tiers: **Tier A** (an Artifact-publishing tool is genuinely present this session) renders a real
+low-fidelity wireframe or status view; **Tier B** (the universal default when unsure) uses Mermaid
+fenced code blocks and ASCII trees — readable as structured plain text in a terminal, rendered as
+real diagrams on GitHub's web UI or in an Artifact-capable session. `plain-language-checkpoint`'s
+prose bar (jargon-free, consequence-first, one bottom line) is unchanged and still leads in both
+tiers — this is a visual layer added on top, never a relaxation of it. Wired into `uxflow.md`
+(flow diagram, additive to the existing `UX-*` table) and `boardroom.md` (a "Where you are"
+pipeline-status view rendered fresh from `.wingman/state.json`/`checkpoints.jsonl`, plus an optional
+seat-verdict grid) — see `references/visual-output-templates.md` for the concrete templates. Other
+command templates are deliberately left untouched for now; extend on evidenced need, not
+speculatively.
+
 ## 5. Department leads (grow 0 → 8, per project)
 
 One lead subagent per corporate department. Each lead covers its department's *entire* remit through its own skills/checklists — it is not itself split into the 56+ sub-roles; those are specialist promotions (§6).
@@ -179,6 +200,28 @@ Claude Code subagents support a `model:` frontmatter field. Assign by how expens
 - `AskUserQuestion` (`commands/boardroom.md`) — already self-disclosed as unavailable in headless/print-mode sessions.
 - `ExitPlanMode` plus its two gating hooks (`boardroom-checkpoint.mjs`, `dod-structural-gate.mjs`) — both key off that exact tool name via `PreToolUse` matchers.
 - `Task`/`Agent` parallel subagent dispatch — the mechanism the entire 7-seat Boardroom review depends on to run all seats in one message.
+
+**The reusable engineering principle behind this section, reverse-engineered from a real, working
+plugin** (`github.com/fivetaku/fablize` — see `references/fablize-pattern.md` for the full
+attribution and mechanism): keep harness-specific *wiring* (which event fires which script — an
+irreducibly Claude-Code-specific concern, since `hooks.json`'s event taxonomy is Claude Code's own)
+strictly separate from the *decision logic* inside each script, and write that logic against
+generic signals (file content, command text, exit codes, JSONL field values) rather than a specific
+tool name wherever a generic signal works equally well. `fablize`'s own hooks (`router.sh`,
+`gate_stop.py`, `gate_post_tool.py`) follow this discipline throughout — none of their internal
+logic branches on a Claude-Code-specific tool name, confirmed by direct inspection, not assumed.
+Re-reading Wingman's own two hook scripts against this exact standard found they **already follow
+it**: every exported function in `dod-structural-gate.mjs` (`checkBoardroomVerdictClean`,
+`checkTestPresence`, `checkThreatRegisterCleanAcrossArtifacts`, etc.) operates purely on generic
+signals; the only tool-name-specific code is the outer `if (toolName === 'ExitPlanMode' | 'Bash')`
+dispatch at the very bottom of the file — which is wiring, not logic, and is exactly as
+irreducible as `fablize`'s own event-name dispatch.
+
+**Concrete fallback per coupling point** (not solved in the sense of "now portable," but each has
+either a working non-Claude-Code path or an honestly-documented degradation):
+- `AskUserQuestion` → the existing headless-fallback path already documented in `commands/boardroom.md` (a `still_reviewing` checkpoint state when no interactive answer is possible).
+- `ExitPlanMode` + its 2 hooks → `plugins/wingman/scripts/dod-pre-push-check.mjs`, a plain CLI wrapper that imports and calls the exact same pure functions `dod-structural-gate.mjs` exports, runnable as a real git `pre-push` hook (or from any harness with shell access) with zero Claude Code involvement. No new decision logic — pure reuse, proving the separation above is real, not just described.
+- `Task`/`Agent` parallel dispatch → genuinely the hardest one. `fablize` offers no pattern here since it shapes single-model behavior, not multi-persona parallel review, and most other harnesses lack native parallel subagent dispatch either. Honest answer: a harness without this capability would need to dispatch the 7 Boardroom seats **sequentially** in the same session rather than in parallel — a real design fork with a real cost (slower, more tokens for context re-establishment per seat), not a solved portability trick. Not built speculatively; revisit if a specific harness with this gap is actually targeted.
 
 **Partially portable**: model tiering (§8) is conceptually vendor-agnostic — risk-cost-based model assignment is a portable idea — but the actual field values (`opus`/`inherit`/`haiku`) are literal Anthropic model names with no indirection layer; they'd need editing, not just reinterpreting, under a different vendor's harness.
 
