@@ -34,4 +34,15 @@ Produce a short artifact — no plan file yet, no Boardroom checkpoint at this s
 **Open questions:** <anything genuinely unresolved that the founder should weigh in on later, if anything>
 ```
 
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+`references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
+rendering tier first, never assume.
+
 Hand off directly to `/wingman:define` — do not stop and wait for approval here; this stage feeds the bundled Planning Milestone checkpoint at the end of the sequence, not its own gate.
+
+## References
+
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.

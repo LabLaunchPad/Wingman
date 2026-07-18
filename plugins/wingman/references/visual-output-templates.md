@@ -2,7 +2,17 @@
 
 Concrete, copy-paste templates for `skills/visual-founder-output`. This file holds the actual
 Mermaid/ASCII source so the skill's own prose doesn't have to embed large code blocks. Owned by
-`skills/visual-founder-output`; cited from `commands/uxflow.md` and `commands/boardroom.md`.
+`skills/visual-founder-output`; cited from all 7 pipeline commands (`discovery.md`, `define.md`,
+`architecture.md`, `uxflow.md`, `implementation-planning.md`, `build.md`, `ship.md`) and
+`boardroom.md`.
+
+**Which template applies where:** §2 (pipeline-status tree) is generic and used by all 7 pipeline
+commands plus `boardroom.md`, for consistent orientation at every stage — not just at a checkpoint.
+§1 (UX flow), §3 (seat-verdict grid), §4 (DEF→ARCH graph), and §5 (task-dependency diagram) are each
+specific to the one command named in their heading, because their content only has real diagram
+shape in that one place — see `skills/visual-founder-output`'s Red Flags before reusing any of them
+somewhere its content doesn't actually have that shape (a flat field list or an independent-item
+table, like `discovery.md`'s output or `define.md`'s requirements, does not get a forced diagram).
 
 Every template below has a Tier A (Artifact-capable) and Tier B (universal fallback) version — see
 `skills/visual-founder-output`'s Core Workflow for how to detect which tier applies before picking
@@ -36,7 +46,7 @@ navigation matching the flow's edges.
 
 ---
 
-## 2. Pipeline-status tree (`commands/boardroom.md`'s "Where you are" section)
+## 2. Pipeline-status tree (every pipeline command's "Where you are" section)
 
 Rendered fresh each time from `.wingman/state.json` (`current_stage`) and `.wingman/checkpoints.jsonl`
 (which checkpoints have actually been recorded) — never hand-maintained, never a new state file.
@@ -60,6 +70,24 @@ Wingman pipeline
   CHANGES`), `▶ you are here` (current stage per `state.json`), `○ not started`.
 - If the current/most recent checkpoint's `bottom_line` was `DO NOT SHIP`, replace `▶ you are here`
   with `✖ blocked — see concerns below` on that row.
+
+**Mid-planning variant** (`discovery.md`/`define.md`/`architecture.md`/`uxflow.md` — no Planning
+Milestone checkpoint recorded yet): mark the Planning Milestone row `▶ you are here` too, and add
+which of the 5 bracketed sub-stages is current so a founder isn't stuck reading "you are here" next
+to a 5-name list with no indication of progress within it:
+
+```
+Wingman pipeline
+├─ Planning Milestone  [discovery → define → architecture → uxflow → implementation-planning]
+│    ▶ you are here — currently: architecture
+├─ Build
+│    ○ not started
+└─ Ship
+     ○ not started
+```
+
+The current sub-stage is simply which command just ran (`architecture.md` running this step means
+`currently: architecture`) — no new state field, read from which command produced this output.
 
 **Tier A (Artifact, rendered status strip):** the same three-row structure as a small horizontal
 step indicator (three labeled segments, current segment highlighted, done segments checked) — no
@@ -99,10 +127,71 @@ laid out in the same Business/Technical/Finance/Research groups the text format 
 
 ---
 
-## Constraints shared by all three templates
+## 4. DEF→ARCH traceability graph (`commands/architecture.md`)
 
-- Every template is generated from data Wingman already has (the `UX-*` table, `state.json`,
-  `checkpoints.jsonl`, the seats' own verdict lines) — never a new hand-maintained source.
+Generated from the same `ARCH-*` rows (and their `Satisfies` column) as the existing table — never a
+hand-authored parallel version. Unlike UX flow, this isn't a sequence a user moves through; it's a
+mapping (which decisions satisfy which requirements, including the real case of one requirement
+needing more than one decision, or one decision satisfying more than one requirement) — a graph, not
+a flowchart with a single direction.
+
+**Tier B (Mermaid, universal fallback):**
+
+```mermaid
+graph LR
+    DEF001["DEF-001: <requirement, short>"] --> ARCH001["ARCH-001: <decision, short>"]
+    DEF002["DEF-002: <requirement, short>"] --> ARCH001
+    DEF002 --> ARCH002["ARCH-002: <decision, short>"]
+```
+
+- One node per `DEF-*` requirement in scope and one per `ARCH-*` decision, edges following each
+  decision's `Satisfies` column exactly (a decision satisfying two requirements gets two incoming
+  edges; a requirement needing two decisions gets two outgoing edges — never collapse these).
+- Keep node labels short (the requirement/decision name only) — the full rationale and reuse note
+  stay in the table.
+
+**Tier A (Artifact):** a simple two-column node-link diagram (requirements on the left, decisions on
+the right, connecting lines) — no additional detail beyond what the table already states.
+
+---
+
+## 5. Task-dependency diagram (`commands/implementation-planning.md`'s internal plan document)
+
+The plan document itself is never shown to the founder directly (`boardroom.md`'s Planning Milestone
+checkpoint is what they see) — this diagram is for whoever executes the plan (a fresh `build.md`
+subagent, or a human maintainer), so ordering and dependency between tasks is visible at a glance
+instead of only implied by task numbering.
+
+**Tier B (Mermaid, universal fallback):**
+
+```mermaid
+flowchart TD
+    T1["Task 1: <short name>"] --> T2["Task 2: <short name>"]
+    T1 --> T3["Task 3: <short name>"]
+    T2 --> T4["Task 4: <short name>"]
+    T3 --> T4
+```
+
+- One node per task in the plan, edges only for a genuine dependency (task B needs task A's output
+  or can't be tested until A exists) — not just numbering order. Independent tasks (no edge between
+  them) can and should show as parallel branches, not forced into one chain.
+- Append this diagram as its own subsection in the plan document (e.g. `## Task Dependencies`), after
+  the task list — it illustrates the existing checkbox list, never replaces its exact-file/exact-step
+  detail (see `skills/writing-plans`'s "No Placeholders" rule, which still governs the task list
+  itself).
+
+**Tier A (Artifact):** not typically warranted here — the plan document's own reader (an executing
+agent or a maintainer reading raw markdown) doesn't benefit from a rendered Artifact the way a
+founder reading a checkpoint does. Default to Tier B for this one regardless of session capability,
+unless the founder has explicitly asked to see the plan directly.
+
+---
+
+## Constraints shared by all templates
+
+- Every template is generated from data Wingman already has (the `UX-*`/`ARCH-*`/`DEF-*` tables, the
+  plan's own task list, `state.json`, `checkpoints.jsonl`, the seats' own verdict lines) — never a
+  new hand-maintained source.
 - Tier B must degrade to something a plain-terminal reader can still parse as structured information,
   even with zero diagram rendering — this is why the ASCII tree above reads correctly as plain text.
 - Keep every label plain-language per `plain-language-checkpoint` — a diagram node reading

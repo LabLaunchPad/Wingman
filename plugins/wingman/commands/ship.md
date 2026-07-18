@@ -48,6 +48,8 @@ Tell the founder:
 **What happens next:** <e.g. "this needs your approval / a merge click" or "it will merge automatically once checks pass">
 ```
 
+Use `skills/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
+
 ## Boardroom checkpoint
 
 Run `/wingman:boardroom diff` one last time before merging, so the founder gets a final plain-language go/no-go rather than being asked to interpret CI output themselves — every pipeline stage ends in a checkpoint, `ship` included, not just the "meaningful" ones (that judgment call is exactly the kind of code-review-substitute decision the Boardroom exists so the founder never has to make alone).
@@ -59,3 +61,8 @@ Suggest the adaptive stages that make sense next, without forcing them:
 - `/wingman:retro` if this was a substantial piece of work worth reflecting on.
 - `/wingman:learn` to capture anything durable that was discovered (a gotcha, a decision, a pattern) so it isn't relearned next time.
 - `/wingman:telemetry` if this shipped something worth watching in production.
+
+## References
+
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.

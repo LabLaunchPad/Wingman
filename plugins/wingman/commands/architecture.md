@@ -33,9 +33,27 @@ same convention):
 | ARCH-001 | <the technical decision, concretely> | DEF-001 | <what existing code this extends, or why nothing existing fits> |
 ```
 
+## Show the requirement-to-decision mapping
+
+Immediately after the table, use `skills/visual-founder-output` to render the same `ARCH-*` rows as
+a DEF→ARCH traceability graph (per `references/visual-output-templates.md` §4, appended to the same
+scratch architecture doc) — detect the session's rendering tier first. The table stays exactly as
+written above; the graph is generated from the same rows, added alongside it, never instead of it.
+This mapping (which decisions satisfy which requirements, including cases where one satisfies
+several or several satisfy one) is genuinely graph-shaped in a way `discovery.md`'s problem
+statement or `define.md`'s independent requirement rows are not — that's why only this planning
+stage gets a dedicated diagram beyond the generic pipeline-status tree below.
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+`references/visual-output-templates.md` §2).
+
 Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
 
 ## References
 
 - `skills/traceability-linking` — the `ARCH-*` ID convention and how it chains back to `DEF-*`.
 - `skills/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
+  traceability graph; §2 — the pipeline-status tree.

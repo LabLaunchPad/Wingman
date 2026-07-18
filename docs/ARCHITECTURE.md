@@ -92,12 +92,23 @@ low-fidelity wireframe or status view; **Tier B** (the universal default when un
 fenced code blocks and ASCII trees — readable as structured plain text in a terminal, rendered as
 real diagrams on GitHub's web UI or in an Artifact-capable session. `plain-language-checkpoint`'s
 prose bar (jargon-free, consequence-first, one bottom line) is unchanged and still leads in both
-tiers — this is a visual layer added on top, never a relaxation of it. Wired into `uxflow.md`
-(flow diagram, additive to the existing `UX-*` table) and `boardroom.md` (a "Where you are"
-pipeline-status view rendered fresh from `.wingman/state.json`/`checkpoints.jsonl`, plus an optional
-seat-verdict grid) — see `references/visual-output-templates.md` for the concrete templates. Other
-command templates are deliberately left untouched for now; extend on evidenced need, not
-speculatively.
+tiers — this is a visual layer added on top, never a relaxation of it.
+
+**Wired into every pipeline command, each only where the content genuinely has diagram shape** (per
+the skill's own Red Flag against decorating flat content): `uxflow.md` (a flow diagram, additive to
+the existing `UX-*` table), `architecture.md` (a DEF→ARCH traceability graph, additive to the
+`ARCH-*` table — a mapping, not a sequence, since one decision can satisfy several requirements or
+vice versa), `implementation-planning.md` (a task-dependency diagram appended to the internal plan
+document itself, for whoever executes it — the plan is never shown to the founder directly, so this
+defaults to Tier B regardless of session capability), and `boardroom.md` (an optional seat-verdict
+grid). `discovery.md`/`define.md`/`build.md`/`ship.md` have no diagram-shaped content of their own
+(a problem statement, an independent-requirement table, a threat register, a field list) and get no
+forced diagram. **Every one of the 7 pipeline commands plus `boardroom.md`** shows the generic
+"Where you are" pipeline-status tree, rendered fresh from `.wingman/state.json`/`checkpoints.jsonl` —
+including a mid-planning variant naming which of the 5 planning sub-stages is current, for the 4
+stages that run before the Planning Milestone checkpoint exists. See
+`references/visual-output-templates.md` for the concrete templates (§1–§5) and which command owns
+each.
 
 ## 5. Department leads (grow 0 → 8, per project)
 
