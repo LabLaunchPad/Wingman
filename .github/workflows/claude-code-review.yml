@@ -69,14 +69,16 @@ jobs:
 
             1. **Mechanical validators** — would this break
                `node plugins/wingman/scripts/validate-structure.mjs`,
-               `node scripts/check-repo-consistency.mjs`, or
-               `node scripts/check-fixtures.mjs`? Run them if unsure.
+               `node scripts/check-repo-consistency.mjs`,
+               `node scripts/check-fixtures.mjs`, or
+               `node plugins/wingman/scripts/check-traceability.mjs`? Run them
+               if unsure.
             2. **Manifest integrity** — `plugin.json` must declare every new
                command/agent/skill with a `./` prefix, must NOT declare a
                `hooks` field (hooks/hooks.json auto-loads), and shipped content
                changes require a `plugin.json` `version` bump (else
-               `claude plugin update` no-ops). `boardroom-engineer` and
-               `boardroom-security` must be `model: opus`.
+               `claude plugin update` no-ops). `boardroom-cto` and
+               `boardroom-ciso` must be `model: opus`.
             3. **The "docs/ isn't installed" bug class** — repo-root `docs/`
                does NOT ship with the plugin. Flag any shipped skill/agent
                template under `plugins/wingman/` that depends on a `docs/*`
