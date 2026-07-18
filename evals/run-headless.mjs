@@ -17,7 +17,7 @@
 // any environment. No dependencies beyond Node's stdlib.
 
 import { readFileSync, readdirSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync, appendFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -26,6 +26,13 @@ const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const casesDir = join(repoRoot, 'evals', 'cases');
 const fixturesDir = join(repoRoot, 'evals', 'fixtures');
 const artifactsDir = join(repoRoot, 'evals', '.artifacts');
+
+// These fixtures are bash scripts; detect availability so Windows environments
+// get a meaningful skip rather than a cryptic exec failure at line 123.
+const HAS_BASH = (() => {
+  try { execSync('bash --version', { stdio: 'ignore' }); return true; }
+  catch { return false; }
+})();
 
 const args = process.argv.slice(2);
 const depthArg = (() => {
@@ -103,6 +110,12 @@ if (dryRun) {
     else summaryLine(`- ${c.name}: no fixture (declared) — not driven by this headless runner`);
   }
   summaryLine(`\nPASS (dry-run: nothing executed)`);
+  process.exit(0);
+}
+
+if (!HAS_BASH) {
+  summaryLine('bash not available — fixture execution requires bash.');
+  summaryLine('Skipping live execution on this platform. The integrity check above still passed (dry-run).');
   process.exit(0);
 }
 
