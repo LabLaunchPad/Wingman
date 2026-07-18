@@ -29,7 +29,7 @@ At the start of `/wingman:discovery` (checks Product, always), `/wingman:archite
 | Data & Analytics | `dept-data` | Codebase has, or the current plan introduces, a schema/migrations directory | `Glob` for `**/migrations/**`, `**/schema.*`, or an ORM config; also check the current plan file for new data-model tasks |
 | QA & Peer Review | `dept-qa` | Always | No check needed — always active |
 | Legal, Security & Compliance | `dept-legal-security` | Project touches auth, payments, or personal data | `Grep` for auth/session/payment-provider/PII-handling code, or check the current plan for such tasks |
-| DevOps & SRE | `dept-devops` | Project has CI config, a Dockerfile, or has shipped once already | Look for `.github/workflows/`, `Dockerfile`, or a prior `/wingman:ship` entry in `.wingman/checkpoints.jsonl` |
+| DevOps & SRE | `dept-devops` | Project has CI config, a Dockerfile, or has shipped once already | Look for `.github/workflows/`, `Dockerfile`, or a prior `/wingman:ship` entry in `.wingman/checkpoints.jsonl` — match on scalar `stage === "ship"` (the `ship` stage name is unchanged across every schema version), not `bundle === "ship"`: `bundle` is absent entirely on `schema_version < 3` entries, so a `bundle`-only check would silently miss every pre-migration ship checkpoint |
 | Revenue, Marketing & Ops | `dept-growth` | Founder explicitly requests docs/SEO/launch copy | Only ever triggered by an explicit founder request, never inferred |
 
 **3. If a signal is true and `.claude/agents/dept-<name>.md` doesn't already exist in the founder's project:**

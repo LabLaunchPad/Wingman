@@ -13,6 +13,8 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill. `dept-growth`'s activation signal is "the founder explicitly requests launch/docs/SEO copy" — invoking `/wingman:launch` at all **is** that request, so this is the one department whose signal this command itself satisfies rather than something to detect from the codebase. Create `dept-growth` if it doesn't exist yet, and delegate the drafting work below to it.
 
+Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — creating `dept-growth` above may be exactly what crosses it, so this check still matters even though `dept-growth`'s own signal needed no detection; if the threshold is met, `mgr-growth` (and any other currently-missing manager whose department lead is active) may need creating.
+
 ## Step 2: Draft the launch materials
 
 Cover only what this launch actually needs — don't manufacture scope:

@@ -17,6 +17,8 @@ Normalize whatever triggered this into one clear problem statement: a founder-pa
 
 Use the `department-lead-activation` skill for `dept-engineering` (always active), `dept-qa` (always active), and `dept-devops` (check for CI config, a Dockerfile, or a prior `ship` entry in `.wingman/checkpoints.jsonl` — a production incident almost always implies at least one prior ship, so this will typically already be true).
 
+Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — creating `dept-devops` above may be exactly what crosses it; if so, `mgr-platform` (and any other currently-missing manager whose department lead is active) may need creating.
+
 ## Step 3: Root cause — before proposing any fix
 
 Delegate to the `systematic-debugging` skill and do not skip ahead. Its Iron Law applies literally here: **no fixes without root cause investigation first.** Specifically:

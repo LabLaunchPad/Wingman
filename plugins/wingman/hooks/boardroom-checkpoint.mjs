@@ -2,8 +2,9 @@
 // PreToolUse hook, matched on ExitPlanMode (see hooks.json).
 //
 // This is a deterministic backstop, not the checkpoint mechanism itself.
-// The actual plain-language translation happens earlier, when /wingman:plan
-// runs /wingman:boardroom and the founder approves via AskUserQuestion.
+// The actual plain-language translation happens earlier, when
+// /wingman:implementation-planning (the final planning stage) runs
+// /wingman:boardroom and the founder approves via AskUserQuestion.
 // /wingman:boardroom then appends a "## Wingman Boardroom Checkpoint" marker
 // to the plan file recording that decision. This hook just refuses to let
 // Claude exit plan mode if that marker is missing or says the founder didn't
@@ -117,7 +118,7 @@ if (planFile) {
 
 if (sources.length === 0) {
   // No plan content to check (e.g. a trivial plan-mode exit outside
-  // /wingman:plan's flow entirely). Don't block work Wingman never touched.
+  // Wingman's own pipeline flow entirely). Don't block work Wingman never touched.
   allow();
 }
 

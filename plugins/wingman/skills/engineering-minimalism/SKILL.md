@@ -67,7 +67,7 @@ Switch via `/wingman:build --intensity lite|full|ultra` or say "minimalism lite/
 **MUST NOT simplify away, regardless of ladder rung:**
 - Input validation at trust boundaries
 - Error handling that prevents data loss
-- Security-relevant checks (auth, injection prevention, secrets handling — see `boardroom-security`'s checklist)
+- Security-relevant checks (auth, injection prevention, secrets handling — see `boardroom-ciso`'s checklist)
 - Accessibility basics
 - Anything the founder explicitly asked for, even if it seems like more than the "minimal" solution
 
