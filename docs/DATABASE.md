@@ -9,6 +9,8 @@ All Wingman state lives under `.wingman/` at the root of the founder's project (
 ```
 .wingman/
 ├── checkpoints.jsonl     # append-only log of every Boardroom checkpoint
+├── checkpoint-details/   # one file per checkpoint: full, unabridged seat verdicts
+│   └── <checkpoint_id>.md
 ├── state.json            # current project-level state (small, overwritten in place)
 ├── traceability.json     # next-available-ID counter per requirement/decision/flow prefix
 └── memory/
@@ -27,7 +29,7 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 
 ```json
 {
-  "schema_version": 3,
+  "schema_version": 4,
   "checkpoint_id": "2026-07-14T14-32-00Z-implementation-planning",
   "stage": ["discovery", "define", "architecture", "uxflow", "implementation-planning"],
   "bundle": "planning-milestone",
@@ -44,12 +46,14 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
   "bottom_line": "GO_WITH_CHANGES",
   "founder_decision": "fix_concerns_first",
   "founder_notes": "",
-  "next_stage": "build"
+  "next_stage": "build",
+  "details_ref": ".wingman/checkpoint-details/2026-07-14T14-32-00Z-implementation-planning.md"
 }
 ```
 
 **Field notes:**
-- `schema_version`: `3` for the 7-stage pipeline schema (this document); `2` marks the 7-seat-Boardroom-but-still-4-stage schema; absent/unmarked entries are implicitly `schema_version: 1` (5-seat, 4-stage) — see the migration notes below.
+- `schema_version`: `4` adds `details_ref` (see migration note below); `3` for the 7-stage pipeline schema; `2` marks the 7-seat-Boardroom-but-still-4-stage schema; absent/unmarked entries are implicitly `schema_version: 1` (5-seat, 4-stage) — see the migration notes below.
+- `details_ref`: path to the companion file (`checkpoint-details/<checkpoint_id>.md`) holding every seat's full, unabridged verdict text — see migration note below. Absent on `schema_version: 3` and earlier entries, and on any `schema_version: 4`+ entry whose companion-file write itself failed; treat its absence as "no full detail available for this one," never an error.
 - `checkpoint_id`: `<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>`, unique per line.
 - `stage`: one of `discovery`, `define`, `architecture`, `uxflow`, `implementation-planning`, `build`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation — **or an array** of stage names when `bundle` is `"planning-milestone"` (the only case where multiple stages share one checkpoint). Consumers must check whether `stage` is an array before iterating; don't assume scalar.
 - `bundle`: `"planning-milestone"`, `"build"`, or `"ship"` — every `schema_version: 3` checkpoint belongs to exactly one of a project's 3 total bundles. Absent on `schema_version: 2` and earlier entries; treat its absence as "not applicable," never an error.
@@ -71,6 +75,15 @@ This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE
 | `ship` | `ship` (unchanged) |
 
 This is an **append-only audit log, never rewritten** — existing `schema_version: 2` (and earlier) entries keep their old scalar `stage` values and no `bundle` field, permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and must not assume `stage` is always a scalar, so `schema_version: 1`, `2`, and `3` entries coexist safely in the same file.
+
+**Migration note — reversible compression (schema_version 3 → 4, 2026):** `/wingman:boardroom` reviews always produced a full, unabridged verdict per seat before condensing it into the one-line `seats[].summary` this file stores — but until now, that full text was never persisted anywhere; once the session ended, only the one-liner survived (see `skills/plain-language-checkpoint`'s reversible-compression rule, added the same round). `schema_version: 4` closes that gap without changing the shape of anything already here:
+
+| `schema_version: 3` (and earlier) | `schema_version: 4` |
+|---|---|
+| `seats[].summary` is the only surviving record of a seat's reasoning | `seats[].summary` unchanged, plus a companion file at `checkpoint-details/<checkpoint_id>.md` holds every seat's full `## <SEAT> VERDICT` text, unabridged |
+| No way to recover a seat's full reasoning once the session ends | `/wingman:boardroom expand <checkpoint_id> [seat]` reads `details_ref` and reprints the original, unabridged |
+
+No existing field changed meaning or shape — this is a purely additive field on new entries. This is an **append-only audit log, never rewritten** — existing `schema_version: 3` (and earlier) entries keep having no `details_ref` field, permanently; do not backfill companion files for historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and never assumed a `details_ref` field existed, so `schema_version: 1` through `4` entries coexist safely in the same file.
 
 **Migration note — 7-seat Boardroom rename (schema_version 1 → 2, 2026):** the Boardroom expanded from 5 seats to 7 as part of a deliberate rearchitecture (see `docs/ARCHITECTURE.md` §4/§5a). Seat names changed:
 
@@ -126,9 +139,11 @@ when a session is about to lose important context:
 - `decisions.md` — a dated decision log (what was decided, why, by whom).
 - `tried.md` — approaches already attempted and their outcome, so they aren't retried blind.
 
-Unlike `checkpoints.jsonl` (Boardroom verdicts only, no rationale beyond a one-line seat summary)
-and `state.json` (current-stage pointers only), this is the one place a project's own decision
-*rationale* is meant to live in prose — though as of `evals/cases/memory.md`'s Run 1, this remains
+Unlike `checkpoints.jsonl` (whose inline record is a one-line seat summary — full seat rationale is
+recoverable, but only via the `details_ref` companion file and only for Boardroom checkpoints
+specifically, see `schema_version: 4` above) and `state.json` (current-stage pointers only), this
+is the one place a project's own decision *rationale* — Boardroom-driven or not — is meant to live
+directly in prose, inline, without an extra retrieval step — though as of `evals/cases/memory.md`'s Run 1, this remains
 `provisional`: no run yet demonstrates a later session actually reading this store back and
 changing its behavior as a result, only that the write path works. Treat it as write-verified,
 not yet read-loop-verified.

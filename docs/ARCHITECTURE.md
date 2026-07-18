@@ -64,7 +64,7 @@ Every agent/manager/department-lead/specialist template declares a `permissions:
 
 ### Checkpoint audit log
 
-Every boardroom run appends one line to `.wingman/checkpoints.jsonl` at the project root (git-committed, human-readable) — see `docs/DATABASE.md` for the full schema, the `schema_version: 2` migration note, and the old→new seat-name mapping from the 5-seat schema.
+Every boardroom run appends one line to `.wingman/checkpoints.jsonl` at the project root (git-committed, human-readable) — see `docs/DATABASE.md` for the full schema, the `schema_version: 2` migration note, and the old→new seat-name mapping from the 5-seat schema. As of `schema_version: 4`, each entry also gets a companion file at `.wingman/checkpoint-details/<checkpoint_id>.md` holding every seat's full, unabridged verdict — the reversible-compression counterpart to `plain-language-checkpoint`'s one-line summaries, retrievable later via `/wingman:boardroom expand <checkpoint_id>` (see `docs/DATABASE.md`'s `schema_version: 3 → 4` migration note).
 
 This is deliberately **not cryptographically signed**. Signing solves multi-party adversarial trust (departments that might lie to each other) — a problem Wingman doesn't have, since there is exactly one trust root: the founder. A plain, git-tracked, append-only log gives a full audit trail without security theater.
 

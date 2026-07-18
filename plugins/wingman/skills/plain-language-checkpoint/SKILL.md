@@ -20,6 +20,7 @@ That doesn't mean dumbing down the substance — it means translating it. A foun
 3. **Every finding needs three things**: what it is (plain), why it matters to the business or user, and what to do about it. A finding missing any of these three is not checkpoint-ready.
 4. **Size things founders can act on.** "Small fix, 10 minutes" or "this changes pricing logic, worth a careful look" beats an unqualified list of issues.
 5. **Never hide a real risk behind reassurance.** "Looks fine" is not a verdict — a verdict has evidence. If something is genuinely uncertain, say that plainly instead of implying confidence you don't have.
+6. **Compression must be reversible.** Translating technical detail into a plain-language summary is not the same as deleting the technical detail — whenever this skill's own translation drops real detail (a seat's full reasoning, a subagent's full finding) to keep the founder-facing message short, persist the untranslated original somewhere retrievable and say, briefly, that it exists (e.g. "full detail: `/wingman:boardroom expand <checkpoint_id>`"). A summary with no path back to its source is a permanent loss, not a convenience. As of 2026, `boardroom.md` is the one command with this actually wired up end to end (the `details_ref` companion file plus `expand` retrieval); the rule itself applies to every checkpoint-facing message per "When this applies" below, but until another command grows an equivalent persistence mechanism, apply the *spirit* of the rule elsewhere (don't discard real detail casually) even without a matching `expand`-style retrieval path yet.
 
 ## Anti-patterns — rewrite on sight
 
@@ -30,6 +31,7 @@ That doesn't mean dumbing down the substance — it means translating it. A foun
 | "LGTM, ship it" | "This does what you asked, I tested it, and I didn't find anything risky — safe to ship" |
 | "There's a potential race condition" | "If two people do this at the exact same time, one of their changes could get silently lost" |
 | A wall of bullet points with no bottom line | One bottom-line sentence first, details after, only if asked |
+| A one-line seat/finding summary with the full original discarded once the session ends | Persist the full original alongside the summary, and name how to retrieve it |
 
 ## Rationalizations
 
@@ -45,10 +47,11 @@ That doesn't mean dumbing down the substance — it means translating it. A foun
 - You're about to lead with mechanism ("how it broke") instead of consequence ("what it means for them").
 - You're about to write "looks fine" / "should work" without evidence behind it.
 - The message has no single bottom-line sentence a founder could stop reading after and still know what to do.
+- You're about to summarize away real detail (a seat's full verdict, a subagent's full finding) with no persisted, retrievable original behind it.
 
 ## Verification
 
-Before sending any founder-facing message, check it against the "three things" rule in step 3 above (what it is, why it matters, what to do) and re-read it as if you were the founder with no technical background — if any sentence requires unstated context to act on, rewrite it before sending.
+Before sending any founder-facing message, check it against the "three things" rule in step 3 above (what it is, why it matters, what to do) and re-read it as if you were the founder with no technical background — if any sentence requires unstated context to act on, rewrite it before sending. If this message compresses away real detail (rule 6), confirm the original is actually persisted somewhere and the message names how to retrieve it — don't just assert that it is.
 
 ## When this applies
 
@@ -59,6 +62,10 @@ Every boardroom agent verdict, every `/wingman:*` stage completion message, and 
 - `skills/visual-founder-output` — the visual-layer companion to this skill, for output whose
   underlying content is structurally a flow, tree, or grid (a diagram/tree can help; this skill's
   own bar governs the words either way, and always leads).
+- `commands/boardroom.md`'s "Record the checkpoint" and "Expand a past checkpoint" sections — the
+  concrete implementation of rule 6 (reversible compression) for Boardroom seat verdicts: full
+  detail persisted to `.wingman/checkpoint-details/<checkpoint_id>.md`, retrievable later via
+  `/wingman:boardroom expand <checkpoint_id>`.
 
 ## Anti-Rationalization Defense
 
@@ -72,6 +79,7 @@ Every boardroom agent verdict, every `/wingman:*` stage completion message, and 
 | "I'll just explain the technical term, they'll get it" | If you must use a term, define it in the same breath the first time and then never use it again. One definition, then plain consequences. |
 | "The bullet points are clear enough" | A wall of bullet points with no bottom line is not clear. One bottom-line sentence first, details after, only if asked. |
 | "Adding the consequence makes it too long" | Lead with consequence in one sentence. The finding is still short — it's just honest about what it means. |
+| "The summary is enough, no need to keep the full version" | A summary with no path back to its source is a permanent loss once the session ends — persist the original and name how to retrieve it. |
 
 ### Red Flags
 
@@ -81,9 +89,11 @@ Every boardroom agent verdict, every `/wingman:*` stage completion message, and 
 - The message has no single bottom-line sentence a founder could stop reading after and still know what to do.
 - You're hiding a real risk behind reassurance — "looks fine" is not a verdict.
 - You're using jargon in a founder-facing message that you haven't defined in plain language.
+- You're about to summarize away real detail with no persisted, retrievable original behind it.
 
 ### Anti-Pattern Callouts
 
 - **Jargon-as-communication:** Using technical terms in founder-facing output without translating them to consequences. The founder doesn't need to know what a "race condition" is — they need to know that two people clicking buy at the same time could double-charge one of them.
 - **Mechanism-over-consequence:** Explaining how something broke instead of what it means for the user or business. Founders act on consequences, not mechanisms.
 - **False confidence:** Saying "looks fine" or "should work" without verification evidence. An honest "I haven't checked yet" is more useful than a false positive.
+- **Lossy compression:** Translating detail into a summary and letting the original evaporate once the session ends, instead of persisting it somewhere the founder can retrieve it later.
