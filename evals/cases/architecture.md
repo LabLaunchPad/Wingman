@@ -23,8 +23,18 @@ Tests `plugins/wingman/commands/architecture.md` behaviorally, distinct from `se
 
 ## Trust level
 
-`provisional` — the architecture-stage behavior is exercised within `seven-stage-pipeline-e2e.md`'s two runs (Run 1 confirmed `ARCH-001..003` with `Satisfies` → `DEF-*` chain, Run 2 confirmed same with a different feature). A dedicated subagent-driven run with a specific reuse-temptation (a feature that could extend existing code or be built in parallel) would strengthen confidence in the reuse-over-reinvention check.
+`verified` — the architecture-stage behavior is exercised within `seven-stage-pipeline-e2e.md`'s two runs (Run 1 confirmed `ARCH-001..003` with `Satisfies` → `DEF-*` chain, Run 2 confirmed same with a different feature), and Run 3 (2026-07-18) closed the reuse-temptation gap: a dedicated dispatch against a requirement deliberately satisfiable by reusing existing code rather than reinventing it.
 
 ## Run log
 
-Covered by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14) and Run 2 (2026-07-14). No independent architecture-only run yet — see Trust level above.
+Covered by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14) and Run 2 (2026-07-14) for the baseline `Satisfies`-chain behavior.
+
+### Run 3 — 2026-07-18 (reuse-over-reinvention temptation, dedicated dispatch)
+
+**Setup:** `setup-architecture-fixture.sh`'s base fixture with one hand-added `DEF-004` ("an operator can see the total current count of active waitlist entries") — deliberately satisfiable by calling the existing `listWaitlist()` and taking its length, but also naively satisfiable by inventing a new counter/index maintained alongside the existing `entries` Map. Neither prior run's `DEF-*` set ever posed this fork.
+
+**Dispatch (fresh `general-purpose` subagent, given only `commands/architecture.md` + the real `DEF-*` requirements + told to read the real `src/waitlist.js`/`src/server.js` itself):** produced `ARCH-004` — a `GET /waitlist/count` route that calls the existing `listWaitlist()` and returns its length — with an explicit reuse note naming *why* a separate counter was rejected (sync-drift risk against the Map on every add/unsubscribe). All 4 `ARCH-*` IDs chained correctly to real `DEF-*` IDs (`ARCH-001`→`DEF-001` … `ARCH-004`→`DEF-004`), no framework/data-model/file-layout question escalated to the founder, and the doc ended by directing to `/wingman:uxflow` without stopping for approval.
+
+**Independently verified** (real filesystem, not the subagent's self-report): `cat docs/wingman/architecture/waitlist-unsubscribe.md` — `ARCH-004`'s row explicitly says "No new counter, no new storage"; `grep -iE "new (counter|index)|separate (count|counter)"` matched only inside that same rejection-reasoning text, confirming no actual new counter mechanism was proposed elsewhere in the doc; `grep -c listWaitlist` returned 6, confirming genuine, repeated reuse of the real existing function rather than a one-off mention.
+
+**No bugs found this run** — the reuse-over-reinvention discipline held under a genuine temptation, with the rejected alternative and its reasoning stated explicitly rather than reuse happening to occur by coincidence. Promoted to `verified`.
