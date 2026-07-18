@@ -35,7 +35,7 @@ Examples:
 | Verifying whether output is correct | `verification-before-completion` |
 | Breaking a feature into implementation steps | `writing-plans` |
 | Designing system architecture | `wingman:boardroom` (engineer seat) |
-| Reviewing code for bugs or security | `wingman:secure` |
+| Reviewing code for bugs or security | `wingman:build`'s Definition-of-Done gate |
 | Straight factual questions | just answer directly |
 | Obvious execution tasks | just do the task |
 

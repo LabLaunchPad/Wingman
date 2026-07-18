@@ -58,7 +58,7 @@ function parseMarkedFile(relPath) {
   const text = read(relPath);
   if (text === null) return { entries: [], totalHeadings: 0, markedHeadings: 0 };
 
-  const lines = text.split('\n');
+  const lines = text.split('\n').map((l) => l.replace(/\r$/, ''));
   const isEntryLine = ENTRY_MATCHERS[relPath] || (() => false);
   // PROJECT.md's decisions log is one section among several -- only count within its bounds.
   let scopeStart = 0, scopeEnd = lines.length;

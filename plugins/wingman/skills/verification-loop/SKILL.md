@@ -13,7 +13,7 @@ A phased verification system that runs after code changes to ensure quality.
 - Before creating a PR or running `wingman:ship`
 - After refactoring
 - When quality gates need to pass
-- During `wingman:secure` security pass
+- During `wingman:build`'s Definition-of-Done security pass
 
 ## Verification Phases
 
@@ -105,8 +105,7 @@ Hooks catch issues immediately; this skill provides comprehensive review.
 
 ## Integration with Pipeline
 
-- **wingman:build** — Run verification after each task
-- **wingman:secure** — Run full verification including security scan
+- **wingman:build** — Run verification after each task, including the Definition-of-Done security scan
 - **wingman:ship** — Run verification before preflight checks
 - **wingman:boardroom** — Reference verification results in engineer seat
 

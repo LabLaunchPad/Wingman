@@ -134,16 +134,6 @@ After any code change, provide at most three short lines explaining what was ski
 ❌ [code] → [5-paragraph essay defending the simplification]
 ```
 
-**The One-Check Rule (from engineering-minimalism):**
-Non-trivial code paths must leave ONE runnable self-check behind — an `assert`-based `demo()`/`__main__` or one small test. This bridges minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works. Trivial one-liners are exempt.
-
-```
-✅ [Code path] → [assert-based self-check that exercises the path] → [run it, see pass]
-❌ "Code works, no test needed for something this simple"
-```
-
-Exception: trivial one-liners (single-expression functions, constant assignments) need no test — YAGNI applies to tests too.
-
 ## Why This Matters in Wingman
 
 Wingman tells a non-technical founder that a stage is done. If that claim is wrong, the founder has no independent way to catch it — they're trusting the plugin. Unverified "done" claims are the single fastest way to destroy that trust and ship broken software to real users.

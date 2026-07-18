@@ -21,6 +21,7 @@ Whenever `/wingman:define`, `/wingman:architecture`, `/wingman:uxflow`, or `/win
 
 | Prefix | Minted by | What it identifies |
 |---|---|---|
+| `DISC-` | `/wingman:discovery` | A discovery-stage finding |
 | `DEF-` | `/wingman:define` | A requirement |
 | `ARCH-` | `/wingman:architecture` | A technical design decision |
 | `UX-` | `/wingman:uxflow` | A user-facing screen/state |

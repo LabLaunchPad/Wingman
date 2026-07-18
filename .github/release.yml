@@ -1,0 +1,39 @@
+# Configures GitHub's auto-generated release notes (Releases -> "Generate release notes").
+# Categories mirror CHANGELOG.md's actual headings (Added/Changed/Fixed/Security/Maintenance) so a
+# generated release matches this project's own changelog conventions instead of introducing a second,
+# inconsistent taxonomy. Label PRs accordingly for this to group correctly.
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+    authors:
+      - dependabot
+  categories:
+    - title: Breaking changes
+      labels:
+        - breaking-change
+    - title: Added
+      labels:
+        - enhancement
+        - new-command
+        - new-skill
+        - new-specialist
+    - title: Changed
+      labels:
+        - changed
+        - rearchitecture
+    - title: Fixed
+      labels:
+        - bug
+        - audit-finding
+    - title: Security
+      labels:
+        - security
+    - title: Maintenance
+      labels:
+        - maintenance
+        - documentation
+        - dependencies
+    - title: Other
+      labels:
+        - "*"

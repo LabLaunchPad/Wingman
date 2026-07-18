@@ -139,7 +139,7 @@ Only pause if you encounter a genuine decision point that requires user input, o
 
 | Excuse | Reality |
 |---|---|
-| "It's already small enough" | The 5-tag taxonomy says otherwise — check each tag (`#delete`, `#stdlib`, `#native`, `#yagni`, `#shrink`) before declaring it done. |
+| "It's already small enough" | Run `/wingman:over-engineering-review`'s 5-tag taxonomy against it — check each tag (`#delete`, `#stdlib`, `#native`, `#yagni`, `#shrink`) before declaring it done. |
 | "I need flexibility for future cases" | Speculative abstraction is exactly what this skill exists to prevent — add it when a second real use case shows up, not before. |
 | "I'm already in this file, might as well clean up more" | Out of scope for this task — note it, don't do it, unless asked. Scope creep disguised as diligence. |
 | "The shortcut works fine, no need to mark it" | Every shortcut without a `// minimal:` comment is invisible debt. Mark it or it rots silently. |

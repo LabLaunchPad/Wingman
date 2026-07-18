@@ -45,7 +45,9 @@ const VALID_HOOK_EVENTS = new Set([
   'SessionEnd',
   'UserPromptSubmit',
   'Stop',
-  'StopFailure',
+  'SubagentStop',
+  'PreCompact',
+  'Notification',
   'PreToolUse',
   'PostToolUse',
 ]);
