@@ -4,6 +4,7 @@ Wingman's "code" is markdown (commands/agents/skills) plus a hooks config — th
 and no traditional unit-test runner. Read [`CLAUDE.md`](CLAUDE.md) first; it's the canonical guide
 for working in this repo (both for Claude Code sessions and for a human maintainer, since the two
 need the same context here). This file only covers what's specific to opening an issue or PR.
+Participation here is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Before you start
 

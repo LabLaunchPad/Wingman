@@ -1,0 +1,43 @@
+name: CodeQL
+
+# Static analysis for the executable JavaScript in this repo -- the hook and
+# validator scripts under plugins/wingman/hooks/, plugins/wingman/scripts/,
+# and scripts/, plus evals/run-headless.mjs. This is the one real security
+# surface Wingman has (see SECURITY.md's scope): these scripts parse
+# `git status` output and tool-call JSON, so command-injection/path-traversal
+# classes are worth a mechanical check, unlike the markdown command/skill/
+# agent content, which is out of SECURITY.md's scope by design.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 7 * * 3" # Wednesdays 07:00 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
+        with:
+          languages: javascript-typescript
+
+      - uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
+        with:
+          category: "/language:javascript-typescript"
