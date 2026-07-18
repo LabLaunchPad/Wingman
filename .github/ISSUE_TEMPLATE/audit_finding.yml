@@ -1,0 +1,65 @@
+name: Audit / dogfooding finding
+description: Track a finding from /wingman:audit, /wingman:dogfood, or a manual systematic-auditing pass that isn't being fixed immediately.
+title: "[audit]: "
+labels: ["audit-finding", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this when `systematic-auditing`'s Core Workflow ("fix real, contained findings immediately;
+        log genuinely larger or ambiguous findings as durable follow-ups") lands on the log-it branch —
+        the finding is real but not a small, contained, immediate fix. Findings that were already fixed
+        in the same pass don't need an issue; put those in the PR description instead.
+
+  - type: dropdown
+    id: lane
+    attributes:
+      label: Which audit concern area found this?
+      options:
+        - Architecture/consistency (docs vs. actual files)
+        - Content/behavioral quality (skill instructions)
+        - Executable code/security (hooks, scripts, config wiring)
+        - Eval/test coverage
+        - Other systematic-auditing pass
+    validations:
+      required: true
+
+  - type: input
+    id: files
+    attributes:
+      label: File(s) involved
+      placeholder: plugins/wingman/...
+    validations:
+      required: true
+
+  - type: textarea
+    id: finding
+    attributes:
+      label: What was found
+      description: State the defect plainly, with the exact inconsistency or gap — not a vague "this seems off."
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification
+    attributes:
+      label: How was this independently verified?
+      description: Per `systematic-auditing`'s constraints, a subagent's self-report alone isn't sufficient — what did you check against the real filesystem/execution?
+    validations:
+      required: true
+
+  - type: textarea
+    id: why_deferred
+    attributes:
+      label: Why is this being logged instead of fixed now?
+      description: Genuinely larger/ambiguous scope, needs a founder/maintainer decision, touches something architecturally significant, etc. — not "ran out of time."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: source
+    attributes:
+      label: Source
+      options:
+        - label: This finding came from an AI agent's audit pass (a Claude Code session, `/wingman:audit`, or `/wingman:dogfood`), independently verified before filing.
+          required: false

@@ -1,0 +1,69 @@
+name: Feature request
+description: Propose a new command, skill, agent/specialist, or pipeline behavior.
+title: "[feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wingman deliberately does **not** bulk-create commands, skills, or specialists speculatively —
+        see `docs/ARCHITECTURE.md`'s activation signals and `docs/AGENT-ROSTER.md`'s promotion process.
+        A new specialist is normally promoted via `/wingman:evolve` only after 2+ genuine, evidenced
+        occurrences of friction, not proposed cold. This form exists for the cases that genuinely can't
+        wait for that mechanism (a structural gap, a missing pipeline stage) — fill it out with that bar
+        in mind, and expect "not yet, log it and wait for a second occurrence" as a legitimate outcome.
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of addition is this?
+      options:
+        - New pipeline command (discovery/define/architecture/uxflow/implementation-planning/build/ship)
+        - New adaptive command (like retro/learn/evolve/audit/hotfix)
+        - New skill (cross-cutting discipline, not tied to one command)
+        - New specialist / department lead (see docs/AGENT-ROSTER.md first)
+        - Change to an existing command/skill's behavior
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What real problem does this solve?
+      description: Describe the actual friction you hit — not a hypothetical future need. Link to the specific run, PR, or eval case where it showed up if you can.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence of repeated need (if proposing a specialist or department lead)
+      description: |
+        Per `docs/AGENT-ROSTER.md`, promotion requires 2+ genuine occurrences — cite them
+        (LEARNINGS.md entries, retro entries, checkpoint IDs). "I think we'll need this eventually"
+        is not evidence. Leave blank if this isn't a specialist/department-lead proposal.
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed shape
+      description: What would the new command/skill/agent actually do? Keep it to what's needed to solve the problem above — no speculative flexibility for cases that haven't happened yet (see `engineering-minimalism`).
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Why can't an existing command/skill do this?
+      description: Name the closest existing mechanism and say specifically why it doesn't cover this case.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: authorship
+    attributes:
+      label: Authorship disclosure
+      options:
+        - label: This was filed (or drafted) by an AI coding agent, and a human has reviewed it before submitting.
+          required: false
