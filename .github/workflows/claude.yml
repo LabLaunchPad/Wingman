@@ -76,7 +76,7 @@ jobs:
 
       - name: Run Claude Code
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
-        uses: anthropics/claude-code-action@4481e6d3c7bbb88db2a928ca3444c536f589c7c1 # v1
+        uses: anthropics/claude-code-action@3553f84341b92da26052e28acf1aa898f9511f32 # v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           additional_permissions: |
