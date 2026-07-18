@@ -1,12 +1,14 @@
 # Eval: discovery
 
-<!-- eval:no-fixture-needed: the distinctive behavior under test (does the command ask the right clarifying questions without escalating technical decisions) is exercised end to end by seven-stage-pipeline-e2e.md's two differently-shaped runs — a dedicated fixture would test the same paths with no additional signal -->
-
 Tests `plugins/wingman/commands/discovery.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers the discovery stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) ask clarifying questions when the founder's request is vague, focused on business outcomes not technical specifics, (b) avoid escalating technical decisions to the founder (that's architecture's job), and (c) produce a structured discovery artifact flowing into `/wingman:define`?
+
+## Fixture
+
+`evals/fixtures/setup-discovery-fixture.sh <target-dir>` — the base waitlist app with no prior Wingman stage output. Discovery starts from a clean project.
 
 ## Procedure
 
-1. Run the `setup-waitlist-app.sh` fixture to get a real project.
+1. Run the fixture setup script.
 2. Spawn a fresh subagent with `commands/discovery.md`, given a deliberately vague founder ask ("add unsubscribe to the waitlist" with no further detail).
 3. Independently verify the output against the expectations below.
 

@@ -1,13 +1,15 @@
 # Eval: uxflow
 
-<!-- eval:no-fixture-needed: the distinctive behaviors under test (producing UX-*-tagged flow table + visual diagram, and skipping gracefully for non-UI projects) are both exercised by seven-stage-pipeline-e2e.md's two differently-shaped runs — Run 1 confirmed the skip-for-non-UI case (JSON API, no UX-* minted), Run 2 confirmed the produce-flow case (user-facing app, UX-* minted with diagram) -->
-
 Tests `plugins/wingman/commands/uxflow.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers the uxflow stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) produce a UX-*-tagged flow table with screen/state descriptions, (b) render the same information as a visual flow diagram using `visual-founder-output`, and (c) skip cleanly for projects with no user-facing surface (pure API, CLI) rather than manufacturing screens?
+
+## Fixture
+
+`evals/fixtures/setup-uxflow-fixture.sh <target-dir>` — the base waitlist app (a JSON API, no user-facing surface) with pre-seeded discovery, define (DEF-001..003), and architecture (ARCH-001..003) artifacts.
 
 ## Procedure
 
-1. Run the `setup-waitlist-app.sh` fixture (a JSON API — no user-facing surface).
-2. Spawn a fresh subagent with `commands/uxflow.md` and pre-seeded ARCH-* decisions.
+1. Run the fixture setup script.
+2. Spawn a fresh subagent with `commands/uxflow.md` and the pre-seeded ARCH-* decisions.
 3. Independently verify the output against the expectations below.
 
 ## Expectations

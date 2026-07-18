@@ -1,13 +1,15 @@
 # Eval: define
 
-<!-- eval:no-fixture-needed: the distinctive behavior under test (scoping requirements with traceability IDs, avoiding scope-creep) is exercised end to end by seven-stage-pipeline-e2e.md's two differently-shaped runs — a dedicated fixture would test the same paths with no additional signal -->
-
 Tests `plugins/wingman/commands/define.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers the define stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) turn a discovery artifact into scoped `DEF-*`-tagged requirements, (b) avoid over-scoping by requiring each requirement to trace to discovery's problem statement, and (c) produce a structured requirements table flowing into `/wingman:architecture`?
+
+## Fixture
+
+`evals/fixtures/setup-define-fixture.sh <target-dir>` — the base waitlist app with a pre-seeded discovery artifact (`docs/wingman/discovery/waitlist-unsubscribe.md`).
 
 ## Procedure
 
-1. Run the `setup-waitlist-app.sh` fixture to get a real project.
-2. Spawn a fresh subagent with `commands/define.md` and a pre-seeded discovery artifact (`docs/wingman/discovery/waitlist-unsubscribe.md` written by discovery's template).
+1. Run the fixture setup script.
+2. Spawn a fresh subagent with `commands/define.md` and the pre-seeded discovery artifact.
 3. Independently verify the output against the expectations below.
 
 ## Expectations
