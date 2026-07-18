@@ -78,6 +78,7 @@ This README is written to be skimmed top-to-bottom in under a minute. If you're 
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — the hybrid Boardroom/department/specialist model and why it's shaped this way.
+- [`docs/GOVERNANCE.md`](docs/GOVERNANCE.md) — a one-page index of where org governance, policy enforcement, and benchmarks/metrics each already live in this repo.
 - [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) — the full specialist candidate catalog, organized by department.
 - [`docs/PROJECT.md`](docs/PROJECT.md) — current build/eval status, decisions log, and roadmap.
 - [`CHANGELOG.md`](CHANGELOG.md) — release history.
