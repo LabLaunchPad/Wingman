@@ -148,11 +148,22 @@ describe('Hooks.json Structure', () => {
   it('should have session-start in SessionStart', () => {
     const hooks = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));
     const sessionStart = hooks.hooks.SessionStart;
-    
+
     assert.ok(sessionStart);
     assert.ok(sessionStart.length > 0);
     assert.ok(sessionStart[0].hooks);
     assert.ok(sessionStart[0].hooks.length > 0);
+  });
+
+  it('should wire pre-compact-guard into PreCompact', () => {
+    const hooks = JSON.parse(fs.readFileSync(hooksPath, 'utf-8'));
+    assert.ok(hooks.hooks.PreCompact, 'PreCompact hook array missing');
+    assert.ok(
+      hooks.hooks.PreCompact.some((entry) =>
+        entry.hooks && entry.hooks.some((k) => k.command.includes('pre-compact-guard.mjs'))
+      ),
+      'pre-compact-guard.mjs not wired into PreCompact'
+    );
   });
 });
 
@@ -563,6 +574,31 @@ describe('Output Secret-Scanner (G4)', () => {
     const { scan } = await import(pathToFileURL(scannerPath).href);
     const result = scan('Bash', 'password = "a1b2c3d4e5f6g7h8i9j0k1l2"');
     assert.ok(result.found.length >= 1);
+  });
+});
+
+// ============================================================================
+// Pre-Compact Guard
+// ============================================================================
+
+describe('Pre-Compact Guard', () => {
+  const guardPath = path.join(process.cwd(), 'plugins', 'wingman', 'hooks', 'pre-compact-guard.mjs');
+
+  it('countRelevantChanges(): unit — clean tree finds nothing', async () => {
+    const { countRelevantChanges } = await import(pathToFileURL(guardPath).href);
+    assert.strictEqual(countRelevantChanges(''), 0);
+  });
+
+  it('countRelevantChanges(): unit — excludes .wingman/ bookkeeping churn', async () => {
+    const { countRelevantChanges } = await import(pathToFileURL(guardPath).href);
+    const porcelain = ' M .wingman/state.json\n M .wingman/checkpoints.jsonl\n';
+    assert.strictEqual(countRelevantChanges(porcelain), 0);
+  });
+
+  it('countRelevantChanges(): unit — counts real project changes', async () => {
+    const { countRelevantChanges } = await import(pathToFileURL(guardPath).href);
+    const porcelain = ' M README.md\n?? src/new-file.js\n M .wingman/state.json\n';
+    assert.strictEqual(countRelevantChanges(porcelain), 2);
   });
 });
 
