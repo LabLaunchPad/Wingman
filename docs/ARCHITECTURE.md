@@ -168,9 +168,16 @@ filter by type/category/status, or ask `--recurring` for exactly which categorie
 2+-occurrence threshold — rather than every consumer re-reading prose by eye or writing its own
 one-off regex.
 
+`scripts/wingman-metrics.mjs` sits alongside these two, computing real cost/quality/debt signals
+from the same flat files (Boardroom seat model-tier distribution as a cost-shape metric, the
+eval-suite verified/provisional ratio, `DEBT.md`'s ceiling rate when one exists, and
+`recurringCategories()`'s occurrence-threshold view) — deliberately not a service-style benchmark
+(no p95 latency, throughput, cache hit rate, or IOPS), since Wingman has no persistent runtime or
+request traffic to instrument those against (§2).
+
 **This is dev-repo-only tooling, by construction**, not a runtime capability of the shipped plugin:
-both scripts live under `/scripts` (repo-root), which is never part of the plugin bundle a founder
-installs (only `plugins/wingman/scripts/` ships). This is exactly why `skills/evolve-promotion`
+all three scripts live under `/scripts` (repo-root), which is never part of the plugin bundle a
+founder installs (only `plugins/wingman/scripts/` ships). This is exactly why `skills/evolve-promotion`
 (runs inside *any* founder's installed project) deliberately does **not** depend on it — it falls
 back to a plain read/grep of the marker lines instead — while `skills/dogfood-gap-classification`
 (runs only from Wingman's own dev-repo checkout) correctly does. Don't "fix" that asymmetry; it's
