@@ -24,7 +24,7 @@ During `/wingman:build`'s Definition-of-Done gate and any time code that touches
 ## Core Workflow
 
 1. **Hunt concretely.** For the actual change, walk STRIDE (Spoofing, Tampering, Repudiation, Information disclosure, Denial of service, Elevation of privilege) and the OWASP Top-10 classes relevant to it. Name specific risks, not categories.
-2. **Prompt-injection defense.** If the change touches an LLM boundary, verify against injection, role manipulation, and secret exfiltration (see `boardroom-security`'s baseline).
+2. **Prompt-injection defense.** If the change touches an LLM boundary, verify against injection, role manipulation, and secret exfiltration (see `boardroom-ciso`'s baseline).
 3. **Register every risk.** Each concrete risk becomes a row in the threat register with a `CLOSED` (fixed, with PR/commit + regression test, or founder-accepted) or `OPEN` disposition. "I looked at it" is not a disposition.
 4. **Block on OPEN.** While `threats_open > 0`, the stage does not advance. Fix, or escalate to the founder for explicit acceptance (recorded in `docs/wingman/founder-todos.md`).
 5. **Verify.** Confirm the fix with a regression test before marking `CLOSED`.

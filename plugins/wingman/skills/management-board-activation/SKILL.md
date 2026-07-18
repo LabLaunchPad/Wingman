@@ -1,6 +1,6 @@
 ---
 name: management-board-activation
-description: Use immediately after department-lead-activation at the start of /wingman:discovery, /wingman:architecture, /wingman:uxflow, /wingman:build, or /wingman:ship — checks whether this project has crossed the complexity threshold for a Management Board manager and creates one in the founder's own repo if so. Triggers only once a project has 3+ active CONDITIONALLY-activated department leads (Design/Data/Legal-Security/DevOps/Growth); never on a fresh or simple project, and never merely because the 3 always-active departments (Product/Engineering/QA) exist.
+description: Use immediately after department-lead-activation at the start of /wingman:discovery, /wingman:architecture, /wingman:uxflow, /wingman:build, /wingman:ship, /wingman:launch, or /wingman:hotfix — every command that can create a conditionally-activated department lead must run this check afterward, since that creation is exactly what can cross the threshold. Checks whether this project has crossed the complexity threshold for a Management Board manager and creates one in the founder's own repo if so. Triggers only once a project has 3+ active CONDITIONALLY-activated department leads (Design/Data/Legal-Security/DevOps/Growth); never on a fresh or simple project, and never merely because the 3 always-active departments (Product/Engineering/QA) exist.
 ---
 
 # Management Board Activation
@@ -15,7 +15,7 @@ Wingman's Management Board (Engineering, Product, Design, Data, Security, QA, Pl
 
 ## When To Use
 
-Immediately after `department-lead-activation` runs, at the start of `/wingman:discovery`, `/wingman:architecture`, `/wingman:uxflow`, `/wingman:build`, or `/wingman:ship` — so a manager can be created in the same pass as the department lead that crosses the threshold, not as a separate always-checked gate.
+Immediately after `department-lead-activation` runs, at the start of `/wingman:discovery`, `/wingman:architecture`, `/wingman:uxflow`, `/wingman:build`, `/wingman:ship`, `/wingman:launch`, or `/wingman:hotfix` — every command that can create a conditionally-activated department lead runs this check right after, in the same pass, since that creation is exactly what can cross the threshold. Not a separate always-checked gate on commands that never touch a conditional department lead.
 
 ## Core Workflow
 

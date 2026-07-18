@@ -40,7 +40,7 @@ Not a department — 9 execution-layer coordinator roles that sit between the Bo
 |---|---|---|
 | Market Intel Specialist | Scans competitor products/repos/docs to identify feature gaps | candidate |
 | User Persona Simulator | Simulates user demographics to pressure-test feature viability pre-build | candidate |
-| Requirements Analyst | Formal SRS/PRD generation | candidate — largely covered inline by `/wingman:plan` today |
+| Requirements Analyst | Formal SRS/PRD generation | candidate — largely covered inline by `/wingman:discovery`/`/wingman:define` today |
 | Ticket Sync Specialist | Syncs epics/stories/acceptance criteria to Jira/Linear (via MCP) | candidate |
 | Localization (L10n) Planner | Ensures multi-language/currency layout compliance | candidate |
 
@@ -99,7 +99,7 @@ Not a department — 9 execution-layer coordinator roles that sit between the Bo
 
 | Candidate role | Original responsibility | Status |
 |---|---|---|
-| SAST Specialist | Static security scanning (OWASP Top 10, injection classes) | candidate — largely covered inline by `/wingman:secure` and `boardroom-security` today |
+| SAST Specialist | Static security scanning (OWASP Top 10, injection classes) | candidate — largely covered inline by `/wingman:build`'s Definition-of-Done gate and `boardroom-ciso` today |
 | Secret Scan Guard | Blocks hardcoded keys/certs/env values from commits | candidate |
 | Open Source License Auditor | Flags GPL/non-compliant dependency licenses | candidate |
 | Privacy & Compliance Specialist | GDPR/CCPA/HIPAA data-handling review | candidate |
