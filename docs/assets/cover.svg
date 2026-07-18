@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" width="1280" height="360" role="img" aria-labelledby="title desc">
+  <title id="title">Wingman — an AI Boardroom for the full SDLC</title>
+  <desc id="desc">Seven C-suite-style seats plus Design review every stage; a pipeline of seven stages runs underneath.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="360" fill="url(#bg)"/>
+
+  <!-- wordmark -->
+  <text x="64" y="112" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#f8fafc">Wingman</text>
+  <text x="64" y="150" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="21" fill="#94a3b8">An AI Boardroom that plans, builds, secures, and ships production-grade software</text>
+  <text x="64" y="178" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="21" fill="#94a3b8">for non-technical founders — plain-language checkpoints instead of code review.</text>
+
+  <!-- 8 boardroom seats as a row of nodes -->
+  <g font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#cbd5e1">
+    <!-- CEO -->
+    <circle cx="88" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="88" y="245" text-anchor="middle" font-weight="600" fill="#e2e8f0">CEO</text>
+    <text x="88" y="282" text-anchor="middle">CEO</text>
+    <!-- CPO -->
+    <circle cx="220" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="220" y="245" text-anchor="middle" font-weight="600" fill="#e2e8f0">CPO</text>
+    <text x="220" y="282" text-anchor="middle">CPO</text>
+    <!-- CMO -->
+    <circle cx="352" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="352" y="245" text-anchor="middle" font-weight="600" fill="#e2e8f0">CMO</text>
+    <text x="352" y="282" text-anchor="middle">CMO</text>
+    <!-- CTO -->
+    <circle cx="484" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="484" y="245" text-anchor="middle" font-weight="600" fill="#e2e8f0">CTO</text>
+    <text x="484" y="282" text-anchor="middle">CTO</text>
+    <!-- CISO -->
+    <circle cx="616" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="616" y="245" text-anchor="middle" font-weight="600" fill="#e2e8f0" font-size="11">CISO</text>
+    <text x="616" y="282" text-anchor="middle">CISO</text>
+    <!-- CFO -->
+    <circle cx="748" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="748" y="245" text-anchor="middle" font-weight="600" fill="#e2e8f0">CFO</text>
+    <text x="748" y="282" text-anchor="middle">CFO</text>
+    <!-- Research -->
+    <circle cx="880" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="880" y="244" text-anchor="middle" font-weight="600" fill="#e2e8f0" font-size="9">R&amp;D</text>
+    <text x="880" y="282" text-anchor="middle">Research</text>
+    <!-- Design -->
+    <circle cx="1012" cy="240" r="22" fill="#1e293b" stroke="url(#accent)" stroke-width="2"/>
+    <text x="1012" y="244" text-anchor="middle" font-weight="600" fill="#e2e8f0" font-size="9">DSN</text>
+    <text x="1012" y="282" text-anchor="middle">Design</text>
+  </g>
+
+  <!-- connecting line under the seats, feeding into one checkpoint -->
+  <line x1="88" y1="266" x2="88" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="220" y1="266" x2="220" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="352" y1="266" x2="352" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="484" y1="266" x2="484" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="616" y1="266" x2="616" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="748" y1="266" x2="748" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="880" y1="266" x2="880" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="1012" y1="266" x2="1012" y2="300" stroke="#334155" stroke-width="2"/>
+  <line x1="88" y1="300" x2="1012" y2="300" stroke="#334155" stroke-width="2"/>
+  <rect x="472" y="312" width="264" height="30" rx="6" fill="#1e293b" stroke="url(#accent)" stroke-width="1.5"/>
+  <text x="604" y="332" text-anchor="middle" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" fill="#e2e8f0">one plain-language checkpoint</text>
+
+  <text x="1216" y="248" text-anchor="end" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#64748b">7 seats + Design</text>
+</svg>

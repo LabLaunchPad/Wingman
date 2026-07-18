@@ -1,22 +1,79 @@
 # Wingman
 
-[![Validate](https://github.com/LabLaunchPad/Wingman/actions/workflows/validate.yml/badge.svg)](https://github.com/LabLaunchPad/Wingman/actions/workflows/validate.yml)
-[![Install smoke](https://github.com/LabLaunchPad/Wingman/actions/workflows/install-smoke.yml/badge.svg)](https://github.com/LabLaunchPad/Wingman/actions/workflows/install-smoke.yml)
-[![Actionlint](https://github.com/LabLaunchPad/Wingman/actions/workflows/actionlint.yml/badge.svg)](https://github.com/LabLaunchPad/Wingman/actions/workflows/actionlint.yml)
+<p align="center">
+  <img src="docs/assets/cover.svg" alt="Wingman — an AI Boardroom that plans, builds, secures, and ships production-grade software, with 7 C-suite-style seats plus Design reviewing every stage." width="100%">
+</p>
 
-Wingman is a Claude Code plugin that gives non-technical founders a full AI SDLC — an AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.
+<p align="center">
+  <a href="https://github.com/LabLaunchPad/Wingman/actions/workflows/validate.yml"><img src="https://github.com/LabLaunchPad/Wingman/actions/workflows/validate.yml/badge.svg" alt="Validate"></a>
+  <a href="https://github.com/LabLaunchPad/Wingman/actions/workflows/install-smoke.yml"><img src="https://github.com/LabLaunchPad/Wingman/actions/workflows/install-smoke.yml/badge.svg" alt="Install smoke"></a>
+  <a href="https://github.com/LabLaunchPad/Wingman/actions/workflows/actionlint.yml"><img src="https://github.com/LabLaunchPad/Wingman/actions/workflows/actionlint.yml/badge.svg" alt="Actionlint"></a>
+  <a href="https://github.com/LabLaunchPad/Wingman/actions/workflows/codeql.yml"><img src="https://github.com/LabLaunchPad/Wingman/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+</p>
+
+Wingman is a [Claude Code](https://claude.com/product/claude-code) plugin that gives non-technical founders a full AI SDLC — an AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.
+
+**At a glance:**
+
+| | |
+|---|---|
+| **Plugin surface** | 23 commands · 39 skills · 8 fixed Boardroom seats |
+| **Eval coverage** | 68 behavioral eval cases, all `verified` |
+| **Current release** | `0.5.12` — see [`CHANGELOG.md`](CHANGELOG.md) |
+| **Install target** | Claude Code marketplace + plugin (`.claude-plugin/marketplace.json`) |
+| **Runtime dependencies** | None — markdown + one dependency-free Node hook script |
+
+## Quickstart
+
+```
+/plugin marketplace add LabLaunchPad/Wingman
+/plugin install wingman
+```
+
+Then run `/wingman:discovery` to start a new project, or `/wingman:boardroom` to get a plain-language review of work already in progress. Every `wingman:*` command is listed in [`plugins/wingman/.claude-plugin/plugin.json`](plugins/wingman/.claude-plugin/plugin.json).
 
 ## How it works
 
-Instead of asking a founder to read code or a diff, Wingman gates every stage of the SDLC through a **Boardroom checkpoint**: 7 C-suite-style seats plus Design (CEO/CPO/CMO/CTO/CISO/CFO/Research/Design) examine the plan or change in parallel and hand back one short, jargon-free go/no-go summary, consolidated into a grouped Business/Technical/Finance/Research report. The founder makes the call; Wingman never assumes silence means approval.
+Instead of asking a founder to read code or a diff, Wingman gates every stage of the SDLC through a **Boardroom checkpoint**: 7 C-suite-style seats plus Design (CEO / CPO / CMO / CTO / CISO / CFO / Research / Design) examine the plan or change in parallel and hand back one short, jargon-free go/no-go summary, consolidated into a grouped Business / Technical / Finance / Research report. The founder makes the call; Wingman never assumes silence means approval.
 
-The agent population is deliberately **lazy, not exhaustive** — a fixed 7+1-seat Boardroom is always present, a small set of department leads (Product, Engineering, QA, Security, DevOps, etc.) are created only when a project's real complexity calls for them, and narrow specialists are promoted one at a time via `/wingman:evolve` only after proven, repeated need. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full model and [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) for the complete specialist catalog.
+```mermaid
+flowchart LR
+    subgraph Pipeline["7-stage pipeline"]
+        direction LR
+        A[discovery] --> B[define] --> C[architecture] --> D[uxflow] --> E[implementation-planning] --> F[build] --> G[ship]
+    end
+    E -.->|Planning Milestone checkpoint| CP1{{Boardroom}}
+    F -.->|Definition-of-Done checkpoint| CP2{{Boardroom}}
+    G -.->|Ship checkpoint| CP3{{Boardroom}}
+```
+
+Only **3 founder-visible checkpoints** exist across the 7 stages — the 5 planning stages bundle into one review at the end of `implementation-planning`, then `build` (which folds in the security pass) and `ship` each keep their own. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §4/§4b for the exact mapping.
+
+The agent population is deliberately **lazy, not exhaustive**:
+
+- A fixed **7+1-seat Boardroom** is always present — it only renders verdicts, never writes code.
+- A small set of **department leads** (Product, Engineering, QA always active; Design, Data, Legal/Security, DevOps, Growth created only when a project's real complexity calls for them) do the actual build-time work.
+- A **Management Board** of coordinators activates only once a project crosses 3+ active conditionally-created department leads.
+- Narrow **specialists** (a 56-role candidate catalog) are promoted one at a time via `/wingman:evolve`, only after proven, repeated need — never bulk-created.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full model and [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) for the complete specialist catalog.
 
 ## Status
 
-The pipeline is built and behaviorally tested, not just scaffolded: **23 commands** (7 named SDLC pipeline stages — `discovery`/`define`/`architecture`/`uxflow`/`implementation-planning`/`build`/`ship` — plus 16 adaptive commands including `audit`, `boardroom`, `launch`, `hotfix`, `harness`, `telemetry`, `retro`, `learn`, `evolve`, `over-engineering-review`, `bloat-audit`, `debt-ledger`, `research`, `advisory`, `incident`, `dogfood`), **39 skills**, and **8 fixed Boardroom seats** (7 C-suite-style + Design). The plugin lives at `plugins/wingman/`, packaged as a Claude Code marketplace + plugin (`.claude-plugin/marketplace.json`). Current release: see `CHANGELOG.md`.
+The pipeline is built and behaviorally tested, not just scaffolded:
 
-`evals/` holds a lightweight behavioral eval harness (not just structural validation) with 60 eval cases covering every command and the high-value skills, including full end-to-end pipeline runs against realistic projects (one adversarial run producing a real `DO NOT SHIP`). See `docs/PROJECT.md` for exact build/eval status and `docs/ARCHITECTURE.md` for what's built versus planned. Most of this was verified in a sandboxed testing environment; real dogfooding passes (actual `claude` CLI install, live pipeline runs via `/wingman:dogfood`) have also happened and found real gaps, now fixed — see `docs/HUMAN-TODOS.md` for what real dogfooding still needs.
+- **23 commands** — 7 named SDLC pipeline stages (`discovery` / `define` / `architecture` / `uxflow` / `implementation-planning` / `build` / `ship`) plus 16 adaptive commands (`audit`, `boardroom`, `launch`, `hotfix`, `harness`, `telemetry`, `retro`, `learn`, `evolve`, `over-engineering-review`, `bloat-audit`, `debt-ledger`, `research`, `advisory`, `incident`, `dogfood`).
+- **39 skills** covering discipline (`engineering-minimalism`, `verification-before-completion`), mechanics (`git-pr-workflow`, `security-checklist`), and adaptive output (`visual-founder-output`, `plain-language-checkpoint`).
+- **8 fixed Boardroom seats** (7 C-suite-style + Design), dispatched in parallel and never writing code.
+
+`evals/` holds a lightweight behavioral eval harness (not just structural validation): **68 eval cases**, all `verified`, covering every command and the high-value skills — including full end-to-end pipeline runs against realistic projects (one adversarial run producing a real `DO NOT SHIP`). Run `node scripts/wingman-health.mjs` for a live, read-only snapshot of these numbers straight from the repo — it's the source of truth this table is generated from, not a number to trust in prose.
+
+See [`docs/PROJECT.md`](docs/PROJECT.md) for exact build/eval status and decisions log, and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for what's built versus deliberately deferred. Most of this was verified in a sandboxed testing environment; real dogfooding passes (actual `claude` CLI install, live pipeline runs via `/wingman:dogfood`) have also happened and found real gaps, now fixed — see [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) for what real dogfooding still needs.
+
+## For humans and for agents
+
+This README is written to be skimmed top-to-bottom in under a minute. If you're an AI coding agent working in this repo instead of a human reading it, start with [`AGENTS.md`](AGENTS.md) (a thin pointer into `CLAUDE.md`, the full project brief) rather than re-deriving conventions from source — and see `docs/ARCHITECTURE.md` §8a for the honest scope of what's portable to a non-Claude-Code harness today (two skills) versus what isn't (the rest).
 
 ## Documentation
 
@@ -24,6 +81,12 @@ The pipeline is built and behaviorally tested, not just scaffolded: **23 command
 - [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) — the full specialist candidate catalog, organized by department.
 - [`docs/PROJECT.md`](docs/PROJECT.md) — current build/eval status, decisions log, and roadmap.
 - [`CHANGELOG.md`](CHANGELOG.md) — release history.
-- [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) — what's blocked on a human rather than more engineering (installing/dogfooding for real, publishing, demo content — see `docs/DEMO-CHECKLIST.md` for the demo-capture plan).
+- [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) — what's blocked on a human rather than more engineering (publishing, demo content — see `docs/DEMO-CHECKLIST.md`).
 - [`evals/README.md`](evals/README.md) — how the behavioral eval harness works and what's been verified.
 - [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) — provenance for design patterns adapted from vendored reference repositories.
+- [`SECURITY.md`](SECURITY.md) — vulnerability disclosure and this repo's actual trust boundaries.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to propose a change.
+
+## License
+
+[MIT](LICENSE)
