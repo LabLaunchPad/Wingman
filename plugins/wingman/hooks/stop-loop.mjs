@@ -16,10 +16,30 @@
 // additive to the existing default-on iteration cap; neither is required —
 // an unset `maxWallClockMinutes` simply skips that check, same as today.
 //
+// Verified-completion gate (2026-07-19, dedicated CISO review, deliberately
+// deferred from the enhancement above): a bare `lastText.includes(promise)`
+// check trusts the agent's own free-text claim that it's done, with nothing
+// confirming the work actually happened. Optional `verifyCommand` in
+// `.wingman/loop.json` (e.g. "npm test") closes that: when set, a text-match
+// alone is no longer enough — the loop only stops once the command ALSO
+// exits 0. Running a founder-configured command here is no new class of risk
+// (dod-structural-gate.mjs's runTestSuite already shells out to a detected
+// test command at push time), but firing on every Stop event instead of once
+// per push is a materially larger surface for one specific exploitation
+// path: a prompt-injected turn rewriting `loop.json` mid-session, then
+// triggering its own re-execution on the very next Stop event, repeatedly.
+// The CISO-recommended mitigation this hook implements: cache
+// `verifyCommand` once, at loop start (into loop-counter.json), and never
+// re-read it from loop.json for the rest of that loop's run — a mid-loop
+// rewrite of `verifyCommand` has no effect until the next fresh loop start.
+// This narrows, but does not claim to close, the gap: nothing here can
+// distinguish a founder-written loop.json from an agent-written one.
+//
 // Pure logic in evaluate() is unit-tested; the CLI reads the loop config and
 // the session transcript to decide whether to continue or stop.
 
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import nodePath from 'node:path';
@@ -35,8 +55,19 @@ export function evaluate(config, lastText = '', iterationCount = 0, extra = {}) 
   if (!config || config.enabled !== true) return 'stop';
   const promise = config.completionPromise || '';
   if (!promise) return 'stop';
-  // Promise already satisfied in the latest assistant message → done.
-  if (lastText.includes(promise)) return 'stop';
+  // Promise already satisfied in the latest assistant message → done, UNLESS a
+  // verifyCommand is configured — in that case a text claim alone isn't
+  // enough; extra.verifyPassed must also be true (the CLI runs the cached
+  // command and reports the result here; this function stays pure). If no
+  // verifyCommand is configured, extra.verifyPassed is simply never checked —
+  // identical to pre-verifyCommand behavior.
+  if (lastText.includes(promise)) {
+    if (!config.verifyCommand || extra.verifyPassed === true) return 'stop';
+    // Claimed done but not (yet) verified — fall through to the same caps
+    // below, so an agent that keeps claiming victory without passing
+    // verification is still bounded by iterations/budget/stall, not allowed
+    // to loop forever either.
+  }
   const max = config.maxIterations || DEFAULT_MAX_ITERATIONS;
   if (iterationCount >= max) return 'stop';
 
@@ -123,12 +154,20 @@ if (process.argv[1] && nodePath.resolve(process.argv[1]) === fileURLToPath(impor
   }
   let iterationCount = 0;
   let startedAt = Date.now();
+  let cachedVerifyCommand; // undefined = not yet cached this loop run
   if (existsSync(counterPath)) {
     try {
       const stored = JSON.parse(readFileSync(counterPath, 'utf-8'));
       iterationCount = stored.count || 0;
       startedAt = stored.startedAt || Date.now();
+      cachedVerifyCommand = stored.verifyCommand;
     } catch { iterationCount = 0; }
+  }
+  // Cache verifyCommand once, at loop start (CISO-reviewed mitigation — see
+  // header comment): only when this is a fresh loop (no cached value yet),
+  // never re-reading it off loop.json for the rest of this loop's run.
+  if (cachedVerifyCommand === undefined) {
+    cachedVerifyCommand = (config && typeof config.verifyCommand === 'string' && config.verifyCommand) || null;
   }
   let input = {};
   try { input = JSON.parse(readStdin()); } catch { input = {}; }
@@ -137,10 +176,30 @@ if (process.argv[1] && nodePath.resolve(process.argv[1]) === fileURLToPath(impor
   const stallThreshold = config?.stallThreshold === 0 ? 0 : (config?.stallThreshold || DEFAULT_STALL_THRESHOLD);
   const recentToolSignatures = stallThreshold > 0 ? readRecentToolSignatures(transcriptPath, stallThreshold) : [];
   const elapsedMinutes = (Date.now() - startedAt) / 60000;
-  const decision = evaluate(config, lastText, iterationCount, { elapsedMinutes, recentToolSignatures });
+  // Only actually run the (cached) verify command when it matters: the
+  // promise text has been claimed and a command is configured. Running it
+  // unconditionally every Stop event would be wasted cost on every
+  // in-progress iteration, not just the one claiming completion.
+  let verifyPassed;
+  const promise = config?.completionPromise || '';
+  if (cachedVerifyCommand && promise && lastText.includes(promise)) {
+    try {
+      execSync(cachedVerifyCommand, { cwd, stdio: 'pipe', timeout: 120000 });
+      verifyPassed = true;
+    } catch {
+      verifyPassed = false;
+      console.error(
+        `Wingman stop-loop: completion promise found, but verifyCommand ("${cachedVerifyCommand}") ` +
+        `did not pass — continuing instead of stopping.`
+      );
+    }
+  }
+  const decision = evaluate(config, lastText, iterationCount, { elapsedMinutes, recentToolSignatures, verifyPassed });
   if (decision === 'continue') {
     const newCount = iterationCount + 1;
-    try { writeFileSync(counterPath, JSON.stringify({ count: newCount, startedAt })); } catch { /* best-effort */ }
+    try {
+      writeFileSync(counterPath, JSON.stringify({ count: newCount, startedAt, verifyCommand: cachedVerifyCommand }));
+    } catch { /* best-effort */ }
     const max = config?.maxIterations || DEFAULT_MAX_ITERATIONS;
     console.error(
       `Wingman stop-loop: completion promise not yet met — continuing (iteration ${newCount}/${max}). ` +

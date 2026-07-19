@@ -554,6 +554,95 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
     assert.strictEqual(evaluate(config, 'working', 5), 'continue');
   });
 
+  it('stop-loop evaluate(): verified-completion gate (dedicated CISO review, 2026-07-19)', async () => {
+    const { evaluate } = await import(pathToFileURL(stopPath).href);
+    const config = { enabled: true, completionPromise: 'DONE', verifyCommand: 'npm test' };
+    // Promise claimed, but not verified (or explicitly failed): keep going, not stop.
+    assert.strictEqual(evaluate(config, 'all done DONE', 5, {}), 'continue');
+    assert.strictEqual(evaluate(config, 'all done DONE', 5, { verifyPassed: false }), 'continue');
+    // Promise claimed AND verified: stop.
+    assert.strictEqual(evaluate(config, 'all done DONE', 5, { verifyPassed: true }), 'stop');
+    // Still bounded by the existing caps even while unverified — doesn't loop forever.
+    assert.strictEqual(evaluate(config, 'all done DONE', 50, {}), 'stop'); // max iterations reached
+    // No verifyCommand configured: verifyPassed is never consulted (backward-compatible default).
+    assert.strictEqual(
+      evaluate({ enabled: true, completionPromise: 'DONE' }, 'all done DONE', 5, {}),
+      'stop'
+    );
+  });
+
+  describe('stop-loop verifyCommand (integration — real cwd, real command)', () => {
+    const tempDir = path.join(process.cwd(), '.test-temp-stop-loop-verify');
+    const loopPath = path.join(tempDir, '.wingman', 'loop.json');
+    const counterPath = path.join(tempDir, '.wingman', 'loop-counter.json');
+
+    function runStopHook(transcriptPath) {
+      return spawnSync('node', [stopPath], {
+        input: JSON.stringify({ transcript_path: transcriptPath || '' }),
+        cwd: tempDir,
+        env: { ...process.env, PWD: tempDir },
+        encoding: 'utf-8',
+      });
+    }
+
+    function writeTranscriptClaimingDone(text) {
+      const transcriptPath = path.join(tempDir, 'transcript.jsonl');
+      fs.writeFileSync(
+        transcriptPath,
+        JSON.stringify({ type: 'assistant', message: { content: text } }) + '\n'
+      );
+      return transcriptPath;
+    }
+
+    beforeEach(() => {
+      if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+      fs.mkdirSync(path.join(tempDir, '.wingman'), { recursive: true });
+    });
+    afterEach(() => {
+      if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+
+    it('keeps looping when the promise is claimed but verifyCommand fails', () => {
+      fs.writeFileSync(loopPath, JSON.stringify({
+        enabled: true, completionPromise: 'DONE', verifyCommand: 'exit 1',
+      }));
+      const transcriptPath = writeTranscriptClaimingDone('all done DONE');
+      const res = runStopHook(transcriptPath);
+      assert.notStrictEqual(res.status, 0, 'should block the stop (continue looping)');
+      assert.match(res.stderr, /did not pass/i);
+    });
+
+    it('stops when the promise is claimed and verifyCommand passes', () => {
+      fs.writeFileSync(loopPath, JSON.stringify({
+        enabled: true, completionPromise: 'DONE', verifyCommand: 'exit 0',
+      }));
+      const transcriptPath = writeTranscriptClaimingDone('all done DONE');
+      const res = runStopHook(transcriptPath);
+      assert.strictEqual(res.status, 0, 'verified completion should let the stop through');
+    });
+
+    it('caches verifyCommand at loop start — a mid-loop rewrite of loop.json has no effect', () => {
+      fs.writeFileSync(loopPath, JSON.stringify({
+        enabled: true, completionPromise: 'DONE', verifyCommand: 'exit 0',
+      }));
+      // First Stop event: not claiming done yet — this caches verifyCommand: 'exit 0'.
+      runStopHook(writeTranscriptClaimingDone('still working'));
+      assert.ok(fs.existsSync(counterPath), 'counter file should exist after the first Stop event');
+      const cachedAfterFirstRun = JSON.parse(fs.readFileSync(counterPath, 'utf-8'));
+      assert.strictEqual(cachedAfterFirstRun.verifyCommand, 'exit 0');
+
+      // Mid-loop: loop.json is rewritten with a different (failing) command — simulating an
+      // injected or otherwise untrusted mid-session write.
+      fs.writeFileSync(loopPath, JSON.stringify({
+        enabled: true, completionPromise: 'DONE', verifyCommand: 'exit 1',
+      }));
+      // Second Stop event, now claiming done: the CACHED 'exit 0' should still be what runs, not
+      // the rewritten 'exit 1' — so this stops cleanly instead of blocking.
+      const res = runStopHook(writeTranscriptClaimingDone('all done DONE'));
+      assert.strictEqual(res.status, 0, 'the cached (original) verifyCommand should be used, not the mid-loop rewrite');
+    });
+  });
+
   it('prompt-guard evaluate(): unit', async () => {
     const { evaluate } = await import(pathToFileURL(promptPath).href);
     assert.strictEqual(evaluate('please summarize this').decision, 'allow');
