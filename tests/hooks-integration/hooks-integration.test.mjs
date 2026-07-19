@@ -522,6 +522,38 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
     assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 10), 'stop');
   });
 
+  it('stop-loop evaluate(): wall-clock budget cap (Boardroom-recommended, 2026-07-19)', async () => {
+    const { evaluate } = await import(pathToFileURL(stopPath).href);
+    const config = { enabled: true, completionPromise: 'DONE', maxWallClockMinutes: 30 };
+    // Under budget, no other trigger: keep going.
+    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 10 }), 'continue');
+    // Budget reached: stop, even though iteration count and completion promise haven't fired.
+    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 30 }), 'stop');
+    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 45 }), 'stop');
+    // Unset maxWallClockMinutes: no budget check at all, regardless of elapsed time (backward-compatible default).
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 5, { elapsedMinutes: 9999 }), 'continue');
+  });
+
+  it('stop-loop evaluate(): stall / no-progress detection (Boardroom-recommended, 2026-07-19)', async () => {
+    const { evaluate } = await import(pathToFileURL(stopPath).href);
+    const config = { enabled: true, completionPromise: 'DONE' };
+    const repeating = ['Bash:{"command":"npm test"}', 'Bash:{"command":"npm test"}', 'Bash:{"command":"npm test"}'];
+    const varying = ['Read:{"file":"a.js"}', 'Edit:{"file":"a.js"}', 'Bash:{"command":"npm test"}'];
+    // Default threshold (3): the same call 3x in a row trips the stall stop.
+    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: repeating }), 'stop');
+    // Genuinely different calls in the window: no stall, keep going.
+    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: varying }), 'continue');
+    // Fewer repeats than the threshold: not yet a stall.
+    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: repeating.slice(0, 2) }), 'continue');
+    // Explicit stallThreshold: 0 disables the check entirely, even with a long identical run.
+    assert.strictEqual(
+      evaluate({ ...config, stallThreshold: 0 }, 'working', 5, { recentToolSignatures: repeating }),
+      'continue'
+    );
+    // No recentToolSignatures passed at all (e.g. every pre-existing caller): no stall check fires.
+    assert.strictEqual(evaluate(config, 'working', 5), 'continue');
+  });
+
   it('prompt-guard evaluate(): unit', async () => {
     const { evaluate } = await import(pathToFileURL(promptPath).href);
     assert.strictEqual(evaluate('please summarize this').decision, 'allow');
