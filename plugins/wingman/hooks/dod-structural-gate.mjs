@@ -110,6 +110,50 @@ export function checkBoardroomVerdictClean(checkpoint) {
   return { ok: true };
 }
 
+// A founder-shared "how real AI apps stay reliable across models" diagram set (2026-07-19)
+// prompted a real CTO + Research Boardroom review of whether Wingman's own safety/quality gate
+// would still hold if a different underlying model (not Claude) were driving `boardroom.md`. Both
+// seats converged: every other layer in that diagram (input validation, orchestration, retrieval,
+// eval/observability) already has a real, file-verified Wingman equivalent — but one real gap
+// existed here. `checkBoardroomVerdictClean()` above trusts whatever `verdict` string the
+// orchestrating model already transcribed into checkpoints.jsonl's `seats[]` array; nothing
+// independently re-derived that value from each seat's own raw `## <SEAT> VERDICT: ...` line. A
+// mis-transcription (e.g. a NO_GO copied in as GO_WITH_CONCERNS) would sail through undetected.
+// `checkVerdictTranscriptionMatchesDetails()` closes that gap the same way `checkBoardroomVerdictClean`
+// itself works: mechanical regex extraction against the already-written `details_ref` companion
+// file (schema_version 4+, boardroom.md's own unabridged-detail write), not a semantic judgment
+// call. Entries with no `details_ref` (schema_version < 4, or a failed detail write) have nothing
+// to cross-check against and are skipped, not failed — same "don't invent a false failure" rule
+// findAllBuildArtifactTexts and detectTestCommand already follow.
+const SEAT_VERDICT_LINE = /^##\s*([A-Z][A-Z\s]*?)\s+VERDICT:\s*(GO_WITH_CONCERNS|NO_GO|GO)\b/gim;
+
+export function checkVerdictTranscriptionMatchesDetails(checkpoint, cwd) {
+  if (!checkpoint || !checkpoint.details_ref) return { ok: true };
+  let detailsText;
+  try {
+    detailsText = readFileSync(join(cwd, checkpoint.details_ref), 'utf-8');
+  } catch {
+    return { ok: true }; // details_ref points at a file that doesn't exist — nothing to cross-check
+  }
+  const rawVerdicts = new Map();
+  for (const m of detailsText.matchAll(SEAT_VERDICT_LINE)) {
+    rawVerdicts.set(m[1].trim().toUpperCase(), m[2].toUpperCase());
+  }
+  for (const s of checkpoint.seats || []) {
+    const seatKey = String(s.seat || '').trim().toUpperCase();
+    const rawVerdict = rawVerdicts.get(seatKey);
+    const recordedVerdict = String(s.verdict || '').toUpperCase();
+    if (rawVerdict && rawVerdict !== recordedVerdict) {
+      return {
+        ok: false,
+        reason: `its "${s.seat}" seat's raw verdict block says "${rawVerdict}" but checkpoints.jsonl ` +
+          `recorded "${recordedVerdict}" — a transcription mismatch, not just a low-detail summary`,
+      };
+    }
+  }
+  return { ok: true };
+}
+
 function findMostRecentPlanFile(cwd) {
   const plansDir = join(cwd, 'docs', 'wingman', 'plans');
   try {
@@ -327,6 +371,17 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
         `blocking verdict — ${verdictResult.reason}. Do not push until this is resolved (fix the ` +
         `concern and get a clean re-check, or get explicit founder override recorded in a new ` +
         `checkpoint) — a checkpoint existing is not the same as it having actually passed.`
+      );
+    }
+
+    // 0.5. Verdict transcription integrity — a checkpoint recording "clean" is not the same as
+    // that recording being an accurate transcription of what each seat actually said.
+    const transcriptionResult = checkVerdictTranscriptionMatchesDetails(checkpoint, cwd);
+    if (!transcriptionResult.ok) {
+      deny(
+        `Wingman dod-structural-gate: the most recent Build-stage Boardroom checkpoint has a ` +
+        `verdict transcription mismatch — ${transcriptionResult.reason}. Re-check checkpoints.jsonl ` +
+        `against the raw seat output at ${checkpoint.details_ref} before pushing.`
       );
     }
 

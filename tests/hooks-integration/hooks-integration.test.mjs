@@ -830,4 +830,123 @@ describe('DoD Gate — Boardroom Verdict Check', () => {
       assert.match(stderr, /DO NOT SHIP/);
     });
   });
+
+  // G14 — verdict transcription integrity: a real CTO+Research Boardroom review (2026-07-19,
+  // prompted by a founder-shared "reliable AI apps" architecture diagram) found that
+  // checkBoardroomVerdictClean trusts checkpoints.jsonl's seats[].verdict field verbatim, with
+  // nothing independently re-deriving it from each seat's own raw "## <SEAT> VERDICT: ..." line —
+  // a mis-transcription would sail through undetected regardless of which model drove boardroom.md.
+  describe('checkVerdictTranscriptionMatchesDetails (unit)', () => {
+    const tempDetailsDir = path.join(process.cwd(), '.test-temp-dod-details');
+
+    beforeEach(() => {
+      if (fs.existsSync(tempDetailsDir)) fs.rmSync(tempDetailsDir, { recursive: true, force: true });
+      fs.mkdirSync(tempDetailsDir, { recursive: true });
+    });
+    afterEach(() => {
+      if (fs.existsSync(tempDetailsDir)) fs.rmSync(tempDetailsDir, { recursive: true, force: true });
+    });
+
+    it('allows when the checkpoint has no details_ref (schema_version < 4)', async () => {
+      const { checkVerdictTranscriptionMatchesDetails } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkVerdictTranscriptionMatchesDetails(
+        { seats: [{ seat: 'ciso', verdict: 'NO_GO' }] },
+        tempDetailsDir
+      );
+      assert.strictEqual(result.ok, true);
+    });
+
+    it('allows when details_ref points at a file that does not exist', async () => {
+      const { checkVerdictTranscriptionMatchesDetails } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkVerdictTranscriptionMatchesDetails(
+        { details_ref: '.wingman/checkpoint-details/missing.md', seats: [{ seat: 'cto', verdict: 'GO' }] },
+        tempDetailsDir
+      );
+      assert.strictEqual(result.ok, true);
+    });
+
+    it('allows when the raw seat verdict matches the recorded verdict', async () => {
+      const detailsPath = path.join(tempDetailsDir, 'details.md');
+      fs.writeFileSync(detailsPath, '## CISO VERDICT: NO_GO\nSome findings here.\n\n## CTO VERDICT: GO\nLooks fine.\n');
+      const { checkVerdictTranscriptionMatchesDetails } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkVerdictTranscriptionMatchesDetails(
+        {
+          details_ref: 'details.md',
+          seats: [{ seat: 'ciso', verdict: 'NO_GO' }, { seat: 'cto', verdict: 'GO' }],
+        },
+        tempDetailsDir
+      );
+      assert.strictEqual(result.ok, true);
+    });
+
+    it('denies when a NO_GO seat was transcribed as GO_WITH_CONCERNS', async () => {
+      const detailsPath = path.join(tempDetailsDir, 'details.md');
+      fs.writeFileSync(detailsPath, '## CISO VERDICT: NO_GO\nA real blocking finding.\n');
+      const { checkVerdictTranscriptionMatchesDetails } = await import(pathToFileURL(dodHookPath).href);
+      const result = checkVerdictTranscriptionMatchesDetails(
+        { details_ref: 'details.md', seats: [{ seat: 'ciso', verdict: 'GO_WITH_CONCERNS' }] },
+        tempDetailsDir
+      );
+      assert.strictEqual(result.ok, false);
+      assert.match(result.reason, /"ciso"/);
+      assert.match(result.reason, /NO_GO/);
+      assert.match(result.reason, /GO_WITH_CONCERNS/);
+    });
+  });
+
+  describe('git push branch (integration) — verdict transcription', () => {
+    const tempDir = path.join(process.cwd(), '.test-temp-dod-transcription-gate');
+
+    function runPushHook() {
+      const res = spawnSync(
+        'node',
+        [dodHookPath],
+        {
+          input: JSON.stringify({
+            tool_name: 'Bash',
+            tool_input: { command: 'git push origin main' },
+            cwd: tempDir,
+          }),
+          encoding: 'utf-8',
+        }
+      );
+      return { status: res.status, stderr: res.stderr, stdout: res.stdout };
+    }
+
+    beforeEach(() => {
+      if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+      fs.mkdirSync(tempDir, { recursive: true });
+      execSync('git init -q', { cwd: tempDir });
+      execSync('git config user.email test@example.com', { cwd: tempDir });
+      execSync('git config user.name Test', { cwd: tempDir });
+      fs.writeFileSync(path.join(tempDir, 'README.md'), '# temp\n');
+      execSync('git add -A && git commit -q -m init', { cwd: tempDir });
+    });
+
+    afterEach(() => {
+      if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+
+    it('blocks git push when a checkpoint-details file disagrees with checkpoints.jsonl', () => {
+      const wingmanDir = path.join(tempDir, '.wingman');
+      const detailsDir = path.join(wingmanDir, 'checkpoint-details');
+      fs.mkdirSync(detailsDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(detailsDir, 'test-checkpoint.md'),
+        '## CISO VERDICT: NO_GO\nSecrets committed in plaintext.\n'
+      );
+      fs.writeFileSync(
+        path.join(wingmanDir, 'checkpoints.jsonl'),
+        JSON.stringify({
+          bundle: 'build',
+          bottom_line: 'GO_WITH_CHANGES',
+          details_ref: '.wingman/checkpoint-details/test-checkpoint.md',
+          seats: [{ seat: 'ciso', verdict: 'GO_WITH_CONCERNS' }],
+        }) + '\n'
+      );
+      const { status, stderr } = runPushHook();
+      assert.notStrictEqual(status, 0, 'a verdict transcription mismatch must block the push');
+      assert.match(stderr, /transcription mismatch/i);
+    });
+  });
 });
