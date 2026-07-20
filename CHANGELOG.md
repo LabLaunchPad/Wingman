@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.21] - 2026-07-20
+
+### Fixed
+- **`secret-guard.mjs`/`secret-scanner.mjs`** — the two hooks' `SECRET` regex lists were byte-identical copies (drift risk) and missing 4 common credential shapes (GitHub fine-grained PAT, Slack tokens, Stripe live keys, Google API keys). De-duplicated (`secret-scanner.mjs` now imports `SECRET` from `secret-guard.mjs`, mirroring the existing `INJECTION` sharing pattern) and added the missing patterns, each verified against real-shaped test strings.
+- **`validate-structure.mjs`** — read every skill's `SKILL.md` from disk twice (once for frontmatter, once for the discipline-triad scan); now reads once.
+- **`skills/security-checklist`, `skills/evolve-promotion`** — added `## References` entries for `references/secrets-policy.md` and `references/persona-template.md`, which had zero citations anywhere in the plugin.
+
+Part of Wave 3 of the audit remediation loop — see `FIXLOG.md` and `docs/PROJECT.md`'s decisions log.
+
 ## [0.5.20] - 2026-07-20
 
 ### Added
