@@ -33,7 +33,12 @@ structured store so future sessions start where the last one ended.
 ## Red Flags
 - Storing anything that looks like a secret (key, token, password) — stop and refuse.
 - Writing opinions as facts — label speculation explicitly.
-- Duplicate or contradictory entries — consolidate, don't append.
+- Duplicate or contradictory entries — consolidate, don't append. When an evergreen fact in
+  `MEMORY.md` is overwritten because reality changed (not because it was wrong), add a one-line
+  entry to `decisions.md` naming what changed and why. `MEMORY.md` only ever holds the current
+  state on purpose — without this, the fact that something *used to be* true (and when it stopped
+  being true) is silently lost, and a later session has no way to tell "we never used Postgres"
+  apart from "we used Postgres until the March migration."
 
 ## Verification
 After any write, re-read the relevant file and confirm the new entry is present,
