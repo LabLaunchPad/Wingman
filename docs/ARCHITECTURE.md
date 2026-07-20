@@ -173,9 +173,14 @@ one-off regex.
 `scripts/wingman-metrics.mjs` sits alongside these two, computing real cost/quality/debt signals
 from the same flat files (Boardroom seat model-tier distribution as a cost-shape metric, the
 eval-suite verified/provisional ratio, `DEBT.md`'s ceiling rate when one exists, and
-`recurringCategories()`'s occurrence-threshold view) — deliberately not a service-style benchmark
-(no p95 latency, throughput, cache hit rate, or IOPS), since Wingman has no persistent runtime or
-request traffic to instrument those against (§2).
+`recurringCategories()`'s occurrence-threshold view, and — since 2026-07-20 — the **agent-weakness
+coverage benchmark** scored from `docs/AGENT-WEAKNESS-BENCHMARK.md`) — deliberately not a
+service-style benchmark (no p95 latency, throughput, cache hit rate, or IOPS), since Wingman has no
+persistent runtime or request traffic to instrument those against (§2). That coverage benchmark
+catalogs community-verified coding-agent failure modes, maps each to the Wingman rule that addresses
+it and the `verified` eval (its positive/negative A/B pair) that measures it, and self-verifies by
+re-deriving each entry's status from the real rule/eval files rather than trusting the catalog's
+hand-written status.
 
 **This is dev-repo-only tooling, by construction**, not a runtime capability of the shipped plugin:
 all three scripts live under `/scripts` (repo-root), which is never part of the plugin bundle a

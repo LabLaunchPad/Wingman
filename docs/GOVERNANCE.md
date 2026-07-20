@@ -60,10 +60,13 @@ fabricating numbers. What's real and computable instead:
 | `evals/` (see `evals/README.md`) | Whether a skill/command's *instructions* produce correct behavior | Pass/fail against real filesystem evidence, human-graded |
 | `scripts/wingman-health.mjs` | Plugin surface size, eval trust-level coverage, decisions logged | Structural/categorical snapshot |
 | `scripts/query-wingman-knowledge.mjs` | `wingman:log` markers by type/category/status, occurrence counts | Structured query over parsed logs |
-| `scripts/wingman-metrics.mjs` | Boardroom model-tier cost shape, eval verified/provisional ratio, `DEBT.md` ceiling rate, occurrence-threshold visibility | Real cost/quality/debt signals, not a performance benchmark |
+| `scripts/wingman-metrics.mjs` | Boardroom model-tier cost shape, eval verified/provisional ratio, `DEBT.md` ceiling rate, occurrence-threshold visibility, agent-weakness coverage | Real cost/quality/debt signals, not a performance benchmark |
+| `docs/AGENT-WEAKNESS-BENCHMARK.md` (scored by `wingman-metrics.mjs` §5) | Coverage of community-verified coding-agent failure modes: % with a rule, % measured by a `verified` eval (its positive/negative A/B pair) | Coverage benchmark; self-verifying (re-derives each entry's status from the real rule/eval files) |
 
 See `docs/PROJECT.md`'s decisions log for the record of why a proposed local/edge/cloud +
-p95/throughput/IOPS benchmark architecture was assessed and declined in favor of the tools above.
+p95/throughput/IOPS benchmark architecture was assessed and declined in favor of the tools above —
+the coverage benchmark above is the honest, computable alternative for a repo with no runtime to
+instrument.
 
 ## Reuse — how this whole model gets applied to a new project
 
