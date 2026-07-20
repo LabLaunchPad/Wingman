@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.19] - 2026-07-20
+
+### Added
+- **`/wingman:knowledge-export`** — exports `.wingman/checkpoints.jsonl` and `memory/*.md` into a Google Open Knowledge Format (OKF v0.1) bundle at `.wingman/okf-export/`, so other AI tools can read a founder's Wingman-tracked decisions without a Wingman-specific reader. Opt-in, never runs automatically. New shipped script `plugins/wingman/scripts/okf-export.mjs` (dependency-free, read-only on source data, runnable standalone — see `docs/ARCHITECTURE.md` §8a). New eval case `evals/cases/knowledge-export.md` with fixture `evals/fixtures/setup-knowledge-export-fixture.sh`, run for real during implementation.
+
+### Maintenance
+- `plugin.json` bumped `0.5.18` → `0.5.19`. (Note: entries `0.5.13`–`0.5.18` were not backfilled here — out of scope for this change.)
+
 ## [0.5.12] - 2026-07-18
 
 ### Fixed
