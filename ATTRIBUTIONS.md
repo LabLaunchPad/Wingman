@@ -24,10 +24,6 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `multica-ai/andrej-karpathy-skills` | MIT (declared in `plugin.json`, `README.md`, and the `SKILL.md` frontmatter — no standalone `LICENSE` file, corrected 2026-07-08 from an earlier "no license" claim in this doc) | `engineering-minimalism` — assumption-surfacing, verifiable success criteria |
 | `jeffallan/claude-skills` | MIT | The "description trap" finding; two-tier `SKILL.md`/`references/` structure |
 | `addyosmani/agent-skills` | MIT (Addy Osmani) | Skill/Persona/Command model, "personas never call personas," parallel-fan-out-then-merge pattern, Rationalizations/Red-Flags/Verification triad |
-| `alirezarezvani/claude-skills` | MIT (Alireza Rezvani) | Broad skill library — discovery + design reference for `research`, `memory`, `code-review`, `incident-response`, `accessibility` gaps (G6/G9/G11/G12) |
-| `jeremylongshore/claude-code-plugins-plus-skills` | MIT (Jeremy Longshore) | Large plugin/skill catalog — coverage-breadth cross-check for the GAPS mining loop |
-| `ComposioHQ/awesome-claude-skills` | MIT (Composio) | Curated index — discovery source for the curated founder-lens mining loop |
-| `avelikiy/great_cto` | MIT (Anton Velikiy) | CTO-advisory persona model — design inspiration for `founder-cfo`/`founder-cmo`/`founder-cro` business-advisory skills (G7) |
 
 ## Non-vendored attribution (design principle only, not a pinned submodule)
 
@@ -39,6 +35,10 @@ request to study its hook design and apply a reusable principle to Wingman's own
 | Repo | License | Used for |
 |---|---|---|
 | `fivetaku/fablize` | Not verified in this pass (fetched web content only, no LICENSE file reviewed) — attribution recorded on a design-principle basis regardless | The wiring/logic separation discipline (harness-specific event wiring kept separate from generic-signal decision logic) — see `plugins/wingman/references/fablize-pattern.md` for the full writeup. Confirmed Wingman's own `hooks/dod-structural-gate.mjs` already follows this discipline; the concrete artifact produced is `plugins/wingman/scripts/dod-pre-push-check.mjs`, a git-`pre-push`-runnable fallback reusing the exact same exported functions. |
+| `alirezarezvani/claude-skills` | MIT (Alireza Rezvani) | Declared in `.gitmodules` at one point but never actually pinned as a submodule (corrected 2026-07-18 — see decisions log) — used only as a browsed discovery/design reference for `research`, `memory`, `code-review`, `incident-response`, `accessibility` gaps (G6/G9/G11/G12) |
+| `jeremylongshore/claude-code-plugins-plus-skills` | MIT (Jeremy Longshore) | Same correction as above — browsed-only, large plugin/skill catalog used as a coverage-breadth cross-check for the GAPS mining loop |
+| `ComposioHQ/awesome-claude-skills` | MIT (Composio) | Same correction as above — browsed-only, curated index used as a discovery source for the curated founder-lens mining loop |
+| `avelikiy/great_cto` | MIT (Anton Velikiy) | Same correction as above — browsed-only, CTO-advisory persona model used as design inspiration for `founder-cfo`/`founder-cmo`/`founder-cro` business-advisory skills (G7) |
 
 ## Per-file adaptation record
 

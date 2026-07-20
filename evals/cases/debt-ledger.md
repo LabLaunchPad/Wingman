@@ -26,4 +26,4 @@ A small Node.js project with intentional debt:
 
 ## Trust level
 
-`verified` — passed a real positive scenario with intentional debt patterns, each command correctly identifying and managing debt.
+`authored, pending first run` — Scenario 1 above is specified but has no run log; do not treat as `verified` until a real run is logged (see `evals/README.md`).
