@@ -124,7 +124,7 @@ Not a department — 9 execution-layer coordinator roles that sit between the Bo
 | SEO Optimization Specialist | Semantic structure, schema markup, meta tags | candidate |
 | Product Documentation Specialist | User guides, feature explainers, support content | candidate |
 | Pricing & Billing Integration Specialist | Stripe/Chargebee webhook and plan verification | candidate |
-| Product Launch & Content Specialist | Changelogs, announcements, launch copy | candidate — the core of the planned `/wingman:launch` command |
+| Product Launch & Content Specialist | Changelogs, announcements, launch copy | candidate — the core of the `/wingman:launch` command |
 
 ---
 

@@ -7,6 +7,11 @@ name: CodeQL
 # `git status` output and tool-call JSON, so command-injection/path-traversal
 # classes are worth a mechanical check, unlike the markdown command/skill/
 # agent content, which is out of SECURITY.md's scope by design.
+#
+# No `paths:` filter below -- CodeQL's language autobuild needs the whole
+# checkout to resolve module graphs correctly, so this scans the full repo
+# rather than just the paths named above. That's over-scanning, not a gap:
+# everything outside those paths is markdown/JSON with no JS to analyze.
 
 on:
   push:
