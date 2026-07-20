@@ -18,9 +18,9 @@ Wingman is a [Claude Code](https://claude.com/product/claude-code) plugin that g
 
 | | |
 |---|---|
-| **Plugin surface** | 23 commands · 39 skills · 8 fixed Boardroom seats |
-| **Eval coverage** | 68 behavioral eval cases, all `verified` |
-| **Current release** | `0.5.12` — see [`CHANGELOG.md`](CHANGELOG.md) |
+| **Plugin surface** | 24 commands · 40 skills · 8 fixed Boardroom seats |
+| **Eval coverage** | 70 behavioral eval cases (mix of `verified`/`provisional` — run `node scripts/wingman-health.mjs` for the live split) |
+| **Current release** | `0.5.20` — see [`CHANGELOG.md`](CHANGELOG.md) |
 | **Install target** | Claude Code marketplace + plugin (`.claude-plugin/marketplace.json`) |
 | **Runtime dependencies** | None — markdown + one dependency-free Node hook script |
 
@@ -63,11 +63,11 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full model and [`docs
 
 The pipeline is built and behaviorally tested, not just scaffolded:
 
-- **23 commands** — 7 named SDLC pipeline stages (`discovery` / `define` / `architecture` / `uxflow` / `implementation-planning` / `build` / `ship`) plus 16 adaptive commands (`audit`, `boardroom`, `launch`, `hotfix`, `harness`, `telemetry`, `retro`, `learn`, `evolve`, `over-engineering-review`, `bloat-audit`, `debt-ledger`, `research`, `advisory`, `incident`, `dogfood`).
-- **39 skills** covering discipline (`engineering-minimalism`, `verification-before-completion`), mechanics (`git-pr-workflow`, `security-checklist`), and adaptive output (`visual-founder-output`, `plain-language-checkpoint`).
+- **24 commands** — 7 named SDLC pipeline stages (`discovery` / `define` / `architecture` / `uxflow` / `implementation-planning` / `build` / `ship`) plus 17 adaptive commands (`audit`, `boardroom`, `launch`, `hotfix`, `harness`, `telemetry`, `retro`, `learn`, `evolve`, `over-engineering-review`, `bloat-audit`, `debt-ledger`, `research`, `advisory`, `incident`, `dogfood`, `knowledge-export`).
+- **40 skills** covering discipline (`engineering-minimalism`, `verification-before-completion`), mechanics (`git-pr-workflow`, `security-checklist`), and adaptive output (`visual-founder-output`, `plain-language-checkpoint`).
 - **8 fixed Boardroom seats** (7 C-suite-style + Design), dispatched in parallel and never writing code.
 
-`evals/` holds a lightweight behavioral eval harness (not just structural validation): **68 eval cases**, all `verified`, covering every command and the high-value skills — including full end-to-end pipeline runs against realistic projects (one adversarial run producing a real `DO NOT SHIP`). Run `node scripts/wingman-health.mjs` for a live, read-only snapshot of these numbers straight from the repo — it's the source of truth this table is generated from, not a number to trust in prose.
+`evals/` holds a lightweight behavioral eval harness (not just structural validation): **70 eval cases**, a mix of `verified` (passed 2+ differently-shaped scenarios including a negative case) and `provisional` (passed one real run) — see `evals/README.md` for the trust-level bar. Covers every command and the high-value skills, including full end-to-end pipeline runs against realistic projects (one adversarial run producing a real `DO NOT SHIP`). Run `node scripts/wingman-health.mjs` for a live, read-only snapshot of these numbers straight from the repo — it's the source of truth this table is generated from, not a number to trust in prose.
 
 See [`docs/PROJECT.md`](docs/PROJECT.md) for exact build/eval status and decisions log, and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for what's built versus deliberately deferred. Most of this was verified in a sandboxed testing environment; real dogfooding passes (actual `claude` CLI install, live pipeline runs via `/wingman:dogfood`) have also happened and found real gaps, now fixed — see [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) for what real dogfooding still needs.
 

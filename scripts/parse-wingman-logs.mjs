@@ -137,9 +137,11 @@ export function parseAll() {
 // Mechanical occurrence-counting helper for evolve-promotion / dogfood-gap-classification: groups
 // all learning/retro/decision entries by category and returns categories with 2+ occurrences --
 // the exact "genuine repetition" signal those skills need, computed from real fields instead of
-// eyeballing prose.
-export function recurringCategories(minOccurrences = 2) {
-  const { learnings, retros, decisions } = parseAll();
+// eyeballing prose. Split into a pure counting step (recurringCategoriesFrom) and a convenience
+// wrapper (recurringCategories) that calls parseAll() itself, so a caller that already has parsed
+// data (e.g. wingman-health.mjs, which calls parseAll() for its own use anyway) can reuse it
+// instead of triggering a second full read+parse pass over the same growing log files.
+export function recurringCategoriesFrom({ learnings, retros, decisions }, minOccurrences = 2) {
   const counts = {};
   for (const e of [...learnings, ...retros, ...decisions]) {
     if (!e.category) continue;
@@ -148,6 +150,10 @@ export function recurringCategories(minOccurrences = 2) {
   return Object.entries(counts)
     .filter(([, n]) => n >= minOccurrences)
     .map(([category, count]) => ({ category, count }));
+}
+
+export function recurringCategories(minOccurrences = 2) {
+  return recurringCategoriesFrom(parseAll(), minOccurrences);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

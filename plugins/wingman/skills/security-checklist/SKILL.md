@@ -45,6 +45,10 @@ During `/wingman:build`'s Definition-of-Done gate and any time code that touches
 - "Fixed" claimed without a regression test.
 - An `OPEN` risk about to be waved through without founder acceptance.
 
+## References
+
+- `references/secrets-policy.md` — consult before adding any integration that touches a credential (key handling, storage, rotation-on-exposure). Covers what the secret hooks (`secret-guard.mjs`, `secret-scanner.mjs`, `prompt-guard.mjs`) do and don't do.
+
 ## Verification
 
 The register itself is the verification: every row `CLOSED` with evidence (PR/commit + test) or founder-accepted, and `threats_open == 0`. See `verification-before-completion` and `references/threat-register.md`.
