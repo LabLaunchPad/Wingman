@@ -52,8 +52,8 @@ const VALID_HOOK_EVENTS = new Set([
   'PostToolUse',
 ]);
 
-function parseFrontmatter(filePath) {
-  const text = readFileSync(filePath, 'utf-8');
+function parseFrontmatter(filePath, textOverride) {
+  const text = textOverride ?? readFileSync(filePath, 'utf-8');
   // Tolerate CRLF line endings (some checkouts don't normalize), so the
   // frontmatter check doesn't false-fail on a file saved with Windows line
   // endings rather than on a genuinely missing frontmatter block.
@@ -159,7 +159,10 @@ for (const relPath of plugin.skills || []) {
   const skillMdRel = join(relPath, 'SKILL.md');
   const fullPath = checkFile(skillMdRel, 'skill');
   if (!fullPath) continue;
-  const fm = parseFrontmatter(fullPath);
+  // Read once, reuse for both frontmatter parsing and the anatomy scan below
+  // (was two separate reads of the same file — see FIXLOG.md PERF2).
+  const skillText = readFileSync(fullPath, 'utf-8');
+  const fm = parseFrontmatter(fullPath, skillText);
   if (!fm || !fm.name) errors.push(`skill ${relPath}: missing required frontmatter field "name"`);
   if (!fm || !fm.description) errors.push(`skill ${relPath}: missing required frontmatter field "description"`);
   if (fm?.description && !/use when|use for|use proactively|triggers/i.test(fm.description)) {
@@ -171,7 +174,7 @@ for (const relPath of plugin.skills || []) {
   // because a skill may legitimately use equivalent headings (e.g.
   // systematic-debugging's "Iron Law" / "Common Rationalizations") -- but the
   // concepts should all be present. Matched on concept, not exact heading.
-  const body = readFileSync(fullPath, 'utf-8');
+  const body = skillText;
   for (const [concept, re] of [
     ['Rationalizations', /rationaliz/i],
     ['Red Flags', /red flag/i],

@@ -26,14 +26,27 @@ const DESTRUCTIVE = [
   /:\s*\(\s*\)\s*\{/i,                    // fork bomb :(){ :|:& };:
 ];
 
+// SECRET is exported (not just used locally) so secret-scanner.mjs can import
+// this exact list rather than keeping its own byte-identical copy that could
+// silently drift — the same reasoning INJECTION is shared between
+// prompt-guard.mjs and content-injection-scanner.mjs. This is a floor, not a
+// ceiling: it catches known vendor-prefix shapes, not every possible secret
+// (no entropy-based detection) -- see FIXLOG.md SEC2/CQ1.
 const SECRET = [
   /AKIA[0-9A-Z]{16}/,                     // AWS access key id
-  /\bghp_[A-Za-z0-9]{36}\b/,              // GitHub PAT
+  /\bghp_[A-Za-z0-9]{36}\b/,              // GitHub PAT (classic)
+  /\bgithub_pat_[A-Za-z0-9_]{20,}\b/,     // GitHub PAT (fine-grained)
+  /\bgh[soru]_[A-Za-z0-9]{20,}\b/,        // GitHub App/OAuth/refresh tokens
+  /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/,     // Slack tokens
+  /\bsk_live_[A-Za-z0-9]{20,}\b/,         // Stripe live secret key
+  /\bAIzaSy[A-Za-z0-9_-]{33}\b/,          // Google API key
   /\bsk-[A-Za-z0-9]{20,}\b/,              // OpenAI / Anthropic-style keys
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,   // PEM private key
   /\bANTHROPIC_API_KEY\s*=\s*\S+/i,       // literal key assignment
   /(?:password|passwd|secret|token|api[_-]?key)\s*[:=]\s*['"]?[A-Za-z0-9\/+_]{20,}/i,
 ];
+
+export { SECRET };
 
 export function decide(toolName, toolInput = {}) {
   const haystacks = [];

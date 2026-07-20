@@ -15,18 +15,15 @@
 // Pure logic in scan()/redact()/findSecrets() is unit-tested; the CLI below
 // just adapts stdin/stdout.
 
+// Reuses secret-guard.mjs's SECRET pattern set rather than a duplicate
+// byte-identical list that could silently drift — the same reasoning
+// content-injection-scanner.mjs already applies to prompt-guard.mjs's
+// INJECTION list. See FIXLOG.md SEC2/CQ1.
+
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-
-const SECRET = [
-  /AKIA[0-9A-Z]{16}/,                     // AWS access key id
-  /\bghp_[A-Za-z0-9]{36}\b/,              // GitHub PAT
-  /\bsk-[A-Za-z0-9]{20,}\b/,              // OpenAI / Anthropic-style keys
-  /-----BEGIN [A-Z ]*PRIVATE KEY-----/,   // PEM private key
-  /\bANTHROPIC_API_KEY\s*=\s*\S+/i,       // literal key assignment
-  /(?:password|passwd|secret|token|api[_-]?key)\s*[:=]\s*['"]?[A-Za-z0-9\/+_]{20,}/i,  // generic key assignment
-];
+import { SECRET } from './secret-guard.mjs';
 
 export function findSecrets(text = '') {
   const hits = [];

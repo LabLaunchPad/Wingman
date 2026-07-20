@@ -78,17 +78,20 @@ exactly Wingman's model (the 4 mechanical validators + the Boardroom review + th
   requirement is minted as a trackable ID. **Measured by:** `evals/cases/traceability-validator.md`
   (`verified`) — all three shapes: linked, unlinked, and orphaned requirement IDs.
 
-<!-- wingman:weakness id=W4 rule="plugins/wingman/skills/anti-rationalization" eval="evals/cases/anti-rationalization.md" status=covered-measured -->
+<!-- wingman:weakness id=W4 rule="plugins/wingman/skills/anti-rationalization" eval="evals/cases/anti-rationalization.md" status=covered-unmeasured -->
 - **W4 — Rationalizing failures / moving the goalposts to declare success.** MAST's reasoning-action
   mismatch and task-derailment classes. **Rule:** `skills/anti-rationalization` (the meta-skill every
-  discipline skill draws its rationalizations/red-flags table from). **Measured by:**
-  `evals/cases/anti-rationalization.md` (`verified`).
+  discipline skill draws its rationalizations/red-flags table from). **Not yet measured:**
+  `evals/cases/anti-rationalization.md` was downgraded from `verified` to `provisional` on
+  2026-07-20 (one run, no negative/differently-shaped second scenario yet — see `FIXLOG.md` T1).
+  Covered by a real rule, not yet backed by a `verified` eval.
 
-<!-- wingman:weakness id=W5 rule="plugins/wingman/skills/systematic-debugging" eval="evals/cases/systematic-debugging.md" status=covered-measured -->
+<!-- wingman:weakness id=W5 rule="plugins/wingman/skills/systematic-debugging" eval="evals/cases/systematic-debugging.md" status=covered-unmeasured -->
 - **W5 — Fixing symptoms before understanding root cause.** A widely-documented debugging failure
   mode; provoked and resisted in this repo's own `evals/cases/hotfix.md`/`incident-response.md` runs.
   **Rule:** `skills/systematic-debugging` (required first step of `/wingman:hotfix` before any fix).
-  **Measured by:** `evals/cases/systematic-debugging.md` (`verified`).
+  **Not yet measured:** `evals/cases/systematic-debugging.md` was downgraded from `verified` to
+  `provisional` on 2026-07-20 (one run, no second scenario yet — see `FIXLOG.md` T1).
 
 <!-- wingman:weakness id=W6 rule="plugins/wingman/skills/test-driven-development" eval="evals/cases/harness.md" status=covered-measured -->
 - **W6 — Skipping or faking tests / trusting a rubber-stamp suite.** MAST's "no or incorrect
@@ -120,10 +123,11 @@ exactly Wingman's model (the 4 mechanical validators + the Boardroom review + th
   **Measured by:** `evals/cases/evidence-gated-catalog.md` (`verified`) — positive/negative pair: an
   unproven `proven`-claiming entry vs. a genuinely-evidenced `draft`-claiming one.
 
-<!-- wingman:weakness id=W10 rule="plugins/wingman/skills/verification-loop" eval="evals/cases/verification-loop.md" status=covered-measured -->
+<!-- wingman:weakness id=W10 rule="plugins/wingman/skills/verification-loop" eval="evals/cases/verification-loop.md" status=covered-unmeasured -->
 - **W10 — Multi-step verification decay (early-step success never re-checked at the end).** MAST's
   verification class. **Rule:** `skills/verification-loop` (a standing multi-phase verification
-  system). **Measured by:** `evals/cases/verification-loop.md` (`verified`).
+  system). **Not yet measured:** `evals/cases/verification-loop.md` was downgraded from `verified`
+  to `provisional` on 2026-07-20 (one run, no second scenario yet — see `FIXLOG.md` T1).
 
 <!-- wingman:weakness id=W11 rule="plugins/wingman/skills/test-driven-development" eval="" status=covered-unmeasured -->
 - **W11 — Hallucinating APIs / methods / libraries that don't exist.** One of the most-reported
