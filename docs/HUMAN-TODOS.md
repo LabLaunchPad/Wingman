@@ -65,7 +65,7 @@ Claude closed all G1–G12 code gaps and set branch protection via API. The rest
 <!-- wingman:log type=todo category=demo-content status=open -->
 2. **Demo footage** — record a real installed session (see `docs/DEMO-CHECKLIST.md`). Needs an interactive terminal; the sandbox can't produce video.
 <!-- wingman:log type=todo category=legal status=open -->
-3. **Independent legal pass** — have a human/legal reviewer confirm `ATTRIBUTIONS.md` (now covers 20 vendor repos). Self-review done; external pass still recommended before public release.
+3. **Independent legal pass** — have a human/legal reviewer confirm `ATTRIBUTIONS.md` (16 pinned vendor submodules, plus 5 non-vendored/browsed-only design-inspiration credits in its own table). Self-review done; external pass still recommended before public release.
 <!-- wingman:log type=todo category=publishing status=open -->
 4. **Marketplace submission** — `.claude-plugin/marketplace.json` (repo root) + `plugins/wingman/.claude-plugin/plugin.json` are structurally complete and committed. Submit via your Anthropic/marketplace account (account action only you can take).
 <!-- wingman:log type=todo category=publishing status=open -->

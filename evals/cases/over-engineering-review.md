@@ -23,4 +23,4 @@ A small Node.js project with intentional over-engineering:
 
 ## Trust level
 
-`verified` — passed a real positive scenario with intentional over-engineering patterns, each finding correctly tagged and simplified.
+`authored, pending first run` — Scenario 1 above is specified but has no run log; do not treat as `verified` until a real run is logged (see `evals/README.md`).
