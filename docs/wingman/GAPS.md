@@ -147,7 +147,18 @@ Schema per row:
 
 ## G13+ ledger (post-original-closure, evidence-driven)
 
-### G13 — Boardroom verdict transcription integrity (`hook`, shipped)
+### G13 — content-injection scanner (`PostToolUse`, shipped)
+- **source**: Boardroom CISO review, 2026-07-19, prompted by a founder-shared Google SAIF 2.0 "Secure Agents" risk map cross-check against Wingman's own Input/Output Handling coverage. `prompt-guard.mjs` (G3) only scans the founder's own `UserPromptSubmit` text — content pulled in mid-task via `WebFetch`/`Read`/`Bash` (a fetched web page, a cloned file, a PR comment surfaced through a tool result) was never scanned at all, even though it can carry the same injection phrasing and a subagent may treat it as instructions rather than data.
+- **founder-value**: a second net against prompt injection riding in through fetched content, not just the founder's own typed prompt — the same "input side vs. output side" defense-in-depth logic G4 already applies to secrets.
+- **type**: hook (`.mjs`), event `PostToolUse`, no matcher (fires on every tool's response, mirroring `secret-scanner.mjs`).
+- **trigger**: after any tool call returns.
+- **behavior**: scans the tool *response* for the same `INJECTION` pattern set `prompt-guard.mjs` exports (reused, not duplicated, to avoid silent drift) and warns (stderr) if matched. WARN-ONLY by design, same rationale as G4 — blocking would risk refusing a legitimate fetch/read whose content merely *quotes* injection-like text (e.g. a security writeup) rather than being an actual attack.
+- **files**: `plugins/wingman/hooks/content-injection-scanner.mjs`, wired in `hooks/hooks.json`; `plugins/wingman/hooks/prompt-guard.mjs`'s `INJECTION` array exported and broadened in the same review (added disregard/forget, act-as-if/pretend, and guardrail-override paraphrases prompt-guard's original 4 patterns didn't cover).
+- **test-plan**: unit test `scan()` finds/doesn't-find matches; integration test that a WebFetch response containing injection text warns (exit 0) and clean content doesn't.
+- **validation**: `validate-structure` (real hook event `PostToolUse`), `node --test` green.
+- **status**: shipped. **Deliberately not attempted in this pass**: fully closing prompt-injection risk — a fixed regex list is a floor, not a ceiling, and this is disclosed as an accepted residual risk in both hooks' own comments and `docs/ARCHITECTURE.md`'s "Agent Permission Model" section, not claimed as solved.
+
+### G14 — Boardroom verdict transcription integrity (`hook`, shipped)
 - **source**: a founder-shared "how real AI applications stay reliable across models" architecture diagram (Analytics Vidhya, 2026-07-19) prompted a real CTO + Research Boardroom review of whether Wingman's safety/quality gate would hold regardless of which underlying model drives `boardroom.md`. Both seats converged on one file-verified gap: `checkBoardroomVerdictClean()` (`dod-structural-gate.mjs`) trusts whatever `verdict` string is already transcribed into `checkpoints.jsonl`'s `seats[]` array, with nothing independently re-deriving it from each seat's own raw `## <SEAT> VERDICT: ...` line — a mis-transcription (e.g. a `NO_GO` copied in as `GO_WITH_CONCERNS`) would sail through undetected. Every other layer the diagram named (input validation, orchestration, retrieval, eval/observability) already had a real, file-verified Wingman equivalent — this was the one genuine gap, not a re-litigation of the already-declined multi-model-router or vector-DB questions.
 - **founder-value**: the push-time gate that's supposed to stop an unresolved security/quality finding from shipping can't be silently defeated by a hand-transcription slip, no matter which model is driving the session.
 - **type**: hook, `dod-structural-gate.mjs` (`checkVerdictTranscriptionMatchesDetails`).
