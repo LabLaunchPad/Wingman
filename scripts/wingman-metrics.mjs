@@ -88,10 +88,57 @@ if (debtBody) {
 // Thin wrapper around the existing recurringCategories() export -- no new parsing.
 const recurring = recurringCategories();
 
+// --- 5. Agent-weakness coverage benchmark ---
+// Parses docs/AGENT-WEAKNESS-BENCHMARK.md's `wingman:weakness` markers, then
+// RE-DERIVES each one's real status from disk rather than trusting the marker's
+// hand-written status: does the rule= path exist, and is the eval= case actually
+// `verified`? Flags any marker whose written status disagrees, plus any broken
+// path. The benchmark verifies its own claims (verification-before-completion
+// applied to the benchmark itself) so the catalog can't silently rot/overstate.
+function evalTrustLevel(evalRel) {
+  const body = read(evalRel);
+  if (body === null) return null; // missing file
+  const after = body.split(/##\s*Trust level/i)[1] || '';
+  const m = after.match(/`(verified|provisional)`/i);
+  return m ? m[1].toLowerCase() : 'authored';
+}
+
+const WEAKNESS_MARKER_RE = /<!--\s*wingman:weakness\s+(.*?)\s*-->/g;
+const weaknessBody = read('docs/AGENT-WEAKNESS-BENCHMARK.md') || '';
+const weaknesses = [];
+for (const match of weaknessBody.matchAll(WEAKNESS_MARKER_RE)) {
+  const attrs = {};
+  for (const a of match[1].matchAll(/(\w+)=(?:"([^"]*)"|(\S+))/g)) attrs[a[1]] = a[2] ?? a[3];
+  // Skip the literal `<!-- wingman:weakness ... -->` examples shown in this doc's
+  // own prose: real catalog markers always carry an id=W<number>.
+  if (!/^W\d+$/.test(attrs.id || '')) continue;
+  const rule = attrs.rule || '';
+  const evalRef = attrs.eval || '';
+  const writtenStatus = attrs.status || '';
+  const hasRule = rule !== '' && existsSync(join(repoRoot, rule));
+  const ruleBroken = rule !== '' && !hasRule;
+  const evalTrust = evalRef !== '' ? evalTrustLevel(evalRef) : null;
+  const evalBroken = evalRef !== '' && evalTrust === null;
+  const measured = hasRule && evalTrust === 'verified';
+  const derivedStatus = !hasRule ? 'uncovered' : (measured ? 'covered-measured' : 'covered-unmeasured');
+  weaknesses.push({
+    id: attrs.id || '?', rule, evalRef, writtenStatus, derivedStatus,
+    ruleBroken, evalBroken, mismatch: writtenStatus !== derivedStatus,
+  });
+}
+const wTotal = weaknesses.length;
+const wCovered = weaknesses.filter((w) => w.derivedStatus !== 'uncovered').length;
+const wMeasured = weaknesses.filter((w) => w.derivedStatus === 'covered-measured').length;
+const wUncovered = wTotal - wCovered;
+const brokenRefs = weaknesses.filter((w) => w.ruleBroken || w.evalBroken);
+const mismatches = weaknesses.filter((w) => w.mismatch);
+const pctCovered = wTotal ? Math.round((wCovered / wTotal) * 100) : 0;
+const pctMeasured = wTotal ? Math.round((wMeasured / wTotal) * 100) : 0;
+
 // --- Report ---
 const asJson = process.argv.includes('--json');
 if (asJson) {
-  console.log(JSON.stringify({ tierCounts, tierByAgent, evalSnapshot: { total: cases.length, verified, provisional, pctVerified }, debt: { summary: debtSummary, rows: debtRows }, recurring }, null, 2));
+  console.log(JSON.stringify({ tierCounts, tierByAgent, evalSnapshot: { total: cases.length, verified, provisional, pctVerified }, debt: { summary: debtSummary, rows: debtRows }, recurring, weaknessBenchmark: { total: wTotal, covered: wCovered, measured: wMeasured, uncovered: wUncovered, pctCovered, pctMeasured, brokenRefs: brokenRefs.map((w) => w.id), mismatches: mismatches.map((w) => ({ id: w.id, written: w.writtenStatus, derived: w.derivedStatus })), weaknesses } }, null, 2));
 } else {
   const line = (s = '') => console.log(s);
   line('# Wingman Metrics — cost, quality, and debt signals (not a service benchmark)');
@@ -113,4 +160,15 @@ if (asJson) {
   line(recurring.length
     ? `   ${recurring.length} categor${recurring.length === 1 ? 'y has' : 'ies have'} crossed the 2+-occurrence evolve-promotion threshold: ${recurring.map((r) => `${r.category} ×${r.count}`).join(', ')}`
     : '   No category has crossed the 2+-occurrence threshold yet.');
+  line();
+  line('## 5. Agent-weakness coverage benchmark (docs/AGENT-WEAKNESS-BENCHMARK.md)');
+  if (wTotal === 0) {
+    line('   No wingman:weakness markers found — catalog missing or empty.');
+  } else {
+    line(`   Cataloged weaknesses:                    ${wTotal}`);
+    line(`   Covered by a rule:                       ${wCovered}/${wTotal} (${pctCovered}%)`);
+    line(`   Measured by a verified eval (incl. A/B): ${wMeasured}/${wTotal} (${pctMeasured}%)`);
+    line(`   Uncovered (evidence-gated candidates):   ${wUncovered}`);
+    line(`   Broken references: ${brokenRefs.length}${brokenRefs.length ? ` (${brokenRefs.map((w) => w.id).join(', ')})` : ''}   Status mismatches: ${mismatches.length}${mismatches.length ? ` (${mismatches.map((w) => `${w.id}: wrote ${w.writtenStatus}, derived ${w.derivedStatus}`).join('; ')})` : ''}`);
+  }
 }
