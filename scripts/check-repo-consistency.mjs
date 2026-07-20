@@ -79,6 +79,28 @@ if (attributions && vendorEntries.length) {
   }
 }
 
+// --- Submodule attribution: every vendor path DECLARED in .gitmodules is attributed ---
+// The check above reads the vendor/ filesystem, which is only populated when
+// submodules are actually checked out — in a CI job that doesn't init them, it
+// silently passes over an unattributed submodule. .gitmodules is the committed,
+// always-present manifest, so this catches the real drift (a submodule added to
+// .gitmodules but never added to ATTRIBUTIONS.md) even without a checkout. Same
+// normalization as above (slashes→dashes, case-insensitive). Deliberately
+// one-directional: ATTRIBUTIONS.md intentionally also lists NON-vendored,
+// browsed-only references (its "Non-vendored attribution" section), so the
+// reverse check (every attributed repo must be a submodule) would false-positive
+// on entries that are correct by design.
+const gitmodules = read('.gitmodules');
+if (attributions && gitmodules) {
+  const haystack = attributions.toLowerCase().replace(/\//g, '-');
+  const declaredPaths = [...gitmodules.matchAll(/^\s*path\s*=\s*vendor\/(\S+)\s*$/gm)].map((m) => m[1]);
+  for (const name of declaredPaths) {
+    if (!haystack.includes(name.toLowerCase())) {
+      errors.push(`attribution: submodule "vendor/${name}" is declared in .gitmodules but not mentioned in ATTRIBUTIONS.md — every pinned submodule must be attributed`);
+    }
+  }
+}
+
 // --- Structural log markers: every entry in LEARNINGS.md/retros.md/PROJECT.md's decisions
 // log/HUMAN-TODOS.md carries a preceding `wingman:log` marker ---
 // Mirrors how check-traceability.mjs enforces its own req-marker convention: an unenforced
