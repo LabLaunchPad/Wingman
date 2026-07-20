@@ -15,6 +15,13 @@ import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Resolve the repo root from this file's own location, not process.cwd() --
+// so these tests work regardless of which directory `node --test` is invoked
+// from (fixes FIXLOG.md T3: the prior process.cwd()-based path was never
+// actually read, only used to justify a tautological assertion).
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 // ============================================================================
 // Decision Ladder Tests
@@ -442,7 +449,7 @@ describe('Over-Engineering Review', () => {
 // ============================================================================
 
 describe('Integration', () => {
-  it('should have all required skills', () => {
+  it('should have all required skills, each with a real, non-empty SKILL.md', () => {
     const requiredSkills = [
       'engineering-minimalism',
       'platform-native-reference',
@@ -451,22 +458,15 @@ describe('Integration', () => {
     ];
 
     for (const skill of requiredSkills) {
-      const skillPath = path.join(
-        process.cwd(),
-        'plugins',
-        'wingman',
-        'skills',
-        skill,
-        'SKILL.md'
-      );
-      
-      // Note: This test will fail if run outside the Wingman directory
-      // In a real test suite, we'd mock the filesystem or use a fixture
-      assert.strictEqual(typeof skill, 'string');
+      const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', skill, 'SKILL.md');
+      assert.ok(fs.existsSync(skillPath), `${skillPath} does not exist`);
+      const content = fs.readFileSync(skillPath, 'utf-8');
+      assert.ok(content.length > 0, `${skillPath} is empty`);
+      assert.match(content, /^---\r?\n/, `${skillPath} is missing YAML frontmatter`);
     }
   });
 
-  it('should have all required commands', () => {
+  it('should have all required commands, each with a real, non-empty command file', () => {
     const requiredCommands = [
       'over-engineering-review',
       'bloat-audit',
@@ -476,43 +476,36 @@ describe('Integration', () => {
     ];
 
     for (const cmd of requiredCommands) {
-      assert.strictEqual(typeof cmd, 'string');
+      const cmdPath = path.join(repoRoot, 'plugins', 'wingman', 'commands', `${cmd}.md`);
+      assert.ok(fs.existsSync(cmdPath), `${cmdPath} does not exist`);
+      const content = fs.readFileSync(cmdPath, 'utf-8');
+      assert.ok(content.length > 0, `${cmdPath} is empty`);
     }
   });
 
-  it('should have consistent tag taxonomy across skills', () => {
+  it('should have consistent 5-tag taxonomy actually present in engineering-minimalism/SKILL.md', () => {
     const tags = ['#delete', '#stdlib', '#native', '#yagni', '#shrink'];
-    
-    // All tags should start with #
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'engineering-minimalism', 'SKILL.md');
+    const content = fs.readFileSync(skillPath, 'utf-8');
+
     for (const tag of tags) {
-      assert.ok(tag.startsWith('#'));
+      assert.ok(content.includes(tag), `${skillPath} is missing tag ${tag}`);
     }
-    
-    // Should have exactly 5 tags
-    assert.strictEqual(tags.length, 5);
   });
 
-  it('should have consistent minimal comment format', () => {
+  it('should have the // minimal: comment convention actually documented in engineering-minimalism/SKILL.md', () => {
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'engineering-minimalism', 'SKILL.md');
+    const content = fs.readFileSync(skillPath, 'utf-8');
     const pattern = /\/\/ minimal: .+?, .+/;
-    
-    const validComments = [
-      '// minimal: O(n²) scan, switch to index if >1000 users',
-      '// minimal: global lock, per-account locks if throughput matters',
-      '// minimal: naive heuristic, replace with ML model if accuracy matters',
-    ];
-    
-    for (const comment of validComments) {
-      assert.ok(pattern.test(comment));
-    }
+    assert.match(content, pattern, `${skillPath} does not document the "// minimal: <what>, <when to revisit>" convention`);
   });
 
-  it('should have consistent intensity levels', () => {
-    const levels = ['lite', 'full', 'ultra'];
-    
-    assert.strictEqual(levels.length, 3);
-    assert.ok(levels.includes('lite'));
-    assert.ok(levels.includes('full'));
-    assert.ok(levels.includes('ultra'));
+  it('should have all three intensity levels actually documented in engineering-minimalism/SKILL.md', () => {
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'engineering-minimalism', 'SKILL.md');
+    const content = fs.readFileSync(skillPath, 'utf-8');
+    for (const level of ['lite', 'full', 'ultra']) {
+      assert.ok(content.includes(level), `${skillPath} does not mention intensity level "${level}"`);
+    }
   });
 });
 

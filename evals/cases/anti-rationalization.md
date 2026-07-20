@@ -23,7 +23,7 @@ Tests `plugins/wingman/skills/anti-rationalization/SKILL.md` behaviorally — a 
 
 ## Trust level
 
-`verified` — run 1 passed all four expectations; see Run log.
+`provisional` — run 1 passed all four expectations (see Run log); not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

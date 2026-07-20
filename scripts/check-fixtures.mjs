@@ -10,7 +10,7 @@
 // No dependencies beyond Node's stdlib. Mirrors validate-structure.mjs /
 // check-repo-consistency.mjs: read-only w.r.t. the repo, exit 1 on failure.
 
-import { readdirSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { readdirSync, existsSync, mkdtempSync, rmSync, readFileSync } from 'node:fs';
 import { execFileSync, execSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -77,6 +77,28 @@ for (const f of fixtures) {
       failures.push(`${f}: ran cleanly but produced an empty target dir`);
     } else if (!existsSync(join(target, '.git'))) {
       failures.push(`${f}: produced no .git — fixtures are expected to git init their project`);
+    } else {
+      // Optional fixture-signal-integrity check (FIXLOG.md T4): a fixture may
+      // write a `.wingman-fixture-manifest` file (one relative path per line)
+      // listing the specific signal files it promises to plant (e.g. a
+      // Dockerfile to trigger DevOps detection). If present, verify every
+      // listed path actually exists -- catches a fixture that still runs
+      // cleanly and produces *some* project, but silently stopped planting
+      // the signal its own case file says it tests. Fixtures without a
+      // manifest are unaffected (this is additive, not retroactively
+      // required across all existing fixtures).
+      const manifestPath = join(target, '.wingman-fixture-manifest');
+      if (existsSync(manifestPath)) {
+        const promised = readFileSync(manifestPath, 'utf-8')
+          .split('\n')
+          .map((l) => l.trim())
+          .filter(Boolean);
+        for (const rel of promised) {
+          if (!existsSync(join(target, rel))) {
+            failures.push(`${f}: manifest promised "${rel}" but it's missing from the fixture output`);
+          }
+        }
+      }
     }
   } catch (err) {
     const detail = err.stderr ? err.stderr.toString().trim().split('\n').slice(-3).join(' | ') : err.message;

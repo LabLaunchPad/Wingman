@@ -24,7 +24,7 @@ Tests `plugins/wingman/skills/spec-handler/SKILL.md` behaviorally — given a ta
 
 ## Trust level
 
-`verified` — see Run 1 in the Run log below; graded independently against the raw subagent transcript (not just its self-report) and against a fresh `npm test` execution.
+`provisional` — see Run 1 in the Run log below; graded independently against the raw subagent transcript (not just its self-report) and against a fresh `npm test` execution. Not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

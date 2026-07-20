@@ -98,6 +98,19 @@ EOF
 git add -A
 git commit -q -m "Initial fixture: Fetch app"
 
+# Fixture-signal-integrity manifest (see scripts/check-fixtures.mjs, FIXLOG.md
+# T4): lists the specific signal files this fixture promises to plant, so the
+# deterministic CI gate catches it if a future edit silently drops one of
+# them, rather than the fixture still running "cleanly" with a weaker signal
+# than its own case file claims. Written after the commit, deliberately not
+# part of the fixture's own git history -- it's checker metadata, not
+# simulated project content a subagent inspecting this fixture should see.
+cat > .wingman-fixture-manifest <<'EOF'
+Dockerfile
+.github/workflows/ci.yml
+package.json
+EOF
+
 echo "Fixture created at $TARGET"
 echo "Expected department-lead activations for this fixture:"
 echo "  dept-product          -> Always (only via /wingman:plan, not tested here)"

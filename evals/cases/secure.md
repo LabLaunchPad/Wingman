@@ -31,7 +31,7 @@ This case was authored during PR #22's eval-coverage batch but marked `authored,
 
 ## Trust level
 
-`verified` — the fold-in discipline caught and correctly handled all 3 differently-shaped risks on the first real run against `build.md`'s new gate, with every fix independently confirmed against the real fixture filesystem (not the subagent's self-report), directly closing MVP2's own named risk that relocating this discipline might dilute it.
+`provisional` — the fold-in discipline caught and correctly handled all 3 differently-shaped risks on the first real run against `build.md`'s new gate, with every fix independently confirmed against the real fixture filesystem (not the subagent's self-report), directly closing MVP2's own named risk that relocating this discipline might dilute it. Not yet re-run against a second scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

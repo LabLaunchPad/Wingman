@@ -24,7 +24,7 @@ A minimal plan with 3 independent tasks: (1) create a `greet` function, (2) crea
 
 ## Trust level
 
-`verified` — first run confirms the core mechanism (fresh subagent per task, review gates, ledger, final broad review, no context pollution). See caveat in Run 1 about one review dispatch's async timing.
+`provisional` — first run confirms the core mechanism (fresh subagent per task, review gates, ledger, final broad review, no context pollution). See caveat in Run 1 about one review dispatch's async timing. Not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 
