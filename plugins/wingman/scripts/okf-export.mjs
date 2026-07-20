@@ -82,7 +82,7 @@ function timestampFromCheckpointId(checkpointId) {
   // ("2026-07-14T14-32-00Z"), with hyphens standing in for the colons.
   const match = String(checkpointId || '').match(/^(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z)/);
   if (!match) return null;
-  return match[1].replace('T', 'T').replace(/(\d{2})-(\d{2})-(\d{2})Z$/, '$1:$2:$3Z');
+  return match[1].replace(/(\d{2})-(\d{2})-(\d{2})Z$/, '$1:$2:$3Z');
 }
 
 function dateFromTimestamp(timestamp) {
