@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.20] - 2026-07-20
+
+### Added
+- **`skills/prompt-diff-check`** — checks whether a changed command/agent/skill's existing eval case actually exercises the changed section, rather than assuming a case existing means the change is covered. Wired into `/wingman:harness`'s self-audit. Narrow, evidence-gated addition following an assessment of an externally-pasted "deep research report" — see `docs/PROJECT.md`'s decisions log for the full assessment (2 of the report's other 4 proposals were declined as architecturally incompatible with Wingman's zero-dependency/no-runtime design, 2 were found already built).
+
 ## [0.5.19] - 2026-07-20
 
 ### Added
