@@ -521,27 +521,27 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
 
   it('stop-loop evaluate(): unit', async () => {
     const { evaluate } = await import(pathToFileURL(stopPath).href);
-    assert.strictEqual(evaluate(null, ''), 'stop');
-    assert.strictEqual(evaluate({ enabled: false, completionPromise: 'DONE' }, ''), 'stop');
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'still working'), 'continue');
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'all done DONE'), 'stop');
+    assert.strictEqual(evaluate(null, '').decision, 'stop');
+    assert.strictEqual(evaluate({ enabled: false, completionPromise: 'DONE' }, '').decision, 'stop');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'still working').decision, 'continue');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'all done DONE').decision, 'stop');
     // Max iteration cap tests
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 49), 'continue');
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 50), 'stop');
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 9), 'continue');
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 10), 'stop');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 49).decision, 'continue');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 50).decision, 'stop');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 9).decision, 'continue');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE', maxIterations: 10 }, 'working', 10).decision, 'stop');
   });
 
   it('stop-loop evaluate(): wall-clock budget cap (Boardroom-recommended, 2026-07-19)', async () => {
     const { evaluate } = await import(pathToFileURL(stopPath).href);
     const config = { enabled: true, completionPromise: 'DONE', maxWallClockMinutes: 30 };
     // Under budget, no other trigger: keep going.
-    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 10 }), 'continue');
+    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 10 }).decision, 'continue');
     // Budget reached: stop, even though iteration count and completion promise haven't fired.
-    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 30 }), 'stop');
-    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 45 }), 'stop');
+    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 30 }).decision, 'stop');
+    assert.strictEqual(evaluate(config, 'working', 5, { elapsedMinutes: 45 }).decision, 'stop');
     // Unset maxWallClockMinutes: no budget check at all, regardless of elapsed time (backward-compatible default).
-    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 5, { elapsedMinutes: 9999 }), 'continue');
+    assert.strictEqual(evaluate({ enabled: true, completionPromise: 'DONE' }, 'working', 5, { elapsedMinutes: 9999 }).decision, 'continue');
   });
 
   it('stop-loop evaluate(): stall / no-progress detection (Boardroom-recommended, 2026-07-19)', async () => {
@@ -550,33 +550,33 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
     const repeating = ['Bash:{"command":"npm test"}', 'Bash:{"command":"npm test"}', 'Bash:{"command":"npm test"}'];
     const varying = ['Read:{"file":"a.js"}', 'Edit:{"file":"a.js"}', 'Bash:{"command":"npm test"}'];
     // Default threshold (3): the same call 3x in a row trips the stall stop.
-    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: repeating }), 'stop');
+    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: repeating }).decision, 'stop');
     // Genuinely different calls in the window: no stall, keep going.
-    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: varying }), 'continue');
+    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: varying }).decision, 'continue');
     // Fewer repeats than the threshold: not yet a stall.
-    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: repeating.slice(0, 2) }), 'continue');
+    assert.strictEqual(evaluate(config, 'working', 5, { recentToolSignatures: repeating.slice(0, 2) }).decision, 'continue');
     // Explicit stallThreshold: 0 disables the check entirely, even with a long identical run.
     assert.strictEqual(
-      evaluate({ ...config, stallThreshold: 0 }, 'working', 5, { recentToolSignatures: repeating }),
+      evaluate({ ...config, stallThreshold: 0 }, 'working', 5, { recentToolSignatures: repeating }).decision,
       'continue'
     );
     // No recentToolSignatures passed at all (e.g. every pre-existing caller): no stall check fires.
-    assert.strictEqual(evaluate(config, 'working', 5), 'continue');
+    assert.strictEqual(evaluate(config, 'working', 5).decision, 'continue');
   });
 
   it('stop-loop evaluate(): verified-completion gate (dedicated CISO review, 2026-07-19)', async () => {
     const { evaluate } = await import(pathToFileURL(stopPath).href);
     const config = { enabled: true, completionPromise: 'DONE', verifyCommand: 'npm test' };
     // Promise claimed, but not verified (or explicitly failed): keep going, not stop.
-    assert.strictEqual(evaluate(config, 'all done DONE', 5, {}), 'continue');
-    assert.strictEqual(evaluate(config, 'all done DONE', 5, { verifyPassed: false }), 'continue');
+    assert.strictEqual(evaluate(config, 'all done DONE', 5, {}).decision, 'continue');
+    assert.strictEqual(evaluate(config, 'all done DONE', 5, { verifyPassed: false }).decision, 'continue');
     // Promise claimed AND verified: stop.
-    assert.strictEqual(evaluate(config, 'all done DONE', 5, { verifyPassed: true }), 'stop');
+    assert.strictEqual(evaluate(config, 'all done DONE', 5, { verifyPassed: true }).decision, 'stop');
     // Still bounded by the existing caps even while unverified — doesn't loop forever.
-    assert.strictEqual(evaluate(config, 'all done DONE', 50, {}), 'stop'); // max iterations reached
+    assert.strictEqual(evaluate(config, 'all done DONE', 50, {}).decision, 'stop'); // max iterations reached
     // No verifyCommand configured: verifyPassed is never consulted (backward-compatible default).
     assert.strictEqual(
-      evaluate({ enabled: true, completionPromise: 'DONE' }, 'all done DONE', 5, {}),
+      evaluate({ enabled: true, completionPromise: 'DONE' }, 'all done DONE', 5, {}).decision,
       'stop'
     );
   });
