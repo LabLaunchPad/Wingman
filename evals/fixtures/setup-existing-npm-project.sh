@@ -29,7 +29,7 @@ cat > package.json <<'EOF'
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "kleur": "^4.1.5"
+    "kleur": "4.1.5"
   }
 }
 EOF

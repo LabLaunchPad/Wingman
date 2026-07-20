@@ -21,8 +21,22 @@
 //   --project-dir defaults to cwd; --out defaults to <project-dir>/.wingman/okf-export
 
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { homedir } from 'node:os';
+
+// Guards the --out target before it's ever passed to rmSync({recursive:true,
+// force:true}): refuses the filesystem root and the user's home directory
+// exactly (a typo'd or empty --out resolving to one of these would otherwise
+// silently wipe it).
+function assertSafeToWipe(dir) {
+  const resolved = resolve(dir);
+  const root = resolve(sep);
+  const home = resolve(homedir());
+  if (resolved === root || resolved === home) {
+    throw new Error(`okf-export: refusing to wipe ${resolved} — refine --out to a project-scoped path`);
+  }
+}
 
 const MEMORY_FILES = [
   { source: 'MEMORY.md', concept: 'memory-facts', title: 'Project memory — evergreen facts' },
@@ -223,6 +237,7 @@ function exportBundle(projectDir, outDir) {
     ...readMemoryFile(projectDir, entry.source),
   })).filter((entry) => entry.exists);
 
+  assertSafeToWipe(outDir);
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
 
