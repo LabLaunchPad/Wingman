@@ -47,14 +47,17 @@ import nodePath from 'node:path';
 const DEFAULT_MAX_ITERATIONS = 50;
 const DEFAULT_STALL_THRESHOLD = 3; // N identical, consecutive tool calls in a row = stuck, not just repeating a valid retry once
 
-// Returns 'continue' (block the stop, keep going) or 'stop' (let it end).
+// Returns { decision, reason }. decision is 'continue' (block the stop, keep
+// going) or 'stop' (let it end); reason names which check produced 'stop' —
+// the CLI below prints it directly instead of recomputing the same stall/
+// budget checks a second time to figure out why (FIXLOG.md CQ4).
 // `extra` carries the two Boardroom-recommended checks; both are optional and
 // backward-compatible — omitting them (as every pre-existing caller does)
 // preserves the original iteration-cap-only behavior exactly.
 export function evaluate(config, lastText = '', iterationCount = 0, extra = {}) {
-  if (!config || config.enabled !== true) return 'stop';
+  if (!config || config.enabled !== true) return { decision: 'stop', reason: 'loop disabled' };
   const promise = config.completionPromise || '';
-  if (!promise) return 'stop';
+  if (!promise) return { decision: 'stop', reason: 'no completion promise configured' };
   // Promise already satisfied in the latest assistant message → done, UNLESS a
   // verifyCommand is configured — in that case a text claim alone isn't
   // enough; extra.verifyPassed must also be true (the CLI runs the cached
@@ -62,21 +65,28 @@ export function evaluate(config, lastText = '', iterationCount = 0, extra = {}) 
   // verifyCommand is configured, extra.verifyPassed is simply never checked —
   // identical to pre-verifyCommand behavior.
   if (lastText.includes(promise)) {
-    if (!config.verifyCommand || extra.verifyPassed === true) return 'stop';
+    if (!config.verifyCommand || extra.verifyPassed === true) {
+      return { decision: 'stop', reason: 'completion promise met' };
+    }
     // Claimed done but not (yet) verified — fall through to the same caps
     // below, so an agent that keeps claiming victory without passing
     // verification is still bounded by iterations/budget/stall, not allowed
     // to loop forever either.
   }
   const max = config.maxIterations || DEFAULT_MAX_ITERATIONS;
-  if (iterationCount >= max) return 'stop';
+  if (iterationCount >= max) {
+    return { decision: 'stop', reason: `max iterations reached (${iterationCount}/${max})` };
+  }
 
   // Wall-clock budget (CFO/CISO): a step-count cap is a loose proxy for
   // cost — a founder who raises maxIterations, or whose iterations are each
   // a large multi-file task, has no ceiling on real spend without this.
   if (typeof config.maxWallClockMinutes === 'number' && config.maxWallClockMinutes > 0
       && typeof extra.elapsedMinutes === 'number' && extra.elapsedMinutes >= config.maxWallClockMinutes) {
-    return 'stop';
+    return {
+      decision: 'stop',
+      reason: `wall-clock budget reached (${extra.elapsedMinutes.toFixed(1)}/${config.maxWallClockMinutes} min)`,
+    };
   }
 
   // Stall detection (CTO/CISO): a text-match completion check alone lets a
@@ -85,10 +95,12 @@ export function evaluate(config, lastText = '', iterationCount = 0, extra = {}) 
   const stallThreshold = config.stallThreshold === 0 ? 0 : (config.stallThreshold || DEFAULT_STALL_THRESHOLD);
   if (stallThreshold > 0 && Array.isArray(extra.recentToolSignatures) && extra.recentToolSignatures.length >= stallThreshold) {
     const window = extra.recentToolSignatures.slice(-stallThreshold);
-    if (window.every((sig) => sig === window[0])) return 'stop';
+    if (window.every((sig) => sig === window[0])) {
+      return { decision: 'stop', reason: `no progress detected — the same tool call repeated ${stallThreshold}x in a row` };
+    }
   }
 
-  return 'continue';
+  return { decision: 'continue', reason: null };
 }
 
 function readStdin() {
@@ -194,7 +206,7 @@ if (process.argv[1] && nodePath.resolve(process.argv[1]) === fileURLToPath(impor
       );
     }
   }
-  const decision = evaluate(config, lastText, iterationCount, { elapsedMinutes, recentToolSignatures, verifyPassed });
+  const { decision, reason: stopReason } = evaluate(config, lastText, iterationCount, { elapsedMinutes, recentToolSignatures, verifyPassed });
   if (decision === 'continue') {
     const newCount = iterationCount + 1;
     try {
@@ -208,18 +220,10 @@ if (process.argv[1] && nodePath.resolve(process.argv[1]) === fileURLToPath(impor
     process.exit(2); // non-zero blocks the stop, driving the loop onward
   }
   // Loop ended (done, max iterations, budget exhausted, or a detected stall)
-  // — say which, then reset the counter/timer for the next run.
+  // — say which (the reason evaluate() already derived), then reset the
+  // counter/timer for the next run.
   if (config?.enabled === true && iterationCount > 0) {
-    const max = config?.maxIterations || DEFAULT_MAX_ITERATIONS;
-    let reason = 'completion promise met';
-    if (iterationCount >= max) reason = `max iterations reached (${iterationCount}/${max})`;
-    else if (typeof config.maxWallClockMinutes === 'number' && elapsedMinutes >= config.maxWallClockMinutes) {
-      reason = `wall-clock budget reached (${elapsedMinutes.toFixed(1)}/${config.maxWallClockMinutes} min)`;
-    } else if (stallThreshold > 0 && recentToolSignatures.length >= stallThreshold
-        && recentToolSignatures.slice(-stallThreshold).every((s) => s === recentToolSignatures[recentToolSignatures.length - 1])) {
-      reason = `no progress detected — the same tool call repeated ${stallThreshold}x in a row`;
-    }
-    console.error(`Wingman stop-loop: stopping — ${reason}.`);
+    console.error(`Wingman stop-loop: stopping — ${stopReason || 'completion promise met'}.`);
   }
   try { writeFileSync(counterPath, JSON.stringify({ count: 0, startedAt: Date.now() })); } catch { /* best-effort */ }
   process.exit(0); // stop normally

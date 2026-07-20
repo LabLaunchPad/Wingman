@@ -39,14 +39,14 @@ suite passed) | `wontfix` (written justification required).
 
 | ID | Domain | Sev | file:line | Claim | Verdict | Proposed patch | Status |
 |---|---|---|---|---|---|---|---|
-| ARCH3 | Architecture | Medium | 7 `SKILL.md` files, `## Continuous Execution` block | Byte-identical ~24-line block duplicated | **CONFIRMED** — diffed 2 of 7, zero diff | Extract to `references/continuous-execution.md`, cite from all 7 | open |
-| PERF3 | Performance | Medium | `scripts/check-fixtures.mjs:54-58` | 46 independent fixtures run strictly sequentially | **CONFIRMED** — plain `for` loop, no concurrency | Bounded-concurrency worker pool | open |
-| SEC1 | Security | Medium | `plugins/wingman/hooks/stop-loop.mjs:157-185` | `verifyCommand` cache has a re-arm window across loop restarts | **CONFIRMED** — code's own comment documents this exact behavior; disclosed, CISO-reviewed, intentional tradeoff | Optional founder-ack hardening — propose, let founder decide | open |
-| SEC6 | Security | Low | `plugins/wingman/scripts/okf-export.mjs:226` | `rmSync(outDir, {recursive:true,force:true})` with no path containment check | **CONFIRMED** — zero `resolve(` calls in file | Add a minimal guard against `/` or home-dir targets | open |
-| CQ4 | Code Quality | Low | `plugins/wingman/hooks/stop-loop.mjs:88` vs `:218-219` | Stall-detection logic computed twice, different anchor | **CONFIRMED** | Thread `{decision, reason}` through `evaluate()` instead of recomputing | open |
-| CQ3 | Code Quality | Low | `plugins/wingman/hooks/dod-structural-gate.mjs:358-436` | 80-line unnamed orchestration block | Accepted (style judgment) | Extract `runGitPushGate()` | open |
-| DEVOPS1 | DevOps/CI | Low | `.github/workflows/{claude-code-review,claude}.yml` | `anthropic_api_key` passed via `with:` not `env:` | **CONFIRMED** | Verify `claude-code-action` supports `env:` input first; change only if confirmed | open |
-| SC4 | Supply Chain | Low | `evals/fixtures/setup-existing-npm-project.sh:32` | Unpinned semver `"kleur": "^4.1.5"` in disposable fixture | **CONFIRMED** | Pin to `4.1.5` | open |
+| ARCH3 | Architecture | Medium | 7 `SKILL.md` files, `## Continuous Execution` block | Byte-identical ~24-line block duplicated | **CONFIRMED** — diffed 2 of 7, zero diff | Extract to `references/continuous-execution.md`, cite from all 7 | fixed |
+| PERF3 | Performance | Medium | `scripts/check-fixtures.mjs:54-58` | 46 independent fixtures run strictly sequentially | **CONFIRMED** — plain `for` loop, no concurrency | Bounded-concurrency worker pool | fixed |
+| SEC1 | Security | Medium | `plugins/wingman/hooks/stop-loop.mjs:157-185` | `verifyCommand` cache has a re-arm window across loop restarts | **CONFIRMED** — code's own comment documents this exact behavior; disclosed, CISO-reviewed, intentional tradeoff | Optional founder-ack hardening — propose, let founder decide | wontfix — proposed to founder 2026-07-20; declined: a same-file ack token wouldn't meaningfully close a threat model where the attacker can already rewrite `loop.json`, so it'd be security theater. Documented tradeoff stands as CISO-reviewed. |
+| SEC6 | Security | Low | `plugins/wingman/scripts/okf-export.mjs:226` | `rmSync(outDir, {recursive:true,force:true})` with no path containment check | **CONFIRMED** — zero `resolve(` calls in file | Add a minimal guard against `/` or home-dir targets | fixed |
+| CQ4 | Code Quality | Low | `plugins/wingman/hooks/stop-loop.mjs:88` vs `:218-219` | Stall-detection logic computed twice, different anchor | **CONFIRMED** | Thread `{decision, reason}` through `evaluate()` instead of recomputing | fixed |
+| CQ3 | Code Quality | Low | `plugins/wingman/hooks/dod-structural-gate.mjs:358-436` | 80-line unnamed orchestration block | Accepted (style judgment) | Extract `runGitPushGate()` | wontfix — same precedent as CQ2: low-risk style judgment, not a correctness or duplication issue; revisit only if the block grows further or a second copy of the pattern appears |
+| DEVOPS1 | DevOps/CI | Low | `.github/workflows/{claude-code-review,claude}.yml` | `anthropic_api_key` passed via `with:` not `env:` | **CONFIRMED** | Verify `claude-code-action` supports `env:` input first; change only if confirmed | fixed — confirmed via the action's source (`inputs.anthropic_api_key \|\| env.ANTHROPIC_API_KEY`) that omitting the input and setting `env.ANTHROPIC_API_KEY` is supported; converted both workflows |
+| SC4 | Supply Chain | Low | `evals/fixtures/setup-existing-npm-project.sh:32` | Unpinned semver `"kleur": "^4.1.5"` in disposable fixture | **CONFIRMED** | Pin to `4.1.5` | fixed |
 
 ## Accepted, no independent re-verification needed (self-disclosed / style judgments)
 
@@ -61,6 +61,8 @@ suite passed) | `wontfix` (written justification required).
 | T6 (see also Wave 1) | Testing | Low | Already scheduled above |
 
 **Summary:** 34/34 findings verified as real claims (0 rejected). 6 in Wave 1 (harness integrity),
-11 in Wave 3 (quick wins), 8 in Wave 4 (structural), 7 accepted without independent action needed
-this round (self-disclosed limitations or already-tracked items), CQ2 flagged `wontfix` candidate
-pending a 3rd duplication instance per this project's own evidence-gate discipline.
+11 in Wave 3 (quick wins), 8 in Wave 4 (structural — 6 fixed, 2 wontfix), 7 accepted without
+independent action needed this round (self-disclosed limitations or already-tracked items), CQ2/CQ3
+flagged `wontfix` on style-judgment/low-risk-duplication grounds; SEC1's proposed founder-ack
+hardening was surfaced to the founder directly and declined as security theater against its actual
+threat model. All 4 waves of the remediation loop are now closed.

@@ -11,10 +11,13 @@
 // check-repo-consistency.mjs: read-only w.r.t. the repo, exit 1 on failure.
 
 import { readdirSync, existsSync, mkdtempSync, rmSync, readFileSync } from 'node:fs';
-import { execFileSync, execSync } from 'node:child_process';
+import { execFile, execSync } from 'node:child_process';
+import { promisify } from 'node:util';
 import { dirname, join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { tmpdir, cpus } from 'node:os';
 import { fileURLToPath } from 'node:url';
+
+const execFileAsync = promisify(execFile);
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const fixturesDir = join(repoRoot, 'evals', 'fixtures');
@@ -49,14 +52,12 @@ if (!HAS_BASH) {
   process.exit(0);
 }
 
-const failures = [];
-
-for (const f of fixtures) {
+async function checkOne(f) {
   const script = join(fixturesDir, f);
   const target = mkdtempSync(join(tmpdir(), 'wingman-fixture-'));
+  const localFailures = [];
   try {
-    execFileSync('bash', [script, target], {
-      stdio: 'pipe',
+    await execFileAsync('bash', [script, target], {
       timeout: 60_000,
       // Fixtures git-init and commit but don't set a local identity — they
       // were only ever exercised in environments with an ambient global git
@@ -74,9 +75,9 @@ for (const f of fixtures) {
     // A fixture must produce a real, non-empty git project.
     const entries = readdirSync(target);
     if (entries.length === 0) {
-      failures.push(`${f}: ran cleanly but produced an empty target dir`);
+      localFailures.push(`${f}: ran cleanly but produced an empty target dir`);
     } else if (!existsSync(join(target, '.git'))) {
-      failures.push(`${f}: produced no .git — fixtures are expected to git init their project`);
+      localFailures.push(`${f}: produced no .git — fixtures are expected to git init their project`);
     } else {
       // Optional fixture-signal-integrity check (FIXLOG.md T4): a fixture may
       // write a `.wingman-fixture-manifest` file (one relative path per line)
@@ -95,17 +96,34 @@ for (const f of fixtures) {
           .filter(Boolean);
         for (const rel of promised) {
           if (!existsSync(join(target, rel))) {
-            failures.push(`${f}: manifest promised "${rel}" but it's missing from the fixture output`);
+            localFailures.push(`${f}: manifest promised "${rel}" but it's missing from the fixture output`);
           }
         }
       }
     }
   } catch (err) {
     const detail = err.stderr ? err.stderr.toString().trim().split('\n').slice(-3).join(' | ') : err.message;
-    failures.push(`${f}: setup script failed — ${detail}`);
+    localFailures.push(`${f}: setup script failed — ${detail}`);
   } finally {
     rmSync(target, { recursive: true, force: true });
   }
+  return localFailures;
+}
+
+// Fixtures are independent (each gets its own tmpdir) so they're safe to run
+// concurrently. Bounded to avoid spawning 40+ bash+git processes at once on
+// small CI runners; unbounded via Promise.all was the original PERF3 finding.
+const CONCURRENCY = Math.max(1, Math.min(cpus().length, 6));
+const failures = [];
+{
+  const queue = [...fixtures];
+  const workers = Array.from({ length: CONCURRENCY }, async () => {
+    while (queue.length) {
+      const f = queue.shift();
+      failures.push(...(await checkOne(f)));
+    }
+  });
+  await Promise.all(workers);
 }
 
 console.log(`Checked ${fixtures.length} eval fixtures: each runs cleanly and produces a git project`);

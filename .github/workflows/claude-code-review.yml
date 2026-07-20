@@ -53,8 +53,13 @@ jobs:
       - name: Run Claude Code Review
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
         uses: anthropics/claude-code-action@3553f84341b92da26052e28acf1aa898f9511f32 # v1
+        env:
+          # claude-code-action reads ANTHROPIC_API_KEY from env when the
+          # anthropic_api_key input is omitted (confirmed against the
+          # action's source: `inputs.anthropic_api_key || env.ANTHROPIC_API_KEY`).
+          # env: is the idiomatic place for a secret passed to a step (FIXLOG.md DEVOPS1).
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           track_progress: true
           prompt: |
             REPO: ${{ github.repository }}
