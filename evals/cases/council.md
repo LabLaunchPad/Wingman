@@ -25,7 +25,7 @@ A decision scenario: "Should we use a monorepo or polyrepo structure for a new p
 
 ## Trust level
 
-`verified` — first run (2026-07-15) confirms the skill produces genuinely independent, structured multi-voice output per its own instructions.
+`provisional` — first run (2026-07-15) confirms the skill produces genuinely independent, structured multi-voice output per its own instructions; not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

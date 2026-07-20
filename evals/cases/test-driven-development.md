@@ -24,7 +24,7 @@ A minimal TypeScript project with a failing test for a `add` function. The test 
 
 ## Trust level
 
-`verified` — Run 1 held all five expectations.
+`provisional` — Run 1 held all five expectations; not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

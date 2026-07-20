@@ -26,7 +26,7 @@ A minimal TypeScript project with: (1) a type error in `src/utils.ts` (string as
 
 ## Trust level
 
-`verified` — Run 1 passed all expectations.
+`provisional` — Run 1 passed all expectations; not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

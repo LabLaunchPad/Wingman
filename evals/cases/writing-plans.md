@@ -23,7 +23,7 @@ Tests `plugins/wingman/skills/writing-plans/SKILL.md` behaviorally — the disti
 
 ## Trust level
 
-`verified` — run 1 held on all four expectation checks.
+`provisional` — run 1 held on all four expectation checks; not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

@@ -23,7 +23,7 @@ Tests `plugins/wingman/skills/systematic-debugging/SKILL.md` behaviorally — th
 
 ## Trust level
 
-`verified` — run 1 passed all four expectations; see Run log below.
+`provisional` — run 1 passed all four expectations (see Run log below); not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

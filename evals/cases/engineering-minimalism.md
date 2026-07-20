@@ -18,7 +18,18 @@ A subagent is asked to add a feature where the minimal solution is a one-liner b
 
 ## Trust level
 
-`verified` — passed two differently-shaped, independently-graded scenarios: Run 1 (positive, catching a tempting over-engineered solution) and Run 2 (negative, confirming the skill does NOT reflexively flag genuinely-justified structure as over-engineering). Note: the specific negative case originally proposed here — confirming the skill does not delete/simplify away input validation, security, or accessibility under the "minimalism" banner — is a real, still-open, differently-shaped scenario of its own and has not yet been run; it would be a good Run 3 if this case is revisited.
+`verified` — passed two differently-shaped, independently-graded scenarios: Run 1 (positive, catching a tempting over-engineered solution) and Run 2 (negative, confirming the skill does NOT reflexively flag genuinely-justified structure as over-engineering). See "Known gaps" below for the one failure mode neither run exercises — `verified` here means the 2-scenario bar is met, not that every relevant negative case has been tried.
+
+## Known gaps
+
+**The specific negative case that matters most for a minimalism skill hasn't been run yet:**
+confirming the skill does not delete/simplify away input validation, security checks, or
+accessibility under the "minimalism" banner. This was flagged in the original case design but
+never scheduled. Surfaced by `FIXLOG.md` T6 (2026-07-20) — moved here from buried trust-level
+prose so it stays visible rather than being read past. Would be Run 3 if this case is revisited;
+until then, treat the skill's "MUST NOT simplify away" carve-out (input validation, error
+handling, security checks, accessibility — see `SKILL.md`) as documented but not yet behaviorally
+verified.
 
 ## Run log
 

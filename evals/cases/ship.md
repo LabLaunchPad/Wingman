@@ -23,7 +23,7 @@ Tests `plugins/wingman/commands/ship.md` behaviorally, distinct from `full-pipel
 
 ## Trust level
 
-`verified`
+`provisional` — passed one real run (2026-07-15); not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
 
 ## Run log
 

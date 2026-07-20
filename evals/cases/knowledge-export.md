@@ -42,9 +42,11 @@ project with:
 
 ## Trust level
 
-`verified` — executed directly against the real fixture during implementation (2026-07-20), all
-checks above confirmed against real filesystem output (`find`, `cat`, `md5sum`), not a subagent's
-self-report.
+`verified` — two differently-shaped scenarios: Run 1 (positive, populated fixture) and Run 2
+(negative, a fully empty project) both executed for real, checks confirmed against real filesystem
+output (`find`, `cat`, `md5sum`), not a subagent's self-report. Corrected 2026-07-20: Run 1's own
+"positive + negative" framing was a same-fixture idempotency re-run, not a genuinely distinct
+scenario — flagged by `FIXLOG.md` T2 and closed by the real Run 2 below rather than by relabeling.
 
 ## Run log
 
@@ -62,3 +64,14 @@ Confirmed via direct filesystem inspection:
 
 No false positives, no gaps found. Every expectation in the table above confirmed against real
 command output during this run.
+
+**2026-07-20 — Run 2 (negative path: fully empty project).** Created a fresh `git init`-only
+directory with no `.wingman/` at all, ran `node plugins/wingman/scripts/okf-export.mjs
+--project-dir <empty-dir>` directly. Confirmed via direct filesystem inspection:
+- Exit code 0 — no crash on a completely empty source.
+- Script printed `okf-export: 0 checkpoint(s) and 0 memory file(s) exported to .../.wingman/okf-export`.
+- `index.md` correctly wrote `_Nothing exported yet — no checkpoints or memory files found in this project._` rather than an empty or malformed file.
+- `log.md` correctly wrote `_No entries yet._`.
+- No `checkpoints/` or `memory/` subdirectories created (matches the "only create if non-empty" contract).
+
+This is the genuinely distinct negative scenario Run 1 didn't provide. Promoted to `verified`.
