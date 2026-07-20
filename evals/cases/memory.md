@@ -53,3 +53,18 @@ self-report): `src/index.js` contains a real `formatEventDate` function using `d
 themselves were left untouched (only `src/index.js` and install byproducts changed).
 
 This closes the specific, named gap from Run 1's trust-level note.
+
+## Note — 2026-07-19, "Living Knowledge Graph" cross-check
+
+A founder-shared diagram on bi-temporal knowledge graphs (valid-time vs. record-time; invalidate
+old facts, don't delete them) prompted a direct check of `SKILL.md`'s own consolidation rule
+against that principle. Finding: the two-file design already has the right shape in effect
+(`MEMORY.md` = current state, `decisions.md` = append-only dated history — record-time is already
+preserved structurally) but the "consolidate, don't append" rule for `MEMORY.md` contradictions
+didn't require also logging the change in `decisions.md`, so a fact update could silently lose the
+"this used to be true, then changed" trail. Fixed directly (one clarifying sentence, not new
+infrastructure — a full bi-temporal graph store would be the same class of over-engineering this
+project already declined for vector search, per `docs/DATABASE.md`). Not re-run against a fresh
+fixture since it's a documentation clarification of an already-verified mechanism's edge case, not
+new behavior; the existing Run 1/Run 2 verification still covers the write/read-back paths this
+change doesn't alter.
