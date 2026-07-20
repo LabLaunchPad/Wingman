@@ -2,6 +2,22 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.22] - 2026-07-20
+
+### Fixed
+- **7 `SKILL.md` files** (`engineering-minimalism`, `subagent-driven-development`, `systematic-auditing`, `systematic-debugging`, `test-driven-development`, `verification-loop`, `writing-plans`) — the `## Continuous Execution` block was byte-identical across all 7; extracted to `references/continuous-execution.md`, each skill now cites it.
+- **`scripts/check-fixtures.mjs`** — 46+ independent eval fixtures ran strictly sequentially; now run through a bounded-concurrency worker pool (min(cpus, 6)), each fixture still gets its own tmpdir so this is safe.
+- **`plugins/wingman/scripts/okf-export.mjs`** — `rmSync(outDir, {recursive:true,force:true})` had no path containment check; added a guard refusing to wipe the filesystem root or the user's home directory.
+- **`plugins/wingman/hooks/stop-loop.mjs`** — stall-detection logic was computed twice (once in `evaluate()` to decide, once in the CLI to report why); `evaluate()` now returns `{decision, reason}` and the CLI uses the derived reason directly instead of recomputing it.
+- **`.github/workflows/claude.yml`, `.github/workflows/claude-code-review.yml`** — `anthropic_api_key` was passed via `with:`; confirmed `claude-code-action` supports reading `ANTHROPIC_API_KEY` from `env:` when the input is omitted, converted both workflows.
+- **`evals/fixtures/setup-existing-npm-project.sh`** — pinned `kleur` from `^4.1.5` to `4.1.5` (disposable fixture, but unpinned semver is still avoidable).
+
+### Won't fix (documented)
+- **SEC1** (`stop-loop.mjs` `verifyCommand` cache re-arm window) — the audit's proposed optional founder-ack hardening was surfaced to the founder directly and declined: a same-file ack token wouldn't meaningfully close a threat model where the attacker can already rewrite `loop.json`. The existing CISO-reviewed disclosure stands.
+- **CQ3** (`dod-structural-gate.mjs`'s 80-line orchestration block) — same precedent as CQ2 (Wave 3): low-risk style judgment, not a correctness issue.
+
+Wave 4 (structural) of the audit remediation loop — see `FIXLOG.md`, now fully closed across all 4 waves.
+
 ## [0.5.21] - 2026-07-20
 
 ### Fixed
