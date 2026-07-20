@@ -46,15 +46,3 @@
 [submodule "vendor/ponytail"]
 	path = vendor/ponytail
 	url = https://github.com/DietrichGebert/ponytail.git
-[submodule "vendor/claude-skills"]
-	path = vendor/claude-skills
-	url = https://github.com/alirezarezvani/claude-skills.git
-[submodule "vendor/claude-code-plugins-plus-skills"]
-	path = vendor/claude-code-plugins-plus-skills
-	url = https://github.com/jeremylongshore/claude-code-plugins-plus-skills.git
-[submodule "vendor/awesome-claude-skills"]
-	path = vendor/awesome-claude-skills
-	url = https://github.com/ComposioHQ/awesome-claude-skills.git
-[submodule "vendor/great-cto"]
-	path = vendor/great-cto
-	url = https://github.com/avelikiy/great_cto.git

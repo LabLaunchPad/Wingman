@@ -18,4 +18,4 @@ A request to add a date picker library when `<input type="date">` exists nativel
 
 ## Trust level
 
-`verified` — passed a real positive scenario where native solutions exist, correctly recommending platform features over dependencies.
+`authored, pending first run` — Scenario 1 above is specified but has no run log; do not treat as `verified` until a real run is logged (see `evals/README.md`).
