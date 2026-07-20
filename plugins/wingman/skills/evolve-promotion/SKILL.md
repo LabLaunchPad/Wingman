@@ -81,6 +81,10 @@ Before writing anything: recount the cluster's actual entries (don't trust a rem
 
 No fixed template beyond the `AskUserQuestion` proposal shape described in step 4. The written artifact follows the relevant template (`references/specialist-agent-template.md` for agents; existing plugin files as the shape reference for commands/skills).
 
+## References
+
+- `references/persona-template.md` — copy-paste scaffold when the promoted item is an advisor/domain persona (a lens that renders a verdict, never writes code — e.g. legal, ops) rather than a code-producing specialist. Mirrors the existing `founder-cfo`/`founder-cmo`/`founder-cro` shape.
+
 ## Anti-Rationalization Defense
 
 ### Common Rationalizations

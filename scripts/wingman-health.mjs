@@ -14,7 +14,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseAll, recurringCategories } from './parse-wingman-logs.mjs';
+import { parseAll, recurringCategoriesFrom } from './parse-wingman-logs.mjs';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const read = (rel) => { try { return readFileSync(join(repoRoot, rel), 'utf-8'); } catch { return null; } };
@@ -55,7 +55,7 @@ const uncoveredSkills = skills.filter((s) => !isCovered(s));
 // --- Learnings/decisions volume, from the structured wingman:log markers, not a prose regex ---
 const logs = parseAll();
 const decisionCount = logs.decisions.length;
-const recurring = recurringCategories();
+const recurring = recurringCategoriesFrom(logs);
 
 // --- Report ---
 const line = (s = '') => console.log(s);

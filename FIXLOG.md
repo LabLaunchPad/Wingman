@@ -23,17 +23,17 @@ suite passed) | `wontfix` (written justification required).
 
 | ID | Domain | Sev | file:line | Claim | Verdict | Proposed patch | Status |
 |---|---|---|---|---|---|---|---|
-| DOCS1 | Docs/DX | Medium | `README.md:23` | Claims release `0.5.12`; actual `0.5.19` | **CONFIRMED** | Update to `0.5.19` | open |
-| DOCS2 | Docs/DX | Medium | `README.md` | Undercounts commands (23 vs live 24) | **CONFIRMED** | Update to 24, add `knowledge-export` to the named list | open |
-| DOCS3 | Docs/DX | Low | `README.md` | Stale eval-case count (68 vs live 69) | **CONFIRMED** | Update to 69 | open |
-| ARCH1/DOCS4 | Architecture/Docs | Low | `docs/PROJECT.md:7` | Still says "23 commands" | **CONFIRMED** | Update to 24 | open |
-| SEC2/CQ1 | Security/Code Quality | Medium | `plugins/wingman/hooks/{secret-guard,secret-scanner}.mjs` | `SECRET` regex arrays byte-identical (drift risk) + missing GitHub fine-grained PAT/Slack/Stripe/Google patterns | **CONFIRMED** — diffed, only a comment differs; missing patterns confirmed absent | Export `SECRET` from `secret-guard.mjs`, import in `secret-scanner.mjs` (mirrors existing `INJECTION` pattern), add 4 missing patterns | open |
-| ARCH2 | Architecture | Medium | `plugins/wingman/references/{secrets-policy,persona-template}.md` | Zero citations from any command/skill/agent | **CONFIRMED** — grepped, zero hits outside dev-history docs | Wire each to an owning skill's `## References`, or delete | open |
-| DEVOPS4 | DevOps/CI | Medium | `.github/workflows/version-gate.yml:11-18` | `paths:` filter omits `references/**` and `scripts/**` | **CONFIRMED** | Add both paths to the filter | open |
-| SEC5 | Security | Low | `docs/wingman/threat-register-v9-v12.md:14` | Says "5 boardroom agents"; actual 8 | **CONFIRMED** | Correct the count, add a "re-verify against live count" note | open |
-| PERF1 | Performance | Low | `scripts/wingman-health.mjs:56,58` | `parseAll()` then `recurringCategories()` (which internally re-calls `parseAll()`) — redundant read | **CONFIRMED** | Add `recurringCategoriesFrom(parsed)` helper, reuse already-parsed data | open |
-| PERF2 | Performance | Low | `plugins/wingman/scripts/validate-structure.mjs:162,174` | `parseFrontmatter(fullPath)` then separate `readFileSync(fullPath)` on same skill file | **CONFIRMED** | Read once, pass text into `parseFrontmatter` | open |
-| CQ2 | Code Quality | Low | `plugins/wingman/scripts/validate-structure.mjs` vs `scripts/wingman-metrics.mjs` | `parseFrontmatter()` duplicated | **CONFIRMED** — diff shows only comments differ | Note duplication; low-risk, defer actual extraction (cross-tree shared module adds complexity for a dev-only convenience script) — `wontfix` candidate, revisit if a 3rd copy appears | open |
+| DOCS1 | Docs/DX | Medium | `README.md:23` | Claims release `0.5.12`; actual `0.5.19` | **CONFIRMED** | Update to `0.5.19` | fixed |
+| DOCS2 | Docs/DX | Medium | `README.md` | Undercounts commands (23 vs live 24) | **CONFIRMED** | Update to 24, add `knowledge-export` to the named list | fixed |
+| DOCS3 | Docs/DX | Low | `README.md` | Stale eval-case count (68 vs live 69) | **CONFIRMED** | Update to 69 | fixed |
+| ARCH1/DOCS4 | Architecture/Docs | Low | `docs/PROJECT.md:7` | Still says "23 commands" | **CONFIRMED** | Update to 24 | fixed |
+| SEC2/CQ1 | Security/Code Quality | Medium | `plugins/wingman/hooks/{secret-guard,secret-scanner}.mjs` | `SECRET` regex arrays byte-identical (drift risk) + missing GitHub fine-grained PAT/Slack/Stripe/Google patterns | **CONFIRMED** — diffed, only a comment differs; missing patterns confirmed absent | Export `SECRET` from `secret-guard.mjs`, import in `secret-scanner.mjs` (mirrors existing `INJECTION` pattern), add 4 missing patterns | fixed |
+| ARCH2 | Architecture | Medium | `plugins/wingman/references/{secrets-policy,persona-template}.md` | Zero citations from any command/skill/agent | **CONFIRMED** — grepped, zero hits outside dev-history docs | Wire each to an owning skill's `## References`, or delete | fixed |
+| DEVOPS4 | DevOps/CI | Medium | `.github/workflows/version-gate.yml:11-18` | `paths:` filter omits `references/**` and `scripts/**` | **CONFIRMED** | Add both paths to the filter | fixed |
+| SEC5 | Security | Low | `docs/wingman/threat-register-v9-v12.md:14` | Says "5 boardroom agents"; actual 8 | **CONFIRMED** | Correct the count, add a "re-verify against live count" note | fixed |
+| PERF1 | Performance | Low | `scripts/wingman-health.mjs:56,58` | `parseAll()` then `recurringCategories()` (which internally re-calls `parseAll()`) — redundant read | **CONFIRMED** | Add `recurringCategoriesFrom(parsed)` helper, reuse already-parsed data | fixed |
+| PERF2 | Performance | Low | `plugins/wingman/scripts/validate-structure.mjs:162,174` | `parseFrontmatter(fullPath)` then separate `readFileSync(fullPath)` on same skill file | **CONFIRMED** | Read once, pass text into `parseFrontmatter` | fixed |
+| CQ2 | Code Quality | Low | `plugins/wingman/scripts/validate-structure.mjs` vs `scripts/wingman-metrics.mjs` | `parseFrontmatter()` duplicated | **CONFIRMED** — diff shows only comments differ | Note duplication; low-risk, defer actual extraction (cross-tree shared module adds complexity for a dev-only convenience script) — `wontfix` candidate, revisit if a 3rd copy appears | wontfix |
 
 ## Wave 4 — Structural
 
