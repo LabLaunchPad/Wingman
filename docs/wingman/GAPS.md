@@ -158,6 +158,16 @@ Schema per row:
 - **validation**: `validate-structure` (real hook event `PostToolUse`), `node --test` green.
 - **status**: shipped. **Deliberately not attempted in this pass**: fully closing prompt-injection risk — a fixed regex list is a floor, not a ceiling, and this is disclosed as an accepted residual risk in both hooks' own comments and `docs/ARCHITECTURE.md`'s "Agent Permission Model" section, not claimed as solved.
 
+### G14 — Boardroom verdict transcription integrity (`hook`, shipped)
+- **source**: a founder-shared "how real AI applications stay reliable across models" architecture diagram (Analytics Vidhya, 2026-07-19) prompted a real CTO + Research Boardroom review of whether Wingman's safety/quality gate would hold regardless of which underlying model drives `boardroom.md`. Both seats converged on one file-verified gap: `checkBoardroomVerdictClean()` (`dod-structural-gate.mjs`) trusts whatever `verdict` string is already transcribed into `checkpoints.jsonl`'s `seats[]` array, with nothing independently re-deriving it from each seat's own raw `## <SEAT> VERDICT: ...` line — a mis-transcription (e.g. a `NO_GO` copied in as `GO_WITH_CONCERNS`) would sail through undetected. Every other layer the diagram named (input validation, orchestration, retrieval, eval/observability) already had a real, file-verified Wingman equivalent — this was the one genuine gap, not a re-litigation of the already-declined multi-model-router or vector-DB questions.
+- **founder-value**: the push-time gate that's supposed to stop an unresolved security/quality finding from shipping can't be silently defeated by a hand-transcription slip, no matter which model is driving the session.
+- **type**: hook, `dod-structural-gate.mjs` (`checkVerdictTranscriptionMatchesDetails`).
+- **trigger**: fires on the existing `git push` check, alongside `checkBoardroomVerdictClean`, whenever the most recent Build-stage checkpoint has a `details_ref` (schema_version 4+).
+- **behavior**: mechanically parses each seat's raw `## <SEAT> VERDICT: ...` line out of the `details_ref` companion file and cross-checks it against `checkpoints.jsonl`'s `seats[].verdict` for the same seat; a mismatch is a hard stop, not a warning. Checkpoints with no `details_ref` (schema_version < 4, or a failed detail write) have nothing to cross-check and are skipped, not failed.
+- **files**: `plugins/wingman/hooks/dod-structural-gate.mjs`, `tests/hooks-integration/hooks-integration.test.mjs`.
+- **validation**: unit tests for the extractor (match / mismatch / no-details_ref / missing-file) + one `git push` integration test proving the mismatch actually blocks a real push.
+- **status**: shipped.
+
 ## Mining loop (how this catalog stays honest)
 1. Curated vendor set: the 20 submodules in `.gitmodules` (incl. `claude-plugins-official`, `alirezarezvani/claude-skills`, `jeremylongshore/...`, `ComposioHQ/awesome-claude-skills`, `avelikiy/great_cto`).
 2. Each loop: pick a vendor, enumerate its commands/skills/agents/hooks, diff against Wingman's inventory, propose gaps with founder-value.
