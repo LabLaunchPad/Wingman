@@ -41,7 +41,14 @@ const provisional = Object.values(trust).filter((t) => t === 'provisional').leng
 // it with a suffix (e.g. "boardroom-gate-rule" covers "boardroom",
 // "evolve-promotion" covers both the "evolve" command and the skill).
 const caseNames = Object.keys(trust);
-const isCovered = (name) => caseNames.some((c) => c === name || c.startsWith(name + '-'));
+// Explicit aliases for a case whose own title states it tests a second,
+// differently-named file (so the filename-prefix rule above can't see it) —
+// e.g. `systematic-auditing.md`'s title says it tests both
+// `skills/systematic-auditing/SKILL.md` and `commands/audit.md`, with real
+// Run 1/Run 2 evidence for both; without this, `audit` mis-reports as
+// uncovered despite having genuine behavioral evidence.
+const aliases = { audit: 'systematic-auditing' };
+const isCovered = (name) => caseNames.some((c) => c === name || c.startsWith(name + '-')) || caseNames.includes(aliases[name]);
 const uncoveredCommands = commands.filter((c) => !isCovered(c));
 const uncoveredSkills = skills.filter((s) => !isCovered(s));
 
