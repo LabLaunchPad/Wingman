@@ -784,3 +784,108 @@ describe('DoD Gate — Boardroom Verdict Check', () => {
     });
   });
 });
+
+// ============================================================================
+// DoD Gate — Threat Register Status Parsing (real-dogfood-found gap: the old
+// check only pattern-matched the literal substring "OPEN", so any other
+// non-CLOSED status word -- a typo, or an invented word like "PENDING" --
+// silently passed the gate despite the risk being genuinely unresolved.
+// ============================================================================
+
+describe('DoD Gate — Threat Register Status Parsing', () => {
+  const dodHookPath2 = path.join(process.cwd(), 'plugins', 'wingman', 'hooks', 'dod-structural-gate.mjs');
+
+  const CLEAN_REGISTER = `
+## Build Threat Register
+
+| ID | Risk Description | Status | Owner | Detection Date | Disposition / Acceptance |
+|----|------------------|--------|-------|----------------|--------------------------|
+| 1 | Hardcoded credentials | CLOSED | dept-engineering | 2026-01-01 | Fixed |
+| 2 | Open redirect | CLOSED | dept-legal-security | 2026-01-01 | Founder-accepted risk |
+`;
+
+  it('passes when every row is CLOSED', async () => {
+    const { checkThreatRegisterClean } = await import(pathToFileURL(dodHookPath2).href);
+    const result = checkThreatRegisterClean(CLEAN_REGISTER);
+    assert.strictEqual(result.ok, true);
+  });
+
+  it('still catches the literal word OPEN', async () => {
+    const { checkThreatRegisterClean } = await import(pathToFileURL(dodHookPath2).href);
+    const text = CLEAN_REGISTER.replace('CLOSED | dept-legal-security', 'OPEN | dept-legal-security');
+    const result = checkThreatRegisterClean(text);
+    assert.strictEqual(result.ok, false);
+  });
+
+  it('catches a non-CLOSED status word other than OPEN (the real bypass a dogfood run found)', async () => {
+    const { checkThreatRegisterClean } = await import(pathToFileURL(dodHookPath2).href);
+    const text = CLEAN_REGISTER.replace('CLOSED | dept-legal-security', 'PENDING | dept-legal-security');
+    const result = checkThreatRegisterClean(text);
+    assert.strictEqual(result.ok, false, 'a "PENDING" row must not silently pass the gate');
+  });
+
+  it('ignores an unrelated markdown table with a differently-ordered Status column (e.g. the Planning "## Risks" table)', async () => {
+    const { checkThreatRegisterClean } = await import(pathToFileURL(dodHookPath2).href);
+    const text = `
+## Risks
+
+| # | Risk | Severity | Status |
+|---|------|----------|--------|
+| 1 | Something | Medium | OPEN |
+
+${CLEAN_REGISTER}`;
+    const result = checkThreatRegisterClean(text);
+    assert.strictEqual(result.ok, true, 'a non-Threat-Register table must not be inspected');
+  });
+
+  it('checkThreatRegisterCleanAcrossArtifacts fails if any artifact has an unresolved row', async () => {
+    const { checkThreatRegisterCleanAcrossArtifacts } = await import(pathToFileURL(dodHookPath2).href);
+    const dirty = CLEAN_REGISTER.replace('CLOSED | dept-legal-security', 'PENDING | dept-legal-security');
+    const result = checkThreatRegisterCleanAcrossArtifacts([CLEAN_REGISTER, dirty]);
+    assert.strictEqual(result.ok, false);
+  });
+});
+
+// ============================================================================
+// DoD Gate — Test Presence for Behavior-Split Suites (real-dogfood-found gap:
+// the basename-only heuristic blocked a push despite full, real test
+// coverage split across behavior-named files, e.g. src/server.js tested by
+// test/shorten.test.js, test/redirect.test.js, etc., none named server.test.js)
+// ============================================================================
+
+describe('DoD Gate — Test Presence for Behavior-Split Suites', () => {
+  const dodHookPath3 = path.join(process.cwd(), 'plugins', 'wingman', 'hooks', 'dod-structural-gate.mjs');
+  const tempDir2 = path.join(process.cwd(), '.test-temp-dod-test-presence');
+
+  beforeEach(() => {
+    if (fs.existsSync(tempDir2)) fs.rmSync(tempDir2, { recursive: true, force: true });
+    fs.mkdirSync(path.join(tempDir2, 'src'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir2, 'test'), { recursive: true });
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(tempDir2)) fs.rmSync(tempDir2, { recursive: true, force: true });
+  });
+
+  it('recognizes a behavior-named test file that imports the source module', async () => {
+    const { checkTestPresence } = await import(pathToFileURL(dodHookPath3).href);
+    fs.writeFileSync(path.join(tempDir2, 'src', 'server.js'), 'export function createApp() {}\n');
+    fs.writeFileSync(
+      path.join(tempDir2, 'test', 'shorten.test.js'),
+      "import { createApp } from '../src/server.js';\n"
+    );
+    const missing = checkTestPresence(tempDir2, ['src/server.js']);
+    assert.deepStrictEqual(missing, [], 'a behavior-named test file importing the source should count as coverage');
+  });
+
+  it('still flags a source file with no test referencing it at all', async () => {
+    const { checkTestPresence } = await import(pathToFileURL(dodHookPath3).href);
+    fs.writeFileSync(path.join(tempDir2, 'src', 'untested.js'), 'export function untouched() {}\n');
+    fs.writeFileSync(
+      path.join(tempDir2, 'test', 'shorten.test.js'),
+      "import { createApp } from '../src/server.js';\n"
+    );
+    const missing = checkTestPresence(tempDir2, ['src/untested.js']);
+    assert.deepStrictEqual(missing, ['src/untested.js']);
+  });
+});
