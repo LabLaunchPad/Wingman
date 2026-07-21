@@ -1,0 +1,34 @@
+{
+  "run_id": "2026-07-21T04-00-00Z-simple",
+  "mode": "maintainer",
+  "path": "simple",
+  "fixture": "evals/fixtures/setup-dogfood-simple.sh",
+  "stages_run": ["discovery", "define", "architecture", "uxflow", "implementation-planning", "build", "ship"],
+  "gates_expected_dormant": ["dept-design", "dept-data", "dept-legal-security", "dept-devops", "dept-growth", "management-board-activation"],
+  "gates_actual_dormant": ["dept-design", "dept-data", "dept-legal-security", "dept-devops", "dept-growth", "management-board-activation"],
+  "gates_expected_active": ["dept-product", "dept-engineering"],
+  "gates_actual_active": ["dept-product", "dept-engineering"],
+  "observed_gaps": [
+    {
+      "description": "Second consecutive maintainer-mode simple-path run (first: 2026-07-18T03-11-34Z-simple) where build.md's always-active dept-qa department lead was never actually created, despite build.md's 'Before starting' step still literally saying 'dept-engineering and dept-qa are always active... Delegate each task to the relevant department lead rather than doing all the work as this command directly,' with no proportionality carve-out for a genuinely single-task plan. This is now real, repeated evidence (2+ occurrences), not a one-off judgment call.",
+      "stage": "build",
+      "evidence": "build.md:20 unchanged since the 2026-07-18 run that first flagged this; .wingman/checkpoints.jsonl and this session's own work show only dept-product/dept-engineering ever referenced, no dept-qa lead file created in either run"
+    },
+    {
+      "description": "This session (playing the pipeline) skipped build.md's own explicit, correctly-worded 'Before starting' instruction to check out a feature branch before the first commit -- work (the plan doc, then the implementation) landed directly on the fixture's default branch (master). This is the identical failure class already logged twice in LEARNINGS.md (occurrence=2 for founder pipeline commands, occurrence=3 for this project's own dev-repo git-pr-workflow skill, both fixed earlier this same session) -- but this is a THIRD context: a live execution of the instruction, correctly worded, simply not followed. ship.md's preflight step 3 ('on a feature branch... if it isn't, stop and offer to create one now') caught it and worked exactly as designed -- the backstop functioned. But the instruction being present in prose did not, by itself, prevent the mistake from happening; only the second, independent backstop did.",
+      "stage": "build/ship",
+      "evidence": "fixture git history: plan.md and the /health implementation both committed on branch 'master'; ship.md's preflight check correctly caught this and a feature branch (feature/health-endpoint) was created before the git-push step, per its documented recovery path -- confirmed via git branch --show-current and git log"
+    },
+    {
+      "description": "A Boardroom re-verification seat (CISO, at the Build checkpoint) was first dispatched with only a diff snippet pasted inline, no file path telling it where the real code lives. It correctly searched the actual accessible repository (Wingman's own dev repo, not the throwaway fixture), found nothing matching, and correctly returned NO_GO rather than trusting an unverified claim -- exactly the rigor a real CISO seat should have. This is not a bug in the CISO persona; it is a real gap in how this run dispatched a re-verification: any prompt asking an agent to verify a claim against 'the code' must include the actual on-disk location, or a rigorous agent will (correctly) refuse to certify something it cannot see. Re-dispatched with the correct path; CISO then independently ran the real tests and confirmed GO.",
+      "stage": "build",
+      "evidence": "First CISO dispatch's transcript: searched /home/user/Wingman exhaustively, found no matching file, returned NO_GO citing 'a claimed closure with no traceable file is not a closed item.' Second dispatch, given the real fixture path, ran `node --test` itself and returned GO with specific file:line citations."
+    }
+  ],
+  "shortcuts_disclosed": [
+    "Final git push and PR creation were skipped -- no git remote is configured on this throwaway fixture. All other ship.md preflight checks (clean working tree, feature branch, verified build) were completed for real; the Ship-stage Boardroom diff checkpoint was dispatched and returned real 8/8 GO before this shortcut was taken.",
+    "Web/live research lookups were not needed -- boardroom-research reasoned from the stated requirement and general industry convention only; no external lookup was material to a static health-check endpoint.",
+    "Department-lead persona files (dept-product, dept-engineering) were not created as separate on-disk agent files or dispatched via a live Task-tool call with a custom subagent_type -- this environment has no registered boardroom-*/dept-* subagent type, so this session executed the department-lead-scoped work directly, consistent with prior runs' disclosed handling of the same environmental limitation. All 24 Boardroom seat dispatches (3 checkpoints x 8 seats), however, were real synchronous Agent-tool calls, each reading the actual persona file and rendering its own verdict -- never a simulated or hand-written verdict."
+  ],
+  "timestamp": "2026-07-21T04:30:00Z"
+}
