@@ -67,6 +67,7 @@ function checkpointToEntry(checkpoint) {
     bundle: checkpoint.bundle || null,
     bottom_line: checkpoint.bottom_line || null,
     founder_decision: checkpoint.founder_decision || null,
+    next_stage: checkpoint.next_stage || null,
     text: `[${checkpoint.bottom_line || 'unknown'}] ${stage || checkpoint.bundle || 'checkpoint'}` +
       (checkpoint.founder_notes ? ` — ${checkpoint.founder_notes}` : ''),
   };
@@ -131,13 +132,25 @@ export function summary(projectDir) {
   const checkpoints = all.filter((r) => r.source === 'checkpoints');
   const lastCheckpoint = checkpoints[checkpoints.length - 1] || null;
   const stateEntry = all.find((r) => r.source === 'state');
+  const state = readJsonFile(join(projectDir, '.wingman', 'state.json'));
+
+  // Found via real multi-session dogfooding (docs/PROJECT.md decisions log, 2026-07-21): a session
+  // that forgets to update state.json after writing a checkpoint leaves current_stage silently
+  // stale -- exactly the kind of drift this whole unification exists to catch, so flag it rather
+  // than reporting current_stage at face value.
+  let stateStageMismatch = null;
+  if (state && lastCheckpoint?.next_stage && state.current_stage !== lastCheckpoint.next_stage) {
+    stateStageMismatch = `state.json says current_stage="${state.current_stage}" but the last checkpoint's next_stage is "${lastCheckpoint.next_stage}" -- state.json may not have been updated after that checkpoint`;
+  }
+
   return {
     project_dir: projectDir,
     has_wingman_state: existsSync(join(projectDir, '.wingman')),
     total_entries: all.length,
     by_source: Object.fromEntries(ALL_SOURCES.map((s) => [s, all.filter((r) => r.source === s).length])),
     current_state: stateEntry ? stateEntry.text : null,
-    last_checkpoint: lastCheckpoint ? { stage: lastCheckpoint.stage, bottom_line: lastCheckpoint.bottom_line, date: lastCheckpoint.date } : null,
+    state_stage_mismatch: stateStageMismatch,
+    last_checkpoint: lastCheckpoint ? { stage: lastCheckpoint.stage, bottom_line: lastCheckpoint.bottom_line, next_stage: lastCheckpoint.next_stage, date: lastCheckpoint.date } : null,
     recent_decisions: all.filter((r) => r.source === 'decisions').slice(-3),
   };
 }
