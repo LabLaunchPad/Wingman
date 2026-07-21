@@ -1,0 +1,24 @@
+{
+  "run_id": "2026-07-21T05-00-00Z-complex",
+  "mode": "maintainer",
+  "path": "complex",
+  "fixture": "evals/fixtures/setup-dogfood-complex.sh",
+  "stages_run": ["discovery", "define", "architecture", "uxflow", "implementation-planning", "build", "ship"],
+  "gates_expected_dormant": ["dept-growth"],
+  "gates_actual_dormant": ["dept-growth"],
+  "gates_expected_active": ["dept-design", "dept-engineering", "dept-data", "dept-qa", "dept-legal-security", "dept-devops", "management-board-activation (mgr-engineering, mgr-design, mgr-data, mgr-security, mgr-qa, mgr-platform)"],
+  "gates_actual_active": ["dept-design", "dept-engineering", "dept-data", "dept-qa", "dept-legal-security", "dept-devops", "management-board-activation (mgr-engineering, mgr-design, mgr-data, mgr-security, mgr-qa, mgr-platform)"],
+  "observed_gaps": [],
+  "notes": [
+    "A genuinely clean run -- every gate fired exactly as the fixture's own documented expectations predicted (4 conditional departments correctly activated their leads; management-board-activation correctly crossed its 3+ threshold and created the corresponding 6 managers, none for the inactive dept-product/dept-growth). Not manufacturing a finding to avoid an empty observed_gaps array, per dogfood.md's own rule.",
+    "This run also directly re-tested both fixes from the same-session simple-path run (2026-07-21T04-00-00Z-simple.json): the feature branch was created up front, before the first commit (the simple path's Gap 2), and every Boardroom re-verification dispatch included the real on-disk fixture path (the simple path's Gap 3). Both held cleanly here -- direct confirming evidence the fixes actually work, not just that they were written.",
+    "Design and CISO rendered substantive, non-N/A verdicts this run (unlike the simple path, where both were N/A) -- confirms the Boardroom actually engages differently based on real project signals (UI present, payments-adjacent context) rather than always returning the same boilerplate.",
+    "The Planning Milestone checkpoint produced two genuine, substantive GO_WITH_CONCERNS findings (CTO+CISO on money-math rounding safety; Research on why not delegate to Stripe's native proration) that materially changed the implementation (integer-cent arithmetic, a float-drift test case, a recorded rationale) -- real Boardroom value, not a rubber stamp."
+  ],
+  "shortcuts_disclosed": [
+    "No live Next.js dev server, Prisma client, or Stripe test key exist in this sandbox -- the fixture's .ts files (auth/billing/UI) can't actually execute. Real TDD was scoped to a genuinely-runnable plain-JS unit (calculateProratedCharge, tested via node --test) rather than fabricating framework execution that can't happen here. This is a sandbox constraint, not a Wingman gap.",
+    "Department-lead and manager persona files (6 + 6) were written directly to .claude/agents/ rather than dispatched via a live Task-tool call with a custom subagent_type -- same disclosed environmental limitation as the simple-path run (no registered boardroom-*/dept-*/mgr-* subagent type in this environment). All 24 Boardroom seat dispatches (3 checkpoints x 8 seats), however, were real synchronous Agent-tool calls, each reading the actual persona file and rendering its own verdict.",
+    "Final git push and PR creation were skipped -- no git remote configured on this throwaway fixture. All other ship.md preflight checks (clean working tree, feature branch, verified build) were completed for real; the Ship-stage Boardroom diff checkpoint returned real 8/8 GO before this shortcut was taken."
+  ],
+  "timestamp": "2026-07-21T05:35:00Z"
+}

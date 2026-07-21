@@ -1,5 +1,44 @@
 # Retros
 
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=5 -->
+## Retro: Maintainer-mode complex-path dogfood run — clean, and the prior run's fixes held — 2026-07-21b
+
+Ran the real 7-stage pipeline against `evals/fixtures/setup-dogfood-complex.sh` (the "Fetch" app —
+Next.js + Prisma + Stripe + Dockerfile/CI, 4 deliberate conditional signals), the same day as the
+simple-path run above. All 3 Boardroom checkpoints dispatched for real — 24 more Agent-tool calls,
+never a simulated verdict. Full run record:
+`evals/dogfood-runs/2026-07-21T05-00-00Z-complex.json`.
+
+**What went well — a genuinely clean run, `observed_gaps` empty by design, not by omission:**
+- `department-lead-activation` correctly activated all 4 conditional leads (`dept-design`,
+  `dept-data`, `dept-legal-security`, `dept-devops`) plus the 2 always-active ones, exactly
+  matching the fixture's own documented expectations. `dept-growth` correctly stayed dormant (no
+  explicit founder request).
+- `management-board-activation` correctly crossed its 3+ conditional-department threshold (4 ≥ 3)
+  and created exactly the 6 expected managers (`mgr-engineering`, `mgr-design`, `mgr-data`,
+  `mgr-security`, `mgr-qa`, `mgr-platform`) — correctly **not** creating `mgr-product`/
+  `mgr-research`/`mgr-growth`, since `dept-product`/`dept-growth` were never active in this run.
+- Design and CISO rendered real, substantive (non-N/A) verdicts this time, given genuine UI and
+  payments-adjacent context — confirms the Boardroom actually engages differently based on real
+  project signals rather than always returning the same boilerplate the zero-signal simple path
+  produced.
+- The Planning Milestone checkpoint produced two genuine `GO_WITH_CONCERNS` findings (CTO+CISO on
+  money-math rounding safety; Research on why not delegate to Stripe's native proration) that
+  materially changed the implementation before Build — real Boardroom value on a real, non-trivial
+  plan, not a rubber stamp.
+- **Both fixes from the same-session simple-path run were directly re-tested here and held
+  cleanly**: the feature branch was created up front, before the first commit (closing the simple
+  path's Gap 2), and every Boardroom re-verification dispatch included the real on-disk fixture
+  path (closing the simple path's Gap 3) — no spurious `NO_GO`, no branch-hygiene gap. This is
+  confirming evidence the fixes actually work, not just that they were written.
+
+**Anything for you to know:**
+- No live Next.js/Prisma/Stripe toolchain exists in this sandbox, so real TDD was scoped to a
+  genuinely-runnable plain-JS unit (`calculateProratedCharge`) rather than fabricating framework
+  execution — a sandbox constraint, honestly disclosed, not a Wingman gap.
+- Both the simple and complex paths have now run for real in the same session, closing out
+  `dogfood.md`'s "default: both, sequentially" recommendation.
+
 <!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=4 -->
 ## Retro: Maintainer-mode simple-path dogfood run — real gaps found and fixed, not just confirmed clean — 2026-07-21
 
