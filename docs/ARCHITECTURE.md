@@ -246,7 +246,7 @@ irreducible as `fablize`'s own event-name dispatch.
 either a working non-Claude-Code path or an honestly-documented degradation):
 - `AskUserQuestion` → formalized (2026-07-20) as the **`ask_founder` port**: `ask_founder(question, options) → decision ∈ {ship_it, fix_concerns_first, still_reviewing}`. Two adapters already exist, both already-shipped — this formalization names them, it doesn't add anything: the primary adapter is the `AskUserQuestion` tool call itself; the fallback adapter is the `still_reviewing` checkpoint state `commands/adaptive/boardroom.md`'s "Ask for the decision" step already writes whenever no interactive answer is obtainable (the tool is confirmed missing in headless/print-mode sessions, or the session ends before the founder answers) — a checkpoint still gets recorded and the plan file still gets marked either way, later replaceable once a real decision arrives. Naming this a port changes no behavior; it gives a future non-Claude-Code adapter (if the evidence-gate below is ever cleared) a stated contract to implement against instead of one that would need reverse-engineering from `boardroom.md`'s prose. The other two coupling points below remain named-but-not-ported — this formalization is scoped to `ask_founder` only, on explicit request, not a signal to port the rest speculatively.
 - `ExitPlanMode` + its 2 hooks → `plugins/wingman/scripts/dod-pre-push-check.mjs`, a plain CLI wrapper that imports and calls the exact same pure functions `dod-structural-gate.mjs` exports, runnable as a real git `pre-push` hook (or from any harness with shell access) with zero Claude Code involvement. No new decision logic — pure reuse, proving the separation above is real, not just described.
-- `Task`/`Agent` parallel dispatch → genuinely the hardest one. `fablize` offers no pattern here since it shapes single-model behavior, not multi-persona parallel review, and most other harnesses lack native parallel subagent dispatch either. Honest answer: a harness without this capability would need to dispatch the 7 Boardroom seats **sequentially** in the same session rather than in parallel — a real design fork with a real cost (slower, more tokens for context re-establishment per seat), not a solved portability trick. Not built speculatively; revisit if a specific harness with this gap is actually targeted.
+- `Task`/`Agent` parallel dispatch → genuinely the hardest one, and this claim was **partially stale as of 2026-07-21** (see §8b): `fablize` still offers no pattern here since it shapes single-model behavior, not multi-persona parallel review, but "most other harnesses lack native parallel subagent dispatch" is no longer true of the two harnesses actually targeted in §8b — Codex CLI (subagents GA, 6 concurrent, since the 2026 GPT-5.5 release) and OpenCode (a documented Task tool plus a parallel general-purpose agent) both gained real parallel-subagent capability during 2026. What's still unconfirmed for both is a single built-in primitive equivalent to Claude Code's one-message 8-way `Task`/`Agent` fan-out — so the honest fallback (sequential per-seat dispatch, a real cost: slower, more tokens for context re-establishment per seat) still applies in practice, just not because the harnesses lack subagents entirely.
 
 **A different kind of portability — knowledge/output, not execution.** Everything above in this section is about whether Wingman's own *execution* (the Boardroom review loop, hook wiring) can run under a different coding-agent harness. `commands/adaptive/knowledge-export.md` / `scripts/okf-export.mjs` (2026-07-20) is a distinct, narrower kind of portability: not "can another harness drive Wingman," but "can another AI tool *read what Wingman has already produced* without running Wingman at all." It converts `.wingman/checkpoints.jsonl` and `memory/*.md` — both Wingman-specific formats — into a [Google Open Knowledge Format v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog) bundle: plain markdown with light YAML frontmatter, no Wingman- or Claude-specific reader required. Built on explicit founder request after an OKF feasibility assessment, and directly answers a gap `docs/DATABASE.md` already named: no file unifies `checkpoints.jsonl` and `memory/*.md` into one browsable "what has this project decided and why" surface. Like `dod-pre-push-check.mjs`, the script is runnable standalone with zero Claude Code involvement — a second, cheap, genuine portability win, but of the founder's *knowledge*, not of Wingman's own execution.
 
@@ -255,6 +255,48 @@ either a working non-Claude-Code path or an honestly-documented degradation):
 **What this means in practice**: a claim that "Wingman is agent-agnostic" is true only for the two skills named above, not for the plugin as a whole. No portability work is scheduled for the Boardroom/hook core absent real, evidenced demand to run Wingman under a non-Claude-Code harness — building a ports-and-adapters abstraction for these three couplings speculatively, with zero current demand, would be exactly the premature-abstraction pattern `engineering-minimalism` warns against.
 
 **External review checkpoint (2026-07-18)**: an outside "agent-agnostic transformation" report proposed flattening `plugins/wingman/` to repo root, per-harness `dist/` build output, `.lsp.json`, a new `renames-map.json`, and automated specialist promotion. Checked against the real repo before accepting any of it: most of its claimed "gaps" were factually wrong (the marketplace/plugin manifest split it called "duplication" is the standard two-file convention; the migration-note system this section's sibling doc `docs/DATABASE.md` already has covers what `renames-map.json` would add; skills are already in `skill-name/SKILL.md` form). The one correct observation — agent-agnosticism today is narrow — restates this section's own finding, not a new one. Declined the prescription in full; logged as a "Deferred mechanism idea" in `docs/AGENT-ROSTER.md` rather than built, same evidence-gate as every other externally-proposed framework this project has assessed. One genuinely relevant, freshly-found data point *toward* (not sufficient to act on) the `Task`/`Agent` coupling point above: the same day's dogfood run found `build.md` names `dept-qa` as always-active but never actually dispatches it — one real occurrence, not the two this project's own promotion rule requires before building anything.
+
+## 8b. Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21)
+
+§8a's "revisit if a specific harness with this gap is actually targeted" escape hatch was invoked
+for real: two named harnesses, Codex CLI and OpenCode. `plugins/wingman/references/harness-adapters/`
+holds the result — scoped narrowly (the Boardroom seats + the git-push safety gate, not a full
+command/skill port), and every artifact is labeled with its true verification status rather than
+overclaiming. Full citation list and the deliberately-not-attempted list live in that directory's own
+`README.md`; summary here:
+
+- **8 Boardroom seat personas, translated into both harnesses' native agent formats** (Codex CLI
+  `.codex/agents/*.toml`; OpenCode `.opencode/agent/*.md`) — `authored, unverified`. The review
+  criteria and `## <SEAT> VERDICT` output contract are harness-agnostic prose, so this is the
+  highest-confidence translation in the adapter, but neither harness is installed in this dev repo,
+  so neither has been run for real.
+- **The `boardroom-checkpoint.mjs` plan-approval gate, ported to an OpenCode plugin**
+  (`opencode/.opencode/plugin/wingman-gate.js`) — `authored, unverified`, but its core decision logic
+  (`evaluateCheckpoint`, a direct line-for-line port of `isApprovedCheckpoint`) is plain JS with no
+  OpenCode dependency, so only the plugin-wiring shell around it carries real uncertainty. Enabled by
+  a genuine structural find: OpenCode's `plan_exit` tool is a near-exact analog of `ExitPlanMode`.
+  Codex CLI has no equivalent — it uses `approval_policy` instead of a plan-mode tool at all, so this
+  specific gate has no Codex port; that's a real capability gap in the target harness, not an
+  oversight.
+- **The git-push safety gate, made genuinely harness-agnostic and installable** —
+  `plugins/wingman/scripts/install-git-hooks.mjs`, **built and tested** (the one fully-verified
+  artifact from this investment): an idempotent, opt-in installer that wires the existing
+  `dod-pre-push-check.mjs` up as a real `.git/hooks/pre-push` hook. Verified end-to-end in this dev
+  sandbox: install → a push with no Boardroom checkpoint is allowed → a push with a recorded
+  `DO NOT SHIP` checkpoint is blocked with the real error message → uninstall correctly removes only
+  the hook this script installed, never a pre-existing one. This fires under any coding-agent harness
+  (or a human) that runs `git push`, since it's git's own hook mechanism — the most robust piece of
+  portability this investment produced, precisely because it depends on no AI harness's tool-naming
+  or hook-API details at all.
+- **Deliberately not attempted**: `secret-guard.mjs`'s Write/Edit-matcher hook path for Codex CLI
+  (its exact file-edit tool-name string wasn't confirmed by research — a wrong guess would make the
+  hook silently never fire); a confirmed single-message N-way parallel-dispatch primitive for either
+  harness (see the §8a correction above); full 1:1 porting of the other 25 commands / 39 skills
+  (untestable at that scale in this sandbox, and the unverified-breadth pattern
+  `engineering-minimalism` warns against).
+
+`plugins/wingman/AGENTS.md` — a new nested, package-scoped `AGENTS.md` (the monorepo "nearest wins"
+convention) — points into this same directory for any agent landing directly in `plugins/wingman/`.
 
 ## 9. Relationship to vendored reference repositories
 

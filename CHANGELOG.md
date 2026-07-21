@@ -2,6 +2,16 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.28] - 2026-07-21
+
+### Added
+- **`plugins/wingman/references/harness-adapters/`** — scoped Codex CLI / OpenCode portability adapters, built after real web research invoked `docs/ARCHITECTURE.md` §8a's own "revisit if a specific harness with this gap is actually targeted" escape hatch. 8 Boardroom seat personas translated into each harness's native agent format (Codex CLI `.codex/agents/*.toml`, OpenCode `.opencode/agent/*.md`), plus a real OpenCode plugin port of the `boardroom-checkpoint.mjs` plan-approval gate (`opencode/.opencode/plugin/wingman-gate.js`, matched against OpenCode's `plan_exit` tool — a genuine structural analog of `ExitPlanMode` that Codex CLI lacks). Every artifact is labeled by verification status (`built + tested` / `authored, unverified` / `not attempted, documented why`) rather than overclaiming — neither harness is installed in this dev repo. Full citation list and scope boundaries in that directory's own `README.md`.
+- **`plugins/wingman/scripts/install-git-hooks.mjs`** — idempotent, opt-in installer wiring the existing `dod-pre-push-check.mjs` up as a real `.git/hooks/pre-push` hook. The one **built and tested** artifact from this investment: verified end-to-end in a scratch git clone (install → allow with no checkpoint → block on a real `DO NOT SHIP` checkpoint → clean uninstall). Fires under any coding-agent harness or a human, since it's git's own hook mechanism.
+- **`plugins/wingman/AGENTS.md`** — nested, package-scoped `AGENTS.md` per the monorepo "nearest wins" convention (immutable-slug rules, per-file-type frontmatter schema, the 4 validators, a pointer to the harness-adapters directory), separate from root `AGENTS.md`'s cross-repo navigation content.
+
+### Fixed
+- **`docs/ARCHITECTURE.md` §8a** — corrected a partially-stale claim ("most other harnesses lack native parallel subagent dispatch"): Codex CLI's subagents went GA (6 concurrent) with the 2026 GPT-5.5 release, and OpenCode has a documented Task tool plus a parallel general-purpose agent. New §8b documents the adapters above and what was deliberately not attempted (full command/skill porting; guessing Codex's unconfirmed Write/Edit tool-name strings; a confirmed single-message N-way fan-out primitive for either harness).
+
 ## [0.5.27] - 2026-07-21
 
 ### Fixed

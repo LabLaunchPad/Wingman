@@ -38,6 +38,14 @@ coding agent's environment, not of git/GitHub itself — no shell script can rep
 notification. `watch-pr-until-green.sh` (below) is the honest, portable substitute: it polls
 instead of being pushed to, which is slightly less immediate but works identically everywhere.
 
+The same agent-agnosticism applies to Wingman's own Build-stage safety gate: rather than relying on
+a Claude-Code-specific `PreToolUse`/`Bash` hook to catch a push made with an open Boardroom
+`NO_GO`, `plugins/wingman/scripts/install-git-hooks.mjs` installs
+`dod-pre-push-check.mjs` as a real `.git/hooks/pre-push` hook — it fires on `git push` regardless of
+which coding agent (or human) is driving. See
+`plugins/wingman/references/harness-adapters/README.md` for the fuller picture of what is and isn't
+portable across coding-agent harnesses.
+
 ## When To Use
 
 - `/wingman:ship`'s "Push and open the change for review" step (see `commands/pipeline/ship.md`).
