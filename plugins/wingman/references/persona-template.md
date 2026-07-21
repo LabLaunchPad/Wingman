@@ -64,7 +64,7 @@ other way.
 ## Wiring it into a command (optional)
 
 If the founder should be able to ask for several advisors at once, add a command
-that fans them out in parallel and merges — exactly like `commands/advisory.md`
+that fans them out in parallel and merges — exactly like `commands/adaptive/advisory.md`
 does for cfo/cmo/cro:
 
 1. Create `commands/<name>.md` with a `description` frontmatter.
@@ -81,3 +81,7 @@ does for cfo/cmo/cro:
 - Plain language; the founder may not be technical.
 - Keep the anatomy above; it's what makes the skill's own failure modes
   catchable.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/evolve-promotion/SKILL.md`

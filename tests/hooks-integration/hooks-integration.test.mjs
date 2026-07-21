@@ -388,8 +388,8 @@ describe('Boardroom Checkpoint Gstack Gate', () => {
 // ============================================================================
 
 describe('Build Command gsd Threat Register (folded in from the former secure.md, MVP2)', () => {
-  const buildPath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'build.md');
-  const securePath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'secure.md');
+  const buildPath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'pipeline', 'build.md');
+  const securePath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'pipeline', 'secure.md');
 
   it('secure.md no longer exists as a standalone command', () => {
     assert.ok(!fs.existsSync(securePath));
@@ -410,10 +410,16 @@ describe('Build Command gsd Threat Register (folded in from the former secure.md
 
 describe('Promoted Skills Structure', () => {
   const skillsRoot = path.join(process.cwd(), 'plugins', 'wingman', 'skills');
-  const promoted = ['spec-handler', 'definition-of-done', 'security-checklist', 'testing-patterns', 'doc-index'];
+  const promoted = [
+    ['mechanics', 'spec-handler'],
+    ['governance', 'definition-of-done'],
+    ['governance', 'security-checklist'],
+    ['mechanics', 'testing-patterns'],
+    ['knowledge', 'doc-index'],
+  ];
 
-  for (const name of promoted) {
-    const skillPath = path.join(skillsRoot, name, 'SKILL.md');
+  for (const [category, name] of promoted) {
+    const skillPath = path.join(skillsRoot, category, name, 'SKILL.md');
 
     it(`${name}: SKILL.md exists`, () => {
       assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);
@@ -784,7 +790,7 @@ describe('Pre-Compact Guard', () => {
 // ============================================================================
 
 describe('Gap Skill Structure — code-review', () => {
-  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'code-review', 'SKILL.md');
+  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'mechanics', 'code-review', 'SKILL.md');
 
   it('SKILL.md exists', () => {
     assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);
@@ -816,7 +822,7 @@ describe('Gap Skill Structure — code-review', () => {
 // ============================================================================
 
 describe('Gap Skill Structure — simplify', () => {
-  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'simplify', 'SKILL.md');
+  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'discipline', 'simplify', 'SKILL.md');
 
   it('SKILL.md exists', () => {
     assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);
@@ -848,8 +854,8 @@ describe('Gap Skill Structure — simplify', () => {
 // ============================================================================
 
 describe('Gap Skill Structure — incident-response', () => {
-  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'incident-response', 'SKILL.md');
-  const cmdPath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'incident.md');
+  const skillPath = path.join(process.cwd(), 'plugins', 'wingman', 'skills', 'response', 'incident-response', 'SKILL.md');
+  const cmdPath = path.join(process.cwd(), 'plugins', 'wingman', 'commands', 'adaptive', 'incident.md');
 
   it('SKILL.md exists', () => {
     assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);

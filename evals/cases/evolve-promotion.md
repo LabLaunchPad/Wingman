@@ -1,6 +1,6 @@
 # Eval: evolve-promotion
 
-Tests `plugins/wingman/skills/evolve-promotion/SKILL.md` behaviorally. The founder-approval gate (`AskUserQuestion`) can't be genuinely exercised by a background subagent with no real founder to answer it, so this eval is split into two parts: **Part A** tests gathering/clustering/classifying/proposing (steps 1–4, stopping before any write), and **Part B** tests file placement under a simulated approval (step 5 onward).
+Tests `plugins/wingman/skills/governance/evolve-promotion/SKILL.md` behaviorally. The founder-approval gate (`AskUserQuestion`) can't be genuinely exercised by a background subagent with no real founder to answer it, so this eval is split into two parts: **Part A** tests gathering/clustering/classifying/proposing (steps 1–4, stopping before any write), and **Part B** tests file placement under a simulated approval (step 5 onward).
 
 ## Fixtures
 
@@ -10,7 +10,7 @@ Tests `plugins/wingman/skills/evolve-promotion/SKILL.md` behaviorally. The found
 ## Procedure — Part A (gather/cluster/classify/propose)
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only: the path to `skills/evolve-promotion/SKILL.md` and its `references/`, the fixture path, and an instruction to run through the skill's Core Workflow **steps 1 through 4 only** — gather signal, cluster, classify, and describe exactly what it would present via `AskUserQuestion` — then **stop and report, without calling `AskUserQuestion` or writing any file**.
+2. Spawn a fresh subagent with only: the path to `skills/governance/evolve-promotion/SKILL.md` and its `references/`, the fixture path, and an instruction to run through the skill's Core Workflow **steps 1 through 4 only** — gather signal, cluster, classify, and describe exactly what it would present via `AskUserQuestion` — then **stop and report, without calling `AskUserQuestion` or writing any file**.
 3. Do not tell the subagent which pattern is expected to qualify.
 4. Grade the report: did it correctly identify the migration-rollback cluster (citing all corroborating sources, not just one), correctly exclude the single-occurrence route-naming note, and correctly classify the qualifying cluster as a specialist-agent candidate (matching "Migration Engineer" in the catalog) rather than a command or skill?
 

@@ -241,3 +241,7 @@ Estimated cost:          (X + Y) * tier_rate
 3. Tier selection is auditable — it appears in the task log.
 4. Using Tier 0 for mechanical work is flagged as waste; using Tier 2 for security review is flagged as risk.
 5. This document is versioned. Changes require a Boardroom checkpoint with the Cost seat.
+
+## Cited by
+
+- `plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md`

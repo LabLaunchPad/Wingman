@@ -1,6 +1,6 @@
 # Eval: engineering-minimalism
 
-Tests `plugins/wingman/skills/engineering-minimalism/SKILL.md` — its "smallest step that solves the problem" discipline: refuse speculative abstraction, surface assumptions, mark shortcuts, and follow the output rule.
+Tests `plugins/wingman/skills/discipline/engineering-minimalism/SKILL.md` — its "smallest step that solves the problem" discipline: refuse speculative abstraction, surface assumptions, mark shortcuts, and follow the output rule.
 
 ## Scenario — A task with a tempting over-engineered solution (positive case)
 
@@ -41,7 +41,7 @@ Graded via `.github/workflows/evals.yml` (requires `ANTHROPIC_API_KEY` + `/bin/b
 
 **Fixture** (scratch, not checked into the repo): a small Node.js "notifier" fixture with two already-shipped, already-called implementations (`emailNotifier.js`, `smsNotifier.js`, both exposing `send(message)`), a `billing.js` with two byte-for-byte-duplicated 8-line retry loops (one per channel), and a real, already-filed, already-assigned ticket (`TICKET-482.txt`) for a genuine third channel (Slack) landing next sprint. The proposed change (`proposed_change/notifier.js` + `proposed_change/billing.js`) extracts the duplicated retry loop into one 12-line `sendWithRetry(notifierModule, message, maxAttempts)` function and replaces both duplicated blocks with one-line calls — no class, no plugin registry, no DI container, no new dependency, and the existing notifier files are left untouched since their existing `send(message)` shape already satisfies the new helper's expectations.
 
-**Procedure**: a fresh `general-purpose` subagent was spawned scoped to only `plugins/wingman/skills/engineering-minimalism/SKILL.md` and the fixture directory (no other repo context), and asked to review the proposed change using the skill's decision ladder, rationalizations table, and red-flags list — walking the actual reasoning, not just asserting an answer — and to separately describe what a genuinely over-engineered version of the *same* task would look like, to confirm it can tell the difference rather than rubber-stamping everything as fine.
+**Procedure**: a fresh `general-purpose` subagent was spawned scoped to only `plugins/wingman/skills/discipline/engineering-minimalism/SKILL.md` and the fixture directory (no other repo context), and asked to review the proposed change using the skill's decision ladder, rationalizations table, and red-flags list — walking the actual reasoning, not just asserting an answer — and to separately describe what a genuinely over-engineered version of the *same* task would look like, to confirm it can tell the difference rather than rubber-stamping everything as fine.
 
 **Result — independently checked against the real fixture files**:
 - Correctly walked the decision ladder rung-by-rung (dropped rungs 1-6 with real reasons, landed on rung 7 only after checking rung 5 — no existing retry dependency in the fixture — and rung 6 — the loop isn't reducible to a one-liner).

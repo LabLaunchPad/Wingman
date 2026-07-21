@@ -1,6 +1,6 @@
 # Eval: definition-of-done
 
-Tests `plugins/wingman/skills/definition-of-done/SKILL.md` behaviorally — the
+Tests `plugins/wingman/skills/governance/definition-of-done/SKILL.md` behaviorally — the
 skill was promoted from a vendored reference doc (`references/definition-of-done.md`)
 in the v10/v11 sweep but had never itself been run against a real "looks
 finished but isn't" scenario: given only the skill file and a project that
@@ -29,7 +29,7 @@ suite and that claim, each a different DoD item:
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `skills/definition-of-done/SKILL.md`
+2. Spawn a fresh subagent with only `skills/governance/definition-of-done/SKILL.md`
    and the fixture path (not told what's wrong, not given
    `security-checklist`/`testing-patterns`/other cross-referenced skill
    files — just this skill, per its own "run it as a final self-audit"
@@ -65,7 +65,7 @@ actually done" without manufacturing findings.
 
 **Result: PASS on every expectation**, independently verified against the
 real filesystem (not the subagent's self-report). The subagent read
-`skills/definition-of-done/SKILL.md`, was told the team considered the
+`skills/governance/definition-of-done/SKILL.md`, was told the team considered the
 "Notify" welcome-notification feature DONE per `STATUS.md` and ready for a
 founder checkpoint, and was asked to verify that claim before it advances.
 It walked all 7 checklist items explicitly rather than accepting the green
@@ -114,7 +114,7 @@ speculative abstraction, no doc drift — deliberately built to actually
 pass, not to look like it passes.
 
 **Result: PASS.** A fresh subagent, given only
-`skills/definition-of-done/SKILL.md` and the fixture path (not told the
+`skills/governance/definition-of-done/SKILL.md` and the fixture path (not told the
 project was actually complete, not given any cross-referenced skill
 files), was asked to verify the team's "done, ready for founder
 checkpoint" claim rather than accept it. It walked all 7 checklist items

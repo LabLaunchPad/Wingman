@@ -1,6 +1,6 @@
 # Eval: harness
 
-Tests `plugins/wingman/commands/harness.md` — its 5-point checklist and report format — against two differently-shaped subjects: the honest, positive case is Wingman's own repo (run directly, not via fixture, since the subject of a harness audit is inherently a real project's actual verification setup); the negative case is a fixture with a rubber-stamp test suite, to confirm the audit doesn't just trust a green "passing" line.
+Tests `plugins/wingman/commands/adaptive/harness.md` — its 5-point checklist and report format — against two differently-shaped subjects: the honest, positive case is Wingman's own repo (run directly, not via fixture, since the subject of a harness audit is inherently a real project's actual verification setup); the negative case is a fixture with a rubber-stamp test suite, to confirm the audit doesn't just trust a green "passing" line.
 
 ## Scenario 1 — Wingman's own repo (real, no fixture)
 

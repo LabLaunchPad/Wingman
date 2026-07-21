@@ -1,6 +1,6 @@
 # Eval: boardroom-expand
 
-Tests `commands/boardroom.md`'s reversible-compression pair: the "Record the checkpoint" write of a
+Tests `commands/adaptive/boardroom.md`'s reversible-compression pair: the "Record the checkpoint" write of a
 companion `.wingman/checkpoint-details/<checkpoint_id>.md` file alongside every `checkpoints.jsonl`
 append, and the "Expand a past checkpoint" `expand` retrieval mode that reads it back. This is the
 one capability no other eval exercises — every prior Boardroom eval (`boardroom-gate-rule`,
@@ -19,14 +19,14 @@ project-specific behavior.
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with `commands/boardroom.md` and `docs/DATABASE.md`'s `checkpoints.jsonl`
+2. Spawn a fresh subagent with `commands/adaptive/boardroom.md` and `docs/DATABASE.md`'s `checkpoints.jsonl`
    schema section, and 7 synthetic seat verdicts, each with genuinely long, specific, multi-sentence
    reasoning (not a one-liner — the whole point is testing that detail survives compression). Ask it
    to record the checkpoint for real (`stage: "build"`).
 3. Independently verify: `checkpoints.jsonl`'s new line has `schema_version: 4` and a `details_ref`
    field; the referenced file exists at that exact path; its content contains every seat's full
    verdict text, not a re-shortened version of what went into `seats[].summary`.
-4. Spawn a **second, separate, fresh** subagent — given only `commands/boardroom.md` and told to run
+4. Spawn a **second, separate, fresh** subagent — given only `commands/adaptive/boardroom.md` and told to run
    `/wingman:boardroom expand <checkpoint_id>` against the project directory the first subagent
    populated (no other context, not shown the seat verdicts directly) — and check whether it
    correctly retrieves and prints the full detail rather than inventing, paraphrasing, or falling

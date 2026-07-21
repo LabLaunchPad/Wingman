@@ -1,6 +1,6 @@
 # Eval: council
 
-Tests `plugins/wingman/skills/council/SKILL.md` behaviorally. This skill convenes a four-voice decision council for ambiguous decisions.
+Tests `plugins/wingman/skills/response/council/SKILL.md` behaviorally. This skill convenes a four-voice decision council for ambiguous decisions.
 
 ## Fixture
 
@@ -31,7 +31,7 @@ A decision scenario: "Should we use a monorepo or polyrepo structure for a new p
 
 ### Run 1 — 2026-07-15
 
-Acted as the fresh subagent per the case's Procedure, given only `plugins/wingman/skills/council/SKILL.md` and the fixture question ("Should we use a monorepo or polyrepo structure for a new project with 3 services?"). Followed the skill's workflow: formed the Architect position first, then launched the Skeptic, Pragmatist, and Critic as three separate `Agent` tool calls (genuine subprocess dispatch, not simulated in one context), each given only the role prompt + question + role-emphasis line from the skill's "Prompt shape" — no conversation history, no exposure to the other voices' output or to my Architect position. Confirmed independence directly by inspecting each subagent's own transcript file (`*.output` JSONL): each one's first `user` message contained only the isolated role prompt I sent, and each produced its Position/Reasoning/Risk/Surprise answer before any of the others' content could reach it.
+Acted as the fresh subagent per the case's Procedure, given only `plugins/wingman/skills/response/council/SKILL.md` and the fixture question ("Should we use a monorepo or polyrepo structure for a new project with 3 services?"). Followed the skill's workflow: formed the Architect position first, then launched the Skeptic, Pragmatist, and Critic as three separate `Agent` tool calls (genuine subprocess dispatch, not simulated in one context), each given only the role prompt + question + role-emphasis line from the skill's "Prompt shape" — no conversation history, no exposure to the other voices' output or to my Architect position. Confirmed independence directly by inspecting each subagent's own transcript file (`*.output` JSONL): each one's first `user` message contained only the isolated role prompt I sent, and each produced its Position/Reasoning/Risk/Surprise answer before any of the others' content could reach it.
 
 Produced verdict:
 

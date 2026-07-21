@@ -1,6 +1,6 @@
 # Eval: over-engineering-review
 
-Tests `plugins/wingman/commands/over-engineering-review.md` — its 5-tag taxonomy and surgical audit process — against a fixture with intentional over-engineering patterns.
+Tests `plugins/wingman/commands/adaptive/over-engineering-review.md` — its 5-tag taxonomy and surgical audit process — against a fixture with intentional over-engineering patterns.
 
 ## Scenario 1 — Code with over-engineering patterns (positive case)
 
@@ -40,7 +40,7 @@ Corrected 2026-07-20 from `authored, pending first run`.
 ### Run 1 — 2026-07-20 — positive case
 
 Ran `evals/fixtures/setup-over-engineering-review-fixture.sh` into a scratch dir, then spawned a
-fresh un-briefed subagent with only `commands/over-engineering-review.md` and the fixture path.
+fresh un-briefed subagent with only `commands/adaptive/over-engineering-review.md` and the fixture path.
 Independently verified the subagent's report by reading all 5 real source files directly.
 
 | Check | Result |

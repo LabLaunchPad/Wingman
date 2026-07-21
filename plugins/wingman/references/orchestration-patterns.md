@@ -230,3 +230,8 @@ Automation is not always the right answer. Recognize these situations:
 3. **Founder seat** owns pattern selection for strategic decisions.
 4. Pattern selection is auditable — it appears in the plan document.
 5. This document is versioned. Changes require a Boardroom checkpoint.
+
+## Cited by
+
+- `plugins/wingman/commands/adaptive/audit.md`
+- `plugins/wingman/commands/adaptive/evolve.md`

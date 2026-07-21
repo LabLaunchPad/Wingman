@@ -52,7 +52,7 @@ wrote a failing test first (confirmed 404 for the right reason), then the minima
 ## Retro: Fresh founder-mode dogfood run confirms the synchronous-dispatch fix holds — 2026-07-15
 
 Ran a second, fresh founder-mode `/wingman:dogfood` pass specifically to re-exercise the current
-`commands/dogfood.md` after adding an instruction (in the same PR as `git-pr-workflow`) telling it
+`commands/adaptive/dogfood.md` after adding an instruction (in the same PR as `git-pr-workflow`) telling it
 to dispatch Boardroom/department-lead seats synchronously (`run_in_background:false`) rather than
 as further background agents — a fix added because two earlier runs stalled by doing the opposite,
 ending their own turn on a vague "waiting for results" message instead of actually finishing.

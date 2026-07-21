@@ -34,3 +34,9 @@ Every concrete risk found during a security pass is recorded with an explicit di
 - "It's a low-risk thing, no need to register it" → Low-risk items are exactly the ones that slip through. Register everything; close it in one line.
 - "I'll fix it after ship" → After ship there is no gate. `threats_open > 0` means no ship.
 - Red flag: the secure stage is about to pass and the register has any `OPEN` row. Block.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/security-checklist/SKILL.md`
+- `plugins/wingman/skills/knowledge/doc-index/SKILL.md`
+- `plugins/wingman/commands/pipeline/build.md`

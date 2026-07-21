@@ -1,6 +1,6 @@
 # Eval: launch
 
-Tests `plugins/wingman/commands/launch.md` behaviorally — does it correctly self-activate `dept-growth` (the one department whose signal is "this command was invoked at all," not something inferred from the codebase), draft only the launch materials the feature actually needs (no invented pricing/billing scope), and gate them through `/wingman:boardroom`'s "content passed directly" review path — the one boardroom scope type nothing else in this eval suite exercises, since every other case reviews a plan file or a diff.
+Tests `plugins/wingman/commands/adaptive/launch.md` behaviorally — does it correctly self-activate `dept-growth` (the one department whose signal is "this command was invoked at all," not something inferred from the codebase), draft only the launch materials the feature actually needs (no invented pricing/billing scope), and gate them through `/wingman:boardroom`'s "content passed directly" review path — the one boardroom scope type nothing else in this eval suite exercises, since every other case reviews a plan file or a diff.
 
 ## Fixture
 

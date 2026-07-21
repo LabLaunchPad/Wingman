@@ -13,7 +13,7 @@
 //
 //   1. ExitPlanMode — light check, traceability only. Only engages when the
 //      plan text contains "## Planning Milestone checkpoint" (a heading unique
-//      to commands/implementation-planning.md), so an unrelated ExitPlanMode
+//      to commands/pipeline/implementation-planning.md), so an unrelated ExitPlanMode
 //      call elsewhere (including Wingman's own dev-planning sessions, which
 //      have zero wingman:req markers by design) is never touched.
 //   2. Bash matching a real `git push` — the full 4-point check (traceability,

@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence is downstream output of the other skills' real work in the same shared consolidated session, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/memory/SKILL.md` — does it record durable, genuinely useful facts
+Tests `plugins/wingman/skills/knowledge/memory/SKILL.md` — does it record durable, genuinely useful facts
 from a real session in the exact layout it specifies, never storing secrets, and in a form a future
 session could actually use?
 

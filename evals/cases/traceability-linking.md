@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/traceability-linking/SKILL.md` — the judgment/instruction layer
+Tests `plugins/wingman/skills/governance/traceability-linking/SKILL.md` — the judgment/instruction layer
 around ID minting and marker placement, distinct from `evals/cases/traceability-validator.md`
 (which tests the mechanical checker script, `check-traceability.mjs`, in isolation).
 `wingman-health.mjs`'s uncovered-skill heuristic matches only by filename prefix, so it lists this
@@ -51,8 +51,8 @@ contain the case):
 Traceability: checked 148 file(s) under . — 3 requirement/decision/flow ID(s) minted, 1 distinct ID(s) referenced
 
 2 warning(s):
-  - unlinked requirement: "ARCH-001" (defined in plugins/wingman/commands/architecture.md) has no downstream wingman:req marker in any other file yet
-  - unlinked requirement: "UX-001" (defined in plugins/wingman/commands/uxflow.md) has no downstream wingman:req marker in any other file yet
+  - unlinked requirement: "ARCH-001" (defined in plugins/wingman/commands/pipeline/architecture.md) has no downstream wingman:req marker in any other file yet
+  - unlinked requirement: "UX-001" (defined in plugins/wingman/commands/pipeline/uxflow.md) has no downstream wingman:req marker in any other file yet
 
 PASS
 ```
@@ -102,7 +102,7 @@ confirmed), not a blocker for this promotion.
 ## Run 3 (2026-07-18): the unlinked-warning contrast case resolved by downstream markers
 
 After Run 2's analysis, `<!-- wingman:req ARCH-001 UX-001 -->` was added to
-`plugins/wingman/commands/implementation-planning.md:14` in the "Gather" step — the natural
+`plugins/wingman/commands/pipeline/implementation-planning.md:14` in the "Gather" step — the natural
 downstream consumer of both architecture and UX flow output. This changes the production repo's
 traceability state: ARCH-001 and UX-001 now have real downstream references, making the contrast
 case against DEF-001 a historical snapshot rather than current evidence.

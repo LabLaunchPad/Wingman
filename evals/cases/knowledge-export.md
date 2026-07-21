@@ -1,6 +1,6 @@
 # Eval: knowledge-export
 
-Tests `plugins/wingman/scripts/okf-export.mjs` and `commands/knowledge-export.md`'s invocation of
+Tests `plugins/wingman/scripts/okf-export.mjs` and `commands/adaptive/knowledge-export.md`'s invocation of
 it — the Google Open Knowledge Format (OKF v0.1) bundle export. Fully deterministic (no
 model-judgment component): run the real script against `evals/fixtures/setup-knowledge-export-fixture.sh`'s
 output and check the real filesystem, same trust methodology as `dod-pre-push-check.md`.

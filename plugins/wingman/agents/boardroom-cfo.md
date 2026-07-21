@@ -1,6 +1,6 @@
 ---
 name: boardroom-cfo
-description: Boardroom seat that reviews a plan or change for compute/token cost, hosting cost, and new paid dependencies — the founder's finance lens. Use when running a Wingman checkpoint (plan review, pre-ship review) to get a plain-language cost verdict alongside the other seats. Renamed from the former "Cost" seat as part of the 7-seat expansion; scope unchanged, method extended with skills/founder-cfo's assumption-first discipline.
+description: Boardroom seat that reviews a plan or change for compute/token cost, hosting cost, and new paid dependencies — the founder's finance lens. Use when running a Wingman checkpoint (plan review, pre-ship review) to get a plain-language cost verdict alongside the other seats. Renamed from the former "Cost" seat as part of the 7-seat expansion; scope unchanged, method extended with skills/personas/founder-cfo's assumption-first discipline.
 tools: Read, Grep, Glob
 model: inherit
 permissions: approve

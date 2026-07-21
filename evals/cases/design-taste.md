@@ -1,6 +1,6 @@
 # Eval: design-taste
 
-Tests `plugins/wingman/skills/design-taste/SKILL.md` — its anti-slop UI/UX quality bar: avoids generic, template-derived interfaces and pushes for deliberate hierarchy, consistency, and restraint.
+Tests `plugins/wingman/skills/output/design-taste/SKILL.md` — its anti-slop UI/UX quality bar: avoids generic, template-derived interfaces and pushes for deliberate hierarchy, consistency, and restraint.
 
 ## Scenario — Generic UI → improved (positive case)
 
@@ -31,7 +31,7 @@ Run 1 tested whether the skill catches bad taste (a generic template UI). Run 2 
 
 **Fixture** (built fresh, no existing app in this repo to test against, so a lightweight standalone fixture was used instead of a full app — deliberately cheap per the task brief): a B2B expense-reconciliation dashboard component (`reconciliation-summary.html`) plus its own `design-tokens.md` documenting an established palette/font/spacing/motion system, written to follow every rule in the skill's own checklists — single accent color, no gradients/icon-tiles/eyebrows/glassmorphism/bounce-easing, IBM Plex Sans/Mono split matching the "developer tools"-adjacent precision tone for the stated B2B audience, heading levels sequential (h1→h2), status conveyed by color+text not color alone. Two small, genuinely-real inconsistencies were left in deliberately (not called out to the subagent): an unregistered `--danger` color plus a second, undocumented blue (`#1E4FB8`) for the "matched" status pill, and two off-4px-grid padding values (`2px`, `10px 16px`).
 
-**Procedure**: a fresh subagent (via the `Agent` tool), scoped to only `plugins/wingman/skills/design-taste/SKILL.md` plus the two fixture files, was asked to apply the skill's full workflow and give its own verdict — not told in advance whether the design was good or bad.
+**Procedure**: a fresh subagent (via the `Agent` tool), scoped to only `plugins/wingman/skills/output/design-taste/SKILL.md` plus the two fixture files, was asked to apply the skill's full workflow and give its own verdict — not told in advance whether the design was good or bad.
 
 **What it found**, independently re-verified against the real files afterward (not trusted from the subagent's self-report):
 - Anti-slop checklist: correctly scored 0/9 — including correctly reasoning the three stat cards are differentiated data (not the checklist's "3+ visually-identical feature cards" tell), avoiding a plausible false-positive trap the checklist's own wording could have baited.

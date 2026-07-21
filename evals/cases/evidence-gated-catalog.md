@@ -1,6 +1,6 @@
 # Eval: evidence-gated-catalog
 
-Tests `plugins/wingman/skills/evidence-gated-catalog/SKILL.md` behaviorally — given one catalog proposal that claims `status: proven` but actually has no real test case, a straw-man negative test, and an unmeasurable outcome, and a second proposal that genuinely satisfies all three evidence gates, does a fresh agent correctly reject/demote the first and approve the second — rather than trusting the claimed status or rubber-stamping both.
+Tests `plugins/wingman/skills/governance/evidence-gated-catalog/SKILL.md` behaviorally — given one catalog proposal that claims `status: proven` but actually has no real test case, a straw-man negative test, and an unmeasurable outcome, and a second proposal that genuinely satisfies all three evidence gates, does a fresh agent correctly reject/demote the first and approve the second — rather than trusting the claimed status or rubber-stamping both.
 
 ## Fixture
 

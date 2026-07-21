@@ -1,6 +1,6 @@
 # Eval: hotfix
 
-Tests `plugins/wingman/commands/hotfix.md` behaviorally — given a real production bug report, does a fresh agent actually follow the root-cause-first discipline (`systematic-debugging`'s Iron Law: no fixes without investigation first), fix only the reported issue test-first, and record a proper Boardroom checkpoint — rather than jumping straight to a plausible-looking patch?
+Tests `plugins/wingman/commands/adaptive/hotfix.md` behaviorally — given a real production bug report, does a fresh agent actually follow the root-cause-first discipline (`systematic-debugging`'s Iron Law: no fixes without investigation first), fix only the reported issue test-first, and record a proper Boardroom checkpoint — rather than jumping straight to a plausible-looking patch?
 
 ## Fixture
 
@@ -44,7 +44,7 @@ Two fixtures, one per run (differently shaped on purpose — see Trust level):
 - Kept the fix to exactly the one function's return line; no unrelated changes.
 - Created all 3 expected department-lead files with zero placeholders, correctly limited to what `hotfix.md` calls for (not the full 8-department roster).
 - Recorded the checkpoint correctly: `stage: "hotfix"`, all 5 seats `GO`, `bottom_line: "GO"`, `next_stage: "ship"`; `state.json` shows the merged department-lead list with `current_stage: "ship"`.
-- Noticed an unrelated pre-existing diff in the Wingman repo's own `plugins/wingman/commands/boardroom.md` during its `git status` check, correctly identified (via `git diff`) that it predated this task and wasn't something it had touched, and reported this transparently rather than silently ignoring or falsely claiming responsibility.
+- Noticed an unrelated pre-existing diff in the Wingman repo's own `plugins/wingman/commands/adaptive/boardroom.md` during its `git status` check, correctly identified (via `git diff`) that it predated this task and wasn't something it had touched, and reported this transparently rather than silently ignoring or falsely claiming responsibility.
 
 ### Run 2 — 2026-07-08 (harder case: obvious hypothesis is wrong)
 

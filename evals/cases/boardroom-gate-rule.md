@@ -1,6 +1,6 @@
 # Eval: boardroom-gate-rule
 
-Tests `plugins/wingman/commands/boardroom.md`'s consolidation logic (the "Bottom line rule") directly — specifically the `DO NOT SHIP` path, which no prior eval in this project had ever exercised: every real or simulated Boardroom run so far (across `department-lead-activation`, `evolve-promotion`, and all four stages of `full-pipeline-e2e`) stayed at `GO` or `GO WITH CHANGES`. This case is deliberately narrow: it tests the mechanical rule application and checkpoint file-writing, not the quality of independent seat judgment (already covered by other evals), so it uses synthetic seat verdicts rather than deriving them from a real review.
+Tests `plugins/wingman/commands/adaptive/boardroom.md`'s consolidation logic (the "Bottom line rule") directly — specifically the `DO NOT SHIP` path, which no prior eval in this project had ever exercised: every real or simulated Boardroom run so far (across `department-lead-activation`, `evolve-promotion`, and all four stages of `full-pipeline-e2e`) stayed at `GO` or `GO WITH CHANGES`. This case is deliberately narrow: it tests the mechanical rule application and checkpoint file-writing, not the quality of independent seat judgment (already covered by other evals), so it uses synthetic seat verdicts rather than deriving them from a real review.
 
 ## Fixture
 

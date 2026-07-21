@@ -1,6 +1,6 @@
 # Eval: token-economy
 
-Tests `plugins/wingman/skills/token-economy/SKILL.md` — its terse internal-only communication bar: drop filler, articles, and pleasantries while keeping full technical accuracy, especially on high-volume internal channels (e.g. Boardroom seat dispatch prompts).
+Tests `plugins/wingman/skills/knowledge/token-economy/SKILL.md` — its terse internal-only communication bar: drop filler, articles, and pleasantries while keeping full technical accuracy, especially on high-volume internal channels (e.g. Boardroom seat dispatch prompts).
 
 ## Scenario — Verbose internal message → compressed (positive case)
 
@@ -29,7 +29,7 @@ Graded via `.github/workflows/evals.yml` (requires `ANTHROPIC_API_KEY` + `/bin/b
 
 **Scenario:** Built a scratch fixture (`/tmp/.../scratchpad/eval-token-economy-run2/task.md`, not committed to the repo) presenting a verbose QA→Deploy internal handoff that mixes two things in one message: (a) genuine filler/pleasantries ("Hey!", "hope that's alright", "really appreciate it!", restated context) that *should* be compressed, and (b) load-bearing detail that must survive compression per the skill's own Constraints/Red-Flags/Verification sections — an irreversible-action warning (a non-re-runnable migration script, with the exact failure mechanism) and a scope boundary (sign-off covers `billing` only, explicitly not `analytics`/`reporting`). This directly exercises the exact gap named in the prior Trust-level note: does the skill's discipline correctly refuse to compress away detail whose loss would cause the recipient to misunderstand scope or take an unsafe action, rather than just compressing everything on offer.
 
-A fresh `general-purpose` subagent was spawned scoped to read only `plugins/wingman/skills/token-economy/SKILL.md` and the task file — not told what was expected, not given the case's checklist.
+A fresh `general-purpose` subagent was spawned scoped to read only `plugins/wingman/skills/knowledge/token-economy/SKILL.md` and the task file — not told what was expected, not given the case's checklist.
 
 **Actual output (verified directly against the transcript, not the subagent's self-report):**
 - All filler/pleasantries dropped: no "Hey!", no "hope that's alright," no "thanks so much... really appreciate it," no restated small talk.

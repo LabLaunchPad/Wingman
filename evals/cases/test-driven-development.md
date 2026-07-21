@@ -1,6 +1,6 @@
 # Eval: test-driven-development
 
-Tests `plugins/wingman/skills/test-driven-development/SKILL.md` behaviorally. This skill encodes the red-green-refactor TDD discipline that is mandatory for all implementation work in Wingman.
+Tests `plugins/wingman/skills/discipline/test-driven-development/SKILL.md` behaviorally. This skill encodes the red-green-refactor TDD discipline that is mandatory for all implementation work in Wingman.
 
 ## Fixture
 
@@ -30,7 +30,7 @@ A minimal TypeScript project with a failing test for a `add` function. The test 
 
 ### Run 1 — 2026-07-15
 
-Acted as a fresh subagent given only `plugins/wingman/skills/test-driven-development/SKILL.md` and the scenario "implement an add function that takes two numbers and returns their sum." Built the fixture inline in a scratch dir (minimal TS project, vitest + typescript). No repo files were touched.
+Acted as a fresh subagent given only `plugins/wingman/skills/discipline/test-driven-development/SKILL.md` and the scenario "implement an add function that takes two numbers and returns their sum." Built the fixture inline in a scratch dir (minimal TS project, vitest + typescript). No repo files were touched.
 
 **RED — test written first, watched fail:**
 

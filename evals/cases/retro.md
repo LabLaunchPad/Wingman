@@ -1,6 +1,6 @@
 # Eval: retro
 
-Tests `plugins/wingman/commands/retro.md` behaviorally — never exercised by any prior eval in this project. Does a fresh agent gather real facts before writing (not generic boilerplate), follow the exact required format, save to the right canonical location, and make a genuine, reasoned feed-forward decision about `/wingman:learn` rather than reflexively always or never triggering it?
+Tests `plugins/wingman/commands/adaptive/retro.md` behaviorally — never exercised by any prior eval in this project. Does a fresh agent gather real facts before writing (not generic boilerplate), follow the exact required format, save to the right canonical location, and make a genuine, reasoned feed-forward decision about `/wingman:learn` rather than reflexively always or never triggering it?
 
 ## Fixture
 

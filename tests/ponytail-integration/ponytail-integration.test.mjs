@@ -451,14 +451,14 @@ describe('Over-Engineering Review', () => {
 describe('Integration', () => {
   it('should have all required skills, each with a real, non-empty SKILL.md', () => {
     const requiredSkills = [
-      'engineering-minimalism',
-      'platform-native-reference',
-      'ponytail-debt-harvesting',
-      'verification-before-completion',
+      ['discipline', 'engineering-minimalism'],
+      ['knowledge', 'platform-native-reference'],
+      ['response', 'ponytail-debt-harvesting'],
+      ['discipline', 'verification-before-completion'],
     ];
 
-    for (const skill of requiredSkills) {
-      const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', skill, 'SKILL.md');
+    for (const [category, skill] of requiredSkills) {
+      const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', category, skill, 'SKILL.md');
       assert.ok(fs.existsSync(skillPath), `${skillPath} does not exist`);
       const content = fs.readFileSync(skillPath, 'utf-8');
       assert.ok(content.length > 0, `${skillPath} is empty`);
@@ -476,7 +476,7 @@ describe('Integration', () => {
     ];
 
     for (const cmd of requiredCommands) {
-      const cmdPath = path.join(repoRoot, 'plugins', 'wingman', 'commands', `${cmd}.md`);
+      const cmdPath = path.join(repoRoot, 'plugins', 'wingman', 'commands', 'adaptive', `${cmd}.md`);
       assert.ok(fs.existsSync(cmdPath), `${cmdPath} does not exist`);
       const content = fs.readFileSync(cmdPath, 'utf-8');
       assert.ok(content.length > 0, `${cmdPath} is empty`);
@@ -485,7 +485,7 @@ describe('Integration', () => {
 
   it('should have consistent 5-tag taxonomy actually present in engineering-minimalism/SKILL.md', () => {
     const tags = ['#delete', '#stdlib', '#native', '#yagni', '#shrink'];
-    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'engineering-minimalism', 'SKILL.md');
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'discipline', 'engineering-minimalism', 'SKILL.md');
     const content = fs.readFileSync(skillPath, 'utf-8');
 
     for (const tag of tags) {
@@ -494,14 +494,14 @@ describe('Integration', () => {
   });
 
   it('should have the // minimal: comment convention actually documented in engineering-minimalism/SKILL.md', () => {
-    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'engineering-minimalism', 'SKILL.md');
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'discipline', 'engineering-minimalism', 'SKILL.md');
     const content = fs.readFileSync(skillPath, 'utf-8');
     const pattern = /\/\/ minimal: .+?, .+/;
     assert.match(content, pattern, `${skillPath} does not document the "// minimal: <what>, <when to revisit>" convention`);
   });
 
   it('should have all three intensity levels actually documented in engineering-minimalism/SKILL.md', () => {
-    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'engineering-minimalism', 'SKILL.md');
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'discipline', 'engineering-minimalism', 'SKILL.md');
     const content = fs.readFileSync(skillPath, 'utf-8');
     for (const level of ['lite', 'full', 'ultra']) {
       assert.ok(content.includes(level), `${skillPath} does not mention intensity level "${level}"`);

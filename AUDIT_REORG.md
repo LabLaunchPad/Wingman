@@ -71,7 +71,7 @@ double-run) is a one-line change per file with an immediate, measurable CI-cost 
 | 6 | **Add a vendor/ submodule freshness + attribution-sync check to CI** | 16 pinned reference repos live under `vendor/` via `.gitmodules`; `check-repo-consistency.mjs` already checks attribution coverage but not that `.gitmodules`' 16 entries and `ATTRIBUTIONS.md`'s entries stay 1:1 as submodules are added/removed. Cheap, catches drift at the source instead of by inspection. | S | 6 |
 | 7 | **Split `tests/hooks-integration/hooks-integration.test.mjs` before it becomes a monolith** | Currently one file covers `secret-guard`, `stop-loop`, `dod-structural-gate`, session-start, and more (92 tests, ~600+ lines). Not urgent today, but the hardcoded-count bugs this session fixed twice (skill count, command count) both originated in this one file. Recommend a 1:1 split (`tests/hooks-integration/<hook-name>.test.mjs`) once it crosses ~800 lines or 100 tests — evidence-gated, not immediate. | M | 7 (deferred) |
 | 8 | **Document the `scripts/` vs `plugins/wingman/scripts/` naming-collision risk** | Two directories both hold Node validator scripts (dev-only vs. shipped). No current bug, but nothing mechanically prevents a shipped script from importing a dev-only sibling path (which would silently break in an installed plugin, since only `plugins/wingman/` ships). Add one `check-repo-consistency.mjs` rule: no `import`/`readFileSync` under `plugins/wingman/**` may reference a path outside `plugins/wingman/`. | S | 8 |
-| 9 | **Wire `skills/doc-index` into a CI check, not just on-demand use** | 205 markdown files exist repo-wide; `doc-index` is available as a skill but nothing confirms its index (if one exists on disk) stays current automatically. Verify whether `doc-index` produces a persisted artifact; if so, add a staleness check to `validate.yml`. If it's purely on-demand/ephemeral, no action needed — confirm and document either way. | S | 9 |
+| 9 | **Wire `skills/knowledge/doc-index` into a CI check, not just on-demand use** | 205 markdown files exist repo-wide; `doc-index` is available as a skill but nothing confirms its index (if one exists on disk) stays current automatically. Verify whether `doc-index` produces a persisted artifact; if so, add a staleness check to `validate.yml`. If it's purely on-demand/ephemeral, no action needed — confirm and document either way. | S | 9 |
 | 10 | **Add a `CHANGELOG.md`-entry presence check to `version-gate.yml`** | `version-gate.yml` already fails a PR that bumps shipped content without a `plugin.json` version bump. It does not yet confirm the bumped version has a matching `## [x.y.z]` `CHANGELOG.md` heading — every version bump this session manually added one, but nothing enforces it. One `grep` step closes the gap. | S | 10 |
 
 ---
@@ -248,7 +248,7 @@ loaded**, not a runtime cache. What already exists and is correctly designed, ve
   `docs/AGENT-ROSTER.md`'s CACHE-001 entry) for the same "no request-serving loop to cache against"
   reason.
 - **Batching:** not applicable — Wingman doesn't issue its own model calls to batch.
-- **`skills/token-economy`:** already exists and is `verified`-eval'd (`evals/cases/token-economy.md`)
+- **`skills/knowledge/token-economy`:** already exists and is `verified`-eval'd (`evals/cases/token-economy.md`)
   — internal-only concision discipline, explicitly never applied to founder-facing output. This *is*
   the token-efficiency mechanism the brief asked for; no gap found.
 

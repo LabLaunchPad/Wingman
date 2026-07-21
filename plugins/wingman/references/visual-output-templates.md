@@ -1,8 +1,8 @@
 # Visual Output Templates — Cross-Command Reference
 
-Concrete, copy-paste templates for `skills/visual-founder-output`. This file holds the actual
+Concrete, copy-paste templates for `skills/output/visual-founder-output`. This file holds the actual
 Mermaid/ASCII source so the skill's own prose doesn't have to embed large code blocks. Owned by
-`skills/visual-founder-output`; cited from all 7 pipeline commands (`discovery.md`, `define.md`,
+`skills/output/visual-founder-output`; cited from all 7 pipeline commands (`discovery.md`, `define.md`,
 `architecture.md`, `uxflow.md`, `implementation-planning.md`, `build.md`, `ship.md`) and
 `boardroom.md`.
 
@@ -10,17 +10,17 @@ Mermaid/ASCII source so the skill's own prose doesn't have to embed large code b
 commands plus `boardroom.md`, for consistent orientation at every stage — not just at a checkpoint.
 §1 (UX flow), §3 (seat-verdict grid), §4 (DEF→ARCH graph), and §5 (task-dependency diagram) are each
 specific to the one command named in their heading, because their content only has real diagram
-shape in that one place — see `skills/visual-founder-output`'s Red Flags before reusing any of them
+shape in that one place — see `skills/output/visual-founder-output`'s Red Flags before reusing any of them
 somewhere its content doesn't actually have that shape (a flat field list or an independent-item
 table, like `discovery.md`'s output or `define.md`'s requirements, does not get a forced diagram).
 
 Every template below has a Tier A (Artifact-capable) and Tier B (universal fallback) version — see
-`skills/visual-founder-output`'s Core Workflow for how to detect which tier applies before picking
+`skills/output/visual-founder-output`'s Core Workflow for how to detect which tier applies before picking
 one.
 
 ---
 
-## 1. UX flow diagram (`commands/uxflow.md`)
+## 1. UX flow diagram (`commands/pipeline/uxflow.md`)
 
 Generated from the same `UX-*` rows as the existing table — never a hand-authored parallel version.
 
@@ -96,7 +96,7 @@ Artifact, not a standalone dashboard.
 
 ---
 
-## 3. Boardroom seat-verdict grid (`commands/boardroom.md`'s "What each seat said" section)
+## 3. Boardroom seat-verdict grid (`commands/adaptive/boardroom.md`'s "What each seat said" section)
 
 Additive to the existing emoji-line format — do not remove the one-line-per-seat text, since that's
 what `plain-language-checkpoint` output already reads cleanly even with zero rendering.
@@ -127,7 +127,7 @@ laid out in the same Business/Technical/Finance/Research groups the text format 
 
 ---
 
-## 4. DEF→ARCH traceability graph (`commands/architecture.md`)
+## 4. DEF→ARCH traceability graph (`commands/pipeline/architecture.md`)
 
 Generated from the same `ARCH-*` rows (and their `Satisfies` column) as the existing table — never a
 hand-authored parallel version. Unlike UX flow, this isn't a sequence a user moves through; it's a
@@ -155,7 +155,7 @@ the right, connecting lines) — no additional detail beyond what the table alre
 
 ---
 
-## 5. Task-dependency diagram (`commands/implementation-planning.md`'s internal plan document)
+## 5. Task-dependency diagram (`commands/pipeline/implementation-planning.md`'s internal plan document)
 
 The plan document itself is never shown to the founder directly (`boardroom.md`'s Planning Milestone
 checkpoint is what they see) — this diagram is for whoever executes the plan (a fresh `build.md`
@@ -177,7 +177,7 @@ flowchart TD
   them) can and should show as parallel branches, not forced into one chain.
 - Append this diagram as its own subsection in the plan document (e.g. `## Task Dependencies`), after
   the task list — it illustrates the existing checkbox list, never replaces its exact-file/exact-step
-  detail (see `skills/writing-plans`'s "No Placeholders" rule, which still governs the task list
+  detail (see `skills/discipline/writing-plans`'s "No Placeholders" rule, which still governs the task list
   itself).
 
 **Tier A (Artifact):** not typically warranted here — the plan document's own reader (an executing
@@ -197,3 +197,15 @@ unless the founder has explicitly asked to see the plan directly.
 - Keep every label plain-language per `plain-language-checkpoint` — a diagram node reading
   `NULL_POINTER_EXC` instead of a translated consequence fails the checkpoint just as badly as a
   prose sentence would.
+
+## Cited by
+
+- `plugins/wingman/skills/output/visual-founder-output/SKILL.md`
+- `plugins/wingman/commands/adaptive/boardroom.md`
+- `plugins/wingman/commands/pipeline/architecture.md`
+- `plugins/wingman/commands/pipeline/build.md`
+- `plugins/wingman/commands/pipeline/define.md`
+- `plugins/wingman/commands/pipeline/discovery.md`
+- `plugins/wingman/commands/pipeline/implementation-planning.md`
+- `plugins/wingman/commands/pipeline/ship.md`
+- `plugins/wingman/commands/pipeline/uxflow.md`

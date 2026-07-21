@@ -30,3 +30,8 @@ Before a plan is "ship it", each of these lenses should have a clear answer. The
 - "The plan is obvious, sections are overhead" → A missing `## Risks` or `## Success Criteria` is exactly how projects ship something unmeasurable and un-rollbackable. Write the sections.
 - "I'll add the sections after exit" → Exit is the gate. After exit there is no gate. Write them now.
 - Red flag: you are about to hit ExitPlanMode and the plan file has no `## Risks`. Stop.
+
+## Cited by
+
+- `plugins/wingman/commands/adaptive/boardroom.md`
+- `plugins/wingman/commands/pipeline/implementation-planning.md`

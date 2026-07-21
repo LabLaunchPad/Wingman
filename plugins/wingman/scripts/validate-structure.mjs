@@ -227,24 +227,48 @@ if (existsSync(hooksFullPath)) {
 // is invisible to Claude Code at runtime -- it silently does nothing. The
 // "declared but missing" direction is already caught by checkFile above;
 // this catches the reverse ("built a command, forgot to register it").
+//
+// Recursive (not a flat readdirSync) since commands/ and skills/ nest one
+// level deeper into category subfolders (e.g. commands/pipeline/discovery.md,
+// skills/knowledge/memory/) -- a flat scan would either false-flag a category
+// folder itself as an orphan skill, or silently stop checking nested command
+// files at all. Compares full relative paths, not bare basenames, since
+// basename comparison can't tell "commands/pipeline/discovery.md" apart from
+// a same-named file nested under a different category.
 function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {
-  const declared = new Set(declaredPaths.map((p) => p.split('/').pop()));
-  let entries;
-  try {
-    entries = readdirSync(join(pluginRoot, dirRel));
-  } catch {
-    return; // dir doesn't exist -- nothing declared from it either, fine
-  }
-  for (const entry of entries) {
-    const full = join(pluginRoot, dirRel, entry);
-    if (isSkillDir) {
-      if (statSync(full).isDirectory() && !declared.has(entry)) {
-        errors.push(`${kind} "${entry}/" exists on disk but is not declared in plugin.json — it will never load`);
+  const declared = new Set(declaredPaths.map((p) => p.replace(/^\.\//, '')));
+  const dirFull = join(pluginRoot, dirRel);
+
+  function walk(relSoFar) {
+    let entries;
+    try {
+      entries = readdirSync(join(pluginRoot, relSoFar));
+    } catch {
+      return; // dir doesn't exist -- nothing declared from it either, fine
+    }
+    for (const entry of entries) {
+      const entryRel = `${relSoFar}/${entry}`;
+      const full = join(pluginRoot, entryRel);
+      if (isSkillDir) {
+        if (statSync(full).isDirectory()) {
+          if (existsSync(join(full, 'SKILL.md'))) {
+            if (!declared.has(entryRel)) {
+              errors.push(`${kind} "${entryRel}/" exists on disk but is not declared in plugin.json — it will never load`);
+            }
+          } else {
+            walk(entryRel); // category folder -- recurse, don't flag it directly
+          }
+        }
+      } else if (statSync(full).isDirectory()) {
+        walk(entryRel); // category folder
+      } else if (entry === 'README.md') {
+        // A category folder's own index/backlink stub, not a command -- never declared in plugin.json.
+      } else if (entry.endsWith('.md') && !declared.has(entryRel)) {
+        errors.push(`${kind} "${entryRel}" exists on disk but is not declared in plugin.json — it will never load`);
       }
-    } else if (entry.endsWith('.md') && !declared.has(entry)) {
-      errors.push(`${kind} "${entry}" exists on disk but is not declared in plugin.json — it will never load`);
     }
   }
+  if (existsSync(dirFull)) walk(dirRel);
 }
 reportOrphans('commands', plugin.commands || [], 'command');
 reportOrphans('agents', plugin.agents || [], 'agent');

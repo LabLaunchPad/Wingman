@@ -1,6 +1,6 @@
 # Eval: telemetry
 
-Tests `plugins/wingman/commands/telemetry.md` — its light-touch production-observability check: reuse existing tooling, confirm errors/usage are visible and no sensitive data leaks, propose the smallest gap-closing addition, and never silently pick a vendor for the founder.
+Tests `plugins/wingman/commands/adaptive/telemetry.md` — its light-touch production-observability check: reuse existing tooling, confirm errors/usage are visible and no sensitive data leaks, propose the smallest gap-closing addition, and never silently pick a vendor for the founder.
 
 ## Fixture
 
@@ -37,7 +37,7 @@ Graded via `.github/workflows/evals.yml` (requires `ANTHROPIC_API_KEY` + `/bin/b
 
 Fixture (hand-built, not the `setup-waitlist-app.sh` script): a small Node/Express waitlist app with a *different* shape than Run 1 — this one already has Segment (`analytics-node`) wired up from 6 months ago for the marketing site, tracking a generic `page_view` event on every request via global middleware. The just-shipped feature under review, `POST /api/waitlist`, rides along on that middleware but gets no feature-specific telemetry: success and a swallowed 500 both look identical (a `page_view` hit) to Segment, and the failure path (`src/waitlist.js` throwing, caught in `src/server.js`) has no logging or error tracking at all. The existing analytics setup also has a latent PII leak — it pulls `email` straight from the query string into Segment properties. Fixture lives at `/tmp/.../scratchpad/eval-telemetry-run2/waitlist-app/` (scratch-only, not committed).
 
-Spawned a fresh subagent scoped to only `commands/telemetry.md` + the fixture path, not told the answer in advance, asked to report on whether the waitlist feature has a way to tell if it's working in production.
+Spawned a fresh subagent scoped to only `commands/adaptive/telemetry.md` + the fixture path, not told the answer in advance, asked to report on whether the waitlist feature has a way to tell if it's working in production.
 
 Result — subagent correctly:
 - Identified the existing Segment tool first and did not propose a second/competing analytics tool.

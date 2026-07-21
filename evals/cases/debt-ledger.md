@@ -1,6 +1,6 @@
 # Eval: debt-ledger
 
-Tests `plugins/wingman/commands/debt-ledger.md` — its status/harvest/add commands and `// minimal:` comment format — against a fixture with intentional debt patterns.
+Tests `plugins/wingman/commands/adaptive/debt-ledger.md` — its status/harvest/add commands and `// minimal:` comment format — against a fixture with intentional debt patterns.
 
 ## Scenario 1 — Codebase with debt patterns (positive case)
 
@@ -41,7 +41,7 @@ has been run. Corrected 2026-07-20 from `authored, pending first run`.
 ### Run 1 — 2026-07-20 — positive case, `status` only
 
 Ran `evals/fixtures/setup-debt-ledger-fixture.sh` into a scratch dir, then spawned a fresh
-un-briefed subagent with only `commands/debt-ledger.md` and the fixture path, instructed to run
+un-briefed subagent with only `commands/adaptive/debt-ledger.md` and the fixture path, instructed to run
 the `status` command. Independently verified the subagent's report by reading the real fixture
 files directly (`src/service.js`, `DEBT.md`).
 

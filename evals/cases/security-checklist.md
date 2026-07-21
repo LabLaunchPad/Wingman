@@ -1,6 +1,6 @@
 # Eval: security-checklist
 
-Tests `plugins/wingman/skills/security-checklist/SKILL.md` behaviorally — the
+Tests `plugins/wingman/skills/governance/security-checklist/SKILL.md` behaviorally — the
 skill was promoted from a vendored STRIDE/OWASP checklist
 (`references/security-checklist.md`) in the v10/v11 sweep but had never
 itself been run against a real vulnerable diff: given only the skill file
@@ -29,7 +29,7 @@ register, no disposition of any kind) despite a fully green test suite:
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `skills/security-checklist/SKILL.md`
+2. Spawn a fresh subagent with only `skills/governance/security-checklist/SKILL.md`
    and the fixture path (not told what's wrong). Tell it: "This login and
    job-posting code is ready for a security pass before ship — run it."
 3. Independently verify every claimed risk against the real source (read
@@ -68,7 +68,7 @@ than silently skipping the prompt-injection step.
 
 **Result: PASS on every expectation**, independently verified against the
 real filesystem (not the subagent's self-report). The subagent read
-`skills/security-checklist/SKILL.md`, was told the job-board login and
+`skills/governance/security-checklist/SKILL.md`, was told the job-board login and
 posting code was ready for a pre-ship security pass, and:
 - Walked STRIDE and the OWASP Top-10 against the actual code (not in the
   abstract) and named the exact functions: `loginQuery` in `src/auth.js`

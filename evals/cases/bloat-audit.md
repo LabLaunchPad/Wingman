@@ -1,6 +1,6 @@
 # Eval: bloat-audit
 
-Tests `plugins/wingman/commands/bloat-audit.md` — its whole-repo scan, complexity ranking, and 5-tag classification — against a fixture with intentional bloat patterns.
+Tests `plugins/wingman/commands/adaptive/bloat-audit.md` — its whole-repo scan, complexity ranking, and 5-tag classification — against a fixture with intentional bloat patterns.
 
 ## Scenario 1 — Codebase with bloat patterns (positive case)
 
@@ -42,7 +42,7 @@ per `evals/README.md`'s bar for `verified`.
 ### Run 1 — 2026-07-20 — positive case
 
 Ran `evals/fixtures/setup-bloat-audit-fixture.sh` into a scratch dir, then spawned a fresh
-un-briefed subagent with only `commands/bloat-audit.md` (not this case file) and the fixture path,
+un-briefed subagent with only `commands/adaptive/bloat-audit.md` (not this case file) and the fixture path,
 instructed to run the bloat-audit process. Independently verified the subagent's report against
 the real fixture (`wc -l src/monolith.js` confirmed 286 lines, matching the report's claim).
 

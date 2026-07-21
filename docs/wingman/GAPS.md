@@ -91,7 +91,7 @@ Schema per row:
 - **type**: skill `memory`.
 - **trigger**: use when the founder's instruction implies remembering, recalling, or carrying context forward across sessions.
 - **behavior**: read/write a structured `MEMORY.md` + `decisions.md` under the project; never store secrets; surface a one-line recall on SessionStart.
-- **files**: `plugins/wingman/skills/memory/SKILL.md` (+ `references/context-handoffs.md`).
+- **files**: `plugins/wingman/skills/knowledge/memory/SKILL.md` (+ `references/context-handoffs.md`).
 - **validation**: `validate-structure` (anatomy: name, description w/ trigger, Rationalizations/Red Flags/Verification).
 - **status**: shipped (Batch 1).
 
@@ -101,7 +101,7 @@ Schema per row:
 - **type**: skill `research` + command `research.md`.
 - **trigger**: use when the founder asks to investigate, compare, or gather evidence on a topic before deciding.
 - **behavior**: decompose the question → web search + targeted reads → synthesize a plain-language brief with source links + a confidence note; never fabricate citations.
-- **files**: `plugins/wingman/skills/research/SKILL.md`, `plugins/wingman/commands/research.md`.
+- **files**: `plugins/wingman/skills/knowledge/research/SKILL.md`, `plugins/wingman/commands/adaptive/research.md`.
 - **validation**: `validate-structure`; command must have `description` frontmatter.
 - **status**: shipped (Batch 1).
 
@@ -111,7 +111,7 @@ Schema per row:
 - **type**: three skills `founder-cfo`, `founder-cmo`, `founder-cro`.
 - **trigger**: use when the founder needs a finance / marketing / revenue lens on a decision.
 - **behavior**: each renders a plain-language verdict + 2-3 options + a recommended path, never writes code. CFO owns unit economics/cash/runway; CMO owns positioning/acquisition/messaging; CRO owns conversion/pricing/revenue.
-- **files**: `plugins/wingman/skills/founder-cfo/SKILL.md`, `founder-cmo/SKILL.md`, `founder-cro/SKILL.md`.
+- **files**: `plugins/wingman/skills/personas/founder-cfo/SKILL.md`, `founder-cmo/SKILL.md`, `founder-cro/SKILL.md`.
 - **validation**: `validate-structure` anatomy; no skill name collisions.
 - **status**: shipped (Batch 1).
 
@@ -121,7 +121,7 @@ Schema per row:
 - **type**: command `advisory.md`.
 - **trigger**: use when the founder wants the combined business-advisory read.
 - **behavior**: fan out to `founder-cfo`/`founder-cmo`/`founder-cro`; merge into one go/no-go-style summary with the most severe caveat winning on conflict.
-- **files**: `plugins/wingman/commands/advisory.md`.
+- **files**: `plugins/wingman/commands/adaptive/advisory.md`.
 - **validation**: `validate-structure` (description frontmatter); mentioned in `CLAUDE.md`.
 - **status**: shipped (Batch 1).
 

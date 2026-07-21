@@ -1,6 +1,6 @@
 # Eval: verification-loop
 
-Tests `plugins/wingman/skills/verification-loop/SKILL.md` behaviorally. This skill runs a comprehensive 8-phase verification after code changes.
+Tests `plugins/wingman/skills/discipline/verification-loop/SKILL.md` behaviorally. This skill runs a comprehensive 8-phase verification after code changes.
 
 ## Fixture
 
@@ -34,7 +34,7 @@ A minimal TypeScript project with: (1) a type error in `src/utils.ts` (string as
 
 **Setup:** No fixture script exists for this case, so the fixture was built by hand in a scratch dir (minimal TS project, not committed to the repo): `src/utils.ts` with `export const maxRetries: number = "5";` (type error) plus an unused-variable warning (`unusedVar` inside an otherwise-unused `unusedHelper()`, flagged via a local `@typescript-eslint/no-unused-vars` flat-config eslint setup — lint *was* trivially available, no need to skip), `src/config.ts` with a hardcoded `sk_live_...`-style API key literal, and `tests/add.test.ts` with `assert.strictEqual(add(2, 2), 5)` (deliberately wrong, using Node's built-in `node --test` runner). `package.json` wired `build`/`typecheck`/`lint`/`test` scripts to `tsc`, `tsc --noEmit`, `eslint`, and `node --test` respectively.
 
-**Procedure:** Spawned a fresh general-purpose subagent given only the path to `plugins/wingman/skills/verification-loop/SKILL.md` and the path to the scratch project directory, instructed to read the skill and run the verification loop, with no other repo context.
+**Procedure:** Spawned a fresh general-purpose subagent given only the path to `plugins/wingman/skills/discipline/verification-loop/SKILL.md` and the path to the scratch project directory, instructed to read the skill and run the verification loop, with no other repo context.
 
 **Result — the subagent's actual report:**
 

@@ -51,3 +51,7 @@ plugin — read it before adding any integration that touches a credential.
 - [ ] Exposed key would be rotated, not merely noted.
 - [ ] `secret-guard` / `secret-scanner` / `prompt-guard` still wired in
       `hooks/hooks.json`.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/security-checklist/SKILL.md`

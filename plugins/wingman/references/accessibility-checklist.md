@@ -269,3 +269,7 @@ function trapFocus(modal: HTMLElement) {
 3. Automated scans catch ~30% of issues; manual testing with assistive technology is required.
 4. New components must pass all checklist items before ship-readiness.
 5. This document is versioned. Changes require a Boardroom checkpoint with the Design seat.
+
+## Cited by
+
+- `plugins/wingman/agents/boardroom-design.md`

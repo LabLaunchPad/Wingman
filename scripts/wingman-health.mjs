@@ -44,7 +44,7 @@ const caseNames = Object.keys(trust);
 // Explicit aliases for a case whose own title states it tests a second,
 // differently-named file (so the filename-prefix rule above can't see it) —
 // e.g. `systematic-auditing.md`'s title says it tests both
-// `skills/systematic-auditing/SKILL.md` and `commands/audit.md`, with real
+// `skills/discipline/systematic-auditing/SKILL.md` and `commands/adaptive/audit.md`, with real
 // Run 1/Run 2 evidence for both; without this, `audit` mis-reports as
 // uncovered despite having genuine behavioral evidence.
 const aliases = { audit: 'systematic-auditing' };

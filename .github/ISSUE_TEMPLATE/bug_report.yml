@@ -36,7 +36,7 @@ body:
     id: file
     attributes:
       label: Exact file(s) involved
-      description: The specific path(s), e.g. `plugins/wingman/hooks/context-monitor.mjs` or `plugins/wingman/commands/build.md`.
+      description: The specific path(s), e.g. `plugins/wingman/hooks/context-monitor.mjs` or `plugins/wingman/commands/pipeline/build.md`.
       placeholder: plugins/wingman/...
     validations:
       required: true
