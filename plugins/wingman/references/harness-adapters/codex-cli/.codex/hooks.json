@@ -1,0 +1,20 @@
+{
+  "_comment": "Codex CLI hooks adapter for Wingman's git-push safety gate. Verification status: authored, unverified -- no live Codex CLI install in the Wingman dev sandbox. Schema per https://learn.chatgpt.com/docs/hooks (PreToolUse, matcher groups, hookSpecificOutput.permissionDecision deny/allow, exit-code-2-blocks convention -- confirmed structurally identical to Claude Code's own hooks.json by web research, not by a live Codex install). Only the confirmed-portable subset is included here: the git-push gate, which keys on COMMAND TEXT (a regex match for 'git push'), not a Claude-Code-specific tool name. Deliberately NOT included: the secret-guard.mjs Write/Edit-matcher path (Codex's exact tool-name strings for its file-edit tool were not confirmed by research -- guessing one risks a hook that silently never fires) and the ExitPlanMode-matcher boardroom-checkpoint gate (Codex CLI has no plan-mode tool at all; it uses approval_policy instead -- there is nothing to gate here, not a missed port).",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "_matcher_comment": "ASSUMPTION, unconfirmed: Codex CLI's shell-execution tool may not literally be named 'Bash'. Before relying on this, run a Codex CLI session, trigger a shell command, and check its own hook/audit log for the actual tool name field -- update this matcher to match.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/scripts/dod-pre-push-check.mjs\" .",
+            "_command_comment": "Replace <PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN> with wherever Claude Code's plugin marketplace installed Wingman on this machine (or a checked-out copy of the LabLaunchPad/Wingman repo). Reuses the real script unmodified -- see plugins/wingman/scripts/dod-pre-push-check.mjs, which already runs standalone with zero Claude Code involvement. Simpler and more robust than this hooks.json path: install it as a real git pre-push hook instead (item 3 of the harness-adapters README) -- that fires under any harness, including this one, with no Codex-specific wiring at all.",
+            "timeout": 120,
+            "statusMessage": "Wingman: checking Boardroom verdict, tests, and threat register before allowing a git push"
+          }
+        ]
+      }
+    ]
+  }
+}
