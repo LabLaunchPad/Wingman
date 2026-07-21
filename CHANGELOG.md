@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.29] - 2026-07-21
+
+### Fixed
+- **`plugins/wingman/scripts/install-git-hooks.mjs`** — found by a real `/wingman:audit` pass against PR #72's own just-merged content (never independently reviewed before): a shell-quoting gap (the generated pre-push hook interpolated `repoDir` into a double-quoted `/bin/sh` string with no escaping — a path containing `"`/`` ` ``/`$` could break out of the quoting), fixed with proper POSIX single-quote escaping and re-tested with a real path containing a literal `'` pushed through a real git remote; and a missing try/catch around `readFileSync` on an existing hook path, which crashed with a raw Node stack trace on a directory/unreadable hook instead of the script's own graceful-error convention.
+- **`AGENTS.md`** (root) — Repository map's "references/ ... stay flat" claim was stale as of PR #72, which added the genuinely nested `references/harness-adapters/` subtree.
+
+### Added
+- **`tests/install-git-hooks/install-git-hooks.test.mjs`** — 10 real regression tests for `install-git-hooks.mjs`'s install/uninstall/idempotency/foreign-hook logic, closing a real zero-coverage gap the same audit pass found.
+
 ## [0.5.28] - 2026-07-21
 
 ### Added

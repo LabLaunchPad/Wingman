@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-// PostToolUse hook (matchers: Bash, Read, Write, Edit, NotebookEdit) — fills gap G4.
+// PostToolUse hook (registered in hooks.json with no matcher, so it fires on every tool call --
+// a superset of the Bash/Read/Write/Edit/NotebookEdit set this comment used to name; broader, not
+// narrower, so not a functional gap, just corrected here to match the real wiring) — fills gap G4.
 //
 // Defense-in-depth companion to secret-guard (G1), which blocks secrets at the
 // *input* side (commands/files being written). This hook scans the *output*

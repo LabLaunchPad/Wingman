@@ -24,10 +24,32 @@ function checkScriptPath() {
   return resolve(dirname(fileURLToPath(import.meta.url)), 'dod-pre-push-check.mjs');
 }
 
+// POSIX single-quote escaping: wrap in '...', replacing each embedded ' with '\''. Unlike double
+// quotes, single quotes in /bin/sh don't expand $, `, \, or " -- so a repoDir containing any of
+// those can't break out of the generated hook script's quoting.
+function shellQuote(value) {
+  return `'${String(value).replace(/'/g, `'\\''`)}'`;
+}
+
 function buildWrapper(repoDir) {
   const scriptPath = checkScriptPath();
   return `#!/bin/sh\n${MARKER} -- installed by plugins/wingman/scripts/install-git-hooks.mjs\n` +
-    `node "${scriptPath}" "${resolve(repoDir)}"\n`;
+    `node ${shellQuote(scriptPath)} ${shellQuote(resolve(repoDir))}\n`;
+}
+
+// readFileSync throws on a directory, a permissions error, or a race where the path disappears
+// between existsSync and the read -- surface that as the same graceful, plain-language error this
+// script uses everywhere else, not a raw Node stack trace.
+function readExistingHook(hookPath) {
+  try {
+    return readFileSync(hookPath, 'utf-8');
+  } catch (err) {
+    console.error(
+      `Wingman: couldn't read the existing ${hookPath} to check whether this script installed it ` +
+      `(${err.code || err.message}). Leaving it alone -- resolve that manually before retrying.`
+    );
+    process.exit(1);
+  }
 }
 
 function main() {
@@ -54,7 +76,7 @@ function main() {
       console.log('Wingman: no pre-push hook installed, nothing to do.');
       return;
     }
-    const existing = readFileSync(hookPath, 'utf-8');
+    const existing = readExistingHook(hookPath);
     if (!existing.includes(MARKER)) {
       console.error(
         'Wingman: .git/hooks/pre-push exists but was not installed by this script -- leaving it ' +
@@ -70,7 +92,7 @@ function main() {
   mkdirSync(hooksDir, { recursive: true });
 
   if (existsSync(hookPath)) {
-    const existing = readFileSync(hookPath, 'utf-8');
+    const existing = readExistingHook(hookPath);
     if (existing.includes(MARKER)) {
       console.log('Wingman: pre-push hook already installed, nothing to do.');
       return;
