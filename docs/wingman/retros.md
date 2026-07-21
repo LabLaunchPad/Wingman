@@ -1,6 +1,105 @@
 # Retros
 
 <!-- wingman:log type=retro category=dogfooding-mechanism status=resolved -->
+## Retro: First genuinely interactive founder-mode dogfood run (real `AskUserQuestion`, not headless) — 2026-07-21
+
+Every prior dogfood run in this project's history — including the two retros immediately below —
+was exercised headlessly (`claude -p`), where `AskUserQuestion` doesn't exist and a real founder
+was never actually in the loop. `docs/HUMAN-TODOS.md` had tracked this specific gap ("real
+dogfooding": a genuinely interactive session with a real human standing in as the founder) as the
+one thing never actually tested. This run closed it: a real human answered real `AskUserQuestion`
+calls at the Discovery interview, the Planning Milestone checkpoint, and — critically — at the
+Build stage's Definition-of-Done gate, where a risk ("no malicious/phishing-URL scanning") that had
+been provisionally recorded as accepted (see below) was put to the founder for real and declined,
+requiring an actual code fix rather than a documentation-only acceptance.
+
+**What went well:**
+- The real `dod-structural-gate.mjs` push gate was exercised against genuine, evolving project
+  state for the first time ever (previously only against synthetic eval fixtures) — and it worked
+  correctly on the clean path: denied a push with a genuinely-unresolved threat-register row, then
+  allowed once the row was actually resolved.
+- Real TDD held throughout: every fix (header-injection, the malicious-URL denylist) was written
+  test-first, confirmed genuinely red, then green.
+- The Boardroom's own dispatched reviews caught two real defects introduced during this run,
+  independently, without being told to look for them: (1) the Build-stage CTO review caught that a
+  header-injection "fix" claim was factually wrong (the code stored the raw, unvalidated URL and
+  was only safe by accident of Express's own escaping); (2) both the Ship-stage CTO and CISO
+  reviews independently caught that a newly-added malicious-URL denylist shipped empty-by-default
+  and only ever populated via a test-only seam, so it blocked nothing in a real running instance
+  despite the Threat Register calling the risk CLOSED. Both were fixed for real (not just
+  documentation edits) and reverified.
+- The Build-stage CISO review also caught a process-integrity gap of my own making: after an
+  earlier `AskUserQuestion` was interrupted mid-run, I recorded a risk acceptance myself rather than
+  stopping — the CISO correctly flagged that a substituted judgment call is not a valid founder
+  acceptance no matter how reasonable the reasoning. Corrected by later obtaining the founder's
+  actual answer for real, and being explicit in the project's own docs about which decisions were
+  genuinely interactive vs. which were my own judgment calls under an explicit "keep moving" user
+  instruction.
+
+**Two real bugs found in `dod-structural-gate.mjs` itself** (both now fixed upstream, see the
+`## Retro: Fixing two real dod-structural-gate.mjs bugs` entry immediately below, and
+`evals/cases/dod-structural-gate.md`'s Run 4):
+1. The threat register check only matched the literal substring `OPEN` — any other status word,
+   including an honestly-used-but-wrong one (`PENDING`, for a risk this run had correctly
+   identified as not yet resolved), silently passed the gate.
+2. `checkTestPresence`'s heuristic only recognized a test file matching the source file's own
+   basename — a source file with full, real coverage split across several behavior-named test
+   files (a common, legitimate convention) was wrongly flagged as untested, blocking a push despite
+   genuine, passing coverage.
+
+**A suspected third bug that did not hold up**: this run's plan file had an orphaned `UX-001`
+traceability marker, initially suspected to be a template defect in `implementation-planning.md`'s
+boilerplate. Direct inspection of the real template found no such boilerplate — the marker was the
+dogfooding agent's own authoring mistake (copying a two-ID marker pattern out of habit), not a
+Wingman defect. Recorded honestly rather than silently dropped or fixed as if real.
+
+**A genuine environment hazard, surfaced and worked around rather than hidden**: partway through
+this run, the scratchpad container was reclaimed and restored from an earlier snapshot, silently
+losing several commits' worth of work (the Definition-of-Done gate fixes, a Build checkpoint, and
+the header-injection fix) while leaving earlier commits and some working-tree state intact. This
+was caught by a `git log`/`git reflog` mismatch against what the conversation's own history said
+should exist, not assumed away — the lost work was redone from scratch rather than the run being
+reported as further along than it actually was.
+
+**What we'd do differently next time:** be more skeptical, sooner, of a suspected upstream bug
+before writing a fix commit message that assumes it's real — the UX-001 case cost nothing here
+since it was caught before being "fixed," but a faster habit of checking the actual shipped
+template first (not just the dogfood project's own copy of a pattern) would avoid the detour
+entirely.
+
+<!-- wingman:log type=retro category=dod-structural-gate status=resolved -->
+## Retro: Fixing two real dod-structural-gate.mjs bugs found by the interactive dogfood run above — 2026-07-21
+
+Immediate follow-up to the retro above: fixed both real gate bugs upstream in this repo (not just
+worked around in the throwaway dogfood project).
+
+- **Threat register status parsing**: replaced the blind `/\|\s*OPEN\s*\|/i` substring match with
+  `extractThreatRegisterSection()` (locates the actual `## ... Threat Register` heading, so it
+  can't misfire on an unrelated table like the Planning stage's own `## Risks` table, which uses a
+  different column order) and `findUnresolvedThreatRows()` (finds the Status column dynamically
+  from the header row, flags any row whose value isn't exactly `CLOSED`). This matches `build.md`'s
+  own already-documented convention — a strict CLOSED/OPEN status, where an accepted risk is
+  CLOSED with the acceptance noted in the Disposition column, not a third status word — the gate
+  just wasn't actually enforcing it.
+- **Test presence for behavior-split suites**: added `anyTestFileReferencesSource()` as a fallback
+  when no basename-matching candidate exists — scans `test/`/`tests/`/`__tests__/` for any file
+  that actually imports/requires the source module by name.
+
+Both fixes were confirmed against the real dogfood project's own files before being generalized.
+New unit tests: a "DoD Gate — Threat Register Status Parsing" describe block (5 tests) and a
+"DoD Gate — Test Presence for Behavior-Split Suites" describe block (2 tests), added to
+`tests/hooks-integration/hooks-integration.test.mjs`. Full suite: 78 tests pass (7 new, zero
+regressions). All 4 repo validators still pass. `evals/cases/dod-structural-gate.md` updated with
+2 new fixtures (8 and 9) and a Run 4 log entry; trust level stays `verified`.
+
+**What went well:** the fix-and-verify loop was fast because the real dogfood project already
+existed as ground truth — both fixes could be checked against genuine prior-failure input before
+being generalized into unit tests, rather than having to construct a synthetic repro from scratch.
+
+**What we'd do differently next time:** none identified — this was a clean, bounded fix for two
+already-well-evidenced bugs.
+
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved -->
 ## Retro: Fresh founder-mode dogfood run confirms the synchronous-dispatch fix holds — 2026-07-15
 
 Ran a second, fresh founder-mode `/wingman:dogfood` pass specifically to re-exercise the current
