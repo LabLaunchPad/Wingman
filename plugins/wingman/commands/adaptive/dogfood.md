@@ -57,6 +57,13 @@ never ships to a founder's installed copy of the plugin.
    as background calls and then ending its own turn with a vague "waiting for the results" message
    instead of actually finishing. There is no other process advancing a dogfood run forward; it
    must drive its own dispatches to completion in the same turn.
+   **Every dispatch reviewing real code (any checkpoint after Discovery) must include the actual
+   on-disk file path(s) being reviewed, not just a pasted diff snippet** — a real 2026-07-21 run
+   dispatched a Build-checkpoint re-verification with only an inline diff, and the seat correctly
+   searched the only repository it could see (Wingman's own dev repo), found nothing matching, and
+   correctly returned `NO_GO` for lack of traceable evidence rather than trusting an unverified
+   claim. That's the seat behaving exactly as it should — the gap was the dispatch omitting where
+   the code actually lives (a throwaway fixture directory, not Wingman's own repo).
 3. Real test-driven implementation during Build: a real failing test, a real fix, a real passing
    test — never write the passing version first.
 4. A real `git push` from inside the fixture, through the actual installed hooks

@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.25] - 2026-07-21
+
+### Fixed
+- **Real full-pipeline maintainer-mode dogfood run** (`evals/dogfood-runs/2026-07-21T04-00-00Z-simple.json`) — Discovery through Ship, all 3 Boardroom checkpoints dispatched for real (24 Agent-tool calls), real TDD, real gate-dormancy confirmation. Found and fixed 2 real gaps: `plugins/wingman/commands/pipeline/build.md` had no proportionality carve-out for a genuinely single-task plan (2nd consecutive occurrence — always-active `dept-qa` never got created for a 1-task change); `plugins/wingman/commands/adaptive/dogfood.md` didn't require a checkpoint re-verification dispatch to include the actual on-disk file path, which caused a real spurious `NO_GO` (the CISO seat correctly refused to certify a diff it couldn't locate — the dispatch, not the seat, was the gap). A third finding (a session skipping `build.md`'s branch-creation step) deliberately got **no new hook** — `ship.md`'s existing preflight backstop caught and recovered from it exactly as designed, and `dogfood-gap-classification`'s cooling-off rule explicitly warns against hardening something that already worked. Full retro in `docs/wingman/retros.md`.
+
 ## [0.5.24] - 2026-07-21
 
 ### Added

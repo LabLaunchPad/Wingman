@@ -1,5 +1,48 @@
 # Retros
 
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=4 -->
+## Retro: Maintainer-mode simple-path dogfood run — real gaps found and fixed, not just confirmed clean — 2026-07-21
+
+Ran the real 7-stage pipeline end to end against a fresh `evals/fixtures/setup-dogfood-simple.sh`
+fixture ("internal-status-api"), adding a genuinely trivial feature (`GET /health` returning a
+static `{"status":"ok"}`), same shape as the 2026-07-18 run. All 3 Boardroom checkpoints (Planning
+Milestone, Build, Ship) dispatched for real — 24 total Agent-tool calls, each reading the actual
+persona file, never a simulated verdict. Real TDD (test written and confirmed failing before the
+implementation existed). Full run record: `evals/dogfood-runs/2026-07-21T04-00-00Z-simple.json`.
+
+**What went well:**
+- Gate dormancy confirmed clean again: `dept-design`/`dept-data`/`dept-legal-security`/`dept-devops`/`dept-growth`
+  and `management-board-activation` all correctly stayed dormant.
+- The Planning Milestone checkpoint produced a genuine, substantive `GO_WITH_CONCERNS` from CISO
+  (the `/health` response body must stay static, never leak version/DB/error info) — a real finding
+  the implementation then had to satisfy, not a rubber-stamp.
+- `ship.md`'s "on a feature branch" preflight backstop worked exactly as designed (see below).
+
+**What went wrong, and was fixed in the same round, not just logged:**
+1. **`build.md`'s "delegate each task to a department lead" instruction had no proportionality
+   carve-out for a genuinely single-task plan** — this is the *second* consecutive simple-path run
+   to hit this (first: 2026-07-18). Fixed: `build.md` now explicitly allows direct execution for a
+   plan naming exactly one task.
+2. **This session (playing the pipeline) skipped `build.md`'s own correctly-worded "create a
+   feature branch before the first commit" step** — work landed on the fixture's default branch.
+   `ship.md`'s preflight step 3 caught it exactly as designed ("stop and offer to create one now")
+   and recovery was clean. **No new hook was added for this** — the cooling-off rule
+   (`dogfood-gap-classification`) explicitly warns against the "obviously needs a hard hook, ship
+   it now" reflex, citing two real prior over-block bugs from that exact pattern. The existing
+   two-layer design (instruct + backstop) demonstrably worked; hardening it further wasn't
+   evidenced as necessary, just satisfying to close the loop with.
+3. **A Boardroom re-verification dispatch omitted the actual file path**, giving the CISO seat only
+   a diff snippet. It correctly searched the one repo it could see, found nothing, and correctly
+   returned `NO_GO` rather than trust an unverified claim — the seat behaved exactly right; the
+   dispatch was the gap. Fixed: `dogfood.md` now explicitly requires every code-reviewing dispatch
+   to include the real on-disk path.
+
+**Anything for you to know:**
+- This run is genuine evidence that `/wingman:dogfood`'s own dispatch discipline matters as much as
+  the pipeline being dogfooded — a rigorous Boardroom seat correctly refusing to certify something
+  it can't see is a feature, not a bug, and the fix belongs in how the run is driven, not in the
+  seat's own leniency.
+
 <!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=1 -->
 ## Retro: Maintainer-mode simple-path dogfood run — gate dormancy confirmed clean — 2026-07-18
 
