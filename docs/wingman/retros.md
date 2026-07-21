@@ -1,5 +1,52 @@
 # Retros
 
+<!-- wingman:log type=retro category=audit status=resolved occurrence=1 -->
+## Retro: Full parallel audit of PR #72's own content — real, small bugs found in code nobody had reviewed independently yet — 2026-07-21c
+
+Ran `/wingman:audit`'s procedure for real: 4 narrowly-scoped parallel subagents (harness-adapters
+correctness, repo-wide consistency/drift, security/secrets sweep, test/eval coverage), each with an
+exact file list, dispatched right after PR #72 merged — the first independent review any of that
+content had gotten (it was built and merged in the same session, by the same actor, with no second
+pair of eyes).
+
+**What was found and fixed, all independently re-verified against the real files/execution before
+trusting the subagent report, per this project's own standing discipline:**
+- `AGENTS.md`'s Repository map claimed `references/` "stay[s] flat" — stale the moment
+  `references/harness-adapters/` (a genuinely nested subtree, 36 files not 15, mirroring Codex
+  CLI's/OpenCode's own discovery layout) was added in the same PR that never updated this line.
+  Fixed to describe both the flat majority and the one deliberate nested exception.
+- `install-git-hooks.mjs` had two real bugs, neither exercised by the original manual scratch-clone
+  verification: (1) a shell-quoting gap — `repoDir` was interpolated into the generated hook's
+  double-quoted `/bin/sh` string with no escaping, so a path containing `"`/`` ` ``/`$` could break
+  out of the quoting; fixed with proper POSIX single-quote escaping (`'...'` with `'` → `'\''`), and
+  directly re-tested with a real path containing a literal single quote pushing through a real git
+  remote. (2) `readFileSync` on an existing hook path had no try/catch — a directory or unreadable
+  file at `.git/hooks/pre-push` crashed with a raw Node stack trace instead of the script's own
+  graceful error convention; fixed and re-verified (a directory at the hook path now produces the
+  same plain-language "couldn't read the existing hook" message every other failure path uses).
+- Zero automated test coverage existed for `install-git-hooks.mjs`'s install/uninstall/idempotency/
+  foreign-hook logic — closed with `tests/install-git-hooks/install-git-hooks.test.mjs` (10 real
+  cases, including a direct regression test for the quoting fix and a case that would have caught
+  the empty-file `unlinkSync`-vs-`writeFileSync('')` bug from earlier in the session, had it still
+  been present).
+
+**What was checked and came back genuinely clean, not skipped:** all 8 Codex CLI TOML agent files
+(parsed with a real TOML parser — no syntax errors), the `wingman-gate.js` OpenCode plugin's
+decision logic (compared line-by-line against `boardroom-checkpoint.mjs`, confirmed a faithful
+port with no copy-paste drift), all 16 Boardroom-seat translation files for cross-seat contamination
+(none found), repo-wide count/version consistency (all 4 validators PASS, `plugin.json`/
+`CHANGELOG.md` versions match, no stale hand-copied numbers), and a full secret/injection sweep
+(only synthetic test fixtures matched the SECRET patterns; `wingman-gate.js` has no shell/eval
+surface at all; zero outbound network calls anywhere under `plugins/wingman/`).
+
+**Feed-forward:** this is direct evidence for treating "just-merged, same-session, same-actor"
+content as still needing an independent audit pass before being considered settled — three of four
+real findings here were in code written and manually verified only hours earlier in this same
+session. Not escalating to a standing rule yet (one occurrence); watching for a second, differently-
+shaped instance of "self-verification missed something an independent audit caught" before
+considering whether this needs to become part of `git-pr-workflow` or `dogfood-gap-classification`'s
+own checklist.
+
 <!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=5 -->
 ## Retro: Maintainer-mode complex-path dogfood run — clean, and the prior run's fixes held — 2026-07-21b
 

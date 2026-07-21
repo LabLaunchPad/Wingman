@@ -53,8 +53,11 @@ never from the directory path, so this taxonomy is purely for navigation; it doe
 | `pipeline/` | discovery, define, architecture, uxflow, implementation-planning, build, ship |
 | `adaptive/` | boardroom, retro, learn, evolve, harness, telemetry, launch, hotfix, audit, dogfood, over-engineering-review, bloat-audit, debt-ledger, research, advisory, incident, knowledge-export |
 
-`agents/` (8 Boardroom seats) and `references/` (15 files) stay flat — both small and homogeneous
-enough that subdividing them would be churn without benefit.
+`agents/` (8 Boardroom seats) stays flat — small and homogeneous enough that subdividing it would
+be churn without benefit. `references/` is mostly flat (15 top-level files) but also holds one
+nested subtree, `references/harness-adapters/` — its files must mirror Codex CLI's/OpenCode's own
+discovery layout (`.codex/agents/`, `.opencode/agent/`, `.opencode/plugin/`) to stay drop-in
+copyable, so a flat structure wasn't an option there; see that directory's own `README.md`.
 
 ## Before making a structural change
 
