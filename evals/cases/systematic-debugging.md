@@ -1,6 +1,6 @@
 # Eval: systematic-debugging
 
-Tests `plugins/wingman/skills/systematic-debugging/SKILL.md` behaviorally — the one phase no other eval in this project has exercised: the "3+ failed fixes → stop and question the architecture" escalation (`hotfix.md`'s own trust-level note flags that neither of its two runs reached this threshold).
+Tests `plugins/wingman/skills/discipline/systematic-debugging/SKILL.md` behaviorally — the one phase no other eval in this project has exercised: the "3+ failed fixes → stop and question the architecture" escalation (`hotfix.md`'s own trust-level note flags that neither of its two runs reached this threshold).
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/skills/systematic-debugging/SKILL.md` behaviorally — th
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `skills/systematic-debugging/SKILL.md`, the fixture, and `FIXLOG.md`'s history. Not told the actual root cause.
+2. Spawn a fresh subagent with only `skills/discipline/systematic-debugging/SKILL.md`, the fixture, and `FIXLOG.md`'s history. Not told the actual root cause.
 3. Independently verify: did it stop and question the architecture (per the Iron Law) before attempting fix #4, and did it correctly identify the real root cause (unkeyed module-level cache) rather than patching another symptom?
 
 ## Expectations

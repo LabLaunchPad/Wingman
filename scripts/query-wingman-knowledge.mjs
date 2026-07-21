@@ -8,7 +8,7 @@
 //
 // Dev-repo-only, same as parse-wingman-logs.mjs: this lives under /scripts, which never ships as
 // part of the installed plugin (see docs/ARCHITECTURE.md's structured-knowledge-layer note under
-// §6). skills/dogfood-gap-classification may depend on it (dev-repo-only itself); evolve-promotion
+// §6). skills/governance/dogfood-gap-classification may depend on it (dev-repo-only itself); evolve-promotion
 // must not (it runs inside any founder's installed project).
 //
 // Usage: node scripts/query-wingman-knowledge.mjs [--type=T] [--category=C] [--status=S]

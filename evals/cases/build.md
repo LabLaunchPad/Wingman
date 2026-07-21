@@ -1,6 +1,6 @@
 # Eval: build
 
-Tests `plugins/wingman/commands/build.md` behaviorally, distinct from `full-pipeline-e2e.md` (which already covers the build stage as part of a whole-pipeline run). The distinctive behavior under test: does `build.md`'s TDD execution discipline (test first, confirm it fails for the right reason, implement, confirm it passes, commit) actually hold — specifically, is the new test real (fails without the implementation) rather than decorative?
+Tests `plugins/wingman/commands/pipeline/build.md` behaviorally, distinct from `full-pipeline-e2e.md` (which already covers the build stage as part of a whole-pipeline run). The distinctive behavior under test: does `build.md`'s TDD execution discipline (test first, confirm it fails for the right reason, implement, confirm it passes, commit) actually hold — specifically, is the new test real (fails without the implementation) rather than decorative?
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/commands/build.md` behaviorally, distinct from `full-pipe
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `commands/build.md` and the fixture (including the pre-seeded plan). Not told the implementation.
+2. Spawn a fresh subagent with only `commands/pipeline/build.md` and the fixture (including the pre-seeded plan). Not told the implementation.
 3. Independently verify: read the diff/history to confirm the test was written and run *before* the implementation existed (and genuinely failed then), not written after and never shown red.
 
 ## Expectations

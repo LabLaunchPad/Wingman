@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence comes from directly-constructed real git scenarios (bare repos, simulated squash-merges) built inline per run, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/git-pr-workflow/SKILL.md` and its 3 bundled scripts — does the
+Tests `plugins/wingman/skills/mechanics/git-pr-workflow/SKILL.md` and its 3 bundled scripts — does the
 squash-merge branch resync correctly detect and fix a stale branch, does the CI-poll script
 correctly distinguish pass/fail/pending/no-checks/timeout, and does the PR-opening script
 correctly check a repo's own PR template and create a draft?
@@ -68,7 +68,7 @@ and this run's target was specifically the sync script's conflict path, the thin
 
 ### Run 1 — 2026-07-15 (real squash-merge-during-ship scenario, un-briefed)
 
-A fresh subagent was given only `commands/ship.md` and this skill's `SKILL.md` — not told which
+A fresh subagent was given only `commands/pipeline/ship.md` and this skill's `SKILL.md` — not told which
 script to use — and asked simply to ship an already-finished, already-tested change
 (`countWidgets` + its test) on a branch whose earlier version had already been squash-merged into
 `main` via a stale, never-deleted remote branch ref. It correctly diagnosed the situation from

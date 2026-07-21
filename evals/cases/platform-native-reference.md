@@ -1,6 +1,6 @@
 # Eval: platform-native-reference
 
-Tests `plugins/wingman/skills/platform-native-reference/SKILL.md` — its cross-layer reference mapping "what you think you need" to "what the platform ships" — against scenarios where native solutions exist.
+Tests `plugins/wingman/skills/knowledge/platform-native-reference/SKILL.md` — its cross-layer reference mapping "what you think you need" to "what the platform ships" — against scenarios where native solutions exist.
 
 ## Scenario 1 — Dependency that platform already provides (positive case)
 
@@ -35,7 +35,7 @@ exercised by this fixture, and no negative case has been run. Corrected 2026-07-
 ### Run 1 — 2026-07-20 — positive case (partial coverage)
 
 Ran `evals/fixtures/setup-platform-native-reference-fixture.sh` into a scratch dir, then spawned a
-fresh un-briefed subagent with only `skills/platform-native-reference/SKILL.md` and the fixture
+fresh un-briefed subagent with only `skills/knowledge/platform-native-reference/SKILL.md` and the fixture
 path. Independently verified the subagent's recommendations by reading the real fixture files.
 
 | Check | Result |

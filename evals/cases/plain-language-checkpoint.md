@@ -1,6 +1,6 @@
 # Eval: plain-language-checkpoint
 
-Tests `plugins/wingman/skills/plain-language-checkpoint/SKILL.md` — its bar for translating technical findings into jargon-free, founder-actionable decisions (leading with consequence, not mechanism).
+Tests `plugins/wingman/skills/output/plain-language-checkpoint/SKILL.md` — its bar for translating technical findings into jargon-free, founder-actionable decisions (leading with consequence, not mechanism).
 
 ## Scenario — Raw technical finding → founder summary (positive case)
 

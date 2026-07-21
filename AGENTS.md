@@ -31,6 +31,31 @@ Two boundaries are easy to get wrong — state them plainly rather than re-deriv
 
 For what is and isn't portable to a non-Claude-Code harness, see `docs/ARCHITECTURE.md` §8a (not restated here).
 
+## Skills and commands, by category
+
+`plugins/wingman/skills/` and `plugins/wingman/commands/` are subdivided into category folders —
+skill/command identity comes from the `name:` frontmatter field (skills) or filename (commands),
+never from the directory path, so this taxonomy is purely for navigation; it doesn't change any
+`/wingman:*` invocation.
+
+| `skills/<category>/` | Skills |
+|---|---|
+| `discipline/` | engineering-minimalism, doubt-driven-development, anti-rationalization, verification-before-completion, verification-loop, test-driven-development, systematic-debugging, systematic-auditing, subagent-driven-development, writing-plans, simplify |
+| `mechanics/` | git-pr-workflow, package-manager-selection, testing-patterns, code-review, spec-handler, interview-one-question-at-a-time |
+| `governance/` | department-lead-activation, management-board-activation, evolve-promotion, dogfood-gap-classification, evidence-gated-catalog, traceability-linking, definition-of-done, security-checklist |
+| `output/` | plain-language-checkpoint, visual-founder-output, design-taste |
+| `knowledge/` | memory, doc-index, token-economy, prompt-diff-check, research, platform-native-reference |
+| `personas/` | founder-cfo, founder-cmo, founder-cro |
+| `response/` | incident-response, ponytail-debt-harvesting, council |
+
+| `commands/<category>/` | Commands |
+|---|---|
+| `pipeline/` | discovery, define, architecture, uxflow, implementation-planning, build, ship |
+| `adaptive/` | boardroom, retro, learn, evolve, harness, telemetry, launch, hotfix, audit, dogfood, over-engineering-review, bloat-audit, debt-ledger, research, advisory, incident, knowledge-export |
+
+`agents/` (8 Boardroom seats) and `references/` (15 files) stay flat — both small and homogeneous
+enough that subdividing them would be churn without benefit.
+
 ## Before making a structural change
 
 1. Read `CLAUDE.md` and `docs/ARCHITECTURE.md` first — they explain *why* the plugin is shaped the way it is, not just what files exist.
@@ -44,4 +69,4 @@ For what is and isn't portable to a non-Claude-Code harness, see `docs/ARCHITECT
 
 ## Portability
 
-Most of this plugin is intentionally coupled to Claude Code's own tool surface (`AskUserQuestion`, `ExitPlanMode`, parallel `Task`/`Agent` dispatch) — see `docs/ARCHITECTURE.md` §8a for exactly what is and isn't portable today, and why. Two skills are built to be genuinely harness-agnostic: `plugins/wingman/skills/git-pr-workflow` and `plugins/wingman/skills/package-manager-selection`.
+Most of this plugin is intentionally coupled to Claude Code's own tool surface (`AskUserQuestion`, `ExitPlanMode`, parallel `Task`/`Agent` dispatch) — see `docs/ARCHITECTURE.md` §8a for exactly what is and isn't portable today, and why. Two skills are built to be genuinely harness-agnostic: `plugins/wingman/skills/mechanics/git-pr-workflow` and `plugins/wingman/skills/mechanics/package-manager-selection`.

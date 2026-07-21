@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: fixture is a plain inline project description shared with several other cases in the same consolidated session, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/code-review/SKILL.md` — does it find a real, genuine quality issue
+Tests `plugins/wingman/skills/mechanics/code-review/SKILL.md` — does it find a real, genuine quality issue
 and report it in plain language, without ever editing the code itself?
 
 ## Fixture (shared across this consolidated session's 8 skills)

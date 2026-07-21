@@ -1,6 +1,6 @@
 # Eval: boardroom-7-seat
 
-Tests `plugins/wingman/commands/boardroom.md`'s 7-seat dispatch and consolidation logic — the MVP1 hard cutover from 5 seats (founder/engineer/security/design/cost) to 7 (CEO/CPO/CMO/CTO/CISO/CFO/Research/Design). This case is deliberately narrow, mirroring `boardroom-gate-rule.md`'s approach: it uses synthetic seat verdicts rather than deriving them from a real review, so it tests the mechanical dispatch-count, grouped-summary formatting, and gate-rule reduction — not the quality of independent seat judgment (each seat's own review discipline is covered by reading its agent file, not by this eval).
+Tests `plugins/wingman/commands/adaptive/boardroom.md`'s 7-seat dispatch and consolidation logic — the MVP1 hard cutover from 5 seats (founder/engineer/security/design/cost) to 7 (CEO/CPO/CMO/CTO/CISO/CFO/Research/Design). This case is deliberately narrow, mirroring `boardroom-gate-rule.md`'s approach: it uses synthetic seat verdicts rather than deriving them from a real review, so it tests the mechanical dispatch-count, grouped-summary formatting, and gate-rule reduction — not the quality of independent seat judgment (each seat's own review discipline is covered by reading its agent file, not by this eval).
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/commands/boardroom.md`'s 7-seat dispatch and consolidatio
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with `commands/boardroom.md`, all 8 `agents/boardroom-*.md` files, and `docs/ARCHITECTURE.md` §4 — but no other eval case, so it isn't told the expected answer.
+2. Spawn a fresh subagent with `commands/adaptive/boardroom.md`, all 8 `agents/boardroom-*.md` files, and `docs/ARCHITECTURE.md` §4 — but no other eval case, so it isn't told the expected answer.
 3. Give it 2 synthetic seat-verdict sets to format and gate:
    - **Run A (all-GO)**: all 8 seats (`ceo`, `cpo`, `cmo`, `cto`, `ciso`, `cfo`, `research`, `design`) return `GO`, with `cmo` and `research` explicitly `N/A — no material input on this checkpoint` (the documented fast-path).
    - **Run B (mixed)**: `cto` returns `GO_WITH_CONCERNS` ("no test plan for the webhook retry path"), `ciso` returns `NO_GO` ("hardcoded API key in the diff"), the rest `GO`.
@@ -58,7 +58,7 @@ One promotion criterion remains open: a second, differently-shaped run (e.g. una
 - **Cost (CFO lane):** an uncapped `for` loop firing 5 redundant paid LLM API calls per signup with no rate limit, cache, or budget alert configured anywhere.
 - **Correctness (CTO/CPO lane):** no error handling around the DB call, so a failed write still returns `{ ok: true }` to the client — users are told signup succeeded when nothing was saved.
 
-All 7 seats were dispatched in parallel (7 backgrounded `general-purpose` agents, each given only its own persona file path and the fixture path — not told what to find), matching `commands/boardroom.md`'s "dispatch all seven in parallel, single message" instruction as closely as this sandbox allows. Design was not dispatched (backend-only diff, no user-facing or developer-facing surface per `boardroom.md`'s own N/A criterion for Design).
+All 7 seats were dispatched in parallel (7 backgrounded `general-purpose` agents, each given only its own persona file path and the fixture path — not told what to find), matching `commands/adaptive/boardroom.md`'s "dispatch all seven in parallel, single message" instruction as closely as this sandbox allows. Design was not dispatched (backend-only diff, no user-facing or developer-facing surface per `boardroom.md`'s own N/A criterion for Design).
 
 **Verdicts returned (quoted verbatim from each seat, independently, with no cross-seat visibility):**
 - **CEO — `NO_GO`**: *"This change hardcodes live-looking payment and cloud credentials into the code, writes customers' passwords and full card numbers to a plain log file, and tells customers 'signup successful' even when it isn't... Hold — do not ship."*

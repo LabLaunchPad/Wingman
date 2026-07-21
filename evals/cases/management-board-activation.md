@@ -1,6 +1,6 @@
 # Eval: management-board-activation
 
-Tests `plugins/wingman/skills/management-board-activation/SKILL.md` behaviorally — does a fresh agent, given only this skill and its template, correctly create Management Board manager files once a project has crossed the 3+ active-department-lead complexity threshold, and correctly withhold them when it hasn't? Mirrors `department-lead-activation.md`'s positive/negative shape one layer up.
+Tests `plugins/wingman/skills/governance/management-board-activation/SKILL.md` behaviorally — does a fresh agent, given only this skill and its template, correctly create Management Board manager files once a project has crossed the 3+ active-department-lead complexity threshold, and correctly withhold them when it hasn't? Mirrors `department-lead-activation.md`'s positive/negative shape one layer up.
 
 ## Fixtures
 

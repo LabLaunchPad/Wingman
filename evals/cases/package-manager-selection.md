@@ -1,6 +1,6 @@
 # Eval: package-manager-selection
 
-Tests `plugins/wingman/skills/package-manager-selection/SKILL.md` — does it correctly default a
+Tests `plugins/wingman/skills/mechanics/package-manager-selection/SKILL.md` — does it correctly default a
 genuinely new Node/JS project to a corepack-pinned pnpm, correctly fall back to npm if pnpm/corepack
 fails, and — the higher-stakes negative case — correctly leave an *existing* project's package
 manager choice completely untouched?

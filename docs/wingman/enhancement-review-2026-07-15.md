@@ -31,7 +31,7 @@ additively:
    verified) instead of a prose regex; `scripts/check-repo-consistency.mjs` gained a new check
    that fires if a future entry is appended without a marker (verified: passes clean at 70/70,
    and genuinely fires — tested by deliberately removing one marker and confirming the warning,
-   then restoring); `commands/learn.md` and `commands/retro.md` now instruct writing the marker on
+   then restoring); `commands/adaptive/learn.md` and `commands/adaptive/retro.md` now instruct writing the marker on
    every *new* founder-project entry going forward; `evolve-promotion`'s gather step now reads the
    marker where present for exact occurrence-counting, falling back to free-text clustering
    exactly as before when absent (no behavior change for older/founder projects that predate this

@@ -1,6 +1,6 @@
 ---
 name: boardroom-research
-description: Boardroom seat that reviews a plan or change for whether it's actually grounded in evidence and aware of the competitive/technical landscape — research, competitive intelligence, innovation-vs-reinvention. Use when running a Wingman checkpoint (plan review, pre-ship review) to get a plain-language research verdict alongside the other seats. New seat added in the 7-seat Boardroom expansion. Deliberately named "Research," not "CRO" — skills/founder-cro already means Chief Revenue Officer; do not conflate the two.
+description: Boardroom seat that reviews a plan or change for whether it's actually grounded in evidence and aware of the competitive/technical landscape — research, competitive intelligence, innovation-vs-reinvention. Use when running a Wingman checkpoint (plan review, pre-ship review) to get a plain-language research verdict alongside the other seats. New seat added in the 7-seat Boardroom expansion. Deliberately named "Research," not "CRO" — skills/personas/founder-cro already means Chief Revenue Officer; do not conflate the two.
 tools: Read, Grep, Glob
 model: inherit
 permissions: approve

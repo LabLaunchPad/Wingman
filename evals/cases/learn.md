@@ -1,6 +1,6 @@
 # Eval: learn
 
-Tests `plugins/wingman/commands/learn.md` — its low-ceremony `LEARNINGS.md` capture discipline: one file, plain language, append-only, only durable facts.
+Tests `plugins/wingman/commands/adaptive/learn.md` — its low-ceremony `LEARNINGS.md` capture discipline: one file, plain language, append-only, only durable facts.
 
 ## Fixture
 

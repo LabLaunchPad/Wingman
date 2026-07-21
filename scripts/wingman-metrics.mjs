@@ -69,7 +69,7 @@ const pctVerified = cases.length ? Math.round((verified / cases.length) * 100) :
 
 // --- 3. Technical-debt ceiling rate, from DEBT.md if one exists ---
 // DEBT.md is generated per founder project by /wingman:debt-ledger (see
-// plugins/wingman/commands/debt-ledger.md) -- Wingman's own dev repo has none today,
+// plugins/wingman/commands/adaptive/debt-ledger.md) -- Wingman's own dev repo has none today,
 // which is expected, not a gap. Report N/A rather than fabricating a rate.
 const debtBody = read('DEBT.md');
 let debtSummary = 'N/A -- no DEBT.md in this repo (expected: DEBT.md is generated per founder project by /wingman:build, not by Wingman\'s own dev process)';

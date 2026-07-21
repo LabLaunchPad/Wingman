@@ -12,7 +12,7 @@
     {
       "description": "define.md/architecture.md/uxflow.md never specified an output-file location convention, unlike discovery.md's explicit docs/wingman/discovery/<slug>.md path — had to improvise where to write requirements/architecture/UX-flow output.",
       "stage": "define",
-      "evidence": "plugins/wingman/commands/define.md had no path instruction anywhere in its body prior to this fix; same for architecture.md and uxflow.md."
+      "evidence": "plugins/wingman/commands/pipeline/define.md had no path instruction anywhere in its body prior to this fix; same for architecture.md and uxflow.md."
     },
     {
       "description": "management-board-activation's per-stage 'Relevant to' gating on manager creation can permanently starve mgr-product/mgr-research, whose only relevant stage (discovery) typically runs once, early, before the 3+ conditional-department threshold is usually crossed.",

@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: shares code-review.md's inline fixture description, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/simplify/SKILL.md` — does it produce a real simplification plan,
+Tests `plugins/wingman/skills/discipline/simplify/SKILL.md` — does it produce a real simplification plan,
 apply it visibly (plan and diff together, never a silent edit), and verify behavior is unchanged
 via the project's real tests before and after?
 

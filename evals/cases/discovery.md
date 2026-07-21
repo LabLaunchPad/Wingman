@@ -1,6 +1,6 @@
 # Eval: discovery
 
-Tests `plugins/wingman/commands/discovery.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers the discovery stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) ask clarifying questions when the founder's request is vague, focused on business outcomes not technical specifics, (b) avoid escalating technical decisions to the founder (that's architecture's job), and (c) produce a structured discovery artifact flowing into `/wingman:define`?
+Tests `plugins/wingman/commands/pipeline/discovery.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers the discovery stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) ask clarifying questions when the founder's request is vague, focused on business outcomes not technical specifics, (b) avoid escalating technical decisions to the founder (that's architecture's job), and (c) produce a structured discovery artifact flowing into `/wingman:define`?
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/commands/discovery.md` behaviorally, distinct from `seven
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with `commands/discovery.md`, given a deliberately vague founder ask ("add unsubscribe to the waitlist" with no further detail).
+2. Spawn a fresh subagent with `commands/pipeline/discovery.md`, given a deliberately vague founder ask ("add unsubscribe to the waitlist" with no further detail).
 3. Independently verify the output against the expectations below.
 
 ## Expectations
@@ -31,7 +31,7 @@ Covered by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14) and Run 2 (2026-07-1
 
 ### Run 3 — 2026-07-18 (isolated dispatch, exact scenario from this case's Procedure)
 
-**Setup:** `setup-discovery-fixture.sh`'s clean base fixture (no prior Wingman output). A fresh `general-purpose` subagent was given `commands/discovery.md` and the literal ask "add unsubscribe to the waitlist" — nothing else, no other pipeline stage running in the same session, isolating the questioning discipline from any downstream-stage context that might have influenced the two prior in-pipeline runs.
+**Setup:** `setup-discovery-fixture.sh`'s clean base fixture (no prior Wingman output). A fresh `general-purpose` subagent was given `commands/pipeline/discovery.md` and the literal ask "add unsubscribe to the waitlist" — nothing else, no other pipeline stage running in the same session, isolating the questioning discipline from any downstream-stage context that might have influenced the two prior in-pipeline runs.
 
 **Result:** asked two business-outcome questions only ("self-serve vs. manual removal for now?", "what does failure look like?") — zero framework/data-model/file-layout/schema questions. Produced the required 4-section structured artifact (Problem statement / Target user / Success signal / Open questions) and handed off directly to `/wingman:define` without stopping for approval, per spec.
 

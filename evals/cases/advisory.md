@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: an orchestrating command with no code of its own to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session -->
 
-Tests `plugins/wingman/commands/advisory.md` — does it fan out to `founder-cfo`/`founder-cmo`/
+Tests `plugins/wingman/commands/adaptive/advisory.md` — does it fan out to `founder-cfo`/`founder-cmo`/
 `founder-cro` in parallel and merge their verdicts into one consolidated, actionable
 recommendation, per its own parallel-fan-out-then-merge design?
 
@@ -28,7 +28,7 @@ gap before we send investors the updated numbers. Should we do it?" — the foun
 assumes a discount-driven revenue bump is a safe, invisible fix; it isn't.
 
 Two fresh subagents were dispatched independently (background + foreground), each scoped only
-to `commands/advisory.md` + the three lens skill files, not told any expected answer, each
+to `commands/adaptive/advisory.md` + the three lens skill files, not told any expected answer, each
 required to show its per-lens reasoning before merging (to check for three genuinely distinct
 voices vs. one generic answer in three hats). Both runs, independently:
 - Restated the decision in one plain-language sentence per step 1.
@@ -63,7 +63,7 @@ month, no grandfathering, partly to hit our revenue target before we close a fun
 we do it?" — a pricing raise with a real cash upside, a real reputation downside, and an
 undiagnosed funnel risk, engineered so CFO, CMO, and CRO have grounds to land on different
 actions rather than different phrasings of one answer. Run executed as a single continuous
-transcript scoped only to `commands/advisory.md` and the three lens skill files, following its
+transcript scoped only to `commands/adaptive/advisory.md` and the three lens skill files, following its
 5 steps in order, with each lens's reasoning shown before the merge (per this file's own
 methodology for checking distinct-voice vs. copy-paste).
 

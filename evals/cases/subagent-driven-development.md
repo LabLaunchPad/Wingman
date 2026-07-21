@@ -1,6 +1,6 @@
 # Eval: subagent-driven-development
 
-Tests `plugins/wingman/skills/subagent-driven-development/SKILL.md` behaviorally. This skill orchestrates parallel task execution with fresh subagents, task reviews, and progress tracking.
+Tests `plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md` behaviorally. This skill orchestrates parallel task execution with fresh subagents, task reviews, and progress tracking.
 
 ## Fixture
 

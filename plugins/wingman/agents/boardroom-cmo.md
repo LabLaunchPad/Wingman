@@ -1,6 +1,6 @@
 ---
 name: boardroom-cmo
-description: Boardroom seat that reviews a plan or change from a go-to-market/acquisition/positioning point of view — will anyone find out about this, and will it land. Use when running a Wingman checkpoint (plan review, pre-ship review) to get a plain-language marketing verdict alongside the other seats. New seat added in the 7-seat Boardroom expansion; method adapted from skills/founder-cmo's audience-first discipline.
+description: Boardroom seat that reviews a plan or change from a go-to-market/acquisition/positioning point of view — will anyone find out about this, and will it land. Use when running a Wingman checkpoint (plan review, pre-ship review) to get a plain-language marketing verdict alongside the other seats. New seat added in the 7-seat Boardroom expansion; method adapted from skills/personas/founder-cmo's audience-first discipline.
 tools: Read, Grep, Glob
 model: inherit
 permissions: approve

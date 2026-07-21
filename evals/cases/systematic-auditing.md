@@ -1,6 +1,6 @@
 # Eval: systematic-auditing
 
-Tests `plugins/wingman/skills/systematic-auditing/SKILL.md` and `plugins/wingman/commands/audit.md` behaviorally — the skill was codified directly from this project's own dogfooding (see `docs/PROJECT.md`'s decisions log) but had never itself been tested: does a fresh agent, given only the skill/command and a project it knows nothing about, actually scope an audit into distinct concerns, dispatch scoped checks, independently verify every finding, and fix what's real — or does it just do one generic pass and call it an audit?
+Tests `plugins/wingman/skills/discipline/systematic-auditing/SKILL.md` and `plugins/wingman/commands/adaptive/audit.md` behaviorally — the skill was codified directly from this project's own dogfooding (see `docs/PROJECT.md`'s decisions log) but had never itself been tested: does a fresh agent, given only the skill/command and a project it knows nothing about, actually scope an audit into distinct concerns, dispatch scoped checks, independently verify every finding, and fix what's real — or does it just do one generic pass and call it an audit?
 
 ## Fixture
 

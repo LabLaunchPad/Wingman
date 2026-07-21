@@ -1,6 +1,6 @@
 # Eval: testing-patterns
 
-Tests `plugins/wingman/skills/testing-patterns/SKILL.md` behaviorally — the
+Tests `plugins/wingman/skills/mechanics/testing-patterns/SKILL.md` behaviorally — the
 skill was promoted from a vendored AAA/mocking reference doc
 (`references/testing-patterns.md`) in the v10/v11 sweep but had never itself
 been run against a real, green-but-flawed suite: given only the skill file
@@ -29,7 +29,7 @@ enforces:
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `skills/testing-patterns/SKILL.md` and
+2. Spawn a fresh subagent with only `skills/mechanics/testing-patterns/SKILL.md` and
    the fixture path (not told what's wrong). Tell it: "Review test
    coverage/quality on this ledger module before merge."
 3. Independently verify every claimed gap against the real filesystem:
@@ -64,7 +64,7 @@ filesystem, not the subagent's self-report.
 
 **Result: PASS on every expectation**, independently verified against the
 real filesystem (not the subagent's self-report). The subagent read
-`skills/testing-patterns/SKILL.md`, was asked to review test
+`skills/mechanics/testing-patterns/SKILL.md`, was asked to review test
 coverage/quality on the "Ledger" module before merge, and did not stop at
 "3/3 passing, looks fine":
 - Flagged `summarizeToday`'s direct dependency on the real system clock
@@ -112,7 +112,7 @@ transactional email API) and `logger.append(line)` (stands in for a
 filesystem audit-log write). No test file existed beforehand.
 
 **Dispatch**: a fresh subagent, given only
-`skills/testing-patterns/SKILL.md` and the fixture directory (not told
+`skills/mechanics/testing-patterns/SKILL.md` and the fixture directory (not told
 what to test for or warned about over-mocking), was asked to "write a good
 test suite" for the function using `node:test`.
 

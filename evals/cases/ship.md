@@ -1,6 +1,6 @@
 # Eval: ship
 
-Tests `plugins/wingman/commands/ship.md` behaviorally, distinct from `full-pipeline-e2e.md` (which always ran with a working local remote, so it only ever exercised the "not on a feature branch" preflight failure). The distinctive behavior under test: two preflight checks no other eval has triggered — a genuinely missing git remote, and a stray uncommitted file unrelated to the shipped feature.
+Tests `plugins/wingman/commands/pipeline/ship.md` behaviorally, distinct from `full-pipeline-e2e.md` (which always ran with a working local remote, so it only ever exercised the "not on a feature branch" preflight failure). The distinctive behavior under test: two preflight checks no other eval has triggered — a genuinely missing git remote, and a stray uncommitted file unrelated to the shipped feature.
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/commands/ship.md` behaviorally, distinct from `full-pipel
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `commands/ship.md` and the fixture. Not told which preflight checks will fail.
+2. Spawn a fresh subagent with only `commands/pipeline/ship.md` and the fixture. Not told which preflight checks will fail.
 3. Independently verify: did the stage stop with a plain-language explanation for the missing remote and the stray file, rather than silently pushing through or crashing uninformatively?
 
 ## Expectations
@@ -29,7 +29,7 @@ Tests `plugins/wingman/commands/ship.md` behaviorally, distinct from `full-pipel
 
 ### Run 1 — 2026-07-15
 
-Ran `evals/fixtures/setup-ship-preflight-fixture.sh` into a scratch dir, then spawned a fresh subagent with only `commands/ship.md` and the fixture path (no other Wingman files), instructed to run the ship preflight as a dry run (no real `git push`/`gh` calls) and report which of the 4 preflight checks passed/failed with evidence.
+Ran `evals/fixtures/setup-ship-preflight-fixture.sh` into a scratch dir, then spawned a fresh subagent with only `commands/pipeline/ship.md` and the fixture path (no other Wingman files), instructed to run the ship preflight as a dry run (no real `git push`/`gh` calls) and report which of the 4 preflight checks passed/failed with evidence.
 
 Independently verified the fixture's actual git state myself before and after the subagent ran (`git status`, `git remote -v`, `git branch`, `cat .wingman/checkpoints.jsonl`): on branch `ship/widget-counter` (not `master`), no remote configured at all, one untracked file `debug-notes.local.txt`, and `plan`/`build`/`secure` checkpoint entries all present with `bottom_line: "GO"`.
 

@@ -1,6 +1,6 @@
 # Eval: implementation-planning
 
-Tests `plugins/wingman/commands/implementation-planning.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers this stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) gather Discovery/Define/Architecture/UX Flow output into a single task-by-task plan with `wingman:req` markers, (b) produce a plan file with all 7 required sections (Executive Summary, Current State, Problem Statement, Solution Approach, Success Criteria, Timeline, Risks) plus a Plain-Language Summary, and (c) route through `/wingman:boardroom` for the bundled Planning Milestone checkpoint rather than calling `ExitPlanMode` directly?
+Tests `plugins/wingman/commands/pipeline/implementation-planning.md` behaviorally, distinct from `seven-stage-pipeline-e2e.md` (which already covers this stage as part of a whole-pipeline run). The distinctive behaviors under test: does the command (a) gather Discovery/Define/Architecture/UX Flow output into a single task-by-task plan with `wingman:req` markers, (b) produce a plan file with all 7 required sections (Executive Summary, Current State, Problem Statement, Solution Approach, Success Criteria, Timeline, Risks) plus a Plain-Language Summary, and (c) route through `/wingman:boardroom` for the bundled Planning Milestone checkpoint rather than calling `ExitPlanMode` directly?
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/commands/implementation-planning.md` behaviorally, distin
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with `commands/implementation-planning.md` and the pre-seeded artifacts from all 4 preceding stages.
+2. Spawn a fresh subagent with `commands/pipeline/implementation-planning.md` and the pre-seeded artifacts from all 4 preceding stages.
 3. Independently verify the output against the expectations below.
 
 ## Expectations

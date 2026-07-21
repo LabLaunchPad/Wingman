@@ -64,7 +64,7 @@ other way.
 ## Wiring it into a command (optional)
 
 If the founder should be able to ask for several advisors at once, add a command
-that fans them out in parallel and merges — exactly like `commands/advisory.md`
+that fans them out in parallel and merges — exactly like `commands/adaptive/advisory.md`
 does for cfo/cmo/cro:
 
 1. Create `commands/<name>.md` with a `description` frontmatter.
