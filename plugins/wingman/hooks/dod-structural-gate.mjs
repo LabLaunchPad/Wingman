@@ -61,8 +61,6 @@ import { fileURLToPath } from 'node:url';
 const PLANNING_MILESTONE_MARKER = '## Planning Milestone checkpoint';
 const NO_TEST_NEEDED = /<!--\s*wingman:no-test-needed:.*?-->/i;
 const TEST_FILE_HINT = /\.(test|spec)\.|_test\.|test_/;
-const OPEN_ROW = /\|\s*OPEN\s*\|/i;
-
 function readStdin() {
   try { return readFileSync(0, 'utf-8'); } catch { return ''; }
 }
@@ -212,6 +210,50 @@ export function checkPlanningMilestoneTraceability(planText) {
 
 // --- git push check: traceability + test presence + threat register ---
 
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function listFilesRecursive(dir) {
+  let results = [];
+  let entries;
+  try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return results; }
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) results = results.concat(listFilesRecursive(full));
+    else results.push(full);
+  }
+  return results;
+}
+
+// Fallback for behavior-split test suites: a source file's tests may live across several
+// behavior-named files (e.g. src/server.js tested by test/shorten.test.js, test/redirect.test.js,
+// ...) rather than a single file matching the source's own basename. A real dogfood run against
+// exactly this layout found the basename-only candidates list above blocked a push despite full,
+// real test coverage. This scans test/tests/__tests__ directories for any test file whose content
+// actually imports/requires the source module by name, before giving up on it.
+function anyTestFileReferencesSource(cwd, baseName) {
+  const escaped = escapeRegExp(baseName);
+  const importRef = new RegExp(
+    `(?:from\\s+['"][^'"]*/${escaped}(?:\\.[a-zA-Z]+)?['"]` +
+    `|require\\(\\s*['"][^'"]*/${escaped}(?:\\.[a-zA-Z]+)?['"]\\s*\\)` +
+    `|^\\s*import\\s+${escaped}\\b` +
+    `|from\\s+[\\w.]*${escaped}\\s+import)`,
+    'm'
+  );
+  for (const dirName of ['test', 'tests', '__tests__']) {
+    const dir = join(cwd, dirName);
+    if (!existsSync(dir) || !statSync(dir).isDirectory()) continue;
+    for (const file of listFilesRecursive(dir)) {
+      if (!TEST_FILE_HINT.test(file)) continue;
+      let content = '';
+      try { content = readFileSync(file, 'utf-8'); } catch { continue; }
+      if (importRef.test(content)) return true;
+    }
+  }
+  return false;
+}
+
 export function checkTestPresence(cwd, changedFiles) {
   const missing = [];
   for (const f of changedFiles) {
@@ -233,23 +275,72 @@ export function checkTestPresence(cwd, changedFiles) {
       `test/${baseName}.test.${ext}`, `test/${baseName}.spec.${ext}`, `test/test_${baseName}.${ext}`,
       `tests/${baseName}.test.${ext}`, `tests/${baseName}.spec.${ext}`, `tests/test_${baseName}.${ext}`,
     ];
-    const hasTest = candidates.some((c) => existsSync(join(cwd, c)));
+    const hasTest = candidates.some((c) => existsSync(join(cwd, c)))
+      || anyTestFileReferencesSource(cwd, baseName);
     if (!hasTest) missing.push(f);
   }
   return missing;
 }
 
+const THREAT_REGISTER_HEADING = /^##\s+.*Threat Register/im;
+
+// Scopes the check to the actual "## ... Threat Register" section (not any other markdown table
+// in the same file, e.g. Implementation Planning's own "## Risks" table, which uses a different
+// column order and would otherwise false-positive). Returns null if no such section exists.
+function extractThreatRegisterSection(text) {
+  const match = THREAT_REGISTER_HEADING.exec(text);
+  if (!match) return null;
+  const rest = text.slice(match.index);
+  const nextHeading = rest.slice(match[0].length).search(/^##\s/m);
+  return nextHeading === -1 ? rest : rest.slice(0, match[0].length + nextHeading);
+}
+
+// Parses the Threat Register's own markdown table and flags any row whose Status column isn't
+// exactly "CLOSED" -- rather than pattern-matching for the literal substring "OPEN". A real
+// dogfood run found the old OPEN_ROW substring check trivially bypassed by any other word
+// ("PENDING", "ACCEPTED", or a plain typo): build.md's own documented convention is a strict
+// CLOSED/OPEN status (an accepted risk is recorded as CLOSED, with the acceptance noted in the
+// Disposition column, not a third status word), so anything other than CLOSED is unresolved.
+// The Status column is located dynamically from the header row, not assumed to be a fixed index.
+function findUnresolvedThreatRows(sectionText) {
+  const unresolved = [];
+  let statusColIdx = -1;
+  let sawHeader = false;
+  for (const rawLine of sectionText.split('\n')) {
+    const line = rawLine.trim();
+    if (!line.startsWith('|') || !line.endsWith('|')) continue;
+    const cells = line.slice(1, -1).split('|').map((c) => c.trim());
+    if (cells.every((c) => /^:?-+:?$/.test(c))) continue; // markdown separator row
+    if (!sawHeader) {
+      const idx = cells.findIndex((c) => /^status$/i.test(c));
+      if (idx === -1) continue; // not the header row (or not a recognizable table yet)
+      statusColIdx = idx;
+      sawHeader = true;
+      continue;
+    }
+    const status = cells[statusColIdx];
+    if (status !== undefined && !/^closed$/i.test(status)) {
+      unresolved.push({ id: cells[0], status });
+    }
+  }
+  return unresolved;
+}
+
 export function checkThreatRegisterClean(planText) {
   if (!planText) return { ok: true }; // no plan/build artifact found — nothing to check against
-  return { ok: !OPEN_ROW.test(planText) };
+  const section = extractThreatRegisterSection(planText);
+  if (!section) return { ok: true }; // no Threat Register section — nothing to check against
+  return { ok: findUnresolvedThreatRows(section).length === 0 };
 }
 
 // Checks every build-artifact text found (plan file + anything under
-// docs/wingman/build/), not just one -- an OPEN row in ANY of them fails the
+// docs/wingman/build/), not just one -- an unresolved row in ANY of them fails the
 // gate. See findAllBuildArtifactTexts()'s comment for why this exists.
 export function checkThreatRegisterCleanAcrossArtifacts(texts) {
   for (const text of texts) {
-    if (OPEN_ROW.test(text)) return { ok: false };
+    const section = extractThreatRegisterSection(text);
+    if (!section) continue;
+    if (findUnresolvedThreatRows(section).length > 0) return { ok: false };
   }
   return { ok: true };
 }
