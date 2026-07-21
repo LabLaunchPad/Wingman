@@ -28,3 +28,7 @@ Every pipeline command should be able to answer, in order:
 - "I'll just do it and see" → Without a spec, "done" is whatever you stopped at. Write the success criteria first.
 - "The spec is the code" → No — the spec is the contract the code is judged against. Keep them separate so you can test the code honestly.
 - Red flag: a command that cannot state its success criteria in one sentence. Stop and write it.
+
+## Cited by
+
+- `plugins/wingman/skills/mechanics/spec-handler/SKILL.md`

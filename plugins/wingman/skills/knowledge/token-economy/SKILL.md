@@ -91,3 +91,5 @@ No fixed template — this skill governs style, not structure. The test is: coul
 - **Compression-as-omission:** Dropping a detail that the reader might need is not economy, it's information loss. Compression means removing filler, not facts.
 - **Context-blind compression:** Applying token economy to founder-facing output. This skill is internal-only — the moment a human might read it, plain language wins.
 - **Measured-shorter-vs-cheaper:** Shorter messages are not always cheaper. A terse message that triggers a clarification round-trip costs more than a clear first message.
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

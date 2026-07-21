@@ -56,3 +56,5 @@ Only once the boardroom checkpoint returns a "ship it" decision should you proce
 - `skills/output/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
   diagram appended to the plan; §2 — the pipeline-status tree above.
 - `skills/governance/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
+
+<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

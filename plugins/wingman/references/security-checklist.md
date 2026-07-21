@@ -196,3 +196,7 @@ For any system that processes LLM prompts or user-generated text that may be sen
 3. Any HIGH or CRITICAL finding is a **blocking NO_GO** — no override without documented risk acceptance by the founder.
 4. MEDIUM findings must be tracked in the risk register with a remediation timeline.
 5. This checklist is versioned. Updates require a Boardroom checkpoint with the Security seat.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/security-checklist/SKILL.md`

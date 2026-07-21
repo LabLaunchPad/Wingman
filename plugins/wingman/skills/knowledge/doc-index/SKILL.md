@@ -51,3 +51,9 @@ A reference doc that nothing cites is a dead doc — it exists, it's correct, an
 ## Verification
 
 The discipline is itself verifiable: `grep` each `references/*.md` for citations and confirm a non-zero count; confirm every promoted/derived doc has an `/ATTRIBUTIONS.md` entry. See `verification-before-completion` — evidence (a citation that exists), not the claim that one "should" be there.
+
+## Referenced by
+
+- `commands/adaptive/evolve.md`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

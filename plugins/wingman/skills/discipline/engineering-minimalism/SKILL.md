@@ -144,3 +144,9 @@ See `references/continuous-execution.md` — maintain momentum through a workflo
 - **YAGNI-as-excuse:** YAGNI means "don't build it yet," not "don't build it correctly." The one-check rule still applies.
 - **Minimalism-as-cutting-corners:** Minimalism applies to *how much code exists*, never to *how carefully the code that must exist is written*. Never simplify away validation, security, or accessibility.
 - **Explanation-as-complexity:** A paragraph defending a simplification is complexity smuggled back in as prose. Three short lines maximum.
+
+## Referenced by
+
+- `commands/pipeline/architecture.md`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

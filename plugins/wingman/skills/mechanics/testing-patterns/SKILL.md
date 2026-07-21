@@ -47,3 +47,7 @@ Whenever `/wingman:build` or a department lead/specialist writes code that shoul
 ## Verification
 
 Run the suite: the new test fails on the old code and passes on the new, and changed paths meet the coverage floor. See `verification-before-completion` and `references/testing-patterns.md`.
+
+## Referenced by
+
+- `commands/pipeline/build.md`

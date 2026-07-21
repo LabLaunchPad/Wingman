@@ -183,3 +183,10 @@ Layer 0 (and, once cleared, Layer 1) line, an eval-case update, and a `docs/wing
   itself was wrong).
 - **Founder/maintainer scope confusion:** writing a promoted artifact to the wrong place. Check the
   mode detection in `commands/adaptive/dogfood.md` before writing anything, every time.
+
+## Referenced by
+
+- `commands/adaptive/dogfood.md`
+- `skills/governance/evolve-promotion`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

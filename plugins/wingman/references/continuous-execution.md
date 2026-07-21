@@ -20,3 +20,13 @@
 ## Exception
 
 Only pause if you encounter a genuine decision point that requires user input, or if the session health hook warns about context limits.
+
+## Cited by
+
+- `plugins/wingman/skills/discipline/engineering-minimalism/SKILL.md`
+- `plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md`
+- `plugins/wingman/skills/discipline/systematic-auditing/SKILL.md`
+- `plugins/wingman/skills/discipline/systematic-debugging/SKILL.md`
+- `plugins/wingman/skills/discipline/test-driven-development/SKILL.md`
+- `plugins/wingman/skills/discipline/verification-loop/SKILL.md`
+- `plugins/wingman/skills/discipline/writing-plans/SKILL.md`

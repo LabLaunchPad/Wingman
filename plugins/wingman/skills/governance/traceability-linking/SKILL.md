@@ -112,3 +112,13 @@ No founder-facing template — this is an internal linking convention. The found
 - A build task with zero markers and no logged exception.
 - A marker pointing at a nonexistent ID.
 - Two distinct requirements sharing one ID.
+
+## Referenced by
+
+- `commands/pipeline/architecture.md`
+- `commands/pipeline/build.md`
+- `commands/pipeline/define.md`
+- `commands/pipeline/implementation-planning.md`
+- `commands/pipeline/uxflow.md`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

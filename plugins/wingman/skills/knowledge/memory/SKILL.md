@@ -44,3 +44,5 @@ structured store so future sessions start where the last one ended.
 After any write, re-read the relevant file and confirm the new entry is present,
 correctly dated, and contains no secret material. Before relying on a recalled
 fact, confirm it matches the current session's reality.
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

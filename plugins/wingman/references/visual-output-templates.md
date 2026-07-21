@@ -197,3 +197,15 @@ unless the founder has explicitly asked to see the plan directly.
 - Keep every label plain-language per `plain-language-checkpoint` — a diagram node reading
   `NULL_POINTER_EXC` instead of a translated consequence fails the checkpoint just as badly as a
   prose sentence would.
+
+## Cited by
+
+- `plugins/wingman/skills/output/visual-founder-output/SKILL.md`
+- `plugins/wingman/commands/adaptive/boardroom.md`
+- `plugins/wingman/commands/pipeline/architecture.md`
+- `plugins/wingman/commands/pipeline/build.md`
+- `plugins/wingman/commands/pipeline/define.md`
+- `plugins/wingman/commands/pipeline/discovery.md`
+- `plugins/wingman/commands/pipeline/implementation-planning.md`
+- `plugins/wingman/commands/pipeline/ship.md`
+- `plugins/wingman/commands/pipeline/uxflow.md`

@@ -97,3 +97,7 @@ Standing checklist applied by every Boardroom seat, every skill, every task. No 
 3. **Engineer seat** owns enforcement; **Founder seat** owns prioritization when gates conflict.
 4. If a gate is intentionally skipped, it must be called out explicitly with justification — silent skips are violations.
 5. This document is versioned. Changes require a Boardroom checkpoint.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/definition-of-done/SKILL.md`

@@ -112,3 +112,7 @@ No fixed template beyond the `AskUserQuestion` proposal shape described in step 
 - **Premature promotion:** Creating a specialist, command, or skill from a single occurrence. The 2-occurrence threshold exists because one occurrence is a coincidence, two is a pattern.
 - **Plugin-directory writes:** Writing any promoted artifact to `plugins/wingman/` instead of the founder's project. Same risk as department-lead-activation — silent loss on update.
 - **Approval skipping:** Creating before the founder approves. The `AskUserQuestion` gate is not optional. The founder controls their own project roster.
+
+## Referenced by
+
+- `commands/adaptive/dogfood.md`

@@ -130,3 +130,15 @@ render the visual layer of their existing templates (see those commands and
   flow, pipeline status, and the boardroom seat-verdict grid, plus Tier-A wireframe guidance.
 - `skills/output/plain-language-checkpoint` — the prose bar this skill extends; consult it for anything
   about wording, not layout.
+
+## Referenced by
+
+- `commands/adaptive/boardroom.md`
+- `commands/pipeline/architecture.md`
+- `commands/pipeline/build.md`
+- `commands/pipeline/define.md`
+- `commands/pipeline/discovery.md`
+- `commands/pipeline/implementation-planning.md`
+- `commands/pipeline/ship.md`
+- `commands/pipeline/uxflow.md`
+- `skills/output/plain-language-checkpoint`

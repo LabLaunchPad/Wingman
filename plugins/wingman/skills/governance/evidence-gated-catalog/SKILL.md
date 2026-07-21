@@ -155,3 +155,7 @@ Before trusting a catalog entry's evidence:
 - **Vague outcomes:** "This pattern improves code quality" without a measurable metric. Quality is not measurable unless you define what you're measuring.
 - **Catalog-bloat:** Adding patterns to make the catalog look impressive. Every pattern without evidence is a liability, not an asset.
 - **Testimonial-as-evidence:** "Someone said this worked for them" without documentation. Testimonials are not reproducible.
+
+## Referenced by
+
+- `commands/adaptive/evolve.md`

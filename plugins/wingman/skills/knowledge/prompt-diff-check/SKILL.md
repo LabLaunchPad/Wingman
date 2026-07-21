@@ -73,3 +73,7 @@ that already exists.
 The discipline is itself verifiable: for the changed file, `grep` `evals/cases/*.md` for its name,
 read the matching case's expectations table, and confirm — file:line to file:line — that the
 changed section maps to a checked row. If it doesn't, that's the finding, not a false alarm.
+
+## Referenced by
+
+- `commands/adaptive/harness.md`

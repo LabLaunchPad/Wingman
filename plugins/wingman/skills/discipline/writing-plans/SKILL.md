@@ -228,3 +228,7 @@ See `references/continuous-execution.md` — maintain momentum through a workflo
 - **Deferred design decisions:** Every "handle appropriately" or "add validation" is a design decision you've silently pushed to the executor. The plan is where design decisions get made, not where they get deferred.
 - **Reference-itis:** "Similar to Task N" assumes sequential reading. Engineers read tasks in dependency order, not plan order. Code must be self-contained per task.
 - **Phantom interfaces:** A function signature used in Task 7 that isn't defined in any earlier task's "Produces" block is a bug waiting to happen.
+
+## Referenced by
+
+- `commands/pipeline/implementation-planning.md`

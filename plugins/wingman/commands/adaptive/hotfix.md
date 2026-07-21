@@ -42,3 +42,5 @@ Run `/wingman:boardroom diff` before this ships again — a hotfix under time pr
 ## Step 7: Hand off
 
 Once the Boardroom clears this stage, proceed to `/wingman:ship`. Suggest `/wingman:learn` afterward if this incident revealed something durable worth remembering (a fragile pattern, a monitoring gap, a recurring root cause).
+
+<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

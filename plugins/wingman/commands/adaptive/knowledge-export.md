@@ -35,3 +35,5 @@ Writes a fresh bundle to `.wingman/okf-export/` (or the output directory given i
 ## When not to use this
 
 If the project has no `.wingman/checkpoints.jsonl` and no populated `memory/*.md` yet, there's nothing meaningful to export — say so plainly rather than writing an empty bundle that looks like output.
+
+<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

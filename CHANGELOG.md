@@ -6,6 +6,7 @@ All notable changes to the Wingman Claude Code plugin.
 
 ### Changed
 - **`plugins/wingman/skills/` and `plugins/wingman/commands/`** — reorganized into category subfolders (40 skills into `discipline/`, `mechanics/`, `governance/`, `output/`, `knowledge/`, `personas/`, `response/`; 24 commands into `pipeline/`, `adaptive/`) for browsability at the plugin's current size. Path-only change: skill identity comes from the `name:` frontmatter field and command identity from the filename, so no `/wingman:*` invocation changed. `plugin.json`'s 64 path entries updated; `validate-structure.mjs`'s orphan detection rewritten to walk recursively instead of a flat, basename-only scan. `agents/` (8, homogeneous) and `references/` (15) stay flat. See `AGENTS.md`'s new "Skills and commands, by category" section for the full taxonomy.
+- **Backlinks, computed from actual citations (not hand-curated)**: each `references/*.md` gets a "Cited by" section listing every skill/command/agent that cites it (15 files, complementing `doc-index`'s existing one-directional owner→reference rule); each skill gets a "Referenced by" section listing every other skill/command that names its path (20 of 40 skills had at least one real citer); every skill/command already named in `docs/ARCHITECTURE.md` gets a one-line pointer back to it (17 files); the 9 new category folders each get a one-line `README.md` pointing back to `AGENTS.md`'s categorized index.
 
 ## [0.5.22] - 2026-07-20
 

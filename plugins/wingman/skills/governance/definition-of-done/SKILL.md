@@ -55,3 +55,7 @@ The gate is itself verifiable: each item above should have a traceable artifact 
 ## References
 
 - `references/fablize-pattern.md` — the wiring/logic separation discipline this gate's own mechanical enforcement (`hooks/dod-structural-gate.mjs`, `scripts/dod-pre-push-check.mjs`) follows; consult it when adding a new mechanical check to understand why the decision logic stays generic-signal-based rather than tool-name-based.
+
+## Referenced by
+
+- `commands/pipeline/build.md`

@@ -261,6 +261,8 @@ function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {
         }
       } else if (statSync(full).isDirectory()) {
         walk(entryRel); // category folder
+      } else if (entry === 'README.md') {
+        // A category folder's own index/backlink stub, not a command -- never declared in plugin.json.
       } else if (entry.endsWith('.md') && !declared.has(entryRel)) {
         errors.push(`${kind} "${entryRel}" exists on disk but is not declared in plugin.json — it will never load`);
       }

@@ -127,3 +127,5 @@ Any friction found here is captured the normal way: `/wingman:learn` for a durab
   above.
 - `commands/adaptive/evolve.md` / `skills/governance/evolve-promotion` — founder-project-scoped promotion (never writes
   to `plugins/wingman/`); the mirror image of `dogfood-gap-classification`'s maintainer scope.
+
+<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

@@ -307,3 +307,7 @@ See `references/continuous-execution.md` — maintain momentum through a workflo
 
 - `references/testing-patterns.md` — AAA structure, boundary mocking, and the >=80% coverage floor this skill's tests should meet.
 - `skills/mechanics/spec-handler` — the failing test is the spec's first handler; write it before the implementation.
+
+## Referenced by
+
+- `skills/mechanics/spec-handler`

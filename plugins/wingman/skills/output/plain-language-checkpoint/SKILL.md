@@ -97,3 +97,8 @@ Every boardroom agent verdict, every `/wingman:*` stage completion message, and 
 - **Mechanism-over-consequence:** Explaining how something broke instead of what it means for the user or business. Founders act on consequences, not mechanisms.
 - **False confidence:** Saying "looks fine" or "should work" without verification evidence. An honest "I haven't checked yet" is more useful than a false positive.
 - **Lossy compression:** Translating detail into a summary and letting the original evaporate once the session ends, instead of persisting it somewhere the founder can retrieve it later.
+
+## Referenced by
+
+- `commands/adaptive/boardroom.md`
+- `skills/output/visual-founder-output`

@@ -81,3 +81,7 @@ does for cfo/cmo/cro:
 - Plain language; the founder may not be technical.
 - Keep the anatomy above; it's what makes the skill's own failure modes
   catchable.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/evolve-promotion/SKILL.md`

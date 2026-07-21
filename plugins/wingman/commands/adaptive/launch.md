@@ -43,3 +43,5 @@ Only after the Boardroom returns "ship it," show the founder the final materials
 ## After this
 
 Suggest `/wingman:learn` if anything about drafting this launch is worth remembering for next time (a recurring changelog format quirk, a channel-specific copy constraint, etc.).
+
+<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

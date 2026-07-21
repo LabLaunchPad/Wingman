@@ -130,3 +130,9 @@ No founder-facing template beyond the one-sentence notification in Core Workflow
 - **Unpinned-install reflex**: treating `packageManager: "pnpm"` (no version) as equivalent to a
   pinned version — it isn't; corepack's signature verification only actually engages with an exact
   version.
+
+## Referenced by
+
+- `skills/output/visual-founder-output`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

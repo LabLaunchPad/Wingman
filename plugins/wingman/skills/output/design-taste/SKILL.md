@@ -141,3 +141,9 @@ No fixed template for build-time use. For `boardroom-design`'s checkpoint verdic
 - **Slop-as-default:** Applying generic AI design patterns (gradients, icon tiles, bounce easing) as the default aesthetic rather than as a deliberate choice. These are tells, not design decisions.
 - **Accessibility-as-taste:** Treating accessibility defects (low contrast, small touch targets, skipped heading levels) as stylistic preferences rather than bugs. They're defects — block, don't note.
 - **Token-amnesia:** Introducing new colors, fonts, or spacing without checking the project's existing design system. Every new token is a consistency risk.
+
+## Referenced by
+
+- `commands/pipeline/uxflow.md`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

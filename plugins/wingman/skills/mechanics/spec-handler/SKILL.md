@@ -45,3 +45,10 @@ Any time a pipeline command runs, a department lead or specialist is dispatched,
 ## Verification
 
 Every handler leaves a runnable check of its spec's success criteria — a test, or at minimum an assert-based self-check. The spec is unfinished without the check that proves it. See `verification-before-completion` for what counts as evidence.
+
+## Referenced by
+
+- `commands/adaptive/boardroom.md`
+- `commands/pipeline/build.md`
+- `skills/discipline/subagent-driven-development`
+- `skills/discipline/test-driven-development`

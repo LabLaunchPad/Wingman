@@ -52,3 +52,7 @@ During `/wingman:build`'s Definition-of-Done gate and any time code that touches
 ## Verification
 
 The register itself is the verification: every row `CLOSED` with evidence (PR/commit + test) or founder-accepted, and `threats_open == 0`. See `verification-before-completion` and `references/threat-register.md`.
+
+## Referenced by
+
+- `commands/pipeline/build.md`

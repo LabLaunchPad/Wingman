@@ -298,3 +298,8 @@ describe("User registration flow", () => {
 3. Coverage below 80% is a **blocking NO_GO** at ship-readiness.
 4. TDD is mandatory for new features; allowed (not mandatory) for bug fixes.
 5. This document is versioned. Changes require a Boardroom checkpoint.
+
+## Cited by
+
+- `plugins/wingman/skills/discipline/test-driven-development/SKILL.md`
+- `plugins/wingman/skills/mechanics/testing-patterns/SKILL.md`

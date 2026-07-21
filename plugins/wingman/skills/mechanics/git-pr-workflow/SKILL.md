@@ -177,3 +177,9 @@ directly.
   the single most likely way to silently destroy real work on a shared branch.
 - **Skipping the draft stage**: opening a PR ready-for-review by default, inviting review attention
   before CI has actually run once.
+
+## Referenced by
+
+- `skills/output/visual-founder-output`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

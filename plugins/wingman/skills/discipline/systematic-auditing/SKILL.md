@@ -96,3 +96,9 @@ See `references/continuous-execution.md` — maintain momentum through a workflo
 - **Verification theater:** Dispatching subagents but not independently checking their findings. The audit's value is in the cross-check, not in the dispatch.
 - **Same-angle redundancy:** Running two subagents on the same concern from the same angle. That's duplicate cost, not additional rigor.
 - **Findings-without-action:** Producing a list of problems and not fixing or tracking any of it. This is strictly worse than not auditing — it creates the appearance of rigor.
+
+## Referenced by
+
+- `commands/adaptive/audit.md`
+
+See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

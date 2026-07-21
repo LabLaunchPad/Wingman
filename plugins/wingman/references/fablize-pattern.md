@@ -50,3 +50,7 @@ own `hooks.json` at all. `plugins/wingman/scripts/dod-pre-push-check.mjs` closes
 wrapper, runnable as a real git `pre-push` hook or from any harness with shell access, that imports
 and calls the exact same exported functions. No new decision logic was written; this is pure reuse,
 which is the whole point of the discipline above.
+
+## Cited by
+
+- `plugins/wingman/skills/governance/definition-of-done/SKILL.md`
