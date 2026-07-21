@@ -62,6 +62,8 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 - `seats[].verdict`: one of `GO`, `GO_WITH_CONCERNS`, `NO_GO` — matches each Boardroom agent's own output contract.
 - `bottom_line`: one of `GO`, `GO_WITH_CHANGES`, `DO NOT SHIP` — the consolidated result, per the gate rule in `docs/ARCHITECTURE.md` §4.
 - `founder_decision`: one of `ship_it`, `fix_concerns_first`, `still_reviewing`.
+- `founder_notes`: free-text, founder-authored context on the decision above; often empty (`""`).
+- `next_stage`: the pipeline stage `state.json`'s `current_stage` should advance to once this checkpoint is acted on — pinned to the *same* stage (not advanced) whenever `bottom_line` is `"DO NOT SHIP"`, per `commands/adaptive/boardroom.md`'s consolidation step. `plugins/wingman/scripts/query-founder-knowledge.mjs`'s `summary()` (added 2026-07-21, see `docs/PROJECT.md`'s decisions log) reads this field back and compares it against `state.json`'s real `current_stage`, surfacing a `state_stage_mismatch` diagnostic when they disagree — the mechanical drift-detector for "a session wrote a checkpoint but forgot to update `state.json` afterward." Absent on checkpoints written before that field was added; treat its absence as "no mismatch check possible for this entry," never an error.
 
 This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
 
