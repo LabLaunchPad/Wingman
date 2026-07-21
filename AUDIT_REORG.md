@@ -63,7 +63,7 @@ double-run) is a one-line change per file with an immediate, measurable CI-cost 
 
 | # | Title | Rationale | Effort | Order |
 |---|---|---|---|---|
-| 1 | **Scope `push:` to `branches: [main]` in `validate.yml`, `actionlint.yml`, `install-smoke.yml`** | Verified via real check-run data on PRs #61/#63: each fires twice per PR push (once on the push event, once on `pull_request: synchronize`) because `push:` has no branch filter. `codeql.yml` already does this correctly. Immediate ~50% CI-minute cut on these 3 jobs. | S | 1 |
+| 1 | ~~**Scope `push:` to `branches: [main]` in `validate.yml`, `actionlint.yml`, `install-smoke.yml`**~~ — **fixed 2026-07-21** | Verified via real check-run data on PRs #61/#63: each fires twice per PR push (once on the push event, once on `pull_request: synchronize`) because `push:` has no branch filter. `codeql.yml` already does this correctly. Immediate ~50% CI-minute cut on these 3 jobs. | S | 1 |
 | 2 | **Auto-generate the plugin-surface count instead of hand-copying it** | The "N commands / M skills / K eval cases" figure has drifted stale 3 times this year (README, `docs/PROJECT.md`, a hardcoded test assertion in `tests/hooks-integration`) — each only caught by a dedicated audit pass, not a standing check. `wingman-health.mjs` already computes the true numbers; wire a `check-repo-consistency.mjs` rule that fails if README's/PROJECT.md's stated counts diverge from `plugin.json`'s real arrays. | S | 2 |
 | 3 | **Add an explicit eval-case ↔ fixture ↔ skill/command manifest** | `wingman-health.mjs`'s coverage check currently infers pairing from filename-prefix matching plus one hardcoded alias (`audit` → `systematic-auditing`). At 70 cases / 50+ fixtures this heuristic will keep needing hand-patched exceptions. A one-line-per-case `evals/MANIFEST.tsv` (case, fixture, covers) makes the mapping explicit and removes the alias hack. | M | 3 |
 | 4 | **Pre-empt the CQ2/CQ3-style duplication class with a mechanical 3rd-occurrence check** | `FIXLOG.md` already tracks two accepted "wontfix, revisit at 3rd occurrence" duplications (`parseFrontmatter()` in `validate-structure.mjs`/`wingman-metrics.mjs`; an 80-line orchestration block in `dod-structural-gate.mjs`). Rather than re-discovering a 3rd instance by audit, add a lightweight content-hash scan to `check-repo-consistency.mjs` that flags any function body (>15 lines) duplicated 3+ times across `plugins/wingman/{hooks,scripts}` and `scripts/`. | M | 4 |
@@ -169,7 +169,12 @@ skills/agents** — real, repeated friction first, not speculative convenience.
 
 ## 6. CI pipeline change plan
 
-### 6a. Fix the double-run (action item #1)
+### 6a. Fix the double-run (action item #1) — **fixed 2026-07-21**
+
+Applied exactly as described below: `push:` scoped to `branches: [main]` in all 3 files, matching
+`codeql.yml`'s existing pattern. Verified: YAML parses cleanly in all 3 files; all 4 mandatory
+validators still exit 0; no `plugins/wingman/` content changed, so no `plugin.json` version bump
+was needed (`version-gate.yml` doesn't gate CI-only config).
 
 Verified root cause: `push:` with no `branches:` filter fires on *every* push, including a push to
 an open PR's own branch — which `pull_request: synchronize` *also* fires on for the same commit.
