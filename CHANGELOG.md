@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.24] - 2026-07-21
+
+### Added
+- **`plugins/wingman/scripts/query-founder-knowledge.mjs`** — prototype (not yet wired into any skill/command) unifying a founder project's 4 fragmented `.wingman/` state formats (`checkpoints.jsonl`, `state.json`, `traceability.json`, `memory/*.md`) into one queryable, chronologically-sortable surface, plus a `--summary` mode answering `docs/DATABASE.md`'s named "what has this project decided and why" gap in one call. Reuses `okf-export.mjs`'s existing parsers rather than duplicating them. Built per `docs/wingman/architecture-audit-2026-07-15.md`'s Emerging finding #6, as a bounded, evidence-gated experiment — see `docs/PROJECT.md`'s decisions log for the real run log and honest grading.
+
 ## [0.5.23] - 2026-07-21
 
 ### Changed
