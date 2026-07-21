@@ -2,7 +2,10 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
-## [0.5.25] - 2026-07-21
+## [0.5.26] - 2026-07-21
+
+### Fixed
+- **`plugins/wingman/skills/mechanics/git-pr-workflow`** — added a Step 0 ("confirm you're not on `main`" before the first edit/commit of a new round of work) and a Step 5 (the "required status checks are expected" merge-blocked-by-base-drift race: update the branch, then wait for checks to actually re-run before retrying — don't retry immediately). Both found from real, self-caught friction this session, not speculative: a commit landed directly on local `main` mid-session (caught before pushing, recovered cleanly), and the base-drift merge race recurred repeatedly across this project's real PR history (one PR needed the fix re-applied 4+ times). `LEARNINGS.md` gets a new entry (occurrence=3) cross-referencing the existing, structurally identical "pipeline stages must create the feature branch before the first commit, not after" lesson (occurrence=2) — same root cause, different context (this project's own dev-repo session workflow vs. a founder pipeline command).
 
 ### Fixed
 - **`plugins/wingman/scripts/query-founder-knowledge.mjs`** — found via a real multi-session dogfood run (4 simulated session boundaries, each reading the tool's output cold): `state.json`'s `current_stage` could silently drift from the last checkpoint's own `next_stage` field with nothing to catch it. Checkpoint entries now expose `next_stage`; `summary()` compares it against `state.json` and returns a `state_stage_mismatch` field when they disagree. Verified both directions (no false positive on correct state; a direct catch when the drift was reintroduced for testing). See `docs/PROJECT.md`'s decisions log for the full run log — the same dogfood run also confirmed a fresh "session" correctly halts on a `DO NOT SHIP` verdict read back from `--summary` alone, closing the "not yet verified whether a later session reads this back" gap the prototype shipped with.

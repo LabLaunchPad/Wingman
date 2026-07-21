@@ -53,6 +53,15 @@ instead of being pushed to, which is slightly less immediate but works identical
 
 ## Core Workflow
 
+**0. Before touching anything — confirm you're not on `main`.** Run `git branch --show-current`
+before the *first* edit or commit of a new round of work, not after. If it says `main` (or
+whatever the base branch is), create and check out a feature branch first
+(`git checkout -b <name>`). This mirrors a real, twice-recurring lesson already fixed for
+founder-facing pipeline commands (`LEARNINGS.md`, "pipeline stages must create the feature branch
+before the first commit, not after") — checking *after* the fact is cosmetic once commits already
+exist; a resync (see step 4) can recover from it, but it's needless rework for something a
+one-line check up front prevents entirely.
+
 **1. Opening a PR — draft first, always.** Run `scripts/open-pr-with-template.sh "<title>"
 <body-file> [--base <branch>]` (omit `--ready`; draft is the default). Write the PR body to a real
 file first, not as an inline shell argument — this avoids quoting breakage on a real multi-section
@@ -80,6 +89,19 @@ the exact rename + `force-with-lease` push commands to finish with — **it neve
 its own**; run this project's own validators/tests against the resynced branch first, then finish
 the steps it prints yourself.
 
+**5. If a merge attempt fails with something like `405 ... required status checks are expected.
+[]`**, this is a different situation from step 4 — it means *another* PR merged into the base
+branch while this one was pending, so the base moved out from under it (`mergeable_state` will
+read `"behind"`, not the squash-merge symptom above). This recurred repeatedly in this project's
+own history (multiple PRs, one hit it 4+ separate times as other PRs kept landing ahead of it) —
+update the branch against the new base (a platform tool, or `gh pr update-branch <pr-number>`
+falling back to a manual `git fetch`/`merge`), then **wait for the base branch's required checks to
+actually re-run and report green** before retrying the merge — a check still shows the *old*
+base's result for a brief window right after the update, so retrying immediately just reproduces
+the same error. A distinct, unrelated error text — `405 Required status check "X" is in progress`
+— means the check is legitimately still running; that's a wait, not a base-drift problem, and
+doesn't need another update.
+
 ## Constraints
 
 **MUST:**
@@ -104,6 +126,8 @@ the steps it prints yourself.
 | "CI usually passes, I'll mark it ready now and check later" | A draft that's already marked ready-for-review invites review attention before you actually know it's green — the whole point of draft-first is that nobody has to look until it is. |
 | "I'll just poll every 2 seconds so I find out the instant it's done" | Wastes API rate-limit budget for no real gain — CI runs take minutes, not seconds; a 30s interval notices "done" just as usefully. |
 | "This platform's built-in tool is probably fine, I don't need the portable script" | It might be fine *here* — but if this exact procedure needs to work for a founder's own project regardless of which coding agent operates it later, the portable script is the one guaranteed to still work. |
+| "I'll just start editing, I'll check what branch I'm on before I commit" | By the time you check, the edits already happened on whatever branch was checked out — checking *before* the first edit is the only version of this that actually prevents the mistake, not just catches it after. |
+| "The merge failed again, let me just retry immediately" | If the error is the "required status checks are expected" base-drift symptom (step 5), an immediate retry reproduces the identical failure — the base checks need to actually finish re-running first, not just be re-triggered. |
 
 ## Red Flags — Stop and Reconsider
 
@@ -113,9 +137,23 @@ the steps it prints yourself.
 - About to auto-resolve a cherry-pick conflict during a branch resync rather than surfacing it.
 - Polling CI status in a loop faster than roughly once every 15-30 seconds.
 - About to hand-derive the squash-merge resync sequence again instead of running the script.
+- About to make your first edit or commit of a new round of work without having just checked
+  `git branch --show-current`.
+- A merge attempt just failed with a "required status checks are expected" error and the next
+  move under consideration is an immediate retry rather than updating the branch and waiting for
+  checks to re-run.
 
 ## Verification
 
+- **Steps 0 and 5 were added from real, self-caught friction in this project's own session
+  history, not speculatively.** Step 0: a commit landed directly on local `main` mid-session
+  (caught before pushing, since `main` has branch protection — recovered by branching off the
+  stray commit and hard-resetting local `main` back to `origin/main`; see `docs/PROJECT.md`'s
+  decisions log). Step 5: the "required status checks are expected" base-drift race recurred
+  repeatedly across several PRs in this project's real merge history (one PR alone needed
+  `update_pull_request_branch` re-applied 4+ separate times as other PRs kept landing ahead of
+  it) before this skill documented the actual fix (update, then wait for checks to re-run, not
+  retry immediately).
 - `scripts/sync-branch-after-squash-merge.sh` was directly tested against a real simulated
   squash-merge scenario (a bare-repo clone, a feature branch, a `git merge --squash` onto main,
   then a further unmerged commit on the feature branch) — confirmed it correctly detects the
