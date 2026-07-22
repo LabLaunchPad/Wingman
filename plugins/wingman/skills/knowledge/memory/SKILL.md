@@ -46,3 +46,10 @@ correctly dated, and contains no secret material. Before relying on a recalled
 fact, confirm it matches the current session's reality.
 
 See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+
+## References
+
+- `references/org-template/founder-preferences.md` — what's worth learning about a founder's
+  working/approval style and where it lands in `MEMORY.md`; guidance, not a second store.
+- `references/org-template/capability-map.md` — what's worth noticing about a founder's own
+  technical background, for the same reason.

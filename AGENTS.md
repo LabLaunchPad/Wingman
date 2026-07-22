@@ -106,10 +106,15 @@ never from the directory path, so this taxonomy is purely for navigation; it doe
 | `adaptive/` | boardroom, retro, learn, evolve, harness, telemetry, launch, hotfix, audit, dogfood, over-engineering-review, bloat-audit, debt-ledger, research, advisory, incident, knowledge-export |
 
 `agents/` (8 Boardroom seats) stays flat — small and homogeneous enough that subdividing it would
-be churn without benefit. `references/` is mostly flat (15 top-level files) but also holds one
-nested subtree, `references/harness-adapters/` — its files must mirror Codex CLI's/OpenCode's own
+be churn without benefit. `references/` is mostly flat (15 top-level files) but also holds two
+nested subtrees: `references/harness-adapters/` — its files must mirror Codex CLI's/OpenCode's own
 discovery layout (`.codex/agents/`, `.opencode/agent/`, `.opencode/plugin/`) to stay drop-in
-copyable, so a flat structure wasn't an option there; see that directory's own `README.md`.
+copyable, so a flat structure wasn't an option there; see that directory's own `README.md` — and
+`references/org-template/` — static reference content (a project-type catalog + playbooks, founder-
+preferences and capability-map guidance) cited from `discovery.md` and `skills/knowledge/memory`;
+deliberately scoped down from a much larger founder-org-scaffold proposal (see `docs/PROJECT.md`'s
+decisions log, 2026-07-22) to only the pieces with a real, evidenced consumer — see that directory's
+own `README.md`.
 
 ## Working here
 

@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.36] - 2026-07-22
+
+### Added
+- **`plugins/wingman/references/org-template/`** — a narrow, evidence-scoped slice of a much larger "master repo blueprint" restructuring proposal: a project-type catalog + 7 short playbooks (website/freelancing/mini-saas/full-saas/ai-agent/automation/internal-tool), plus `founder-preferences.md` and `capability-map.md` guidance docs. Cited from `commands/pipeline/discovery.md` (project-type consult) and `skills/knowledge/memory` (what's worth persisting to `MEMORY.md`). An audit found the original ~60-file proposal would have violated `skills/governance/evidence-gated-catalog` (speculative bulk creation, no consumer for most files) and reversed a 2026-07-18 decision that already declined a similarly-shaped restructuring (`docs/ARCHITECTURE.md` §8a) — see `docs/PROJECT.md`'s decisions log for the full scoping trail and the founder decisions (Scope A / Placement B / Adapter A / Tools A) that bounded this to reference content only, with no new command, script, or dependency.
+
 ## [0.5.35] - 2026-07-22
 
 ### Changed

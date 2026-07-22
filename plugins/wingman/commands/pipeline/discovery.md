@@ -15,6 +15,8 @@ If the request is vague or could mean several different things, ask a small numb
 
 Do not ask the founder to make technical decisions (frameworks, data models, file layout) — that's `architecture.md`'s job, several stages from now. Only escalate a question here if it's a business/product tradeoff or a one-way door.
 
+If the project's shape clearly matches one of `references/org-template/project-types/catalog.md`'s 7 types, consult that type's short playbook for what typically changes in later stages — never force a fit; most projects are close to one type but not exact, and this conversation always takes precedence over a category label.
+
 ## Step 2: Confirm the Product department is active
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
