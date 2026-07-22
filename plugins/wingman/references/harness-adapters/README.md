@@ -44,9 +44,15 @@ a `verified` status with no real evidence):
   Untestable in this sandbox at that scale, and exactly the unverified-breadth pattern this project's
   own `engineering-minimalism` skill warns against. Revisit if real, evidenced demand for full
   command-surface parity (not just the Boardroom + safety gate) shows up.
-- **Codex CLI's `secret-guard.mjs` Write/Edit-matcher hook path.** Codex's exact tool-name strings
-  for its file-edit tool weren't confirmed by research; a wrong guess would make the hook silently
-  never fire, which is worse than not porting it and saying so plainly (see `codex-cli/.codex/hooks.json`'s own inline comment).
+- **Codex CLI's `secret-guard.mjs` Write/Edit-matcher hook path.** A 2026-07-22 follow-up audit
+  confirmed the matcher shape via OpenAI's official Codex hooks docs (`apply_patch`/`Edit`/`Write`
+  all valid matcher values; hook input's `tool_name` always reports `apply_patch`) — the original
+  "tool-name strings weren't confirmed" blocker is resolved. What's still unconfirmed is the exact
+  JSON field name inside `apply_patch`'s `tool_input` holding the patch content itself (the
+  equivalent of Claude Code's `toolInput.content`/`new_string`), so `secret-guard.mjs` still isn't
+  wired here — guessing that field risks a hook that runs but silently never matches anything,
+  worse than not porting it and saying so plainly. See `codex-cli/README.md`'s "2026-07-22 research
+  update" section and `codex-cli/.codex/hooks.json`'s own inline comment for the full detail.
 - **A Codex CLI equivalent of the `ExitPlanMode`/`boardroom-checkpoint.mjs` plan-approval gate.**
   Codex CLI has no plan-mode tool at all — it uses `approval_policy` instead. This is a genuine
   capability gap in the target harness, not a missed port.

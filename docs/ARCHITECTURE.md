@@ -396,6 +396,26 @@ Wingman's skills are designed to auto-fire off `description` matching by intent 
 workflow that needs to suppress auto-invocation) and none pre-approve a narrow, fixed tool set
 distinct from the agent's own — so the honest result is a confirmed non-gap, not an oversight.
 
+**Docs-only note, no action taken**: Wingman ships its 24 pipeline/adaptive commands as flat
+`.md` files under `commands/`. Official docs confirm this still works ("Custom commands have been
+merged into skills... your existing `.claude/commands/` files keep working") but now recommend
+`skills/` for new plugins ("Commands: skills as flat Markdown files. Use `skills/` for new
+plugins."). Not treated as a gap needing a fix: migrating 24 files to the `skills/` layout is a
+large, unforced refactor with zero evidenced friction driving it (no dogfood run or founder report
+has ever hit an actual problem caused by the `commands/` layout) — the same evidence-gate standard
+this project applies to every other "the community does it differently" pitch. Noted here so the
+tradeoff is visible, not silently missed.
+
+**Codex CLI adapter follow-up, same date**: fetching OpenAI's official Codex hooks docs directly
+(`learn.chatgpt.com/docs/hooks`) resolved one of `references/harness-adapters/codex-cli/`'s two
+previously-unconfirmed blockers — its `Bash` PreToolUse matcher is now a confirmed real tool name,
+and the Write/Edit-matcher path's matcher *values* (`apply_patch`/`Edit`/`Write`) are now confirmed
+too. What remains unconfirmed is the exact `tool_input` JSON field name carrying patch content for
+`apply_patch` calls — needed before `secret-guard.mjs` can be safely wired against it without
+guessing. See `codex-cli/README.md`'s "2026-07-22 research update" section for the full detail,
+including a genuinely unresolved conflict between official docs (hooks enabled by default) and a
+third-party cheatsheet (claimed an opt-in flag) that a live install would be needed to settle.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 16 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
