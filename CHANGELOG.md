@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.30] - 2026-07-21
+
+### Fixed
+- **`plugins/wingman/hooks/dod-structural-gate.mjs`** — found by the first genuinely interactive founder-mode dogfood run (real `AskUserQuestion` calls to an actual human, exercising the real `git push` gate against live, evolving project state for the first time): the threat-register check only matched the literal substring `"OPEN"`, so any other status word (including an honestly-wrong `"PENDING"` for a genuinely unresolved risk) silently passed the gate; replaced with a real, section-scoped table parse (`extractThreatRegisterSection` + `findUnresolvedThreatRows`) that locates the Status column dynamically and flags anything other than exactly `CLOSED`. Also, `checkTestPresence` only recognized a test file matching the source file's own basename, wrongly flagging a file with full, real coverage split across several behavior-named test files; added `anyTestFileReferencesSource`, a content-based fallback checking whether any test file actually imports/requires the source module.
+
+### Added
+- New unit tests in `tests/hooks-integration/hooks-integration.test.mjs`: "DoD Gate — Threat Register Status Parsing" (5 tests) and "DoD Gate — Test Presence for Behavior-Split Suites" (2 tests).
+
 ## [0.5.29] - 2026-07-21
 
 ### Fixed
