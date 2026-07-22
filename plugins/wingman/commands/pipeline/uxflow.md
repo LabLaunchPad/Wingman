@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific screen or flow]"
 
 # Wingman: UX Flow
 
-The fourth of Wingman's 7 planning stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:implementation-planning` rather than manufacturing screens that don't need to exist.
+The fourth of Wingman's 5 planning stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:implementation-planning` rather than manufacturing screens that don't need to exist.
 
 $ARGUMENTS
 

@@ -5,7 +5,7 @@ argument-hint: "<what you want built, in your own words>"
 
 # Wingman: Discovery
 
-The first of Wingman's 7 planning stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
+The first of Wingman's 5 planning stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
 
 $ARGUMENTS
 

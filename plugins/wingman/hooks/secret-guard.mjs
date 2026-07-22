@@ -40,7 +40,11 @@ const SECRET = [
   /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/,     // Slack tokens
   /\bsk_live_[A-Za-z0-9]{20,}\b/,         // Stripe live secret key
   /\bAIzaSy[A-Za-z0-9_-]{33}\b/,          // Google API key
-  /\bsk-[A-Za-z0-9]{20,}\b/,              // OpenAI / Anthropic-style keys
+  /\bsk-[A-Za-z0-9]{20,}\b/,              // OpenAI-style keys
+  /\bsk-ant-[A-Za-z0-9_-]{20,}\b/,        // Anthropic keys (real shape is hyphen-delimited,
+                                          // e.g. sk-ant-api03-<...>-<...>, which the OpenAI-style
+                                          // pattern above never matches -- found by a
+                                          // /wingman:audit pass)
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/,   // PEM private key
   /\bANTHROPIC_API_KEY\s*=\s*\S+/i,       // literal key assignment
   /(?:password|passwd|secret|token|api[_-]?key)\s*[:=]\s*['"]?[A-Za-z0-9\/+_]{20,}/i,

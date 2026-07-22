@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific requirement ID to design 
 
 # Wingman: Architecture
 
-The third of Wingman's 7 planning stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
+The third of Wingman's 5 planning stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
 
 $ARGUMENTS
 
