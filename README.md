@@ -33,6 +33,23 @@ Wingman is a [Claude Code](https://claude.com/product/claude-code) plugin that g
 
 Then run `/wingman:discovery` to start a new project, or `/wingman:boardroom` to get a plain-language review of work already in progress. Every `wingman:*` command is listed in [`plugins/wingman/.claude-plugin/plugin.json`](plugins/wingman/.claude-plugin/plugin.json).
 
+### Using a different AI coding agent
+
+Wingman is built as a Claude Code plugin, and most of the Boardroom's execution mechanism (interactive
+founder questions, the plan-approval gate, parallel multi-seat dispatch) is genuinely coupled to
+Claude Code's own tool surface — see [`docs/ARCHITECTURE.md` §8a/§8b](docs/ARCHITECTURE.md) for the
+honest account of what is and isn't portable. Two harnesses have a real, scoped starting point:
+
+- **Codex CLI** and **OpenCode** — Boardroom seat personas translated into each harness's native
+  agent format, plus install steps: [`plugins/wingman/references/harness-adapters/`](plugins/wingman/references/harness-adapters/README.md).
+  Every artifact there is labeled `built + tested`, `authored, unverified`, or `not attempted,
+  documented why` — nothing is overclaimed as working until it's actually been run against a live
+  install of that harness.
+- **Any harness at all** (including a human running plain `git`) — the git-push safety gate
+  (`dod-structural-gate.mjs`'s threat-register/traceability/test checks) has a harness-agnostic
+  fallback: `plugins/wingman/scripts/install-git-hooks.mjs` wires it up as a real `.git/hooks/pre-push`
+  hook, with zero per-harness adaptation. This is the one piece confirmed working outside Claude Code.
+
 ## How it works
 
 Instead of asking a founder to read code or a diff, Wingman gates every stage of the SDLC through a **Boardroom checkpoint**: 7 C-suite-style seats plus Design (CEO / CPO / CMO / CTO / CISO / CFO / Research / Design) examine the plan or change in parallel and hand back one short, jargon-free go/no-go summary, consolidated into a grouped Business / Technical / Finance / Research report. The founder makes the call; Wingman never assumes silence means approval.
