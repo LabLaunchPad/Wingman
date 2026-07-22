@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.33] - 2026-07-22
+
+### Changed
+- **`plugins/wingman/references/harness-adapters/codex-cli/`** — a follow-up audit fetched OpenAI's official Codex hooks docs directly, confirming two previously-unconfirmed items in `.codex/hooks.json`: the `Bash` PreToolUse matcher (now confirmed a real tool name) and the Write/Edit-matcher path's matcher *values* (`apply_patch`/`Edit`/`Write`, all confirmed valid — the hook input's `tool_name` always reports `apply_patch`). `secret-guard.mjs`'s actual payload scan remains deliberately unwired, since the `tool_input` JSON field name carrying patch content still isn't confirmed by the fetched docs. Updated `codex-cli/README.md`, `.codex/hooks.json`'s inline comments, and the parent `harness-adapters/README.md`.
+
 ## [0.5.32] - 2026-07-22
 
 ### Added
