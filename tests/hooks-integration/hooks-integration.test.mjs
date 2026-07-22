@@ -1408,3 +1408,64 @@ describe('Harness Adapter Drift Check', () => {
     assert.match(res.stdout, /PASS/);
   });
 });
+
+describe('Version Gate — CHANGELOG Entry Check', () => {
+  const checkPath = path.join(process.cwd(), 'scripts', 'check-changelog-entry.mjs');
+
+  describe('hasChangelogEntry (unit)', () => {
+    it('finds a matching version heading', async () => {
+      const { hasChangelogEntry } = await import(pathToFileURL(checkPath).href);
+      const changelog = '# Changelog\n\n## [0.5.32] - 2026-07-22\n- Some change.\n\n## [0.5.31] - 2026-07-22\n- Older change.\n';
+      assert.strictEqual(hasChangelogEntry(changelog, '0.5.32'), true);
+    });
+
+    it('reports a missing version heading (the real gap this check closes)', async () => {
+      const { hasChangelogEntry } = await import(pathToFileURL(checkPath).href);
+      const changelog = '# Changelog\n\n## [0.5.31] - 2026-07-22\n- Older change.\n';
+      assert.strictEqual(hasChangelogEntry(changelog, '0.5.32'), false);
+    });
+
+    it('does not false-positive on a version that is a substring of another', async () => {
+      const { hasChangelogEntry } = await import(pathToFileURL(checkPath).href);
+      const changelog = '# Changelog\n\n## [0.5.320] - 2026-07-22\n- Unrelated later version.\n';
+      assert.strictEqual(hasChangelogEntry(changelog, '0.5.32'), false);
+    });
+  });
+
+  describe('CLI (integration — constructed mismatch fails, matching pair passes)', () => {
+    const tempDir = path.join(process.cwd(), '.test-temp-changelog-check');
+
+    beforeEach(() => {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+      fs.mkdirSync(tempDir, { recursive: true });
+    });
+
+    afterEach(() => {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    });
+
+    it('exits non-zero when the bumped version has no CHANGELOG entry', () => {
+      const changelogPath = path.join(tempDir, 'CHANGELOG.md');
+      fs.writeFileSync(changelogPath, '## [0.5.31] - 2026-07-22\n- Older change.\n');
+      const res = spawnSync('node', [checkPath, '0.5.32', changelogPath], { encoding: 'utf-8' });
+      assert.strictEqual(res.status, 1);
+      assert.match(res.stderr, /no "## \[0\.5\.32\]" entry found/);
+    });
+
+    it('exits zero when the bumped version has a matching CHANGELOG entry', () => {
+      const changelogPath = path.join(tempDir, 'CHANGELOG.md');
+      fs.writeFileSync(changelogPath, '## [0.5.32] - 2026-07-22\n- New change.\n');
+      const res = spawnSync('node', [checkPath, '0.5.32', changelogPath], { encoding: 'utf-8' });
+      assert.strictEqual(res.status, 0, res.stderr);
+      assert.match(res.stdout, /matching \[0\.5\.32\] entry/);
+    });
+
+    it('the real repo state passes clean right now (current plugin.json version has a CHANGELOG entry)', () => {
+      const pluginJson = JSON.parse(
+        fs.readFileSync(path.join(process.cwd(), 'plugins', 'wingman', '.claude-plugin', 'plugin.json'), 'utf-8')
+      );
+      const res = spawnSync('node', [checkPath, pluginJson.version], { encoding: 'utf-8' });
+      assert.strictEqual(res.status, 0, res.stderr);
+    });
+  });
+});
