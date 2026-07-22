@@ -1,6 +1,7 @@
 ---
 name: package-manager-selection
 description: Use during /wingman:build's "Before starting" step, the first time a new Node/JS project needs a package manager at all — never for a project that already has one. Triggers whenever build.md is about to run an install/add/script command and no lock file or packageManager field exists yet.
+effort: low
 ---
 
 # Package Manager Selection

@@ -1,6 +1,7 @@
 ---
 name: token-economy
 description: Use for internal-only, non-founder-facing communication — subagent-to-subagent delegation, tool-call narration, department-lead handoffs, working logs. Never use for anything the founder will read (Boardroom verdicts, checkpoint summaries, plan documents) — those are always governed by plain-language-checkpoint instead, which wins on any conflict.
+effort: low
 ---
 
 <!--

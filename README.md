@@ -90,7 +90,7 @@ See [`docs/PROJECT.md`](docs/PROJECT.md) for exact build/eval status and decisio
 
 ## For humans and for agents
 
-This README is written to be skimmed top-to-bottom in under a minute. If you're an AI coding agent working in this repo instead of a human reading it, start with [`AGENTS.md`](AGENTS.md) (a thin pointer into `CLAUDE.md`, the full project brief) rather than re-deriving conventions from source — and see `docs/ARCHITECTURE.md` §8a for the honest scope of what's portable to a non-Claude-Code harness today (two skills) versus what isn't (the rest).
+This README is written to be skimmed top-to-bottom in under a minute. If you're an AI coding agent working in this repo instead of a human reading it, start with [`AGENTS.md`](AGENTS.md) — the canonical project brief, following the open [AGENTS.md standard](https://agents.md) (`CLAUDE.md` is a symlink to it, kept for tools that look for that filename specifically) — rather than re-deriving conventions from source. See `docs/ARCHITECTURE.md` §8a for the honest scope of what's portable to a non-Claude-Code harness today (two skills) versus what isn't (the rest).
 
 ## Documentation
 
