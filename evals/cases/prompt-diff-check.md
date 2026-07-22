@@ -36,9 +36,11 @@ with two commands, each shown as a before/after change plus its eval case:
 
 ## Trust level
 
-`provisional` — passed one real run with both a positive and negative signal in the same fixture
-(see Run log). Not yet re-run against a second, differently-shaped scenario (e.g. a case that's
-missing entirely, not just outdated), per `evals/README.md`'s bar for `verified`.
+`verified` — Run 1 covered "meaningful change, case covers it" vs. "meaningful change, case doesn't
+cover it." Run 2 covered the differently-shaped axis Run 1 never touched: is the change meaningful
+at all, including a change engineered to *look* cosmetic while being load-bearing. Both scenarios
+passed, one of them a genuine negative case (correctly does nothing when nothing behaviorally
+changed).
 
 ## Run log
 
@@ -60,3 +62,37 @@ eval case content (`grep -c "confirmation\|founder" evals/cases/rollback.md` →
 
 All 5 expectations passed on first run, with both the positive and negative signal correctly
 distinguished in the same dispatch — not just told two separate stories on request.
+
+### Run 2 — 2026-07-22 — cosmetic-vs-disguised-load-bearing (differently shaped from Run 1)
+
+Run 1 only ever tested "is a change covered" for changes already established as meaningful. It
+never tested the skill's Step 1 judgment — whether a diff is meaningful in the first place. Built a
+new scratch fixture (not added to `evals/fixtures/`, per instructions to touch only this case file)
+at `/tmp/claude-0/-home-user-Wingman/ce30667c-52f4-5242-baf9-f99967a6a993/scratchpad/prompt-diff-run2/`,
+a synthetic project with two commands, each with a before/after and an existing eval case:
+
+- `commands/format.md` — purely cosmetic rewording of all 3 steps (same actions, same order, same
+  gate/non-gate status). Negative case: should NOT be flagged as a meaningful change.
+- `commands/publish.md` — a one-word diff, "You **must** verify the checksum... before uploading"
+  softened to "You **should** verify...". Disguised-load-bearing case: looks cosmetic (tiny diff)
+  but actually demotes a mandatory pre-upload gate to an optional suggestion — a real behavior
+  change. `evals/cases/publish.md`'s expectations table has a row explicitly requiring the mandatory
+  gate, which the new prompt text no longer honors.
+
+Applied the skill's Core Workflow directly against only the SKILL.md + fixture content (no live
+sub-dispatch tool was available in this session), then independently re-verified against the raw
+files via `diff commands/format.before.md commands/format.md` and
+`diff commands/publish.before.md commands/publish.md`, not trusting the judgment alone.
+
+| Check | Result |
+|---|---|
+| `format.md` correctly judged NOT a meaningful change | **Pass** — all 3 line edits are same action/order/gate-status; skill's own Step 1 language ("not a rephrase with identical behavior") applies directly; no eval-case action needed |
+| `format.md`'s existing eval case correctly left alone (no fabricated gap) | **Pass** — did not invent a coverage problem where none exists |
+| `publish.md`'s must→should correctly judged a meaningful change despite the 1-word diff | **Pass** — identified the mandatory-gate-to-suggestion demotion as a real behavior change, not a cosmetic tweak |
+| `publish.md`'s eval case correctly flagged as now-mismatched (case still expects mandatory-gate behavior the prompt no longer requires) | **Pass** — cited the exact stale expectations-table row, verified via `diff` that the change really is must→should and nothing else |
+| No fabricated coverage or false negative | **Pass** — the cosmetic case wasn't over-flagged, the disguised case wasn't under-flagged |
+
+All 5 expectations passed. This is a genuinely different scenario shape from Run 1 (it exercises
+"is this meaningful at all," including an adversarial disguised-as-cosmetic trap, rather than
+"does an already-established meaningful change have coverage") and includes a real negative case
+(format.md correctly triggers no action) — satisfying `evals/README.md`'s bar for `verified`.

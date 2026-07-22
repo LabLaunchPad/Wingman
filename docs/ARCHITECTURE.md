@@ -416,6 +416,43 @@ guessing. See `codex-cli/README.md`'s "2026-07-22 research update" section for t
 including a genuinely unresolved conflict between official docs (hooks enabled by default) and a
 third-party cheatsheet (claimed an opt-in flag) that a live install would be needed to settle.
 
+## 8e. Token-efficiency audit of every auto-firing mechanism (2026-07-22)
+
+On explicit request, audited every mechanism that fires *automatically* (not on explicit user
+invocation) across a session for hidden token cost — all 6 wired `hooks.json` events plus all 40
+skills' auto-fire-by-description design. Checked directly against real file content and, for the
+one genuinely ambiguous point, against official Claude Code hook docs.
+
+**Confirmed non-issue, the one point that needed external verification**: `secret-guard.mjs`,
+`dod-structural-gate.mjs`, and `boardroom-checkpoint.mjs` (all `PreToolUse`) emit an unconditional
+`hookSpecificOutput.permissionDecision: 'allow'` on every single successful `Bash`/`Write`/`Edit`/
+`NotebookEdit`/`ExitPlanMode` call. This looked like a per-tool-call token cost multiplied across
+an entire session, but official docs confirm `permissionDecision` (and `permissionDecisionReason`)
+are **pure control-plane signals never shown to the model as context** — only a hook's distinct
+`additionalContext` field gets wrapped in a system-reminder and actually injected. None of
+Wingman's `allow()` paths set `additionalContext`, so this costs zero tokens per call, confirmed
+rather than assumed.
+
+**Confirmed already correct by design**: `session-health.mjs` and `context-monitor.mjs` (both
+unmatched `PostToolUse`, firing on every tool call) only emit a `hookSpecificOutput.message` — the
+field that *does* inject visible context — conditionally, when a real yellow/red threshold is
+crossed, never unconditionally. `secret-scanner.mjs` and `content-injection-scanner.mjs` (same
+unmatched `PostToolUse` scope) write only to `stderr`, and only when something is actually found —
+zero output on the common path. `deny()` paths across all `PreToolUse` hooks correctly reserve
+their (necessary) stderr+exit-2 text for the rare blocking case, not the common allow case.
+
+**Confirmed already correct on the skills side**: all 40 `SKILL.md` files load only when a specific
+skill is actually invoked (by description-match or explicit call) — auto-fire cost is inherently
+scoped to relevance by the platform's own design, not a Wingman-specific concern. Of the 40, 5
+already use the two-tier `SKILL.md` + `references/` progressive-disclosure pattern (including the
+longest file, `subagent-driven-development` at 374 lines) even though none of the 40 exceed the
+~500-line threshold official guidance flags for extraction — no skill currently needs splitting.
+
+**Net result**: no code changes made. Every auto-firing mechanism already avoids unconditional
+context injection on the common path; the one point needing external confirmation checked out
+clean. Manufacturing a fix here would repeat the exact false-positive pattern this session's own
+`bloat-audit`/`over-engineering-review` eval promotions just tested against.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 16 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.

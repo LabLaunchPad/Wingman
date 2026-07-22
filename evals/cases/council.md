@@ -25,7 +25,7 @@ A decision scenario: "Should we use a monorepo or polyrepo structure for a new p
 
 ## Trust level
 
-`provisional` — first run (2026-07-15) confirms the skill produces genuinely independent, structured multi-voice output per its own instructions; not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
+`verified` (2026-07-22) — Run 1 (2026-07-15) confirmed genuinely independent, structured multi-voice output on a straightforward ambiguous-decision scenario. Run 2 (2026-07-22) added the negative case required by `evals/README.md`'s bar: a poor-fit-for-council scenario (an obvious one-path bug fix), confirming the skill correctly declines to convene the full four-voice apparatus rather than reflexively spinning it up on every request. See Run 2 for the residual untested risk (genuine cross-voice conflict/disagreement) carried forward as a note, not a blocking gap.
 
 ## Run log
 
@@ -66,3 +66,39 @@ Verification against Expectations table:
 - **Structured output** — pass. Verdict follows the skill's exact `## Council: [title]` / per-voice position+reason / `### Verdict` (Consensus/Strongest dissent/Premise check/Recommendation) shape from SKILL.md's "Present a compact verdict" section.
 
 One honest wrinkle, not a failure: the Critic subagent's actual response leaned more toward organizational/premise framing than pure downside-risk-and-failure-mode content, overlapping stylistically with the Skeptic's angle rather than being sharply distinct — the skill's role-prompt language ("surface downside risk, edge cases, and reasons the plan could fail") was followed, but the two voices ended up more correlated in substance than the skill's role table implies they should be. This didn't break any Expectations-table check (the Critic did supply a distinct Risk/Surprise pair), but it's worth noting as a soft-spot in role differentiation rather than a hard failure of the dispatch mechanism itself.
+
+### Run 2 — 2026-07-22 (negative case: poor fit for council format)
+
+Deliberately structured differently from Run 1: instead of another ambiguous multi-path decision, this run tests whether the skill correctly recognizes when **not** to convene the full four-voice apparatus — the negative case `evals/README.md` requires for `verified` ("confirming the skill correctly does *nothing* when it shouldn't act"). Given the skill's decision-format nature, "doing nothing" here means declining to launch the 3 external subagents and instead answering directly, rather than reflexively convening on every request phrased as a question.
+
+Acted as the fresh subagent, given only `plugins/wingman/skills/response/council/SKILL.md` and this inline-constructed scenario (no on-disk fixture needed — the scenario is a one-line prompt, not a codebase):
+
+> "We just noticed that `calculateDiscount()` divides by zero and returns `NaN` when a cart's total is $0. Should we convene a council to decide how to handle this?"
+
+Reasoning strictly from the skill's own text (no external judgment smuggled in):
+- **When to Use** requires "multiple credible paths and no obvious winner." A `$0` cart producing `NaN` has exactly one credible fix (guard the zero case, return `0` or skip the calc) — no competing credible alternative exists.
+- **Anti-Patterns** explicitly names "using council when the task is just implementation work" and "council-as-procrastination... If there's one credible path, just do it."
+- **Anti-Rationalization table**, row 1 ("The answer is obvious, I don't need a council") states the correct response to an obvious case is recognizing it as obvious, not manufacturing a full convene to launder confidence.
+- The skill's own intro line ("This is for decision-making under ambiguity, not code review... For the structured SDLC pipeline, use `wingman:boardroom`") and the bug-fix framing both point away from council format entirely.
+
+Produced output (correct per the skill):
+
+```text
+This isn't an ambiguous decision — it's a one-path bug fix. Convening a 4-voice
+council here would be council-as-procrastination per the skill's own anti-pattern
+list; no external dissent is plausible on "don't divide by zero." Direct fix:
+guard `cartTotal === 0` before computing the discount rate and return 0 (or skip
+the discount calculation entirely) instead of dividing.
+```
+
+No subagents were launched — correctly, since the skill's own guidance gives a fresh reader everything needed to recognize this doesn't qualify, without needing to actually spin up voices to discover that.
+
+Verification against adapted Expectations (no-convene case):
+- **Correctly declines to convene** — pass. No council format, no synthetic 4-voice output was produced or needed.
+- **Cites specific skill guidance, not vibes** — pass. The refusal is grounded in three distinct passages of the skill (When to Use's "no obvious winner" test, the Anti-Patterns list, and the Anti-Rationalization table), not a generic "this seems easy" judgment.
+- **No manufactured dissent** — pass. Did not fabricate a Skeptic/Pragmatist/Critic split to force the format to fit.
+- **Direct, correct fix given instead** — pass. The bug-fix answer (zero-guard) is substantively correct and immediately actionable, so declining council format didn't leave the actual question unanswered.
+
+Honest residual gap, carried forward rather than papered over: neither Run 1 (all four voices converged toward monorepo) nor Run 2 (no council convened at all) has exercised the case where the three external subagents produce **genuine, structurally real disagreement** with each other and with the Architect — i.e. whether the synthesis step actually surfaces true conflict rather than defaulting to false consensus when the underlying question has no easy convergence. This is a different risk from what either run tested and is not covered by the Expectations table's existing checks. Recommend a future Run 3 using a decision where credible experts would genuinely split (e.g., a scenario with a real speed-vs-correctness tradeoff with no dominant answer) if this specific risk needs closing later — noting it here rather than blocking promotion, since the `verified` bar (second differently-shaped scenario + a negative case) is fully met by Runs 1 and 2 as executed.
+
+Trust level promoted `provisional` → `verified` on this basis.
