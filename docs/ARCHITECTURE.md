@@ -298,6 +298,57 @@ overclaiming. Full citation list and the deliberately-not-attempted list live in
 `plugins/wingman/AGENTS.md` — a new nested, package-scoped `AGENTS.md` (the monorepo "nearest wins"
 convention) — points into this same directory for any agent landing directly in `plugins/wingman/`.
 
+## 8c. Community agent-agnostic plugin research (2026-07-22) — one adopted, rest deliberately declined
+
+On explicit request, studied how real, notable "agent-agnostic" AI coding plugin repos structure
+their directories, to check whether §8b's hand-authored adapter approach was missing a better,
+already-proven pattern. Four real exemplars fetched and read directly (not assumed from name):
+
+- **The AGENTS.md standard** (`agentsstandard.com`) — a 5-tier cascade (`~/.agents/AGENTS.md` →
+  `llms.txt` → `.agents/AGENTS.md` → root `AGENTS.md` → folder-scoped) with `.agents/skills/` as the
+  emerging cross-client canonical skill path.
+- **`alirezarezvani/claude-skills`** — a domain-first skill-content repo serving 13 tools from one
+  source tree via per-tool conversion scripts (`convert.sh --tool all`) generating `.mdc`
+  (Cursor), `CONVENTIONS.md` (Aider), etc.
+- **`wshobson/agents`** (already vendored, see §9/`ATTRIBUTIONS.md`) — a single-source-of-truth
+  `plugins/` directory with harness-specific outputs *generated at build time* via
+  `make generate HARNESS=<x>`, and a `make garden` command that specifically detects drift/dead
+  links between the canonical source and generated artifacts.
+- **`fusengine/harness`** (new, non-vendored citation, see `ATTRIBUTIONS.md`) — a real runtime
+  library with a harness-agnostic "pure policy core" (`src/policy/`) and thin per-harness
+  `src/adapters/{claude,codex,cursor,...}/` translation layers, plus a `harness init` command that
+  writes the actual hook-wiring files per target.
+
+**Ground-checked against Wingman's own §8b adapters before deciding anything**: `codex-cli/` and
+`opencode/`'s Boardroom persona files are a one-time, hand-authored translation of the canonical
+`plugins/wingman/agents/boardroom-*.md` files, already labeled `authored, unverified` — and, until
+now, had **no mechanism at all** to notice if a later edit to the canonical agents (a new seat, a
+renamed seat, a model-tier change) silently drifted the adapters out of sync. This is exactly the
+gap `wshobson/agents`' `make garden` and `fusengine/harness`'s adapter/policy-core split both
+independently point at.
+
+**Adopted, in its most proportionate form**: `plugins/wingman/scripts/check-harness-adapter-drift.mjs`
+— a mechanical, structure-only drift check (seat coverage across canonical/Codex/OpenCode, model-tier
+consistency for `opus`-pinned seats, presence of the `## <SEAT> VERDICT:` output contract), wired into
+`.github/workflows/validate.yml` so it runs on every PR. Deliberately **not** a full
+markdown-to-TOML/markdown regeneration engine the way `wshobson/agents`' `make generate` is — hand-
+condensed prose differs intentionally between the canonical agent and each translated adapter, so a
+fuzzy text diff would be both too strict (would flag legitimate condensation as drift) and too
+fragile to maintain in its own right. A structural check catches the real risk (a seat silently
+falling out of sync) without requiring the auto-regeneration engine's much larger surface area and
+verification burden.
+
+**Explicitly declined, same evidence-gate reasoning as every prior "make Wingman more agent-agnostic"
+proposal this project has assessed and turned down** (the 2026-07-18 "flatten everything" report, the
+mindwalk/swarm-intelligence/hybrid-framework pitches, all logged in `docs/AGENT-ROSTER.md`'s
+deferred-ideas table): a `wshobson`-style full build-generation pipeline for all 24 commands/40
+skills, the AGENTS.md standard's `llms.txt`+symlink cascade, and a `fusengine`-style generalized
+runtime adapter framework. None of these have real, evidenced demand behind them beyond "the
+community does it this way" — Wingman is itself the canonical Claude Code plugin, not a
+generic multi-harness generator, and building speculative infrastructure for harnesses with zero
+real dogfood/founder-reported friction would repeat the exact unverified-breadth pattern
+`engineering-minimalism` already warns against and this project has declined every time it's come up.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 16 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.

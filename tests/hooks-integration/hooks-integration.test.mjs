@@ -1305,3 +1305,106 @@ describe('OKF Export — Wipe-Target Safety', () => {
     assert.ok(fs.existsSync(path.join(projectDir, 'important-stuff', 'data.txt')));
   });
 });
+
+// ============================================================================
+// Harness Adapter Drift Check (a /wingman:audit + community-research finding: the
+// Codex CLI/OpenCode adapters are a hand-authored, one-time translation of the
+// canonical boardroom-*.md agents, with no mechanism to catch later drift --
+// borrowed wshobson/agents' `make garden` drift-detection concept in mechanical,
+// structure-only form: seat coverage + model-tier consistency + VERDICT-block presence).
+// ============================================================================
+
+describe('Harness Adapter Drift Check', () => {
+  const driftCheckPath = path.join(process.cwd(), 'plugins', 'wingman', 'scripts', 'check-harness-adapter-drift.mjs');
+  const tempDir4 = path.join(process.cwd(), '.test-temp-harness-drift');
+  const agentsDir = path.join(tempDir4, 'agents');
+  const codexDir = path.join(tempDir4, 'codex');
+  const opencodeDir = path.join(tempDir4, 'opencode');
+
+  function writeCanonical(seat, model) {
+    fs.writeFileSync(
+      path.join(agentsDir, `boardroom-${seat}.md`),
+      `---\nname: boardroom-${seat}\ndescription: test seat\nmodel: ${model}\n---\n\nBody.\n`
+    );
+  }
+
+  function writeCodex(seat, { opusNote = false, verdict = true } = {}) {
+    const modelLine = opusNote
+      ? `model = "gpt-5.5"  # source pins model: opus for this seat`
+      : `model = "gpt-5.5"  # placeholder`;
+    const body = verdict ? `## ${seat.toUpperCase()} VERDICT: <GO>` : '';
+    fs.writeFileSync(path.join(codexDir, `boardroom-${seat}.toml`), `${modelLine}\n${body}\n`);
+  }
+
+  function writeOpencode(seat, { model = 'anthropic/claude-sonnet-5', verdict = true } = {}) {
+    const body = verdict ? `## ${seat.toUpperCase()} VERDICT: <GO>` : '';
+    fs.writeFileSync(
+      path.join(opencodeDir, `boardroom-${seat}.md`),
+      `---\ndescription: test\nmodel: ${model}\n---\n\n${body}\n`
+    );
+  }
+
+  beforeEach(() => {
+    if (fs.existsSync(tempDir4)) fs.rmSync(tempDir4, { recursive: true, force: true });
+    fs.mkdirSync(agentsDir, { recursive: true });
+    fs.mkdirSync(codexDir, { recursive: true });
+    fs.mkdirSync(opencodeDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(tempDir4)) fs.rmSync(tempDir4, { recursive: true, force: true });
+  });
+
+  it('passes when a seat is consistent across canonical, Codex, and OpenCode', async () => {
+    const { checkDrift } = await import(pathToFileURL(driftCheckPath).href);
+    writeCanonical('cto', 'opus');
+    writeCodex('cto', { opusNote: true });
+    writeOpencode('cto', { model: 'anthropic/claude-opus-4-8' });
+    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    assert.deepStrictEqual(errors, []);
+  });
+
+  it('flags a missing Codex adapter for a canonical seat', async () => {
+    const { checkDrift } = await import(pathToFileURL(driftCheckPath).href);
+    writeCanonical('cto', 'opus');
+    writeOpencode('cto', { model: 'anthropic/claude-opus-4-8' });
+    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    assert.ok(errors.some((e) => /missing boardroom-cto\.toml/.test(e)));
+  });
+
+  it('flags an OpenCode adapter whose model tier no longer matches the canonical opus pin', async () => {
+    const { checkDrift } = await import(pathToFileURL(driftCheckPath).href);
+    writeCanonical('cto', 'opus');
+    writeCodex('cto', { opusNote: true });
+    writeOpencode('cto', { model: 'anthropic/claude-sonnet-5' }); // drifted: should be opus tier
+    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    assert.ok(errors.some((e) => /canonical seat pins model: opus/.test(e) && /opencode/.test(e)));
+  });
+
+  it('flags an adapter missing the expected VERDICT block', async () => {
+    const { checkDrift } = await import(pathToFileURL(driftCheckPath).href);
+    writeCanonical('cmo', 'inherit');
+    writeCodex('cmo', { verdict: false });
+    writeOpencode('cmo');
+    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    assert.ok(errors.some((e) => /does not contain the expected/.test(e) && /codex-cli/.test(e)));
+  });
+
+  it('flags a stale adapter left behind after a seat is removed from canonical', async () => {
+    const { checkDrift } = await import(pathToFileURL(driftCheckPath).href);
+    writeCanonical('cto', 'opus');
+    writeCodex('cto', { opusNote: true });
+    writeOpencode('cto', { model: 'anthropic/claude-opus-4-8' });
+    // A leftover adapter for a seat that no longer exists in canonical:
+    writeCodex('retired-seat', {});
+    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    assert.ok(errors.some((e) => /stale adapter for a removed\/renamed seat/.test(e)));
+  });
+
+  it('the real repo state passes clean right now', () => {
+    const pluginRoot = path.join(process.cwd(), 'plugins', 'wingman');
+    const res = spawnSync('node', [driftCheckPath], { encoding: 'utf-8' });
+    assert.strictEqual(res.status, 0, res.stderr);
+    assert.match(res.stdout, /PASS/);
+  });
+});

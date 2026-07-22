@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.32] - 2026-07-22
+
+### Added
+- **`plugins/wingman/scripts/check-harness-adapter-drift.mjs`** — a mechanical structural check (seat coverage, `opus`-tier consistency, VERDICT-block presence) between the canonical `plugins/wingman/agents/boardroom-*.md` files and their hand-authored Codex CLI/OpenCode translations under `plugins/wingman/references/harness-adapters/`. Closes a real gap: those adapters were "authored, unverified" with no mechanism to notice future drift. Wired into `.github/workflows/validate.yml`. Adopted after studying 4 real community "agent-agnostic" plugin repos (see `docs/ARCHITECTURE.md` §8c, `ATTRIBUTIONS.md`) — the single most valuable, proportionate practice found (`wshobson/agents`' `make garden` drift detector; `fusengine/harness`'s adapter/policy-core split), deliberately in mechanical form rather than a full prose-regeneration engine.
+
 ## [0.5.31] - 2026-07-22
 
 ### Fixed

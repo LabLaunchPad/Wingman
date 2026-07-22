@@ -25,6 +25,7 @@ node plugins/wingman/scripts/validate-structure.mjs   # plugin-internal invarian
 node scripts/check-repo-consistency.mjs                # repo-root doc/attribution invariants
 node scripts/check-fixtures.mjs                        # every eval fixture (evals/fixtures/setup-*.sh) still runs clean
 node plugins/wingman/scripts/check-traceability.mjs     # requirement/marker cross-referencing (also shippable, runs in founder projects)
+node plugins/wingman/scripts/check-harness-adapter-drift.mjs  # checks the Codex CLI/OpenCode Boardroom adapters haven't drifted from the canonical agents/boardroom-*.md
 node scripts/wingman-health.mjs                         # read-only dev-health report: built vs. verified vs. gaps
 node scripts/query-wingman-knowledge.mjs                # dev-repo-only: query the wingman:log markers by type/category/status, or --recurring
 node scripts/wingman-metrics.mjs                        # dev-repo-only: real cost/quality/debt signals, not a service benchmark
