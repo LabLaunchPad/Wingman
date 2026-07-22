@@ -33,7 +33,7 @@ node evals/run-headless.mjs --dry-run                   # confirms every eval ca
 node evals/run-headless.mjs                              # runs the behavioral eval cases via `claude -p`, needs ANTHROPIC_API_KEY
 ```
 
-All three validators must exit 0 before committing a structural change. There is no build step and no unit test runner in the conventional sense — see "Project status" above.
+All four Layer-1 validators (`validate-structure.mjs`, `check-repo-consistency.mjs`, `check-fixtures.mjs`, `check-traceability.mjs`) must exit 0 before committing a structural change; `check-harness-adapter-drift.mjs` is a separate, narrower check for the harness adapters specifically. There is no build step and no unit test runner in the conventional sense — see "Project status" above.
 
 ## Project purpose
 
