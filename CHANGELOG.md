@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.34] - 2026-07-22
+
+### Fixed
+- **`plugins/wingman/commands/adaptive/debt-ledger.md`** — found by a real `harvest` run in `evals/cases/debt-ledger.md`'s Run 2: the `harvest` step never reconciled `DEBT.md` after applying an upgrade, so a harvested item's ledger row silently kept showing `OPEN`/`HIT` even though the code had already been fixed. Added a 5th `harvest` step + a matching Rules-section invariant requiring the `DEBT.md` row be set to `RESOLVED` in the same pass that removes the `// minimal:` comment.
+
 ## [0.5.33] - 2026-07-22
 
 ### Changed

@@ -43,6 +43,7 @@ For each debt item that's been hit or is within 20% of its ceiling:
 2. Propose the upgrade (based on the upgrade path in the comment)
 3. If the upgrade is safe, apply it
 4. Verify with tests
+5. Update that item's row in `DEBT.md`: set `Status` to `RESOLVED` and remove the now-obsolete `// minimal:` comment from the code. Skip this step only for an item you deliberately left alone (e.g. a lower-priority item within the same run) — a harvested item with no `DEBT.md` update leaves the ledger silently out of sync with the code, which defeats its purpose as a source of truth.
 
 ### `add`
 
@@ -65,6 +66,7 @@ When you're about to take a deliberate shortcut during `/wingman:build`:
 
 - Every `// minimal:` comment MUST have a corresponding DEBT.md entry
 - Every entry MUST have a ceiling and upgrade path
+- A `harvest`-ed item MUST have its `DEBT.md` row updated (`Status` → `RESOLVED`) in the same pass that removes its `// minimal:` comment — never leave the ledger claiming `OPEN`/`HIT` for code that's already been upgraded
 - No ceiling may be permanently exceeded without either:
   - Upgrading to the proper solution, OR
   - Raising the ceiling with explicit justification

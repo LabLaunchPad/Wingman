@@ -91,15 +91,20 @@ applied it (removing the stale `// minimal:` comment since the shortcut was reso
 | Applies the upgrade | **Pass** — `src/cache.js` rewritten, old array implementation and its `// minimal:` comment removed |
 | Verifies with tests | **Pass** — `node --test` ran 3/3 green both before (baseline) and after the change, independently re-run and confirmed, not taken on the subagent's word |
 
-**Gap found (real, not fixed — case file only):** the doc's `harvest` section (4 steps: show,
-propose, apply, verify) never says to reconcile `DEBT.md` afterward. Following it literally left
+**Gap found and fixed (2026-07-22):** the doc's `harvest` section (originally 4 steps: show,
+propose, apply, verify) never said to reconcile `DEBT.md` afterward. Following it literally left
 `DEBT.md` still showing `D1 | ... | HIT` after the code was upgraded — independently confirmed by
-`cat DEBT.md` post-harvest, unchanged from before. That means a literal `harvest` run leaves the
-ledger's own source of truth silently out of sync with the code the moment it succeeds, which
-undercuts the ledger's whole purpose (a founder or the next `status` run would still see D1 as an
-unresolved ceiling hit). This is a genuine instruction gap in `commands/adaptive/debt-ledger.md`
-itself, not a fixture artifact — left unfixed per this run's scope (case file only, no other file
-edits), and it is why Trust level stays `provisional` rather than promoting to `verified`.
+`cat DEBT.md` post-harvest, unchanged from before. That meant a literal `harvest` run left the
+ledger's own source of truth silently out of sync with the code the moment it succeeded, which
+undercut the ledger's whole purpose (a founder or the next `status` run would still see D1 as an
+unresolved ceiling hit). Fixed in `commands/adaptive/debt-ledger.md`: added step 5 ("update that
+item's row in `DEBT.md`: set `Status` to `RESOLVED` and remove the now-obsolete `// minimal:`
+comment") and a matching Rules-section invariant. **Trust level stays `provisional`, not
+`verified`** — the fix itself hasn't been exercised by a real Run 3 yet (this Run 2 predates it);
+promoting on the strength of a fix nobody's actually run would repeat the exact
+self-report-without-evidence mistake this project's own discipline exists to catch. A Run 3
+re-running this same `harvest` scenario against the fixed doc, confirming `DEBT.md`'s D1 row now
+reads `RESOLVED`, is the concrete next step to actually promote this case.
 
 4/4 tabled checks pass, including the judgment check (leaving D2 alone), but the DEBT.md-
 reconciliation gap is a real behavioral defect surfaced by actually running the command outside
