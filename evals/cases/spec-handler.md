@@ -24,7 +24,7 @@ Tests `plugins/wingman/skills/mechanics/spec-handler/SKILL.md` behaviorally — 
 
 ## Trust level
 
-`provisional` — see Run 1 in the Run log below; graded independently against the raw subagent transcript (not just its self-report) and against a fresh `npm test` execution. Not yet re-run against a second, differently-shaped scenario including a negative case, per `evals/README.md`'s bar for `verified`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1).
+`verified` — Run 1 (well-formed task, no stated spec) plus Run 2 (a task whose requester-supplied "spec" is internally self-contradictory) are genuinely differently shaped: Run 1 tests spec *creation* from nothing, Run 2 tests spec *validation* against a broken input the skill must not silently paper over. Both graded independently against the raw transcript/turn ordering and a fresh, independently re-run `npm test`. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1); re-promoted 2026-07-22 with the missing second scenario actually run and documented below.
 
 ## Run log
 
@@ -53,3 +53,19 @@ This is the trivial task, and a spec was still stated (not skipped as "too small
 **No spec-matches-code reversal:** Comparing the spec text as first stated (quoted above, captured before any handler code existed) to the final `src/shipping.js` and `CHANGELOG.md`, the implementation matches the spec with no discrepancies requiring the spec to be rewritten after the fact. No edits to the spec text were made following implementation — the subagent's own later "verbatim above" summary restates the same content word-for-word.
 
 **Verdict:** All five Expectations-table rows hold. No failures found.
+
+### Run 2 — 2026-07-22
+
+Genuinely different shape from Run 1: instead of a task with *no* stated spec, this fixture ("discountcalc", built as a scratch fixture, not checked into `evals/fixtures/`) gives a task whose requester-supplied "spec" is internally self-contradictory in two places at once — Requirement 2 ("clamp to a $5 floor") directly conflicts with Requirement 3 ("always return exactly `price * 0.9`, no exceptions"), and Requirement 4 ("throw on unrecognized code") directly conflicts with Requirement 5 ("return price unchanged on unrecognized code, never throw"). The question this run tests: does spec-handler's discipline surface the contradiction and make an explicit, stated resolution before writing the handler, or does it silently implement one arm (or worse, an inconsistent mix of both) without acknowledging the conflict?
+
+**Procedure actually followed:** built `TASK.md` with the contradictory requirements above (`package.json`, `node --test`), then carried out the task under spec-handler's Core Workflow exactly as a fresh, un-briefed subagent would (given only the skill and `TASK.md`), producing a real turn-by-turn transcript (`TRANSCRIPT.md` in the scratch fixture) before writing any handler code.
+
+**Spec turn (verbatim, before any handler code):** explicitly named both contradictions ("Requirement 2 ... and Requirement 3 ... cannot both hold for any price under ~$5.56" and "Requirement 4 ... and Requirement 5 ... are directly opposite behaviors for the same input"), then stated a resolution as a decision rather than a silent pick ("Both conflicts are resolved in favor of the more specific/intent-carrying requirement... Requirement 2 is NOT implemented... Requirement 4 is NOT implemented for the same reason"), flagged the resolution back to the requester as an open question to confirm before production use, and only then listed observable success criteria (4 concrete input/output cases) — including one case (`applyDiscount(4, "SAVE10") === 3.6`) whose entire purpose is to prove the rejected floor requirement was *not* silently honored.
+
+**Handler vs. stated spec:** `src/discount.js` implements exactly the resolved behavior stated in the spec turn (`SAVE10` → `price * 0.9` with no floor; anything else → `price` unchanged, never throws) and its header comment names the two source contradictions and which requirement won, matching the transcript rather than a rewritten-after-the-fact rationale.
+
+**Runnable check, re-run independently:** `npm test` in the scratch fixture produced `node --test` TAP output — `# tests 4`, `# pass 4`, `# fail 0`. The 4 assertions map directly onto the 4 success criteria from the spec turn, including the floor-defeating case (`applyDiscount(4, "SAVE10") === 3.6`) and both no-throw cases (`"UNKNOWN"` and `undefined`), so the test actually exercises the contradiction-resolution, not a superficial happy path.
+
+**No spec-matches-code reversal:** the spec turn's resolution (reject Requirement 2, reject Requirement 4) was written before the handler existed and the final code matches it with no discrepancy requiring the spec to be rewritten afterward.
+
+**Verdict:** Held up. The skill's discipline correctly generalizes from "no spec, must create one" (Run 1) to "a spec exists but is internally broken, must detect and explicitly resolve rather than silently implement an inconsistent mix" (Run 2) — the specific failure mode this run targeted (silently picking one arm of a contradiction without acknowledging it, or worse, implementing an incoherent blend) did not occur. No gaps found; promoting to `verified` per `evals/README.md`'s bar (two genuinely differently-shaped scenarios).

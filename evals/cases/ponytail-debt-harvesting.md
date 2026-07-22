@@ -28,10 +28,14 @@ create.
 
 ## Trust level
 
-`provisional` — passed the format-extraction and DEBT.md-creation checks (see Run log); ceiling-hit,
-approaching-ceiling, and debt-decay/staleness checks weren't exercised (this fixture's 3 shortcuts
-are all fresh, by design, to test the create-from-nothing path specifically), and no negative case
-has been run. Corrected 2026-07-20 from `authored, pending first run`.
+`provisional` — as of Run 2 (2026-07-22), all 5 documented checks (format extraction, ceiling-hit,
+approaching-ceiling, debt-decay/staleness, and DEBT.md creation/reconciliation) have each been
+exercised at least once across Run 1 (create-from-nothing) and Run 2 (reconcile-existing, ceiling
+states), all passing with no bugs found in the skill's instructions. Still `provisional`, not
+`verified`, because both runs are positive cases and `evals/README.md`'s trust-level bar requires at
+least one negative case (confirming the skill correctly does *nothing* — no invented debt, no
+false-flagged shortcuts — when there's nothing real to harvest); that scenario hasn't been run yet.
+Corrected 2026-07-20 from `authored, pending first run`.
 
 ## Run log
 
@@ -54,3 +58,33 @@ process. Independently verified by reading the file the subagent wrote.
 DEBT.md" path; the ceiling-hit/approaching/stale paths need a differently-shaped fixture (like
 `debt-ledger.md`'s, which does have those states) for a future run — logged as an open gap, not
 silently claimed.
+
+### Run 2 — 2026-07-22 — positive case, reconcile-existing-DEBT.md path (ceiling-hit / approaching / stale)
+
+Built a scratch fixture (`setup-ponytail-run2.sh`, kept in scratch, not committed to `evals/fixtures/`)
+deliberately shaped opposite to Run 1: a **pre-existing, out-of-sync** `DEBT.md` with 3 entries, all
+still marked `OPEN`/no Hit Date, plus a checked-in `data/current-metrics.json` giving real current
+values to compare each shortcut's ceiling against, and all 3 `// minimal:` comments/DEBT.md rows
+git-committed 2026-02-10 (~5.4 months before the eval's "today," 2026-07-22) so staleness is real,
+not asserted. Then acted as the fresh, un-briefed subagent (given only the SKILL.md and the fixture
+path) and ran the harvest process by hand, updating `DEBT.md` in place; independently re-verified
+afterward by re-reading the written file fresh and cross-checking every claim against
+`data/current-metrics.json`, `git log --date=short` on each file, and the system clock (not trusting
+the harvest step's own report).
+
+| Check | Result |
+|---|---|
+| Correctly identifies `// minimal:` format | **Pass** — ceiling + upgrade path extracted correctly from all 3 comments (carried over from Run 1's fixture shape, unchanged here) |
+| Correctly identifies ceiling hits | **Pass** — `concurrentUsers: 520` vs. `>500 concurrent users` ceiling correctly flagged `HIT`, with Hit Date set to today (2026-07-22, confirmed against `date -u`) rather than left blank — independently confirmed by reading the metrics file and the written `DEBT.md` row side by side |
+| Correctly identifies approaching ceiling | **Pass** — `totalUsers: 850` vs. `>1000 users` ceiling is 85%, correctly flagged `APPROACHING` (past the documented 80% threshold) while correctly left short of `HIT` — independently confirmed via the same cross-check |
+| Correctly creates DEBT.md entries | **Pass (reconcile variant)** — this run's DEBT.md already existed, so the check here is that the harvest step updated the existing table in place (same 3 rows, same IDs/locations) rather than duplicating or recreating it; confirmed by diffing the row count and IDs before/after |
+| Correctly applies debt decay rules | **Pass** — D3 (`spamFilter.js`, marked 2026-02-10) correctly flagged `STALE` for being well past one release cycle with no review — independently confirmed via `git log --date=short` on the file. Bonus finding, not in the original expectations table: the harvest step also caught that D3's own ceiling ("accuracy matters") is unmeasurably vague per the skill's own anti-pattern list ("a `// minimal:` comment with no realistic ceiling"), and recommended a concrete numeric ceiling instead of silently letting the vague comment ride — a real instance of the skill's anti-rationalization guidance being applied, not just its mechanical table format |
+
+5 of 5 checks now exercised across Run 1 + Run 2 combined, all passed, with no bugs found in the
+skill's instructions. This closes the ceiling-hit/approaching/stale gap Run 1 left open. **Not**
+promoting to `verified` yet, though: both runs so far are positive cases (the skill correctly acting
+on real debt); `evals/README.md`'s trust-level definition requires "at least one negative case
+(confirming the skill correctly does *nothing* when it shouldn't act)" — e.g. a fixture with clean,
+unremarkable code and zero `// minimal:` comments, confirming the harvest step doesn't invent debt
+or false-flag ordinary shortcuts. That negative case is still open; leaving Trust level at
+`provisional` rather than overclaiming.
