@@ -349,6 +349,53 @@ generic multi-harness generator, and building speculative infrastructure for har
 real dogfood/founder-reported friction would repeat the exact unverified-breadth pattern
 `engineering-minimalism` already warns against and this project has declined every time it's come up.
 
+## 8d. Verification against 2026 Claude Code platform/community conventions (2026-07-22)
+
+On explicit request, ran a broader check than §8c's multi-harness-portability scope: whether
+Wingman's own plugin mechanics (skill frontmatter, `hooks.json` event coverage, manifest fields,
+version/release hygiene) are current with 2026 Claude Code platform conventions, via parallel web
+research cross-checked directly against the real repo before treating anything as a gap.
+
+**Already correct, no action needed** (checked, not skipped):
+- Subagent orchestration: the Boardroom's parallel fan-out + documented sequential fallback (§8a)
+  already matches the "focused parallel agents over one generalist" pattern found.
+- SKILL.md length: longest file is 374 lines (`subagent-driven-development`), well under the
+  "extract to `references/` past ~500 lines" guidance — already this project's own convention.
+- MCP server security guidance: not applicable — Wingman ships no MCP server of its own.
+- `plugin.json`/`marketplace.json` already carry every documented recommended field (name,
+  description, version, author, license, keywords, category, tags, source).
+- Hook performance/matcher-narrowness guidance (keep `PreToolUse` fast, match narrowly): confirmed
+  already true of `hooks.json`'s existing per-tool matcher scoping.
+
+**Gap found and fixed**: `version-gate.yml` diffed `plugin.json`'s `version` field against the PR
+base but never cross-checked `CHANGELOG.md` at all — a version bump with no matching `## [x.y.z]`
+entry passed CI silently. Fixed by adding `scripts/check-changelog-entry.mjs` (pure
+`hasChangelogEntry(text, version)` function + thin CLI, same shape as
+`check-harness-adapter-drift.mjs`) as a second `version-gate` step.
+
+**Gap investigated, confirmed untestable in this environment, deliberately not built on**:
+whether a `SubagentStop` hook (one of the ~27-30 documented 2026 hook events; `hooks.json` wires
+only 6: `SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`, `UserPromptSubmit`, `PreCompact`)
+fires usefully for `Task`/`Agent`-dispatched subagents, which would matter given the Boardroom's
+own subagent-dispatch-centric design. Direct investigation of this session's own configuration
+(`.claude/settings.json`, `.claude/settings.local.json`) showed hook wiring is loaded once at
+session/subagent start — a hook can't be registered and exercised live mid-session, and this
+dev-repo session isn't even running with `plugins/wingman/hooks/hooks.json` active in the first
+place (only the repo's own `SessionStart` dev hook is wired). Verifying `SubagentStop`'s real
+firing behavior/payload would require a fresh session pre-configured with a throwaway hook before
+launch — out of scope for a same-session research spike. Per this project's own "don't guess about
+untested platform behavior" discipline (the same reasoning that governed the earlier Codex CLI
+`hooks.json` matcher-name decision), no `SubagentStop` hook is built on this unconfirmed premise.
+Revisit if a future session can run the live test, or if a founder/dogfood run surfaces a concrete
+need the existing post-hoc `checkVerdictTranscriptionMatchesDetails` (G14) check doesn't cover.
+
+**Gap checked and confirmed non-existent**: whether any of Wingman's 40 `SKILL.md` files would
+benefit from the `allowed-tools`, `disable-model-invocation`, or `context` frontmatter fields.
+Direct grep confirms zero current usage of any of the three across all 40 skill files. All of
+Wingman's skills are designed to auto-fire off `description` matching by intent (no side-effect
+workflow that needs to suppress auto-invocation) and none pre-approve a narrow, fixed tool set
+distinct from the agent's own — so the honest result is a confirmed non-gap, not an oversight.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 16 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
