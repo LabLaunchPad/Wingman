@@ -14,11 +14,38 @@ load, it's more likely an API detail this research missed than a made-up feature
   copied faithfully — that content is harness-agnostic prose, so this is the highest-confidence part
   of this adapter.
 - `.codex/hooks.json` — only the git-push safety gate, which keys on command-text pattern-matching
-  (`git push`), not a harness-specific tool name. Deliberately excludes two things, both explained
-  inline in the file's own comments: the `secret-guard.mjs` Write/Edit-matcher path (Codex's actual
-  tool-name strings for file edits weren't confirmed by research) and the `boardroom-checkpoint.mjs`
-  plan-approval gate (Codex CLI has no plan-mode tool to gate — it uses `approval_policy` instead;
-  this is a genuine capability gap, not an oversight).
+  (`git push`), not a harness-specific tool name. Deliberately excludes the `boardroom-checkpoint.mjs`
+  plan-approval gate: Codex CLI has no plan-mode tool to gate — it uses `approval_policy` instead;
+  this is a genuine capability gap, not an oversight. See "2026-07-22 research update" below for
+  what changed on the `secret-guard.mjs` Write/Edit path.
+
+## 2026-07-22 research update — Bash matcher confirmed, Write/Edit matcher partially confirmed
+
+A follow-up platform-conventions audit fetched OpenAI's official Codex hooks reference
+(`learn.chatgpt.com/docs/hooks`, redirected from `developers.openai.com/codex/hooks`) directly,
+resolving two things this adapter previously flagged as unconfirmed:
+
+- **The `Bash` matcher is now confirmed, not a guess.** The official docs state PreToolUse/
+  PostToolUse intercept "Bash, file edits performed through `apply_patch`, MCP tool calls, and
+  other local function tools" — `Bash` is a real, documented tool name.
+- **The Write/Edit matcher shape is now confirmed, but the payload field name still isn't.** The
+  same docs confirm matcher values `apply_patch`, `Edit`, or `Write` all work for the file-edit hook
+  path — the hook input's own `tool_name` field always reports `apply_patch` regardless of which
+  matcher value is configured. That resolves this adapter's original blocker (unconfirmed tool-name
+  strings). What's still unconfirmed: the exact JSON field name inside `apply_patch`'s `tool_input`
+  that holds the actual patch/diff content — the equivalent of Claude Code's
+  `toolInput.content`/`toolInput.new_string` that `secret-guard.mjs`'s `decide()` function scans.
+  Wiring `secret-guard.mjs` against a guessed field name risks a hook that runs on every file edit
+  but never actually matches anything — silently worse than not porting it at all, per this
+  project's own standing engineering discipline. **Concrete next step, not attempted here**: a live
+  Codex CLI session's own `/hooks` audit log would show the real payload shape in one inspection.
+- **Left genuinely unresolved — conflicting sources**: whether Codex hooks are enabled by default.
+  The official docs say hooks are on by default, with `[features] hooks = false` in `config.toml`
+  to disable them (`codex_hooks` is called out as a deprecated alias for the same flag). A
+  third-party cheatsheet claimed the opposite — an opt-in `codex_hooks = true` flag, with silent
+  no-ops otherwise. Official docs are treated as authoritative here, but this specific point hasn't
+  been confirmed against a live install either, so treat it as the one open question before relying
+  on this adapter's hooks firing at all.
 
 ## Install
 
