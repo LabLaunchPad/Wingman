@@ -13,7 +13,7 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `jnuyens/gsd-plugin` | MIT | `/wingman:secure` threat-gate pattern, `/wingman:ship` preflight pattern, state-store design reference — **implemented** in `commands/secure.md` as the `CLOSED`/`OPEN` threat register that blocks advancement while `threats_open > 0` |
 | `affaan-m/ECC` | MIT (Affaan Mustafa) | `/wingman:evolve` and `/wingman:secure` checklist shape |
 | `anthropics/claude-plugins-official` | Apache-2.0 | Immutable-slug convention, LLM-as-gate-reviewer validation |
-| `wshobson/agents` | MIT (Seth Hobson) | Doc-index discipline, agent-name-uniqueness convention, severity-tier findings model |
+| `wshobson/agents` | MIT (Seth Hobson) | Doc-index discipline, agent-name-uniqueness convention, severity-tier findings model; its `make garden` drift/dead-link detector concept — **implemented** in `plugins/wingman/scripts/check-harness-adapter-drift.mjs` as a structural (not prose-diff) consistency check between the canonical `boardroom-*.md` agents and their hand-authored Codex CLI/OpenCode translations |
 | `davila7/claude-code-templates` | MIT (Daniel Ávila) | Studied as anti-pattern reference; `owasp-security` skill as future `/wingman:secure` content source |
 | `VoltAgent/awesome-claude-code-subagents` | MIT | Studied as anti-pattern reference; category-as-plugin packaging idea |
 | `Leonxlnx/taste-skill` | MIT | `design-taste` — countable-rule checklist discipline |
@@ -39,6 +39,7 @@ request to study its hook design and apply a reusable principle to Wingman's own
 | `jeremylongshore/claude-code-plugins-plus-skills` | MIT (Jeremy Longshore) | Same correction as above — browsed-only, large plugin/skill catalog used as a coverage-breadth cross-check for the GAPS mining loop |
 | `ComposioHQ/awesome-claude-skills` | MIT (Composio) | Same correction as above — browsed-only, curated index used as a discovery source for the curated founder-lens mining loop |
 | `avelikiy/great_cto` | MIT (Anton Velikiy) | Same correction as above — browsed-only, CTO-advisory persona model used as design inspiration for `founder-cfo`/`founder-cmo`/`founder-cro` business-advisory skills (G7) |
+| `fusengine/harness` | Not verified in this pass (fetched web content only, no LICENSE file reviewed) — attribution recorded on a design-principle basis regardless | Studied on explicit request as a real-world example of the "pure policy core + thin per-harness adapters" architecture (its `src/policy/` harness-agnostic guards vs. `src/adapters/{claude,codex,cursor,...}/` translation layers). Confirmed Wingman already follows this same discipline (`dod-structural-gate.mjs`'s pure exported functions vs. `dod-pre-push-check.mjs`'s thin CLI wrapper) — no new architecture adopted from it, but it independently corroborates the pattern `fivetaku/fablize` also confirmed. |
 
 ## Per-file adaptation record
 
