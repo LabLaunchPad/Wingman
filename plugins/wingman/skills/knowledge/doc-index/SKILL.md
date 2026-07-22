@@ -1,6 +1,7 @@
 ---
 name: doc-index
 description: Use when adding, promoting, or auditing Wingman documentation or reference material — keep a discoverable documentation index so every doc/reference is cross-linked from an owning command/skill/agent and nothing becomes an orphaned "dead doc." Adapted from wshobson/agents' doc-index discipline.
+effort: low
 ---
 
 <!--

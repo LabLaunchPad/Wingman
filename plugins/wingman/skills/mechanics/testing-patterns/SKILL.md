@@ -1,6 +1,7 @@
 ---
 name: testing-patterns
 description: Use when writing or reviewing tests in /wingman:build or any department-lead work — follow AAA structure, mock at boundaries, and target meaningful coverage (>=80% on changed paths). The testing bar, not a formality.
+effort: low
 ---
 
 <!--

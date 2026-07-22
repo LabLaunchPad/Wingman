@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.35] - 2026-07-22
+
+### Changed
+- **`plugins/wingman/skills/{mechanics/package-manager-selection,mechanics/testing-patterns,knowledge/doc-index,knowledge/token-economy}/SKILL.md`** — added `effort: low` frontmatter to four mechanical, checklist-shaped skills, per 2026 research into Claude Code's per-skill effort tiering (a token/latency-saving hint, no behavior change). `governance/security-checklist` was considered and deliberately excluded — its own description frames it as "a concrete risk hunt, not a generic checklist recitation," so tiering it down would work against its stated purpose.
+- Repo-root `AGENTS.md` is now the canonical file (absorbing `CLAUDE.md`'s former content) and `CLAUDE.md` is a symlink to it, aligning with the AGENTS.md open standard's own convention (donated to the Linux Foundation's Agentic AI Foundation, December 2025) and a real multi-harness precedent (`wshobson/agents`). Dev-repo-only doc reorganization — no shipped-surface behavior change. See `docs/ARCHITECTURE.md` §8a for the accompanying re-confirmation that execution-level multi-harness portability stays out of scope, and why.
+
 ## [0.5.34] - 2026-07-22
 
 ### Fixed
