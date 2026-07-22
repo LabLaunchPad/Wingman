@@ -525,6 +525,17 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
     assert.strictEqual(decide('Edit', { new_string: 'AKIA' + 'B'.repeat(16) }).decision, 'deny');
   });
 
+  // Real /wingman:audit finding: the old sk-[A-Za-z0-9]{20,} pattern (comment claimed it covered
+  // "OpenAI / Anthropic-style keys") never actually matched a real Anthropic key shape, which is
+  // hyphen-delimited (sk-ant-api03-<...>-<...>). This must catch a bare key with no
+  // ANTHROPIC_API_KEY= prefix around it (the existing test above only covers the prefixed case,
+  // which was already caught by a separate, unrelated pattern).
+  it('secret-guard decide(): catches a bare Anthropic-shaped key with no env-var prefix', async () => {
+    const { decide } = await import(pathToFileURL(secretPath).href);
+    const bareKey = 'sk-ant-api03-' + 'A'.repeat(20) + '-' + 'B'.repeat(20);
+    assert.strictEqual(decide('Write', { content: `const key = "${bareKey}";` }).decision, 'deny');
+  });
+
   it('stop-loop evaluate(): unit', async () => {
     const { evaluate } = await import(pathToFileURL(stopPath).href);
     assert.strictEqual(evaluate(null, '').decision, 'stop');
@@ -1236,5 +1247,61 @@ describe('DoD Gate — Test Presence for Behavior-Split Suites', () => {
     );
     const missing = checkTestPresence(tempDir2, ['src/untested.js']);
     assert.deepStrictEqual(missing, ['src/untested.js']);
+  });
+});
+
+// ============================================================================
+// OKF Export — Wipe-Target Safety (real /wingman:audit finding: assertSafeToWipe
+// only refused the filesystem root and the user's home directory exactly, so
+// --out equal to --project-dir silently wiped the entire project via rmSync
+// before writing the bundle -- reproduced directly against a scratch project
+// directory before being fixed).
+// ============================================================================
+
+describe('OKF Export — Wipe-Target Safety', () => {
+  const okfExportPath = path.join(process.cwd(), 'plugins', 'wingman', 'scripts', 'okf-export.mjs');
+  const tempDir3 = path.join(process.cwd(), '.test-temp-okf-export');
+
+  beforeEach(() => {
+    if (fs.existsSync(tempDir3)) fs.rmSync(tempDir3, { recursive: true, force: true });
+    fs.mkdirSync(path.join(tempDir3, 'proj', '.wingman'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir3, 'proj', 'important-stuff'), { recursive: true });
+    fs.writeFileSync(path.join(tempDir3, 'proj', 'important-stuff', 'data.txt'), 'do not delete me\n');
+    fs.writeFileSync(path.join(tempDir3, 'proj', '.wingman', 'checkpoints.jsonl'), '{}\n');
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(tempDir3)) fs.rmSync(tempDir3, { recursive: true, force: true });
+  });
+
+  it('refuses to run when --out equals --project-dir, and does not touch the project', () => {
+    const projectDir = path.join(tempDir3, 'proj');
+    const res = spawnSync('node', [okfExportPath, '--project-dir', projectDir, '--out', projectDir], {
+      encoding: 'utf-8',
+    });
+    assert.notStrictEqual(res.status, 0, 'must refuse rather than wipe the project directory');
+    assert.match(res.stderr, /refusing to wipe/i);
+    assert.ok(
+      fs.existsSync(path.join(projectDir, 'important-stuff', 'data.txt')),
+      'the project\'s real files must survive a rejected --out'
+    );
+  });
+
+  it('refuses to run when --out is an ancestor of --project-dir', () => {
+    const projectDir = path.join(tempDir3, 'proj');
+    const res = spawnSync('node', [okfExportPath, '--project-dir', projectDir, '--out', tempDir3], {
+      encoding: 'utf-8',
+    });
+    assert.notStrictEqual(res.status, 0);
+    assert.match(res.stderr, /refusing to wipe/i);
+    assert.ok(fs.existsSync(path.join(projectDir, 'important-stuff', 'data.txt')));
+  });
+
+  it('still succeeds with the normal default --out (nested under .wingman/)', () => {
+    const projectDir = path.join(tempDir3, 'proj');
+    const res = spawnSync('node', [okfExportPath, '--project-dir', projectDir], { encoding: 'utf-8' });
+    assert.strictEqual(res.status, 0, res.stderr);
+    assert.ok(fs.existsSync(path.join(projectDir, '.wingman', 'okf-export', 'index.md')));
+    assert.ok(fs.existsSync(path.join(projectDir, 'important-stuff', 'data.txt')));
   });
 });

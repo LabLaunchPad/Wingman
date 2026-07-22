@@ -5,7 +5,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Define
 
-The second of Wingman's 7 planning stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
+The second of Wingman's 5 planning stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
 
 $ARGUMENTS
 

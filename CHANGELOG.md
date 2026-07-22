@@ -2,6 +2,17 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.31] - 2026-07-22
+
+### Fixed
+- **`plugins/wingman/scripts/okf-export.mjs`** — found by a `/wingman:audit` pass: `assertSafeToWipe` only refused the filesystem root and the user's home directory exactly, so `--out` equal to (or an ancestor of) `--project-dir` silently wiped the entire project via `rmSync` before writing the bundle. Reproduced directly (a real file was deleted from a scratch project) before fixing. Now also refuses when `--out` resolves to the project directory or any of its ancestors.
+- **`plugins/wingman/hooks/secret-guard.mjs`** — the Anthropic-key pattern (`sk-[A-Za-z0-9]{20,}`) never matched a real Anthropic key's actual hyphen-delimited shape (`sk-ant-api03-<...>-<...>`) despite the inline comment claiming coverage. Added a dedicated pattern; verified with a constructed real-shaped key.
+- **`plugins/wingman/commands/pipeline/{discovery,define,architecture,uxflow}.md`** — each said "Nth of Wingman's 7 planning stages," but only 5 of the 7 total pipeline stages are planning stages (build/ship are execution, not planning); `implementation-planning.md` already correctly said 5. Corrected the other four.
+- **`docs/PROJECT.md`** — its own "live count" pointer had drifted within 4 days of being written (said 68 cases/68 verified/0 provisional "as of 2026-07-18"; live was 70/54/16). Corrected and reworded to stop implying a snapshot number would stay current.
+
+### Added
+- New regression tests in `tests/hooks-integration/hooks-integration.test.mjs`: "OKF Export — Wipe-Target Safety" (3 tests) and a bare-Anthropic-key test for `secret-guard`'s `decide()`.
+
 ## [0.5.30] - 2026-07-21
 
 ### Fixed

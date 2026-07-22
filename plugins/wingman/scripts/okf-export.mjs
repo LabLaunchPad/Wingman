@@ -26,15 +26,21 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 // Guards the --out target before it's ever passed to rmSync({recursive:true,
-// force:true}): refuses the filesystem root and the user's home directory
-// exactly (a typo'd or empty --out resolving to one of these would otherwise
-// silently wipe it).
-function assertSafeToWipe(dir) {
+// force:true}): refuses the filesystem root, the user's home directory, the
+// project directory itself, and any ancestor of the project directory (a
+// real bug found by a /wingman:audit pass: --out equal to --project-dir
+// silently wiped the entire project before writing the bundle -- confirmed
+// by actually reproducing it against a scratch project directory).
+function assertSafeToWipe(dir, projectDir) {
   const resolved = resolve(dir);
   const root = resolve(sep);
   const home = resolve(homedir());
+  const project = resolve(projectDir);
   if (resolved === root || resolved === home) {
     throw new Error(`okf-export: refusing to wipe ${resolved} — refine --out to a project-scoped path`);
+  }
+  if (resolved === project || project === resolved || project.startsWith(resolved + sep)) {
+    throw new Error(`okf-export: refusing to wipe ${resolved} — it is the project directory (or an ancestor of it); use a path nested inside the project instead`);
   }
 }
 
@@ -237,7 +243,7 @@ function exportBundle(projectDir, outDir) {
     ...readMemoryFile(projectDir, entry.source),
   })).filter((entry) => entry.exists);
 
-  assertSafeToWipe(outDir);
+  assertSafeToWipe(outDir, projectDir);
   rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
 
