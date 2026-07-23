@@ -24,7 +24,19 @@ A minimal plan with 3 independent tasks: (1) create a `greet` function, (2) crea
 
 ## Trust level
 
-`provisional` — Run 1 confirmed the core mechanism (fresh subagent per task, review gates, ledger, final broad review, no context pollution), with a disclosed caveat that one review dispatch's async timing wasn't confirmed synchronously. Run 2 (2026-07-22) added a genuinely differently-shaped scenario — a subagent's work correctly REJECTED and sent back for fix + re-review, not just the happy path — independently verified against real files/git history. Run 1's async-timing caveat remains **open**: Run 2's environment had no tool capable of reproducing or probing it, and Run 2 itself used inline role-construction rather than real nested subagent dispatch (documented in its entry), so the isolation guarantee wasn't independently re-confirmed this time. Staying `provisional` rather than promoting to `verified` until a run in an environment with a real backgroundable `Agent`/`Task` dispatch tool closes the async gap. Corrected 2026-07-20 from a `verified` label the run log doesn't actually support (see `FIXLOG.md` T1) — do not repeat that mistake.
+`verified` — Run 3 (2026-07-22) closed the specific gap Run 1 and Run 2 both left open: this
+session's environment does have a real backgroundable `Agent` dispatch tool, and a fresh sequential
+2-task run explicitly waited for each background reviewer's completion notification before
+dispatching the next task — the exact synchronous review-gate discipline Run 1's environment
+couldn't confirm. Independently verified (not the subagents' self-reports): the real git commit
+order (`a5b80d0` implement Task 1 → reviewer dispatched and returned `APPROVED` → `bf2f06e` Task 2
+brief only added *after* that → `22125d9` implement Task 2 → reviewer `APPROVED` → ledger updated →
+final review `APPROVED`), and `node --test` re-run directly showing 10/10 passing. Combined with
+Run 1 (core mechanism, 3-task happy path) and Run 2 (reject/fix/re-review loop, a genuinely
+different shape), this is now 3 differently-shaped, independently-verified scenarios. Promoted from
+`provisional`. Corrected 2026-07-20 from a `verified` label the run log didn't actually support at
+the time (see `FIXLOG.md` T1) — this promotion is not a repeat of that mistake: the specific named
+gap is closed with direct evidence, not asserted.
 
 ## Run log
 
@@ -74,3 +86,60 @@ Ran as described: acted as the fresh subagent given only the skill file and a fi
 2. **This run used inline construction, not real nested subagent dispatch**, per the task's own documented fallback (no `Agent`/`Task`-style tool was available to this session). Unlike Run 1 — where three separate real subagent processes were dispatched via an `Agent` tool and independently returned verdicts — every role here (implementer, reviewer, fixer, final reviewer) was played by the same orchestrating context in sequence. The rejection/redo *process logic* was genuinely exercised and independently checked against real files/git history, but the *context-isolation* guarantee the skill relies on (a subagent that literally cannot see the other roles' reasoning) was not independently re-confirmed by this run — Run 1 already established that separately and this run did not need to re-litigate it.
 
 **Trust-level decision:** given (1) is unresolved and (2) is a real methodological gap (no true nested dispatch this run), Trust level stays `provisional` rather than promoting to `verified`. This run adds real, independently-checked evidence for a new discipline (the reject/redo loop) but does not close the specific caveat the prior `provisional` label was conditioned on, so promoting now would repeat the exact mistake `FIXLOG.md` T1 already corrected once (a trust label the run log doesn't actually support). A future Run 3 in an environment with a real backgroundable `Agent`/`Task` dispatch tool is still needed to close the async gap before this case can honestly promote to `verified`.
+
+### Run 3 — 2026-07-22 — closing the async-review-timing gap with a real backgroundable dispatch tool
+
+**Goal:** this session's environment (unlike Run 2's) exposes a real `Agent` tool with
+`run_in_background: true`. Test whether the skill's required sequencing — dispatch reviewer, then
+*wait* for its verdict before advancing — actually holds when a real background dispatch tool is
+available, closing the specific gap named as open in both Run 1 and Run 2.
+
+**Scenario:** a fresh scratch git repo (`/tmp/wingman-eval-sdd-run3/repo/`) with a 2-task plan
+(`sum(a, b)`, `product(a, b)`, both with a binding Global Constraint: `TypeError` on non-number
+input, no silent coercion, no external dependencies).
+
+**Execution, with explicit wait-for-review discipline enforced at each step:**
+1. Dispatched a background implementer for Task 1 only (brief-scoped, no plan/history access).
+   Waited for its completion notification before touching anything else.
+2. Independently verified Task 1's real commit (`a5b80d0`) and re-ran tests myself before
+   proceeding — did not trust the implementer's self-report alone.
+3. Dispatched a background reviewer for Task 1. **Did not create Task 2's brief or dispatch
+   anything for Task 2 until the reviewer's completion notification arrived** — verdict:
+   `APPROVED`, written to a real file (`task-1-review.md`), independently confirmed present and
+   matching the self-report before advancing.
+4. Only then added Task 2's brief and dispatched Task 2's implementer (background), again waiting
+   for its notification and independently verifying the real commit (`22125d9`) and tests before
+   proceeding.
+5. Dispatched Task 2's reviewer (background), again waiting for its notification before touching
+   the ledger — verdict `APPROVED`, independently confirmed.
+6. Updated `.wingman/sdd/progress.md` only after both tasks' reviews had genuinely returned.
+7. Dispatched the final whole-branch reviewer (background) with the full plan + full diff — the one
+   point where reading everything is correct per the skill. Verdict `APPROVED`.
+
+**Independent verification performed at every step** (not any subagent's self-report alone): real
+`git log --oneline` inspected after each stage to confirm commit order matched the claimed
+sequence; `node --test` re-run directly by me after Task 1, after Task 2, and again after the final
+review (10/10 passing, matching all self-reports); all 6 written review/report files
+(`task-1-report.md`, `task-1-review.md`, `task-2-report.md`, `task-2-review.md`, `progress.md`,
+`final-review.md`) read directly and cross-checked against the actual diffs, not just their prose
+claims.
+
+**Result — the specific named gap is closed:** the git commit history itself is direct evidence
+that Task 2's brief was not created (and Task 2 was not dispatched) until *after* Task 1's reviewer
+notification had returned `APPROVED` — this is not asserted from memory, it's structurally visible
+in the commit order (`a5b80d0` implement → reviewer runs → `bf2f06e` Task 2 brief only appears
+after). This is the exact synchronous review-gate behavior Run 1's environment could not confirm
+(its Task 1 reviewer was dispatched in background mode and its verdict did not return before Task 2
+started) and Run 2's environment could not even attempt (no dispatch tool existed at all).
+
+**One non-blocking finding, not a defect:** the final reviewer noted `NaN` passes both functions'
+`typeof === 'number'` guard (e.g. `sum(NaN, 1)` returns `NaN` rather than throwing). This is
+consistent with the plan's Global Constraint as literally written ("non-number input" — `NaN`'s
+`typeof` is `"number"`) and wasn't in either task's brief; noted for a possible future iteration,
+not a bug in this run.
+
+**Trust-level decision:** this closes the one specific, named gap both prior `provisional` labels
+were conditioned on. Combined with Run 1 (core mechanism, 3-task happy path, real nested dispatch)
+and Run 2 (reject/fix/re-review loop, a genuinely different shape), this case has now passed 3
+differently-shaped scenarios, each independently verified against real files/git history rather
+than trusted from self-report. Promoted to `verified`.
