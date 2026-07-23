@@ -113,8 +113,16 @@ export function evaluateCheckpoint(inlinePlanText, cwd) {
 
 // OpenCode plugin export. Shape per https://opencode.ai/docs/config/ and public plugin-development
 // references (a plugin module exports an async function receiving the app context, returning a
-// hooks object) -- NOT confirmed against a live install. `plan_exit` as the matched tool name is
-// per OpenCode's documented plan/build-mode workflow (see this adapter's README).
+// hooks object). Updated 2026-07-23: this file's registration is now confirmed against a real, live
+// OpenCode install (v1.18.4) -- `opencode debug config`'s resolved output lists this exact file
+// under its top-level `plugin` array, confirming the export shape loaded without error. The
+// `tool.execute.before` hook name and `plan_exit` as the matched tool name are both independently
+// confirmed against real sources (not just this project's own research): `tool.execute.before` is
+// a documented OpenCode plugin hook, and `plan_exit` is referenced as a real tool name in a live
+// OpenCode GitHub issue (anomalyco/opencode#18515, "subagents can trigger plan_exit"). What remains
+// unverified: this hook actually firing end-to-end during a real plan-mode session -- that needs a
+// configured model provider/API key, which this sandbox does not have, so the throw-on-reject path
+// has never been observed live, only confirmed to be registered and syntactically/structurally sound.
 export const WingmanGatePlugin = async ({ directory }) => {
   return {
     'tool.execute.before': async (input, output) => {

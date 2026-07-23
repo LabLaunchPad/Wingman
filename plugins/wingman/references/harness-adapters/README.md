@@ -18,19 +18,27 @@ Every artifact in this directory carries one of these labels, matching this proj
 a `verified` status with no real evidence):
 
 - **built + tested** — created and confirmed working in this repo's own sandbox.
+- **structurally verified (live install)** — confirmed against a real, installed instance of the
+  target harness that the artifact is discovered, parsed, loaded, and (where applicable) its policy
+  is enforced — but no live model inference was run (no configured API key/model provider), so
+  behavioral/output-level correctness is still unconfirmed.
 - **authored, unverified** — a faithful, best-effort translation checked against public
-  documentation, but never run against a live install of the target harness (neither harness is
-  installed in the Wingman dev sandbox this was built in).
+  documentation, but never run against a live install of the target harness.
 - **not attempted, documented why** — deliberately skipped, with the concrete reason stated inline
   rather than silently omitted.
 
 ## What's here
 
-- `codex-cli/` — Boardroom seat personas (8, **authored, unverified**) + a narrow hooks.json subset
-  for the git-push gate (**authored, unverified**) + install/usage notes.
-- `opencode/` — Boardroom seat personas (8, **authored, unverified**) + a real code port of the
-  `boardroom-checkpoint.mjs` plan-approval gate as an OpenCode plugin (**authored, unverified**, but
-  its core decision logic is a direct, faithful port — see the file itself) + install/usage notes.
+- `codex-cli/` — Boardroom seat personas (8, **authored, unverified** — directory convention and
+  field schema independently confirmed correct against official docs, but no Codex CLI account
+  exists in this sandbox to confirm the files are actually recognized at runtime) + a narrow
+  hooks.json subset for the git-push gate (**authored, unverified**) + install/usage notes.
+- `opencode/` — Boardroom seat personas (8, **structurally verified (live install)** as of
+  2026-07-23 — `opencode agent list`/`debug config`/`debug agent` all confirm real discovery,
+  parsing, and permission enforcement) + a real code port of the `boardroom-checkpoint.mjs`
+  plan-approval gate as an OpenCode plugin (**structurally verified (live install)** — confirmed
+  registered in the resolved plugin config; its hook name and matched tool name are both
+  independently confirmed against real sources) + install/usage notes.
 - The single **built + tested** artifact from this investment isn't harness-specific at all:
   `plugins/wingman/scripts/install-git-hooks.mjs`, which wires the existing
   `dod-pre-push-check.mjs` up as a real `.git/hooks/pre-push` hook. That fires under any coding
