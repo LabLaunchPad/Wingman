@@ -46,5 +46,8 @@ Hand off directly to `/wingman:define` — do not stop and wait for approval her
 
 ## References
 
+- `references/org-template/README.md` — the project-type catalog consulted in Step 1, and the two
+  other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/knowledge/memory`
+  draws on.
 - `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
