@@ -28,13 +28,12 @@ create.
 
 ## Trust level
 
-`provisional` — as of Run 2 (2026-07-22), all 5 documented checks (format extraction, ceiling-hit,
-approaching-ceiling, debt-decay/staleness, and DEBT.md creation/reconciliation) have each been
-exercised at least once across Run 1 (create-from-nothing) and Run 2 (reconcile-existing, ceiling
-states), all passing with no bugs found in the skill's instructions. Still `provisional`, not
-`verified`, because both runs are positive cases and `evals/README.md`'s trust-level bar requires at
-least one negative case (confirming the skill correctly does *nothing* — no invented debt, no
-false-flagged shortcuts — when there's nothing real to harvest); that scenario hasn't been run yet.
+`verified` — as of Run 3 (2026-07-22), all 5 documented checks have been exercised across Run 1
+(create-from-nothing) and Run 2 (reconcile-existing, ceiling states), all passing with no bugs
+found in the skill's instructions, and Run 3 closes the negative case `evals/README.md`'s
+trust-level bar requires: a genuinely clean codebase (zero `// minimal:` markers, no existing
+`DEBT.md`) correctly produced no fabricated debt — independently confirmed no `DEBT.md` was
+created and the source files were left untouched, not just asserted by the subagent's own report.
 Corrected 2026-07-20 from `authored, pending first run`.
 
 ## Run log
@@ -81,10 +80,25 @@ the harvest step's own report).
 | Correctly applies debt decay rules | **Pass** — D3 (`spamFilter.js`, marked 2026-02-10) correctly flagged `STALE` for being well past one release cycle with no review — independently confirmed via `git log --date=short` on the file. Bonus finding, not in the original expectations table: the harvest step also caught that D3's own ceiling ("accuracy matters") is unmeasurably vague per the skill's own anti-pattern list ("a `// minimal:` comment with no realistic ceiling"), and recommended a concrete numeric ceiling instead of silently letting the vague comment ride — a real instance of the skill's anti-rationalization guidance being applied, not just its mechanical table format |
 
 5 of 5 checks now exercised across Run 1 + Run 2 combined, all passed, with no bugs found in the
-skill's instructions. This closes the ceiling-hit/approaching/stale gap Run 1 left open. **Not**
-promoting to `verified` yet, though: both runs so far are positive cases (the skill correctly acting
-on real debt); `evals/README.md`'s trust-level definition requires "at least one negative case
-(confirming the skill correctly does *nothing* when it shouldn't act)" — e.g. a fixture with clean,
-unremarkable code and zero `// minimal:` comments, confirming the harvest step doesn't invent debt
-or false-flag ordinary shortcuts. That negative case is still open; leaving Trust level at
-`provisional` rather than overclaiming.
+skill's instructions. This closes the ceiling-hit/approaching/stale gap Run 1 left open. Not yet
+promoted after this run: both Run 1 and Run 2 are positive cases; the negative case below closes
+the remaining gap.
+
+### Run 3 — 2026-07-22 — negative case, clean codebase with zero debt markers
+
+Built a scratch fixture (`/tmp/wingman-eval-ponytail-negative`, not committed to `evals/fixtures/`):
+a genuinely clean 2-function Node project (`formatCurrency`, `titleCase`) with matching tests, zero
+`// minimal:` comments anywhere, no pre-existing `DEBT.md`, and no code smell that would justify
+retroactively marking something as debt (no O(n²) loops, no global state, no obviously-deferred
+edge cases). Asked a fresh, un-briefed subagent (given only the skill file and the fixture path,
+told simply "run a debt harvest pass on this codebase") to apply the skill.
+
+**Result:** the subagent correctly reported nothing to harvest and made no changes — no `DEBT.md`
+created, `src/format.js`/`src/format.test.js` left untouched. Independently verified against the
+real filesystem, not the subagent's self-report: `test -f DEBT.md` confirmed absent, `git status
+--short` showed zero uncommitted changes, `git log --oneline` showed no new commits beyond the
+fixture's own init, and `git diff HEAD -- src/` was empty.
+
+**No bugs found this run** — the skill correctly does nothing when there's nothing to harvest,
+rather than fabricating debt to appear productive. This closes the negative-case gap
+`evals/README.md`'s trust-level bar requires. Promoted to `verified`.

@@ -32,9 +32,13 @@ approaching-ceiling, stale, and a fifth open item), plus a pre-existing `DEBT.md
 
 ## Trust level
 
-`provisional` — Run 1 passed the `status` command's checks; Run 2 exercised `harvest` and found a
-real gap in the command's own instructions (see Run log), so this case still does not promote to
-`verified`. `add` remains unexercised.
+`verified` — Run 1 passed the `status` command's checks (first shape); Run 2 exercised `harvest`
+and found a real gap in the command's own instructions, fixed it, but deliberately did not promote
+on the strength of an unexercised fix (second shape, negative-until-proven); Run 3 (2026-07-22)
+re-ran the identical `harvest` scenario against the fixed document and confirmed the fix actually
+works end to end, independently verified against real files (third shape: same scenario, different
+outcome, proving the fix rather than asserting it). `add` remains unexercised — a future run could
+extend coverage there, but the `harvest`/`status` core is now genuinely proven across 3 differently-shaped runs.
 
 ## Run log
 
