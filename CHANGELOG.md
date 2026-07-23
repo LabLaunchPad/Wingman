@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.37] - 2026-07-22
+
+### Fixed
+- **`version-gate` CI check** — the previous commit edited `plugins/wingman/commands/pipeline/discovery.md` (a real shipped-content change: a new project-type-consult line) without bumping `plugin.json`'s version, incorrectly assuming an edit to an *existing* file didn't count. The gate is scoped to any change under `plugins/wingman/commands/**` (among other paths) regardless of whether it's a new file or an edit — bumped `0.5.36` → `0.5.37`.
+
 ## [0.5.36] - 2026-07-22
 
 ### Added
