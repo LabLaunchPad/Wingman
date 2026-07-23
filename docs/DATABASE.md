@@ -78,7 +78,7 @@ This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE
 
 This is an **append-only audit log, never rewritten** — existing `schema_version: 2` (and earlier) entries keep their old scalar `stage` values and no `bundle` field, permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and must not assume `stage` is always a scalar, so `schema_version: 1`, `2`, and `3` entries coexist safely in the same file.
 
-**Migration note — reversible compression (schema_version 3 → 4, 2026):** `/wingman:boardroom` reviews always produced a full, unabridged verdict per seat before condensing it into the one-line `seats[].summary` this file stores — but until now, that full text was never persisted anywhere; once the session ended, only the one-liner survived (see `skills/output/plain-language-checkpoint`'s reversible-compression rule, added the same round). `schema_version: 4` closes that gap without changing the shape of anything already here:
+**Migration note — reversible compression (schema_version 3 → 4, 2026):** `/wingman:boardroom` reviews always produced a full, unabridged verdict per seat before condensing it into the one-line `seats[].summary` this file stores — but until now, that full text was never persisted anywhere; once the session ended, only the one-liner survived (see `skills/plain-language-checkpoint`'s reversible-compression rule, added the same round). `schema_version: 4` closes that gap without changing the shape of anything already here:
 
 | `schema_version: 3` (and earlier) | `schema_version: 4` |
 |---|---|
@@ -119,7 +119,7 @@ Small, overwritten in place (not append-only). Tracks what a fresh Claude Code s
 
 ### `traceability.json`
 
-Small, overwritten in place. Written by `skills/governance/traceability-linking`, which mints
+Small, overwritten in place. Written by `skills/traceability-linking`, which mints
 `<!-- wingman:req ID -->`-style markers per pipeline stage — this file is the single source of
 truth for the next available ID per prefix, so two sessions never mint the same ID for two
 different things.
@@ -134,7 +134,7 @@ traceability markers has no `traceability.json` at all — that's expected, not 
 ### `memory/`
 
 Three separate Markdown files (not JSON/JSONL, unlike everything else under `.wingman/`), written
-and read by `skills/knowledge/memory` per the founder's own explicit "remember"/"note that" instructions or
+and read by `skills/memory` per the founder's own explicit "remember"/"note that" instructions or
 when a session is about to lose important context:
 
 - `MEMORY.md` — evergreen facts (project name, stack, constraints, preferences).

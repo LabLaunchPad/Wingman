@@ -14,9 +14,9 @@ Wingman's governance model is the four-tier agent population described in full i
 | Layer | What it does | Where it's defined |
 |---|---|---|
 | **Boardroom** (fixed, 7+1 seats) | Reviews and gates — never writes code, only renders a plain-language go/no-go verdict at a checkpoint. | `docs/ARCHITECTURE.md` §4, `plugins/wingman/agents/boardroom-*.md` |
-| **Management Board** (grows 0→9) | Coordinates department-lead execution once a project is complex enough (3+ active conditionally-created department leads). Never renders Boardroom verdicts. | `docs/ARCHITECTURE.md` §5a, `plugins/wingman/skills/governance/management-board-activation` |
-| **Department leads** (grows 0→8) | Build-time workers, one per corporate department, created lazily per real project need. | `docs/ARCHITECTURE.md` §5, `plugins/wingman/skills/governance/department-lead-activation` |
-| **Specialists** (uncapped) | Narrow sub-roles, promoted one at a time only after 2+ evidenced occurrences of repeated friction. | `docs/AGENT-ROSTER.md`, `plugins/wingman/skills/governance/evolve-promotion` |
+| **Management Board** (grows 0→9) | Coordinates department-lead execution once a project is complex enough (3+ active conditionally-created department leads). Never renders Boardroom verdicts. | `docs/ARCHITECTURE.md` §5a, `plugins/wingman/skills/management-board-activation` |
+| **Department leads** (grows 0→8) | Build-time workers, one per corporate department, created lazily per real project need. | `docs/ARCHITECTURE.md` §5, `plugins/wingman/skills/department-lead-activation` |
+| **Specialists** (uncapped) | Narrow sub-roles, promoted one at a time only after 2+ evidenced occurrences of repeated friction. | `docs/AGENT-ROSTER.md`, `plugins/wingman/skills/evolve-promotion` |
 
 The gate rule and human-escalation mapping (which risk tier routes to whom) are in
 `docs/ARCHITECTURE.md` §4's "Gate rule" and "Human Escalation Framework" subsections.
@@ -29,14 +29,14 @@ policy-as-code system, because there's no cluster or deployed service to apply o
 
 **Rules** (stated, not just implied — each names explicit MUST/MUST NOT constraints):
 
-- `plugins/wingman/skills/governance/security-checklist` — STRIDE + OWASP + prompt-injection hunt, blocks
+- `plugins/wingman/skills/security-checklist` — STRIDE + OWASP + prompt-injection hunt, blocks
   advancement while `threats_open > 0`.
-- `plugins/wingman/skills/governance/definition-of-done` + `plugins/wingman/references/definition-of-done.md`
+- `plugins/wingman/skills/definition-of-done` + `plugins/wingman/references/definition-of-done.md`
   — the ship gate: spec met, tests pass, type checker clean, coverage, security threats closed,
   docs in sync.
-- `plugins/wingman/skills/discipline/engineering-minimalism` — the decision ladder and the explicit "MUST NOT
+- `plugins/wingman/skills/engineering-minimalism` — the decision ladder and the explicit "MUST NOT
   simplify away" list (input validation, error handling, security checks, accessibility).
-- `plugins/wingman/skills/mechanics/spec-handler` + `plugins/wingman/skills/discipline/test-driven-development` — spec
+- `plugins/wingman/skills/spec-handler` + `plugins/wingman/skills/test-driven-development` — spec
   before code, then strict red-green-refactor; "NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST."
 
 **Mechanical enforcement** (`plugins/wingman/hooks/hooks.json` wires these in):

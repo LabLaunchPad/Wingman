@@ -37,4 +37,4 @@
 ## Authorship disclosure
 
 - [ ] This PR was authored (fully or in part) by an AI coding agent.
-  - [ ] Every claim in the test plan above was independently verified against real command output — not a subagent's or tool's self-report (see `skills/discipline/verification-before-completion`).
+  - [ ] Every claim in the test plan above was independently verified against real command output — not a subagent's or tool's self-report (see `skills/verification-before-completion`).
