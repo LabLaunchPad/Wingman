@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.39] - 2026-07-23
+
+### Fixed
+- **`skills/governance/evolve-promotion/SKILL.md`** — step 3's classification rule let a subagent commit to "skill" vs. "specialist agent" via an abstract judgment call before ever checking `references/specialist-catalog.md` for a concrete matching row, even when the catalog's own worked example directly names the correct answer. Found by a real fresh-subagent simulation testing the `/wingman:evolve` command wrapper (previously untested — only the skill itself had eval coverage): given the migration-rollback fixture, it misclassified the pattern as a new skill instead of the "Migration Engineer" specialist the catalog explicitly names for this exact scenario. Fixed by making the catalog-first priority explicit; re-verified with a second independent subagent run.
+
 ## [0.5.38] - 2026-07-23
 
 ### Changed
