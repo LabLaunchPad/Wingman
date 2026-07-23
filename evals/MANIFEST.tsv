@@ -1,6 +1,7 @@
 case	fixture	covers
 advisory	(none: an orchestrating command with no code of its own to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session)	plugins/wingman/commands/adaptive/advisory.md
 anti-rationalization	evals/fixtures/setup-anti-rationalization-fixture.sh	plugins/wingman/skills/discipline/anti-rationalization/SKILL.md
+api-hallucination	(none: fixtures are small scratch npm projects with a stubbed dependency, built inline per run, not a setup-*.sh script (a checked-in fixture would give away the trap in its own setup))	plugins/wingman/skills/discipline/test-driven-development/SKILL.md; plugins/wingman/skills/knowledge/research/SKILL.md; docs/AGENT-WEAKNESS-BENCHMARK.md
 architecture	evals/fixtures/setup-architecture-fixture.sh	plugins/wingman/commands/pipeline/architecture.md; seven-stage-pipeline-e2e.md
 bloat-audit	evals/fixtures/setup-bloat-audit-fixture.sh	plugins/wingman/commands/adaptive/bloat-audit.md
 boardroom-7-seat	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md
