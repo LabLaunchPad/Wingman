@@ -48,6 +48,7 @@ During `/wingman:build`'s Definition-of-Done gate and any time code that touches
 ## References
 
 - `references/secrets-policy.md` — consult before adding any integration that touches a credential (key handling, storage, rotation-on-exposure). Covers what the secret hooks (`secret-guard.mjs`, `secret-scanner.mjs`, `prompt-guard.mjs`) do and don't do.
+- `vendor/anthropic-cybersecurity-skills` — a pinned, 817-skill reference library (29 security domains: cloud IAM, AD, SIEM, network, container, AI/LLM security) for when the **founder's own project** — not Wingman itself — has a real-world attack surface this catalog covers (a web app with cloud infra, a service with a database, an AI feature). Consult it for domain-specific depth (e.g. `securing-github-actions-workflows`, `detecting-dependency-confusion`, `detecting-indirect-prompt-injection`) beyond this checklist's STRIDE/OWASP baseline — cite the specific skill used, don't bulk-copy. Not a runtime dependency; see `ATTRIBUTIONS.md`.
 
 ## Verification
 
