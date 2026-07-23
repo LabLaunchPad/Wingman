@@ -228,11 +228,14 @@ if (existsSync(hooksFullPath)) {
 // "declared but missing" direction is already caught by checkFile above;
 // this catches the reverse ("built a command, forgot to register it").
 //
-// Recursive (not a flat readdirSync) since commands/ and skills/ nest one
-// level deeper into category subfolders (e.g. commands/pipeline/discovery.md,
-// skills/knowledge/memory/) -- a flat scan would either false-flag a category
-// folder itself as an orphan skill, or silently stop checking nested command
-// files at all. Compares full relative paths, not bare basenames, since
+// Recursive (not a flat readdirSync) since commands/ still nests one level
+// deeper into category subfolders (e.g. commands/pipeline/discovery.md).
+// skills/ is flat as of 2026-07-23 (skills/<name>/SKILL.md, no category
+// subdirectory -- see docs/ARCHITECTURE.md §8b), but the recursive walk is
+// left generic rather than hardcoded to either depth: it recurses into any
+// directory that isn't itself a skill (no SKILL.md at that level), so it
+// tolerates whichever nesting a given tree actually has instead of assuming
+// a fixed depth. Compares full relative paths, not bare basenames, since
 // basename comparison can't tell "commands/pipeline/discovery.md" apart from
 // a same-named file nested under a different category.
 function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {

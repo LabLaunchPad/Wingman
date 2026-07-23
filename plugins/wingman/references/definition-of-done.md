@@ -100,4 +100,4 @@ Standing checklist applied by every Boardroom seat, every skill, every task. No 
 
 ## Cited by
 
-- `plugins/wingman/skills/governance/definition-of-done/SKILL.md`
+- `plugins/wingman/skills/definition-of-done/SKILL.md`

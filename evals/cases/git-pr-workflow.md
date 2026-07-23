@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence comes from directly-constructed real git scenarios (bare repos, simulated squash-merges) built inline per run, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/mechanics/git-pr-workflow/SKILL.md` and its 3 bundled scripts — does the
+Tests `plugins/wingman/skills/git-pr-workflow/SKILL.md` and its 3 bundled scripts — does the
 squash-merge branch resync correctly detect and fix a stale branch, does the CI-poll script
 correctly distinguish pass/fail/pending/no-checks/timeout, and does the PR-opening script
 correctly check a repo's own PR template and create a draft?

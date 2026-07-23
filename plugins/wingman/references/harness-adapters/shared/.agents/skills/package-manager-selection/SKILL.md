@@ -134,6 +134,6 @@ No founder-facing template beyond the one-sentence notification in Core Workflow
 
 ## Referenced by
 
-- `skills/output/visual-founder-output`
+- `skills/visual-founder-output`
 
 See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

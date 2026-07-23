@@ -244,4 +244,4 @@ Estimated cost:          (X + Y) * tier_rate
 
 ## Cited by
 
-- `plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md`
+- `plugins/wingman/skills/subagent-driven-development/SKILL.md`

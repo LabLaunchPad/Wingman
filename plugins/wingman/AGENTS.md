@@ -25,10 +25,12 @@ section are not restated here). This file is package-scoped: the conventions spe
   `tools` (comma-separated Claude Code tool names), `model` (`inherit` or a tier name — never a
   pinned model *version*), `permissions`. Body ends with a mandated `## <SEAT> VERDICT: <GO |
   GO_WITH_CONCERNS | NO_GO>` block — see any existing `agents/boardroom-*.md` for the exact shape.
-- **Skills** (`skills/<category>/<name>/SKILL.md`): YAML frontmatter with `name`, `description`
-  ("Use when..." framing, same convention as agents). Discipline skills additionally carry a
-  Constraints/Rationalizations/Red-Flags/Verification structure (see any `skills/discipline/*`
-  file for the pattern) — this is the bar every skill should meet, not just that category.
+- **Skills** (`skills/<name>/SKILL.md` — flat, no category subdirectory as of 2026-07-23, see
+  `docs/ARCHITECTURE.md` §8b): YAML frontmatter with `name`, `description` ("Use when..." framing,
+  same convention as agents). Discipline-category skills (see root `AGENTS.md`'s conceptual
+  category table) additionally carry a Constraints/Rationalizations/Red-Flags/Verification
+  structure (e.g. `skills/engineering-minimalism/SKILL.md`) — this is the bar every skill should
+  meet, not just that conceptual category.
 
 ## Before making a structural change (new command, agent, skill, or department)
 

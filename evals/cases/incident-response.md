@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: shares code-review.md's inline fixture description, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/response/incident-response/SKILL.md` and `commands/adaptive/incident.md` — does the
+Tests `plugins/wingman/skills/incident-response/SKILL.md` and `commands/adaptive/incident.md` — does the
 calm, ordered runbook (triage → diagnose before touching code → smallest safe fix) hold up against
 a real bug, and does it correctly diagnose the *actual* root cause rather than accepting a plausible
 but wrong hint?

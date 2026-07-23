@@ -39,7 +39,7 @@ function readJsonFile(filePath) {
   }
 }
 
-// decisions.md / tried.md are freeform prose per skills/knowledge/memory's own SKILL.md (no strict
+// decisions.md / tried.md are freeform prose per skills/memory's own SKILL.md (no strict
 // schema) -- parse defensively. The convention that skill documents is "- YYYY-MM-DD: text", but a
 // line missing the leading date is still surfaced (undated) rather than silently dropped, since a
 // human wrote it and it's still real content worth returning.

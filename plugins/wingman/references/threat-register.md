@@ -37,6 +37,6 @@ Every concrete risk found during a security pass is recorded with an explicit di
 
 ## Cited by
 
-- `plugins/wingman/skills/governance/security-checklist/SKILL.md`
-- `plugins/wingman/skills/knowledge/doc-index/SKILL.md`
+- `plugins/wingman/skills/security-checklist/SKILL.md`
+- `plugins/wingman/skills/doc-index/SKILL.md`
 - `plugins/wingman/commands/pipeline/build.md`

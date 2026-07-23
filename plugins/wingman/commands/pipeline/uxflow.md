@@ -33,7 +33,7 @@ same convention):
 
 ## Show the flow, not just the table
 
-Immediately after the table, use `skills/output/visual-founder-output` to render the same rows as an
+Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
 actual flow diagram — detect the session's rendering tier first, then follow
 `references/visual-output-templates.md`'s UX-flow template (Tier B: a Mermaid flowchart appended to
 the same `docs/wingman/uxflow/<short-slug>.md` file; Tier A: a low-fidelity HTML wireframe per key
@@ -45,7 +45,7 @@ Hand off directly to `/wingman:implementation-planning` — this stage doesn't r
 
 ## References
 
-- `skills/governance/traceability-linking` — the `UX-*` ID convention.
-- `skills/output/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
+- `skills/traceability-linking` — the `UX-*` ID convention.
+- `skills/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.

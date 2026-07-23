@@ -1,6 +1,6 @@
 # Eval: writing-plans
 
-Tests `plugins/wingman/skills/discipline/writing-plans/SKILL.md` behaviorally — the distinctive behavior no other eval exercises: does the skill's own "Scope Check" actually split a request bundling two independent subsystems into two separate plans, rather than writing one blended plan?
+Tests `plugins/wingman/skills/writing-plans/SKILL.md` behaviorally — the distinctive behavior no other eval exercises: does the skill's own "Scope Check" actually split a request bundling two independent subsystems into two separate plans, rather than writing one blended plan?
 
 ## Fixture
 
@@ -9,7 +9,7 @@ Tests `plugins/wingman/skills/discipline/writing-plans/SKILL.md` behaviorally �
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `skills/discipline/writing-plans/SKILL.md` and the fixture's `SPEC.md`. Not told the two subsystems should be split.
+2. Spawn a fresh subagent with only `skills/writing-plans/SKILL.md` and the fixture's `SPEC.md`. Not told the two subsystems should be split.
 3. Independently verify: did it produce two separate plans (one per subsystem), or one blended plan covering both under the shared constraint?
 
 ## Expectations
@@ -31,7 +31,7 @@ Tests `plugins/wingman/skills/discipline/writing-plans/SKILL.md` behaviorally �
 
 Setup: ran `evals/fixtures/setup-writing-plans-fixture.sh` into a scratch dir, producing the TinyBoard project with `SPEC.md` bundling Request A (per-IP rate limiting) and Request B (RSS changelog feed) under one shared "Node 18+, no new deps" constraint.
 
-A background sub-dispatch was spawned to act as the fresh subagent (given only `skills/discipline/writing-plans/SKILL.md` and the fixture) but did not return a result in time — it left `docs/wingman/plans/` created but empty. Per the coordinator's instruction not to stall, the plan was written directly from the same two inputs (the skill file's text and `SPEC.md`, no other framing), applying the skill's Scope Check exactly as written, then independently graded against the Expectations table below.
+A background sub-dispatch was spawned to act as the fresh subagent (given only `skills/writing-plans/SKILL.md` and the fixture) but did not return a result in time — it left `docs/wingman/plans/` created but empty. Per the coordinator's instruction not to stall, the plan was written directly from the same two inputs (the skill file's text and `SPEC.md`, no other framing), applying the skill's Scope Check exactly as written, then independently graded against the Expectations table below.
 
 Result: two separate plan files were produced, not one blended plan:
 - `docs/wingman/plans/2026-07-15-api-rate-limiting.md`
@@ -67,7 +67,7 @@ there's a lot of matches, we don't want to dump everything back at once.
 Node 18+ only. No new npm dependencies.
 ```
 
-Acting as the fresh subagent described in the case's own Procedure (given only `skills/discipline/writing-plans/SKILL.md` and this `SPEC.md`, not told the expected grading outcome), a single plan was written and saved to `docs/wingman/plans/2026-07-22-changelog-search.md` in the scratch fixture. It was then independently re-read from disk (per the skill's own Self-Review discipline) and graded against the Expectations table, and — going further than Run 1 — the plan's actual code was extracted and run for real:
+Acting as the fresh subagent described in the case's own Procedure (given only `skills/writing-plans/SKILL.md` and this `SPEC.md`, not told the expected grading outcome), a single plan was written and saved to `docs/wingman/plans/2026-07-22-changelog-search.md` in the scratch fixture. It was then independently re-read from disk (per the skill's own Self-Review discipline) and graded against the Expectations table, and — going further than Run 1 — the plan's actual code was extracted and run for real:
 
 ```
 $ node --test    # after writing src/search.js, src/server.js, and all 3 test files exactly as the plan specifies

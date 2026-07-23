@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/governance/dogfood-gap-classification/SKILL.md` — its 5-branch decision tree
+Tests `plugins/wingman/skills/dogfood-gap-classification/SKILL.md` — its 5-branch decision tree
 (out-of-scope / hook candidate / skill candidate / command-instruction addition / deferred) and
 whether it drives an approved fix through implementation, reproduction, eval coverage, and a retro,
 rather than stopping at "classified and proposed."

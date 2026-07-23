@@ -2,7 +2,7 @@
 
 # Eval: visual-founder-output
 
-Tests `skills/output/visual-founder-output`'s capability-detection-first discipline and its wirings across
+Tests `skills/visual-founder-output`'s capability-detection-first discipline and its wirings across
 `commands/pipeline/uxflow.md`, `commands/adaptive/boardroom.md`, and `commands/pipeline/architecture.md`. The distinctive
 behavior under test: does the skill actually check the current session's rendering capability before
 choosing a format, rather than assuming, and does the resulting output stay correct (bottom line
@@ -14,7 +14,7 @@ stages for the mid-planning tree)?
 
 **Setup:** run a fresh subagent in a session with no Artifact-publishing tool available (a plain
 tool-use session, confirmed by checking its own tool list first). Give it only `commands/pipeline/uxflow.md`,
-`skills/output/visual-founder-output/SKILL.md`, `references/visual-output-templates.md`, and this UX-flow
+`skills/visual-founder-output/SKILL.md`, `references/visual-output-templates.md`, and this UX-flow
 table already written to a scratch file:
 
 ```markdown
@@ -43,7 +43,7 @@ which tier to use.
 
 **Setup:** run a fresh subagent in a session that genuinely has an Artifact-publishing tool
 available (confirmed by checking its own tool list first — a real capability, not simulated). Give
-it only `commands/adaptive/boardroom.md`, `skills/output/visual-founder-output/SKILL.md`,
+it only `commands/adaptive/boardroom.md`, `skills/visual-founder-output/SKILL.md`,
 `references/visual-output-templates.md`, and these already-collected seat verdicts plus a minimal
 `.wingman/state.json`/`checkpoints.jsonl` pair showing Planning Milestone already cleared and Build
 as the current stage:
@@ -75,7 +75,7 @@ bottom-line verdict in advance (it must derive `GO WITH CHANGES` itself from the
 ## Scenario 3 — DEF→ARCH traceability graph + mid-planning status tree, architecture.md
 
 **Setup:** run a fresh subagent (no Artifact tool available, forcing Tier B) with only
-`commands/pipeline/architecture.md`, `skills/output/visual-founder-output/SKILL.md`,
+`commands/pipeline/architecture.md`, `skills/visual-founder-output/SKILL.md`,
 `references/visual-output-templates.md`, and this Architecture decisions table already written to a
 scratch file — deliberately including the many-to-many edge case (one decision satisfying two
 requirements, one requirement needing two decisions) that a naive one-edge-per-row rendering would

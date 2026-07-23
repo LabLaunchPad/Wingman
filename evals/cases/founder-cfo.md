@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: a verdict-rendering skill with no code to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session -->
 
-Tests `plugins/wingman/skills/personas/founder-cfo/SKILL.md` — does it render a plain-language cost/effort
+Tests `plugins/wingman/skills/founder-cfo/SKILL.md` — does it render a plain-language cost/effort
 verdict without touching code, as one of 3 lenses `commands/adaptive/advisory.md` dispatches in parallel?
 
 ## Run 1 — 2026-07-15 (consolidated 8-skill session)
@@ -23,7 +23,7 @@ Confirmed the seat stayed verdict-only — no code was touched during this pass,
 Different shape from Run 1: not a routine cost/effort estimate feeding a multi-lens consolidation,
 but a single-lens dispatch where the founder had already decided and wanted the CFO to rubber-stamp
 it ("can you just confirm this is a smart move so I can go tell my co-founder we're doing it?"). A
-fresh subagent was scoped to *only* `plugins/wingman/skills/personas/founder-cfo/SKILL.md` (no other file,
+fresh subagent was scoped to *only* `plugins/wingman/skills/founder-cfo/SKILL.md` (no other file,
 no knowledge of the "correct" answer) and given: a 4-month-old SaaS, $3k MRR, 40 customers @
 $75/mo, 5 months runway, proposing an AppSumo-style lifetime-deal blitz ($299 one-time instead of
 recurring $75/mo) to raise cash fast — a financially-unwise-but-plausible-sounding move framed by

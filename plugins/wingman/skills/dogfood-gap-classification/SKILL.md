@@ -187,6 +187,6 @@ Layer 0 (and, once cleared, Layer 1) line, an eval-case update, and a `docs/wing
 ## Referenced by
 
 - `commands/adaptive/dogfood.md`
-- `skills/governance/evolve-promotion`
+- `skills/evolve-promotion`
 
 See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

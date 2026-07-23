@@ -301,5 +301,5 @@ describe("User registration flow", () => {
 
 ## Cited by
 
-- `plugins/wingman/skills/discipline/test-driven-development/SKILL.md`
-- `plugins/wingman/skills/mechanics/testing-patterns/SKILL.md`
+- `plugins/wingman/skills/test-driven-development/SKILL.md`
+- `plugins/wingman/skills/testing-patterns/SKILL.md`

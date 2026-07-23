@@ -55,7 +55,7 @@ const PRIMITIVES = [
   // Both word orders matter, and the gap between them can cross a line break (e.g. a heading
   // "...in parallel" followed by a blank line then "Each subagent gets:") -- `.` alone doesn't match
   // `\n` in JS regex without the `s` flag, so `[\s\S]` is used for the gap instead. Found via
-  // skills/response/council/SKILL.md during review, which described parallel dispatch but got no
+  // skills/council/SKILL.md during review, which described parallel dispatch but got no
   // harness note because "in parallel" preceded "subagent" across a line break, not within one line.
   { id: 'ParallelDispatch', pattern: /\bTask tool\b|\bAgent tool\b|\bparallel\b[\s\S]{0,60}\b(subagent|dispatch|agents)\b|\b(subagent|dispatch|agents)\b[\s\S]{0,60}\bparallel\b|\bfan[- ]out\b/i },
 ];
@@ -89,13 +89,15 @@ function harnessNoteBlock(primitiveIds, harness) {
 }
 
 function listSkills() {
+  // Flat skills/<name>/SKILL.md layout (no category subdirectory) -- matches how listCommands()
+  // already scans dynamically rather than assuming fixed depth. Skills used to live nested under
+  // skills/<category>/<name>/, but that nesting was removed repo-wide so the on-disk layout matches
+  // the flat structure precedent multi-harness repos use and lines up with Codex CLI's plugin-cache
+  // path reading this same tree directly.
   const out = [];
-  for (const category of readdirSync(skillsDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
-    const categoryDir = join(skillsDir, category.name);
-    for (const skill of readdirSync(categoryDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
-      const skillPath = join(categoryDir, skill.name, 'SKILL.md');
-      if (existsSync(skillPath)) out.push({ name: skill.name, path: skillPath });
-    }
+  for (const skill of readdirSync(skillsDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    const skillPath = join(skillsDir, skill.name, 'SKILL.md');
+    if (existsSync(skillPath)) out.push({ name: skill.name, path: skillPath });
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }

@@ -48,7 +48,7 @@ Tell the founder:
 **What happens next:** <e.g. "this needs your approval / a merge click" or "it will merge automatically once checks pass">
 ```
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
+Use `skills/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
 
 ## Boardroom checkpoint
 
@@ -64,5 +64,5 @@ Suggest the adaptive stages that make sense next, without forcing them:
 
 ## References
 
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.

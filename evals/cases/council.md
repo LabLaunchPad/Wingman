@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: fixture is a single inline decision question, not a setup-*.sh script -->
 
-Tests `plugins/wingman/skills/response/council/SKILL.md` behaviorally. This skill convenes a four-voice decision council for ambiguous decisions.
+Tests `plugins/wingman/skills/council/SKILL.md` behaviorally. This skill convenes a four-voice decision council for ambiguous decisions.
 
 ## Fixture
 
@@ -33,7 +33,7 @@ A decision scenario: "Should we use a monorepo or polyrepo structure for a new p
 
 ### Run 1 — 2026-07-15
 
-Acted as the fresh subagent per the case's Procedure, given only `plugins/wingman/skills/response/council/SKILL.md` and the fixture question ("Should we use a monorepo or polyrepo structure for a new project with 3 services?"). Followed the skill's workflow: formed the Architect position first, then launched the Skeptic, Pragmatist, and Critic as three separate `Agent` tool calls (genuine subprocess dispatch, not simulated in one context), each given only the role prompt + question + role-emphasis line from the skill's "Prompt shape" — no conversation history, no exposure to the other voices' output or to my Architect position. Confirmed independence directly by inspecting each subagent's own transcript file (`*.output` JSONL): each one's first `user` message contained only the isolated role prompt I sent, and each produced its Position/Reasoning/Risk/Surprise answer before any of the others' content could reach it.
+Acted as the fresh subagent per the case's Procedure, given only `plugins/wingman/skills/council/SKILL.md` and the fixture question ("Should we use a monorepo or polyrepo structure for a new project with 3 services?"). Followed the skill's workflow: formed the Architect position first, then launched the Skeptic, Pragmatist, and Critic as three separate `Agent` tool calls (genuine subprocess dispatch, not simulated in one context), each given only the role prompt + question + role-emphasis line from the skill's "Prompt shape" — no conversation history, no exposure to the other voices' output or to my Architect position. Confirmed independence directly by inspecting each subagent's own transcript file (`*.output` JSONL): each one's first `user` message contained only the isolated role prompt I sent, and each produced its Position/Reasoning/Risk/Surprise answer before any of the others' content could reach it.
 
 Produced verdict:
 
@@ -73,7 +73,7 @@ One honest wrinkle, not a failure: the Critic subagent's actual response leaned 
 
 Deliberately structured differently from Run 1: instead of another ambiguous multi-path decision, this run tests whether the skill correctly recognizes when **not** to convene the full four-voice apparatus — the negative case `evals/README.md` requires for `verified` ("confirming the skill correctly does *nothing* when it shouldn't act"). Given the skill's decision-format nature, "doing nothing" here means declining to launch the 3 external subagents and instead answering directly, rather than reflexively convening on every request phrased as a question.
 
-Acted as the fresh subagent, given only `plugins/wingman/skills/response/council/SKILL.md` and this inline-constructed scenario (no on-disk fixture needed — the scenario is a one-line prompt, not a codebase):
+Acted as the fresh subagent, given only `plugins/wingman/skills/council/SKILL.md` and this inline-constructed scenario (no on-disk fixture needed — the scenario is a one-line prompt, not a codebase):
 
 > "We just noticed that `calculateDiscount()` divides by zero and returns `NaN` when a cart's total is $0. Should we convene a council to decide how to handle this?"
 

@@ -33,7 +33,7 @@ Translate every finding through `plain-language-checkpoint`'s bar before it reac
 ## References
 
 - `references/orchestration-patterns.md` — the multi-angle parallel audit pattern this command operationalizes.
-- `skills/discipline/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.
+- `skills/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.
 - `commands/adaptive/dogfood.md` — a different, complementary operation: `/wingman:audit` reviews *existing* project state; `/wingman:dogfood` generates and runs a fixture/feature through the real pipeline end to end.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

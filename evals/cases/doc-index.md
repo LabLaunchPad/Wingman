@@ -1,6 +1,6 @@
 # Eval: doc-index
 
-Tests `plugins/wingman/skills/knowledge/doc-index/SKILL.md` behaviorally — the skill
+Tests `plugins/wingman/skills/doc-index/SKILL.md` behaviorally — the skill
 was codified from this project's own v10 finding (all 9 `references/*.md`
 files were uncited until deliberately wired in) but had never itself been
 run against a fresh project: given only the skill file and a small
@@ -26,7 +26,7 @@ case:
 ## Procedure
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `skills/knowledge/doc-index/SKILL.md` and the
+2. Spawn a fresh subagent with only `skills/doc-index/SKILL.md` and the
    fixture path (not told which doc is orphaned). Tell it: "Audit this
    project's documentation for doc-index discipline."
 3. Independently verify by grepping the fixture directly for each
@@ -65,7 +65,7 @@ still a cheap future addition if this ever needs re-confirming.
 
 **Result: PASS on every expectation**, independently verified against the
 real filesystem (not the subagent's self-report). The subagent read
-`skills/knowledge/doc-index/SKILL.md`, was asked to audit "Fleetdesk" for doc-index
+`skills/doc-index/SKILL.md`, was asked to audit "Fleetdesk" for doc-index
 discipline, and:
 - Correctly recognized `references/deploy-checklist.md` as cited by
   `commands/deploy.md` and `references/rate-limit-tuning.md` as cited by
@@ -108,7 +108,7 @@ project** — nothing in `commands/` or `skills/` touches webhooks at all — to
 test whether the skill would fabricate a forced citation rather than
 correctly flagging it.
 
-A fresh subagent, given only `skills/knowledge/doc-index/SKILL.md` and the fixture
+A fresh subagent, given only `skills/doc-index/SKILL.md` and the fixture
 path (not told which docs were orphaned or how many), was asked to run a
 documentation audit/pass.
 

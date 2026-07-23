@@ -5,7 +5,7 @@ description: Use when implementing any feature or bugfix during /wingman:build, 
 
 <!--
 Adapted from obra/superpowers (MIT License, Copyright (c) 2025 Jesse Vincent)
-— skills/discipline/test-driven-development/SKILL.md. Adapted for Wingman's build-time
+— skills/test-driven-development/SKILL.md. Adapted for Wingman's build-time
 use with references to Wingman's own verification-before-completion skill.
 -->
 
@@ -306,8 +306,8 @@ See `references/continuous-execution.md` — maintain momentum through a workflo
 ## References
 
 - `references/testing-patterns.md` — AAA structure, boundary mocking, and the >=80% coverage floor this skill's tests should meet.
-- `skills/mechanics/spec-handler` — the failing test is the spec's first handler; write it before the implementation.
+- `skills/spec-handler` — the failing test is the spec's first handler; write it before the implementation.
 
 ## Referenced by
 
-- `skills/mechanics/spec-handler`
+- `skills/spec-handler`

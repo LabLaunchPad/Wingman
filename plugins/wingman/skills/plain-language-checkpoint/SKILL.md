@@ -59,7 +59,7 @@ Every boardroom agent verdict, every `/wingman:*` stage completion message, and 
 
 ## References
 
-- `skills/output/visual-founder-output` — the visual-layer companion to this skill, for output whose
+- `skills/visual-founder-output` — the visual-layer companion to this skill, for output whose
   underlying content is structurally a flow, tree, or grid (a diagram/tree can help; this skill's
   own bar governs the words either way, and always leads).
 - `commands/adaptive/boardroom.md`'s "Record the checkpoint" and "Expand a past checkpoint" sections — the
@@ -101,4 +101,4 @@ Every boardroom agent verdict, every `/wingman:*` stage completion message, and 
 ## Referenced by
 
 - `commands/adaptive/boardroom.md`
-- `skills/output/visual-founder-output`
+- `skills/visual-founder-output`

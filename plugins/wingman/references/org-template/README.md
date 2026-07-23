@@ -18,9 +18,9 @@ narrow — see `docs/PROJECT.md`'s decisions log (2026-07-22, "founder-org scaff
 founder's project and no generation step — they are read-only reference content an existing
 command/skill consults, the same way `references/testing-patterns.md` or
 `references/security-checklist.md` already work. If real per-founder, cross-project capture is ever
-needed, that is a separate, future evidence-gated decision (see `skills/governance/evidence-gated-catalog`).
+needed, that is a separate, future evidence-gated decision (see `skills/evidence-gated-catalog`).
 
 ## References
 
-- Cited by `commands/pipeline/discovery.md` (`project-types/`) and `skills/knowledge/memory`
+- Cited by `commands/pipeline/discovery.md` (`project-types/`) and `skills/memory`
   (`founder-preferences.md`, `capability-map.md`).

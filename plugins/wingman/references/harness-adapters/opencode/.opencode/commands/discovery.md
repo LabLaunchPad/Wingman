@@ -38,7 +38,7 @@ Produce a short artifact — no plan file yet, no Boardroom checkpoint at this s
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
 rendering tier first, never assume.
 
@@ -47,7 +47,7 @@ Hand off directly to `/wingman:define` — do not stop and wait for approval her
 ## References
 
 - `references/org-template/README.md` — the project-type catalog consulted in Step 1, and the two
-  other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/knowledge/memory`
+  other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/memory`
   draws on.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.

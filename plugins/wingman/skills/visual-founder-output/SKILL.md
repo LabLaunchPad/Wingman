@@ -18,7 +18,7 @@ non-technical founder" bar, applied to *shape* instead of *words*.
 
 **Core principle:** detect what the current session can actually render before choosing a format,
 never assume — the same "detect first, choose second, fall back silently" discipline this project
-already uses for tool availability (`skills/mechanics/package-manager-selection`, `skills/mechanics/git-pr-workflow`),
+already uses for tool availability (`skills/package-manager-selection`, `skills/git-pr-workflow`),
 applied here to rendering medium instead of a CLI.
 
 ## When To Use
@@ -128,7 +128,7 @@ render the visual layer of their existing templates (see those commands and
 
 - `references/visual-output-templates.md` — the actual copy-paste Mermaid/ASCII templates for UX
   flow, pipeline status, and the boardroom seat-verdict grid, plus Tier-A wireframe guidance.
-- `skills/output/plain-language-checkpoint` — the prose bar this skill extends; consult it for anything
+- `skills/plain-language-checkpoint` — the prose bar this skill extends; consult it for anything
   about wording, not layout.
 
 ## Referenced by
@@ -141,4 +141,4 @@ render the visual layer of their existing templates (see those commands and
 - `commands/pipeline/implementation-planning.md`
 - `commands/pipeline/ship.md`
 - `commands/pipeline/uxflow.md`
-- `skills/output/plain-language-checkpoint`
+- `skills/plain-language-checkpoint`

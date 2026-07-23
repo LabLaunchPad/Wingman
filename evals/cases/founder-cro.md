@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: a verdict-rendering skill with no code to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session -->
 
-Tests `plugins/wingman/skills/personas/founder-cro/SKILL.md` — does it render a plain-language conversion/
+Tests `plugins/wingman/skills/founder-cro/SKILL.md` — does it render a plain-language conversion/
 revenue-lens verdict without touching code, as one of 3 lenses `commands/adaptive/advisory.md` dispatches
 in parallel?
 

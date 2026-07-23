@@ -1,6 +1,6 @@
 # Eval: interview-one-question-at-a-time
 
-Tests `plugins/wingman/skills/mechanics/interview-one-question-at-a-time/SKILL.md` behaviorally — given a genuinely vague, multi-ambiguity founder request, does a fresh agent ask exactly one question per message, reflect back and log each answer before the next question, and produce an explicit-confirmation summary before moving to implementation — rather than dumping several questions at once or inferring the gaps itself.
+Tests `plugins/wingman/skills/interview-one-question-at-a-time/SKILL.md` behaviorally — given a genuinely vague, multi-ambiguity founder request, does a fresh agent ask exactly one question per message, reflect back and log each answer before the next question, and produce an explicit-confirmation summary before moving to implementation — rather than dumping several questions at once or inferring the gaps itself.
 
 This skill is conversational rather than file-based, so unlike most other cases the eval is graded on the live transcript (message-by-message), not just a post-hoc file diff — the fixture supplies the ambiguous request the subagent works from, and the person running the case plays "the founder" for the live back-and-forth per the fixture's `REVIEWER-NOTES.md`.
 

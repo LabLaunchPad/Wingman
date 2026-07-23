@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.3] - 2026-07-23
+
+### Changed
+- **Flattened `plugins/wingman/skills/<category>/<name>/SKILL.md` to `plugins/wingman/skills/<name>/SKILL.md`** for all 40 skills — the deferred follow-up named in `0.6.1`'s native-install finding. Matches the flat layout precedent multi-harness repos use and lets Codex CLI's native `codex plugin add` install cache (which reads this tree directly) mirror the real structure with zero nesting mismatch. `plugin.json`'s `skills` array, ~90 files' cross-references, `generate-harness-adapters.mjs`'s `listSkills()` (previously hardcoded to 2-level nesting), and root `AGENTS.md`'s category table (now a conceptual grouping, not folder-backed) all updated. A real regression was caught during this pass — two test files independently hardcoded category-qualified skill paths outside the original update's scope — found via a full `node --test` run and fixed. Live-install re-verified: OpenCode and Codex CLI both still discover all 40 skills under the new flat layout; Codex's plugin cache now genuinely mirrors it. See `docs/ARCHITECTURE.md` §8b and `docs/PROJECT.md`'s decisions log for the full account.
+
 ## [0.6.2] - 2026-07-23
 
 ### Fixed

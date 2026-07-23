@@ -23,10 +23,10 @@ Only pause if you encounter a genuine decision point that requires user input, o
 
 ## Cited by
 
-- `plugins/wingman/skills/discipline/engineering-minimalism/SKILL.md`
-- `plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md`
-- `plugins/wingman/skills/discipline/systematic-auditing/SKILL.md`
-- `plugins/wingman/skills/discipline/systematic-debugging/SKILL.md`
-- `plugins/wingman/skills/discipline/test-driven-development/SKILL.md`
-- `plugins/wingman/skills/discipline/verification-loop/SKILL.md`
-- `plugins/wingman/skills/discipline/writing-plans/SKILL.md`
+- `plugins/wingman/skills/engineering-minimalism/SKILL.md`
+- `plugins/wingman/skills/subagent-driven-development/SKILL.md`
+- `plugins/wingman/skills/systematic-auditing/SKILL.md`
+- `plugins/wingman/skills/systematic-debugging/SKILL.md`
+- `plugins/wingman/skills/test-driven-development/SKILL.md`
+- `plugins/wingman/skills/verification-loop/SKILL.md`
+- `plugins/wingman/skills/writing-plans/SKILL.md`

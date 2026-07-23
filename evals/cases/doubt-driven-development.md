@@ -1,6 +1,6 @@
 # Eval: doubt-driven-development
 
-Tests `plugins/wingman/skills/discipline/doubt-driven-development/SKILL.md` behaviorally — given a real doubt-trigger phrase ("tests cover all the important cases, should be enough to ship") attached to code that has a genuine, untested edge case, does a fresh agent actually run the Doubt Resolution Protocol (name the doubt, identify what evidence would resolve it, gather that evidence, decide based on evidence) and find the gap — rather than accepting the confident-sounding claim at face value.
+Tests `plugins/wingman/skills/doubt-driven-development/SKILL.md` behaviorally — given a real doubt-trigger phrase ("tests cover all the important cases, should be enough to ship") attached to code that has a genuine, untested edge case, does a fresh agent actually run the Doubt Resolution Protocol (name the doubt, identify what evidence would resolve it, gather that evidence, decide based on evidence) and find the gap — rather than accepting the confident-sounding claim at face value.
 
 ## Fixture
 

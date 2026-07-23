@@ -8,7 +8,7 @@
   founders can compare the other 6 types against.
 - Department leads are more likely to activate here than for the other 6 types (Design/Data/
   Legal-Security/DevOps/Growth all have plausible real signals in a scaling product) — see
-  `skills/governance/department-lead-activation`'s activation signals, don't create them speculatively.
+  `skills/department-lead-activation`'s activation signals, don't create them speculatively.
 - Security/CISO review carries more weight here than in a website or internal tool, given real user
   data and billing are in scope from the start.
 

@@ -9,7 +9,7 @@
 // check-repo-consistency.mjs, check-fixtures.mjs) — designed to report "nothing to
 // check" rather than fail when pointed at a project with no requirement/marker data yet.
 //
-// What it checks (see plugins/wingman/skills/governance/traceability-linking/SKILL.md):
+// What it checks (see plugins/wingman/skills/traceability-linking/SKILL.md):
 //   - every requirement/decision/flow ID (DISC-*, DEF-*, ARCH-*, UX-*, IP-*) minted in
 //     a markdown table has at least one downstream `wingman:req <ID>` marker elsewhere.
 //   - every `wingman:req <ID>` marker resolves to an ID that was actually minted

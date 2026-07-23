@@ -29,6 +29,6 @@ something to bolt onto this reference doc.
 
 ## References
 
-- `skills/knowledge/memory` — the actual store this feeds.
-- `skills/mechanics/interview-one-question-at-a-time` — how to ask, not what to ask; this doc is the
+- `skills/memory` — the actual store this feeds.
+- `skills/interview-one-question-at-a-time` — how to ask, not what to ask; this doc is the
   "what," that skill is the "how."
