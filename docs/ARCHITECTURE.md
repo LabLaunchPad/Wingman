@@ -597,6 +597,62 @@ Seven workflows, engineered from a survey of all 66 workflow files across the 16
 
 All actions are pinned to full commit SHAs (not floating version tags), and every workflow declares least-privilege `permissions:` explicitly — supply-chain hygiene the vendor survey found in the more mature repos (`wshobson-agents`, `ecc`) but that this project's own first CI pass hadn't yet adopted.
 
+## 12. `agnostic-boardroom/` — a parallel-track Python rewrite (in progress, additive)
+
+A pasted "Enterprise Blueprint" proposed replacing this entire architecture — the markdown
+commands/agents/skills/hooks documented in §1-11 above — with a standalone Python backend: a
+LangGraph macro-graph, PydanticAI (Maker/Checker) micro-loops, an MCP server, a vector-store skill
+router, and a relational (SQLite/Postgres) state store. Evaluated against this doc's own existing
+decisions before any code was written, it directly reverses three of them: `docs/DATABASE.md`'s
+flat-file state-store choice (a real, revisited decision — schema_version 1→2→3 — not an
+oversight); the Boardroom's unconditional any-`NO_GO`-blocks gate rule (§4), which a near-identical
+"configurable strictness" proposal was already declined for; and §10's v16 audit entry, which
+explicitly dropped local vector search from the roadmap for zero evidenced need across this
+project's entire dogfooding history. Each conflict was named directly to the founder before
+building anything, via `AskUserQuestion` — the founder's answer: build it anyway, as a genuine full
+rewrite. See `docs/PROJECT.md`'s decisions log for the full record.
+
+**Scoped as additive, not destructive.** The new backend lives under a new top-level
+`agnostic-boardroom/` directory — it does not touch, replace, or depend on anything under
+`plugins/wingman/`. Wingman's actual shipped product keeps operating unchanged throughout this
+build-out; nothing here is wired to override it, and nothing gets retired until the replacement is
+proven end-to-end. This directory is **not** part of the installable plugin surface (not listed in
+`plugin.json`, not covered by `validate-structure.mjs`) — it is a separate, standalone codebase that
+happens to live in the same repo, tracked by its own `agnostic-boardroom/pyproject.toml` and test
+suite, exempt from the Node-only zero-dependency invariant `install-smoke.yml` checks (that check is
+scoped to the plugin install path; a Python backend under a directory the plugin manifest never
+references doesn't touch it).
+
+**Framework choice: Agno, not the blueprint's own suggested LangGraph.** A live 2026 research pass
+found Agno's declarative, minimal, transparent-debugging design closer to this project's own
+`engineering-minimalism` discipline than LangGraph's heavier LangChain-lineage stack, and Agno ships
+`AgentOS` (a stateless FastAPI runtime) that satisfies the blueprint's Pillar III MCP-server
+requirement with less custom plumbing. LangGraph's countervailing strength — proven large-scale
+production use and more mature cyclic-graph state primitives — is the documented fallback if the
+Maker/Checker retry loops need genuinely complex branching state later.
+
+**Execution is phased, not attempted in one pass**, tracked via the harness's own task list:
+
+1. **Data & Schema (done)** — `core/state_schema.py`: Pydantic models (`ProjectState`,
+   `BoardroomVerdict`, `ThreatRegisterEntry`, `DebtLedgerEntry`, `TraceabilityLink`) faithfully
+   ported from `docs/DATABASE.md`'s and the threat-register/debt-ledger docs' real, already-shipped
+   shapes — not a speculative new schema. 7 tests pass, two copied verbatim from `docs/DATABASE.md`'s
+   own worked JSON examples to prove the port is faithful, including the documented
+   "`active_managers` absent → treat as `[]`" forward-compatibility rule and the
+   any-`NO_GO`-blocks `blocks_advancement` gate rule kept as a fixed property, not a tunable
+   parameter.
+2. **The MCP Server (not started)** — stand up `mcp_server/server.py`; prove a dummy tool call and a
+   resource read work end-to-end via a real MCP client before adding any AI logic.
+3. **The Micro-Loops (not started)** — an Agno Maker/Checker pair
+   (`agents/departments/engineering_maker.py` + `agents/boardroom/cto_evaluator.py`); prove a real,
+   bounded 3-iteration rejection loop with no human input, escalating to the founder on the 3rd
+   failure.
+4. **The Macro-Graph (not started)** — wrap the micro-loops in Agno's own workflow/topology
+   primitives: Discovery → Define → Build → Ship, with a cyclical escalation edge back to Build when
+   the Ship-stage preflight gate fails.
+
+See `agnostic-boardroom/README.md` for current phase status.
+
 ## Open items (planned, not yet built)
 
 - The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — see that document's "Why no server yet").

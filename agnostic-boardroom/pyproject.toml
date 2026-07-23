@@ -1,0 +1,25 @@
+[project]
+name = "agnostic-boardroom"
+version = "0.1.0"
+description = "Standalone, agent-agnostic MCP backend rebuild of Wingman's Boardroom/pipeline (experimental, in-progress)"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+# Added in later phases, not installed yet:
+#   agno              -- Phase 3/4 (Maker/Checker micro-loops, macro-graph topology)
+#   mcp                -- Phase 2 (MCP server: JSON-RPC 2.0 over stdio/SSE)
+#   fastapi, uvicorn   -- Phase 2 (if HTTP/SSE transport is needed alongside stdio)
+#   chromadb or qdrant-client -- Phase 2/3 (semantic skill routing vector store)
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
