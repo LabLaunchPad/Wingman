@@ -14,7 +14,7 @@
 // No dependencies beyond Node's stdlib. Warnings don't fail; errors do.
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAll } from './parse-wingman-logs.mjs';
 
@@ -112,7 +112,44 @@ if (coverage.markedHeadings < coverage.totalHeadings) {
   warnings.push(`structural-log-drift: ${coverage.totalHeadings - coverage.markedHeadings} entr${coverage.totalHeadings - coverage.markedHeadings === 1 ? 'y' : 'ies'} in LEARNINGS.md/retros.md/PROJECT.md-decisions/HUMAN-TODOS.md is missing a wingman:log marker (see scripts/parse-wingman-logs.mjs) — a new entry was likely appended without one`);
 }
 
-console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings})`);
+// --- Shipped/dev-only script boundary: nothing under plugins/wingman/ may
+// reference a path outside plugins/wingman/ ---
+// Only plugins/wingman/ ships (install-smoke.yml proves it). A shipped .mjs
+// that relative-imports or reads a file from root scripts/, docs/, evals/,
+// or tests/ would pass here (both trees exist in this dev checkout) but
+// break silently the moment a founder installs just the plugin — the exact
+// naming-collision risk this project's own audit history (docs/wingman/
+// audit-reorg-2026-07-20.md, action item #8) flagged and left as a TODO.
+function walkMjs(dir) {
+  let out = [];
+  let entries = [];
+  try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return out; }
+  for (const entry of entries) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) out = out.concat(walkMjs(full));
+    else if (entry.isFile() && entry.name.endsWith('.mjs')) out.push(full);
+  }
+  return out;
+}
+
+const pluginRoot = join(repoRoot, 'plugins', 'wingman');
+const shippedMjsFiles = walkMjs(pluginRoot);
+const relativeRefPattern = /(?:from\s+|import\(|require\(|readFileSync\(|readdirSync\(|existsSync\(|writeFileSync\()\s*['"](\.\.?\/[^'"]*)['"]/g;
+
+for (const file of shippedMjsFiles) {
+  const text = readFileSync(file, 'utf-8');
+  const fileDir = dirname(file);
+  for (const match of text.matchAll(relativeRefPattern)) {
+    const specifier = match[1];
+    const resolved = resolve(fileDir, specifier);
+    const rel = relative(pluginRoot, resolved);
+    if (rel.startsWith('..')) {
+      errors.push(`shipped-boundary: ${relative(repoRoot, file)} references "${specifier}" which resolves outside plugins/wingman/ — the shipped surface must never depend on a dev-only path, since only plugins/wingman/ ships to a founder's install`);
+    }
+  }
+}
+
+console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files)`);
 
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);
