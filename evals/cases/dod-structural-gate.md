@@ -1,5 +1,7 @@
 # Eval: dod-structural-gate
 
+<!-- eval:no-fixture-needed: fixtures are inline git repos built per-run (see "## Fixtures (inline git repos, not setup-*.sh scripts)" below), not a setup-*.sh script -->
+
 Tests `plugins/wingman/hooks/dod-structural-gate.mjs` — the new deterministic hook that mechanically enforces artifact *presence* (traceability, tests, a clean threat register) before a real `git push`, closing the gap that 5 discipline skills were previously enforced only by prose. This is the highest-risk piece of MVP2's design: the plan explicitly flagged that the test-presence heuristic is the likeliest source of a false-positive over-block (the same failure shape `boardroom-checkpoint.mjs`'s own v12.1 fix had to correct once), so this case exists specifically to prove that risk does *not* materialize.
 
 Like `traceability-validator.md`, this is deterministic — the hook's logic has no model-judgment component — so it's verified by feeding real JSON stdin to the actual hook script and checking its exit code/output, not by grading a subagent.

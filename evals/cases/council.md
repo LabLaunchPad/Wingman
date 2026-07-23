@@ -1,5 +1,7 @@
 # Eval: council
 
+<!-- eval:no-fixture-needed: fixture is a single inline decision question, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/response/council/SKILL.md` behaviorally. This skill convenes a four-voice decision council for ambiguous decisions.
 
 ## Fixture

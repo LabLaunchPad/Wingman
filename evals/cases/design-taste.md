@@ -1,5 +1,7 @@
 # Eval: design-taste
 
+<!-- eval:no-fixture-needed: fixture is a hand-built HTML/design-tokens pair, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/output/design-taste/SKILL.md` — its anti-slop UI/UX quality bar: avoids generic, template-derived interfaces and pushes for deliberate hierarchy, consistency, and restraint.
 
 ## Scenario — Generic UI → improved (positive case)

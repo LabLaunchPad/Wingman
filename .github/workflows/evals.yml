@@ -39,8 +39,23 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Pin Claude Code CLI version
+        id: cli-version
+        run: echo "version=$(npm view @anthropic-ai/claude-code version)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Claude Code CLI
+        id: cache-claude-cli
+        uses: actions/cache@v4 # TODO(human): pin to an exact commit SHA to match this repo's other actions (couldn't verify the real SHA from this sandbox - no network access to api.github.com for actions/cache)
+        with:
+          path: ~/.npm-global
+          key: claude-code-cli-${{ steps.cli-version.outputs.version }}
+
       - name: Install the Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
+        if: steps.cache-claude-cli.outputs.cache-hit != 'true'
+        run: npm install -g --prefix ~/.npm-global @anthropic-ai/claude-code
+
+      - name: Add cached CLI to PATH
+        run: echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
 
       - name: Run headless evals (degrades to a dry-run integrity check with no key)
         env:

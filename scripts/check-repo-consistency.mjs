@@ -17,6 +17,7 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAll } from './parse-wingman-logs.mjs';
+import { buildManifest, renderManifest } from './generate-eval-manifest.mjs';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const errors = [];
@@ -149,7 +150,21 @@ for (const file of shippedMjsFiles) {
   }
 }
 
-console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files)`);
+// --- Eval manifest drift: evals/MANIFEST.tsv must match what a fresh
+// regeneration produces from evals/cases/*.md right now ---
+// The manifest is generated, not hand-maintained (scripts/generate-eval-manifest.mjs),
+// specifically so it can't quietly drift from the case files it summarizes
+// the way the old filename-heuristic coverage check did. If someone edits a
+// case's "Tests ..." line or fixture reference without re-running the
+// generator, this catches it the same way a stale generated-lockfile check
+// would.
+const regenerated = renderManifest(buildManifest());
+const committedManifest = read('evals/MANIFEST.tsv');
+if (committedManifest !== null && committedManifest !== regenerated) {
+  errors.push('eval-manifest-drift: evals/MANIFEST.tsv does not match a fresh regeneration — run `node scripts/generate-eval-manifest.mjs --write` and commit the result');
+}
+
+console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files), eval-manifest freshness`);
 
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);

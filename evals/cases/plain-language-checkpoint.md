@@ -1,5 +1,7 @@
 # Eval: plain-language-checkpoint
 
+<!-- eval:no-fixture-needed: fixture is an inline raw-technical-finding scenario, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/output/plain-language-checkpoint/SKILL.md` — its bar for translating technical findings into jargon-free, founder-actionable decisions (leading with consequence, not mechanism).
 
 ## Scenario — Raw technical finding → founder summary (positive case)

@@ -136,6 +136,8 @@ This already satisfies every rule in the brief's "Governance rules" and "Promoti
 
 No phase touches `plugin.json`, `marketplace.json`, or any shipped path's location.
 
+**Separately, `docs/wingman/audit-reorg-2026-07-20.md`'s own action-item list (a prior, independent audit, referenced in §1.2 finding #3) is now closed out**: items #1/#6/#8/#10 turned out already implemented, #2 was superseded by a better fix (dropping hardcoded counts rather than drift-checking them), #3 and #5 were newly built this session, and #9 was checked and confirmed non-actionable. #4 and #7 remain correctly deferred, evidence-gated. See `docs/PROJECT.md`'s decisions log (category=eval) for the full account.
+
 ---
 
 ## 7. Security and coupling risks

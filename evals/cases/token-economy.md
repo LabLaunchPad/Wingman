@@ -1,5 +1,7 @@
 # Eval: token-economy
 
+<!-- eval:no-fixture-needed: fixture is a scratch verbose-message file built inline, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/knowledge/token-economy/SKILL.md` — its terse internal-only communication bar: drop filler, articles, and pleasantries while keeping full technical accuracy, especially on high-volume internal channels (e.g. Boardroom seat dispatch prompts).
 
 ## Scenario — Verbose internal message → compressed (positive case)

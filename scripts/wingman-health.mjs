@@ -15,6 +15,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseAll, recurringCategoriesFrom } from './parse-wingman-logs.mjs';
+import { buildManifest } from './generate-eval-manifest.mjs';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const read = (rel) => { try { return readFileSync(join(repoRoot, rel), 'utf-8'); } catch { return null; } };
@@ -37,18 +38,17 @@ for (const f of cases) {
 const verified = Object.values(trust).filter((t) => t === 'verified').length;
 const provisional = Object.values(trust).filter((t) => t === 'provisional').length;
 
-// A case "covers" a command/skill if its filename equals that name or extends
-// it with a suffix (e.g. "boardroom-gate-rule" covers "boardroom",
-// "evolve-promotion" covers both the "evolve" command and the skill).
-const caseNames = Object.keys(trust);
-// Explicit aliases for a case whose own title states it tests a second,
-// differently-named file (so the filename-prefix rule above can't see it) —
-// e.g. `systematic-auditing.md`'s title says it tests both
-// `skills/discipline/systematic-auditing/SKILL.md` and `commands/adaptive/audit.md`, with real
-// Run 1/Run 2 evidence for both; without this, `audit` mis-reports as
-// uncovered despite having genuine behavioral evidence.
-const aliases = { audit: 'systematic-auditing' };
-const isCovered = (name) => caseNames.some((c) => c === name || c.startsWith(name + '-')) || caseNames.includes(aliases[name]);
+// A command/skill is covered if evals/MANIFEST.tsv's "covers" column for
+// some case names its own file — the manifest is generated from each case's
+// own "Tests `<path>`" opening line (scripts/generate-eval-manifest.mjs), so
+// this reads ground truth the case authors already stated, instead of
+// inferring coverage from filename-prefix matching plus a hand-patched
+// alias table (the old approach, retired per audit-reorg-2026-07-20.md
+// action item #3 — it kept needing new exceptions as the suite grew, e.g.
+// `audit` mis-reporting as uncovered until "audit: systematic-auditing" was
+// added by hand).
+const manifestRows = buildManifest();
+const isCovered = (name) => manifestRows.some((r) => new RegExp(`(^|/)${name}($|/SKILL\\.md|\\.md)`).test(r.covers));
 const uncoveredCommands = commands.filter((c) => !isCovered(c));
 const uncoveredSkills = skills.filter((s) => !isCovered(s));
 
