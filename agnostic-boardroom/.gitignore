@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
+knowledge/.data/
+knowledge/.lancedb/
+*.lance/

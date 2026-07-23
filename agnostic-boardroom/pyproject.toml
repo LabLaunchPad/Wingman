@@ -5,6 +5,10 @@ description = "Standalone, agent-agnostic MCP backend rebuild of Wingman's Board
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.9",
+    "agno>=2.8",
+    "lancedb>=0.34",
+    "fastembed>=0.5",
+    "tiktoken>=0.13",
 ]
 
 [project.optional-dependencies]
@@ -12,10 +16,8 @@ dev = [
     "pytest>=8.0",
 ]
 # Added in later phases, not installed yet:
-#   agno              -- Phase 3/4 (Maker/Checker micro-loops, macro-graph topology)
 #   mcp                -- Phase 2 (MCP server: JSON-RPC 2.0 over stdio/SSE)
-#   fastapi, uvicorn   -- Phase 2 (if HTTP/SSE transport is needed alongside stdio)
-#   chromadb or qdrant-client -- Phase 2/3 (semantic skill routing vector store)
+#   fastapi, uvicorn   -- Phase 2 (if HTTP/SSE transport is needed alongside stdio, or Agno's own AgentOS)
 
 [build-system]
 requires = ["hatchling"]

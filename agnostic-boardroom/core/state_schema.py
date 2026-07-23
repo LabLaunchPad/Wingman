@@ -144,6 +144,36 @@ class TraceabilityLink(BaseModel):
     referenced_by: list[str] = Field(default_factory=list)
 
 
+class ContextVariant(str, Enum):
+    """The two Pillar II context strategies being A/B tested."""
+
+    FULL_CONTEXT = "full_context"  # today's approach: the whole SKILL.md in context
+    RETRIEVED_CONTEXT = "retrieved_context"  # the blueprint's proposal: top-k vector-retrieved chunks
+
+
+class ABTestResult(BaseModel):
+    """One append-only log row for a skill-context A/B run.
+
+    Deliberately logs only what is mechanically, honestly measurable without
+    a live model call: token count and retrieval latency. It does NOT log a
+    "decision quality preserved" field, because verifying that requires
+    actually running an agent against the reduced context and checking its
+    output against the Definition of Done -- that needs live model inference,
+    which isn't wired up yet (tracked as Phase 3, the Maker/Checker loop).
+    Logging a fabricated quality score here would be exactly the kind of
+    "purposeless data" this A/B layer exists to avoid.
+    """
+
+    run_id: str
+    skill_name: str
+    query: str
+    variant: ContextVariant
+    context_text: str
+    token_count: int
+    retrieval_latency_ms: float | None = None  # None for FULL_CONTEXT (no retrieval step)
+    logged_at: datetime = Field(default_factory=datetime.utcnow)
+
+
 class ProjectState(BaseModel):
     """The overwritten-in-place `.wingman/state.json`."""
 

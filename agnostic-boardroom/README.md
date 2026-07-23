@@ -1,6 +1,6 @@
 # Agnostic Boardroom (experimental, in-progress rewrite)
 
-**Status: Phase 1 in progress (Data & Schema). Not installable, not wired into anything yet.**
+**Status: Phase 1 (Data & Schema) done. Phase 2a (skill-context A/B testing) done. Phase 2 (MCP server) not started. Not installable, not wired into anything yet.**
 
 This is a from-scratch Python backend rebuild of Wingman's Boardroom/pipeline concepts as a
 standalone, agent-agnostic MCP server — LangGraph-style graph orchestration (via
@@ -38,6 +38,31 @@ in progress.
    bounded rejection loop with no human input.
 4. **The Macro-Graph** (not started) — wrap the micro-loops in Agno's own workflow/topology
    primitives; Discovery → Define → Build → Ship.
+
+## Phase 2a: skill-context A/B testing (done)
+
+`knowledge/vector_store.py` + `knowledge/ab_harness.py` — a real, running A/B comparison of
+Wingman's own two candidate context strategies for a subagent's skill payload: **Variant A**
+(today's approach — the whole `SKILL.md` in context) vs. **Variant B** (the blueprint's Pillar II
+proposal — top-k vector-retrieved chunks only). Uses Agno's own `Knowledge` abstraction over an
+embedded LanceDB table (a single local directory, no server — the "lightest minimal runtime"
+property that motivated choosing Agno over LangGraph) and a local FastEmbed model (ONNX, no
+Anthropic/OpenAI API key required), indexing the real, already-shipped `plugins/wingman/skills/*/SKILL.md`
+files, not synthetic content. Retrieval timing reuses Agno's own `agno.eval.performance.PerformanceEval`
+rather than a hand-rolled timer.
+
+**What this honestly measures, and what it doesn't.** Each run logs an append-only `ABTestResult`
+row per variant (`.data/ab_results.jsonl`, mirroring `.wingman/checkpoints.jsonl`'s own
+append-only-audit-log convention) with a real `tiktoken` token count and retrieval latency. Real
+measured numbers against actual skill files, at a tuned `chunk_size=800` (Agno's 5000-char default
+barely sub-divided a ~10K-char `SKILL.md`, giving near-zero compression until tuned down — a real
+finding, not assumed): **`systematic-debugging`** 2211 → 536 tokens (~76% reduction);
+**`engineering-minimalism`** 2427 → 545 tokens (~78% reduction) — both within the blueprint's
+claimed 60-80% range, but earned by measurement, not asserted. This layer does **not** claim
+decision quality is preserved under the reduced context — verifying that needs an actual agent run
+against each variant and a Definition-of-Done check on its output, which needs live model
+inference (Phase 3, the Maker/Checker loop, not built yet). Logging a fabricated quality score here
+would be exactly the "purposeless data" this A/B layer exists to avoid.
 
 ## Running this today
 

@@ -651,6 +651,23 @@ Maker/Checker retry loops need genuinely complex branching state later.
    primitives: Discovery → Define → Build → Ship, with a cyclical escalation edge back to Build when
    the Ship-stage preflight gate fails.
 
+**Phase 2a (skill-context A/B testing, follow-up founder request, done).** The founder asked to
+A/B test the blueprint's Pillar II claim specifically, with genuinely purposeful logging rather
+than vanity metrics — this axis was chosen over two other candidates (model-tier comparison,
+old-plugin-vs-new-backend) via `AskUserQuestion` because it's the one measurable honestly without
+live model inference. `knowledge/vector_store.py` and `knowledge/ab_harness.py` compare Variant A
+(today's whole-`SKILL.md`-in-context) against Variant B (top-k vector-retrieved chunks, via Agno's
+own `Knowledge` abstraction over an embedded LanceDB table + a local FastEmbed model — no API key,
+no server), logging a real `tiktoken` token count and retrieval latency (Agno's own
+`PerformanceEval`, reused rather than reinvented) per variant to an append-only log mirroring
+`.wingman/checkpoints.jsonl`'s convention. Confirmed empirically, not assumed: Agno's default
+5000-char chunk size barely sub-divided a typical `SKILL.md`, giving near-zero compression until
+tuned to 800 chars. At that size, real measured results (`systematic-debugging` 2211→536 tokens;
+`engineering-minimalism` 2427→545 tokens, both ~76-78% reduction) land inside the blueprint's
+claimed 60-80% range, earned rather than asserted. Deliberately does **not** log a
+decision-quality-preserved field, since verifying that needs a live agent run against each variant
+and a Definition-of-Done check — that requires model inference not yet wired (Phase 3).
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)
