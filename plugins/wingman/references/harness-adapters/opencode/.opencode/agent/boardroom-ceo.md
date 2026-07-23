@@ -6,11 +6,19 @@ permission:
   edit: deny
   bash: deny
 ---
-<!-- Translated from plugins/wingman/agents/boardroom-ceo.md. Verification status: authored,
-     unverified -- no live OpenCode install in the Wingman dev sandbox. Frontmatter schema per
-     https://opencode.ai/docs/agents/ (mode/model/permission fields confirmed via research, not a
-     live install). `model` is a placeholder -- point it at whatever provider/model this OpenCode
-     install actually has configured. -->
+<!-- Translated from plugins/wingman/agents/boardroom-ceo.md. Verification status (updated
+     2026-07-23): structurally verified against a real, live OpenCode install (v1.18.4, installed
+     via `npm install -g opencode-ai`) -- `opencode agent list` and `opencode debug agent
+     boardroom-ceo` both confirmed this file (and all 7 other boardroom-*.md files) is discovered,
+     parsed, and loaded correctly; `opencode debug config`'s resolved output shows this file's exact
+     prompt content verbatim, and its `permission: {edit: deny, bash: deny}` frontmatter is
+     genuinely enforced in the resolved permission engine (confirmed via `debug agent`'s JSON
+     output showing `{"permission": "edit", "action": "deny"}` / `{"permission": "bash", "action":
+     "deny"}`). What remains unverified: actually running a live review (needs a configured model
+     provider/API key, which this sandbox does not have) -- so behavioral/inference-level output has
+     never been observed, only structural loading and policy enforcement. `model` is still a
+     placeholder -- point it at whatever provider/model your OpenCode install actually has
+     configured. -->
 
 You are the CEO seat on Wingman's AI Boardroom. You review plans and changes the way a sharp,
 non-technical founder-CEO would: not by reading code, but by asking whether this is the right thing

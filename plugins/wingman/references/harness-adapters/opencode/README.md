@@ -1,9 +1,24 @@
 # OpenCode adapter for Wingman's Boardroom
 
-**Verification status: authored, unverified.** No live OpenCode install exists in the Wingman dev
-sandbox this was built in. Everything below is a faithful, best-effort translation checked against
-public OpenCode documentation (cited in `../README.md` and `docs/ARCHITECTURE.md` §8b), not against
-a real running session.
+**Verification status (updated 2026-07-23): structurally verified against a real, live OpenCode
+install** (v1.18.4, `npm install -g opencode-ai`, no fabricated environment — installed and run
+directly in this dev sandbox). Confirmed for real, not just checked against documentation:
+
+- All 8 `boardroom-*.md` agent files are discovered, parsed, and loaded (`opencode agent list`
+  correctly typed each as `(subagent)`).
+- `opencode debug config`'s resolved output shows each file's exact prompt content verbatim — no
+  parsing loss or truncation.
+- `boardroom-ceo.md`'s `permission: {edit: deny, bash: deny}` frontmatter is genuinely enforced in
+  the resolved permission engine (`opencode debug agent boardroom-ceo` shows the real deny rules).
+- `.opencode/plugin/wingman-gate.js` is registered — `opencode debug config`'s top-level `plugin`
+  array lists this exact file, confirming the plugin export shape loaded without error.
+- The plugin's hook name (`tool.execute.before`) and matched tool name (`plan_exit`) are both
+  independently confirmed against real sources beyond this project's own research (a documented
+  OpenCode plugin hook, and a real GitHub issue referencing `plan_exit` by name).
+
+**What's still unverified**: actual live model inference — a real Boardroom review firing end to
+end. This sandbox has no configured model provider/API key for OpenCode, so the throw-on-reject gate
+logic has never been observed running live, only confirmed to load and enforce policy correctly.
 
 ## What's here
 
@@ -25,9 +40,9 @@ a real running session.
 1. Copy this directory's `.opencode/` folder into your project root: `cp -r .opencode /path/to/your/project/`.
 2. Edit each `boardroom-*.md`'s `model:` field to a model your OpenCode install actually has
    configured (the placeholders here are guesses, not confirmed defaults).
-3. Confirm `.opencode/plugin/wingman-gate.js` actually loads (OpenCode's plugin-loading location and
-   exact hook-registration API weren't verified against a live install — check your OpenCode
-   version's own plugin docs if it doesn't).
+3. Confirm `.opencode/plugin/wingman-gate.js` actually loads — this specific loading path and hook
+   registration are confirmed working against OpenCode v1.18.4 (`opencode debug config` shows the
+   file registered); if a different version doesn't pick it up, check that version's own plugin docs.
 
 ## Running a Boardroom review under OpenCode
 

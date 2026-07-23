@@ -258,7 +258,7 @@ either a working non-Claude-Code path or an honestly-documented degradation):
 
 **Re-checked against 2026 SOTA multi-harness conventions (2026-07-22)**: researched the AGENTS.md open standard (formalized August 2025, donated to the Linux Foundation's Agentic AI Foundation December 2025; 60,000+ adopting projects, 30+ tools) and a real multi-harness precedent (`wshobson/agents`, which auto-generates native per-harness artifacts from one source because its agents don't depend on harness-unique interactive primitives). This section's conclusion holds: `wshobson/agents`' generation approach only works *because* its agents avoid exactly the couplings (`AskUserQuestion`, `ExitPlanMode`, one-message parallel `Task`/`Agent` fan-out) that the Boardroom review loop structurally depends on — applying that pattern here would overclaim portability, not add it. One concrete, low-risk change did come out of the research: the repo now follows the AGENTS.md standard's own convention of `AGENTS.md` as the canonical file with `CLAUDE.md` as a symlink to it (previously reversed) — a documentation-layer change, not an execution-portability one.
 
-## 8b. Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21)
+## 8b. Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21, re-verified 2026-07-23)
 
 §8a's "revisit if a specific harness with this gap is actually targeted" escape hatch was invoked
 for real: two named harnesses, Codex CLI and OpenCode. `plugins/wingman/references/harness-adapters/`
@@ -268,18 +268,30 @@ overclaiming. Full citation list and the deliberately-not-attempted list live in
 `README.md`; summary here:
 
 - **8 Boardroom seat personas, translated into both harnesses' native agent formats** (Codex CLI
-  `.codex/agents/*.toml`; OpenCode `.opencode/agent/*.md`) — `authored, unverified`. The review
-  criteria and `## <SEAT> VERDICT` output contract are harness-agnostic prose, so this is the
-  highest-confidence translation in the adapter, but neither harness is installed in this dev repo,
-  so neither has been run for real.
+  `.codex/agents/*.toml`; OpenCode `.opencode/agent/*.md`). **Updated 2026-07-23**: both `opencode`
+  (v1.18.4) and `codex` (0.145.0) CLIs were actually installed in this dev sandbox (`npm install -g
+  opencode-ai` / `npm install -g @openai/codex`) — this had never been possible before. For OpenCode:
+  now `structurally verified (live install)` — `opencode agent list` correctly discovered and typed
+  all 8 files as `(subagent)`, `opencode debug config`'s resolved output reproduced each file's exact
+  prompt content verbatim, and `boardroom-ceo.md`'s `permission: {edit: deny, bash: deny}` frontmatter
+  is genuinely enforced in the resolved permission engine. For Codex CLI: still `authored, unverified`
+  at the runtime level — the CLI installs and runs (`codex doctor` succeeds structurally), but no
+  account/API key exists in this sandbox, and Codex CLI exposes no config-listing command for custom
+  agents the way OpenCode's `agent list`/`debug agent` do, so recognition of the actual `.toml` files
+  couldn't be directly confirmed. The directory convention and field schema were independently
+  re-confirmed correct against real documentation, which was already the prior claim, not new ground.
 - **The `boardroom-checkpoint.mjs` plan-approval gate, ported to an OpenCode plugin**
-  (`opencode/.opencode/plugin/wingman-gate.js`) — `authored, unverified`, but its core decision logic
-  (`evaluateCheckpoint`, a direct line-for-line port of `isApprovedCheckpoint`) is plain JS with no
-  OpenCode dependency, so only the plugin-wiring shell around it carries real uncertainty. Enabled by
-  a genuine structural find: OpenCode's `plan_exit` tool is a near-exact analog of `ExitPlanMode`.
-  Codex CLI has no equivalent — it uses `approval_policy` instead of a plan-mode tool at all, so this
-  specific gate has no Codex port; that's a real capability gap in the target harness, not an
-  oversight.
+  (`opencode/.opencode/plugin/wingman-gate.js`) — **updated 2026-07-23: `structurally verified (live
+  install)`.** `opencode debug config`'s resolved output lists this exact file in its top-level
+  `plugin` array, confirming the plugin export shape loaded without error. Both the hook name
+  (`tool.execute.before`) and the matched tool name (`plan_exit`) are now independently confirmed
+  against real sources beyond this project's own prior research — a documented OpenCode plugin hook,
+  and a live GitHub issue (`anomalyco/opencode#18515`) referencing `plan_exit` by name. What remains
+  unverified: the gate actually firing during a real plan-mode session end to end, which needs a
+  configured model provider this sandbox doesn't have — so the throw-on-reject path itself has never
+  been observed live, only confirmed to load and enforce policy correctly. Codex CLI has no
+  equivalent — it uses `approval_policy` instead of a plan-mode tool at all, so this specific gate has
+  no Codex port; that's a real capability gap in the target harness, not an oversight.
 - **The git-push safety gate, made genuinely harness-agnostic and installable** —
   `plugins/wingman/scripts/install-git-hooks.mjs`, **built and tested** (the one fully-verified
   artifact from this investment): an idempotent, opt-in installer that wires the existing

@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.5.38] - 2026-07-23
+
+### Changed
+- **`plugins/wingman/references/harness-adapters/opencode/`** — verification status upgraded from `authored, unverified` to a new `structurally verified (live install)` tier after installing real OpenCode (v1.18.4) and Codex CLI (v0.145.0) in this dev sandbox for the first time. Confirmed: all 8 Boardroom seat files are discovered/parsed/loaded correctly, `boardroom-ceo.md`'s deny-edit/deny-bash permissions are genuinely enforced, and `wingman-gate.js` is registered with its hook name/matched tool name independently confirmed against real sources. Live model inference remains unverified (no configured API key in this sandbox). Codex CLI stays `authored, unverified` at the runtime level — no config-listing command exists to confirm agent-file recognition the way OpenCode's does.
+
 ## [0.5.37] - 2026-07-22
 
 ### Fixed
