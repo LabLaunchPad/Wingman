@@ -1,53 +1,53 @@
 case	fixture	covers
-advisory	(none: an orchestrating command with no code of its own to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session)	plugins/wingman/commands/adaptive/advisory.md; founder-cfo; founder-cmo
+advisory	(none: an orchestrating command with no code of its own to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session)	plugins/wingman/commands/adaptive/advisory.md
 anti-rationalization	evals/fixtures/setup-anti-rationalization-fixture.sh	plugins/wingman/skills/discipline/anti-rationalization/SKILL.md
-architecture	evals/fixtures/setup-architecture-fixture.sh	plugins/wingman/commands/pipeline/architecture.md; seven-stage-pipeline-e2e.md; ARCH-*; DEF-*
+architecture	evals/fixtures/setup-architecture-fixture.sh	plugins/wingman/commands/pipeline/architecture.md; seven-stage-pipeline-e2e.md
 bloat-audit	evals/fixtures/setup-bloat-audit-fixture.sh	plugins/wingman/commands/adaptive/bloat-audit.md
-boardroom-7-seat	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md; boardroom-gate-rule.md
+boardroom-7-seat	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md
 boardroom-expand	evals/fixtures/setup-boardroom-gate-fixture.sh	commands/adaptive/boardroom.md
-boardroom-gate-rule	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md; DO NOT SHIP; department-lead-activation; evolve-promotion; full-pipeline-e2e; GO; GO WITH CHANGES
-build	evals/fixtures/setup-build-tdd-fixture.sh	plugins/wingman/commands/pipeline/build.md; full-pipeline-e2e.md; build.md
+boardroom-gate-rule	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md
+build	evals/fixtures/setup-build-tdd-fixture.sh	plugins/wingman/commands/pipeline/build.md; full-pipeline-e2e.md
 code-review	(none: fixture is a plain inline project description shared with several other cases in the same consolidated session, not a dedicated setup-*.sh script)	plugins/wingman/skills/mechanics/code-review/SKILL.md
 council	(none: fixture is a single inline decision question, not a setup-*.sh script)	plugins/wingman/skills/response/council/SKILL.md
-debt-ledger	evals/fixtures/setup-debt-ledger-fixture.sh	plugins/wingman/commands/adaptive/debt-ledger.md; // minimal:
-define	evals/fixtures/setup-define-fixture.sh	plugins/wingman/commands/pipeline/define.md; seven-stage-pipeline-e2e.md; DEF-*; /wingman:architecture
+debt-ledger	evals/fixtures/setup-debt-ledger-fixture.sh	plugins/wingman/commands/adaptive/debt-ledger.md
+define	evals/fixtures/setup-define-fixture.sh	plugins/wingman/commands/pipeline/define.md; seven-stage-pipeline-e2e.md
 definition-of-done	evals/fixtures/setup-dod-fixture.sh	plugins/wingman/skills/governance/definition-of-done/SKILL.md
 department-lead-activation	evals/fixtures/setup-fetch-app.sh	plugins/wingman/skills/governance/department-lead-activation/SKILL.md
 design-taste	(none: fixture is a hand-built HTML/design-tokens pair, not a setup-*.sh script)	plugins/wingman/skills/output/design-taste/SKILL.md
-discovery	evals/fixtures/setup-discovery-fixture.sh	plugins/wingman/commands/pipeline/discovery.md; seven-stage-pipeline-e2e.md; /wingman:define
+discovery	evals/fixtures/setup-discovery-fixture.sh	plugins/wingman/commands/pipeline/discovery.md; seven-stage-pipeline-e2e.md
 doc-index	evals/fixtures/setup-doc-index-fixture.sh	plugins/wingman/skills/knowledge/doc-index/SKILL.md
 dod-pre-push-check	(none: constructed inline, mirrors dod-structural-gate.md's own convention for tiny 2-3-file fixtures)	plugins/wingman/scripts/dod-pre-push-check.mjs
-dod-structural-gate	(none: fixtures are inline git repos built per-run (see "## Fixtures (inline git repos, not setup-*.sh scripts)" below), not a setup-*.sh script)	plugins/wingman/hooks/dod-structural-gate.mjs; git push; boardroom-checkpoint.mjs
+dod-structural-gate	(none: fixtures are inline git repos built per-run (see "## Fixtures (inline git repos, not setup-*.sh scripts)" below), not a setup-*.sh script)	plugins/wingman/hooks/dod-structural-gate.mjs
 dogfood-gap-classification	(none: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script)	plugins/wingman/skills/governance/dogfood-gap-classification/SKILL.md
 dogfood	evals/fixtures/setup-dogfood-simple.sh	plugins/wingman/commands/adaptive/dogfood.md
 doubt-driven-development	evals/fixtures/setup-doubt-driven-fixture.sh	plugins/wingman/skills/discipline/doubt-driven-development/SKILL.md
 engineering-minimalism	(none: fixture is a small scratch Node project built inline, not checked into the repo, not a setup-*.sh script)	plugins/wingman/skills/discipline/engineering-minimalism/SKILL.md
-evidence-gated-catalog	evals/fixtures/setup-evidence-gated-fixture.sh	plugins/wingman/skills/governance/evidence-gated-catalog/SKILL.md; status: proven
-evolve-promotion	evals/fixtures/setup-evolve-fixture.sh	plugins/wingman/skills/governance/evolve-promotion/SKILL.md; AskUserQuestion
+evidence-gated-catalog	evals/fixtures/setup-evidence-gated-fixture.sh	plugins/wingman/skills/governance/evidence-gated-catalog/SKILL.md
+evolve-promotion	evals/fixtures/setup-evolve-fixture.sh	plugins/wingman/skills/governance/evolve-promotion/SKILL.md; commands/adaptive/evolve.md
 founder-cfo	(none: a verdict-rendering skill with no code to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session)	plugins/wingman/skills/personas/founder-cfo/SKILL.md
 founder-cmo	(none: a verdict-rendering skill with no code to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session)	plugins/wingman/skills/personas/founder-cmo/SKILL.md
 founder-cro	(none: a verdict-rendering skill with no code to set up as a fixture; evidence comes from a real dispatch inside a shared consolidated session)	plugins/wingman/skills/personas/founder-cro/SKILL.md
-full-pipeline-e2e	evals/fixtures/setup-waitlist-app.sh	/wingman:plan; /wingman:build; /wingman:secure; /wingman:ship; docs/PROJECT.md
+full-pipeline-e2e	evals/fixtures/setup-waitlist-app.sh	whole Wingman SDLC pipeline — `/wingman:plan` → `/wingman:build` → `/wingman:secure` → `/wingman:ship` — run in sequence against one continuous realistic project, rather than testing any single skill or command in isolation
 git-pr-workflow	(none: evidence comes from directly-constructed real git scenarios (bare repos, simulated squash-merges) built inline per run, not a dedicated setup-*.sh script)	plugins/wingman/skills/mechanics/git-pr-workflow/SKILL.md
 harness	evals/fixtures/setup-harness-fake-fixture.sh	plugins/wingman/commands/adaptive/harness.md
-hotfix	evals/fixtures/setup-hotfix-fixture.sh	plugins/wingman/commands/adaptive/hotfix.md; systematic-debugging
-implementation-planning	evals/fixtures/setup-implementation-planning-fixture.sh	plugins/wingman/commands/pipeline/implementation-planning.md; seven-stage-pipeline-e2e.md; wingman:req; /wingman:boardroom; ExitPlanMode
+hotfix	evals/fixtures/setup-hotfix-fixture.sh	plugins/wingman/commands/adaptive/hotfix.md
+implementation-planning	evals/fixtures/setup-implementation-planning-fixture.sh	plugins/wingman/commands/pipeline/implementation-planning.md; seven-stage-pipeline-e2e.md
 incident-response	(none: shares code-review.md's inline fixture description, not a dedicated setup-*.sh script)	plugins/wingman/skills/response/incident-response/SKILL.md; commands/adaptive/incident.md
 interview-one-question-at-a-time	evals/fixtures/setup-interview-fixture.sh	plugins/wingman/skills/mechanics/interview-one-question-at-a-time/SKILL.md
 knowledge-export	evals/fixtures/setup-knowledge-export-fixture.sh	plugins/wingman/scripts/okf-export.mjs; commands/adaptive/knowledge-export.md
-launch	evals/fixtures/setup-launch-fixture.sh	plugins/wingman/commands/adaptive/launch.md; dept-growth; /wingman:boardroom
-learn	evals/fixtures/setup-waitlist-app.sh	plugins/wingman/commands/adaptive/learn.md; LEARNINGS.md
-management-board-activation	evals/fixtures/setup-fetch-app.sh	plugins/wingman/skills/governance/management-board-activation/SKILL.md; department-lead-activation.md
+launch	evals/fixtures/setup-launch-fixture.sh	plugins/wingman/commands/adaptive/launch.md
+learn	evals/fixtures/setup-waitlist-app.sh	plugins/wingman/commands/adaptive/learn.md
+management-board-activation	evals/fixtures/setup-fetch-app.sh	plugins/wingman/skills/governance/management-board-activation/SKILL.md
 memory	(none: evidence is downstream output of the other skills' real work in the same shared consolidated session, not a dedicated setup-*.sh script)	plugins/wingman/skills/knowledge/memory/SKILL.md
 over-engineering-review	evals/fixtures/setup-over-engineering-review-fixture.sh	plugins/wingman/commands/adaptive/over-engineering-review.md
 package-manager-selection	evals/fixtures/setup-new-node-project.sh	plugins/wingman/skills/mechanics/package-manager-selection/SKILL.md
 plain-language-checkpoint	(none: fixture is an inline raw-technical-finding scenario, not a setup-*.sh script)	plugins/wingman/skills/output/plain-language-checkpoint/SKILL.md
 plan	(retired)	(retired)
 platform-native-reference	evals/fixtures/setup-platform-native-reference-fixture.sh	plugins/wingman/skills/knowledge/platform-native-reference/SKILL.md
-ponytail-debt-harvesting	evals/fixtures/setup-ponytail-debt-harvesting-fixture.sh	plugins/wingman/skills/response/ponytail-debt-harvesting/SKILL.md; // minimal:
+ponytail-debt-harvesting	evals/fixtures/setup-ponytail-debt-harvesting-fixture.sh	plugins/wingman/skills/response/ponytail-debt-harvesting/SKILL.md
 prompt-diff-check	evals/fixtures/setup-prompt-diff-check-fixture.sh	plugins/wingman/skills/knowledge/prompt-diff-check/SKILL.md
 research	(none: evidence comes from a real query against live web search inside a shared consolidated session, not a synthetic fixture)	plugins/wingman/skills/knowledge/research/SKILL.md; commands/adaptive/research.md
-retro	evals/fixtures/setup-ledger-fixture.sh	plugins/wingman/commands/adaptive/retro.md; /wingman:learn
+retro	evals/fixtures/setup-ledger-fixture.sh	plugins/wingman/commands/adaptive/retro.md
 secure	(retired)	(retired)
 security-checklist	evals/fixtures/setup-security-checklist-fixture.sh	plugins/wingman/skills/governance/security-checklist/SKILL.md
 seven-stage-pipeline-e2e	evals/fixtures/setup-waitlist-app.sh	discovery; define; architecture; uxflow; implementation-planning; build; ship; full-pipeline-e2e.md
@@ -55,15 +55,15 @@ ship	evals/fixtures/setup-ship-preflight-fixture.sh	plugins/wingman/commands/pip
 simplify	(none: shares code-review.md's inline fixture description, not a dedicated setup-*.sh script)	plugins/wingman/skills/discipline/simplify/SKILL.md
 spec-handler	evals/fixtures/setup-spec-handler-fixture.sh	plugins/wingman/skills/mechanics/spec-handler/SKILL.md
 subagent-driven-development	(none: fixture is a scratch git repo + plan built inline, not a setup-*.sh script)	plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md
-systematic-auditing	evals/fixtures/setup-audit-fixture.sh	plugins/wingman/skills/discipline/systematic-auditing/SKILL.md; plugins/wingman/commands/adaptive/audit.md; docs/PROJECT.md
-systematic-debugging	evals/fixtures/setup-systematic-debugging-fixture.sh	plugins/wingman/skills/discipline/systematic-debugging/SKILL.md; hotfix.md
+systematic-auditing	evals/fixtures/setup-audit-fixture.sh	plugins/wingman/skills/discipline/systematic-auditing/SKILL.md; plugins/wingman/commands/adaptive/audit.md
+systematic-debugging	evals/fixtures/setup-systematic-debugging-fixture.sh	plugins/wingman/skills/discipline/systematic-debugging/SKILL.md
 telemetry	evals/fixtures/setup-waitlist-app.sh	plugins/wingman/commands/adaptive/telemetry.md
 test-driven-development	(none: fixture is a minimal scratch TS project built inline, not a setup-*.sh script)	plugins/wingman/skills/discipline/test-driven-development/SKILL.md
 testing-patterns	evals/fixtures/setup-testing-patterns-fixture.sh	plugins/wingman/skills/mechanics/testing-patterns/SKILL.md
 token-economy	(none: fixture is a scratch verbose-message file built inline, not a setup-*.sh script)	plugins/wingman/skills/knowledge/token-economy/SKILL.md
 traceability-linking	(none: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script)	plugins/wingman/skills/governance/traceability-linking/SKILL.md
 traceability-validator	(none: fixtures are inline 2-file directories built per-run (see "## Fixtures (inline, not a setup-*.sh script)" below), not a setup-*.sh script)	plugins/wingman/scripts/check-traceability.mjs; traceability-linking
-uxflow	evals/fixtures/setup-uxflow-fixture.sh	plugins/wingman/commands/pipeline/uxflow.md; seven-stage-pipeline-e2e.md; visual-founder-output
+uxflow	evals/fixtures/setup-uxflow-fixture.sh	plugins/wingman/commands/pipeline/uxflow.md; seven-stage-pipeline-e2e.md
 verification-before-completion	evals/fixtures/setup-verify-true-fixture.sh	plugins/wingman/skills/discipline/verification-before-completion/SKILL.md
 verification-loop	(none: fixture is a minimal scratch TS project built by hand per run, not a setup-*.sh script)	plugins/wingman/skills/discipline/verification-loop/SKILL.md
 visual-founder-output	(none: tests a formatting/rendering-tier decision, not a code-manipulation task — a throwaway git project has nothing to seed here. Both scenarios below use fixed, inline synthetic input (a UX-flow table, a set of boardroom seat verdicts), same pattern as cases/boardroom-gate-rule.md and cases/dod-structural-gate.md.)	skills/output/visual-founder-output
