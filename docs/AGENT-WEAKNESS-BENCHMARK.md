@@ -131,14 +131,16 @@ exactly Wingman's model (the 4 mechanical validators + the Boardroom review + th
   Run 2 used an always-green build script masking a real type error via a fake `echo "succeeded"`,
   confirming the loop reads actual command output rather than trusting exit codes.
 
-<!-- wingman:weakness id=W11 rule="plugins/wingman/skills/discipline/test-driven-development" eval="" status=covered-unmeasured -->
+<!-- wingman:weakness id=W11 rule="plugins/wingman/skills/discipline/test-driven-development" eval="evals/cases/api-hallucination.md" status=covered-measured -->
 - **W11 — Hallucinating APIs / methods / libraries that don't exist.** One of the most-reported
-  coding-agent failure modes. **Partial rule:** `skills/discipline/test-driven-development` (a hallucinated API
+  coding-agent failure modes. **Rule:** `skills/discipline/test-driven-development` (a hallucinated API
   fails its test at red-green time) and `skills/knowledge/research` (check real docs before relying on an API).
-  **Not yet measured:** no eval case *specifically* provokes an API hallucination and confirms the
-  rule catches it — so this is honestly `covered-unmeasured`, not `covered-measured`. A dedicated
-  eval (a fixture that tempts a call to a plausible-but-nonexistent library method) is the concrete
-  next step if this weakness is prioritized.
+  **Measured by:** `evals/cases/api-hallucination.md` (`verified`) — two differently-shaped traps (an
+  unfamiliar-package name mismatch; a genuinely real, since-removed lodash API a model could plausibly
+  recall from stale training data). Honestly disclosed limitation in the case's own run log: neither
+  run actually triggered a hallucination-then-recovery trail to observe directly — one was prevented by
+  the research skill's check-first discipline, the other by the model's own current knowledge already
+  being correct — so the red-time recovery path specifically remains unexercised, not unmeasured.
 
 <!-- wingman:weakness id=W12 rule="" eval="" status=uncovered -->
 - **W12 — Not reading existing code/conventions before editing (reinventing or contradicting

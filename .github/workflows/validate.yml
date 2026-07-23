@@ -28,3 +28,4 @@ jobs:
       - run: node scripts/check-fixtures.mjs
       - run: node plugins/wingman/scripts/check-traceability.mjs
       - run: node plugins/wingman/scripts/check-harness-adapter-drift.mjs
+      - run: node plugins/wingman/scripts/generate-harness-adapters.mjs --check
