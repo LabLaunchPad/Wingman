@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.1] - 2026-07-23
+
+### Changed
+- **Documented Codex CLI's native plugin-install path as the recommended route for that harness** (`plugins/wingman/references/harness-adapters/codex-cli/README.md`), superseding the generated `.agents/skills/` copy as the primary method. Verified live against the real repo: `codex plugin marketplace add <repo>` + `codex plugin add wingman@wingman` reads Wingman's existing, unmodified `marketplace.json`/`plugin.json` directly — no adapter, no copying — and correctly discovers all ~40 skills from the cached install. Found via stress-testing the prior harness-parity work against real precedent repos (`wshobson/agents`'s shared-content-plus-manifest-pointer pattern). Also disclosed an undocumented, partial Codex behavior (auto-migrates 4 of 24 commands into synthetic skills, no confirmed selection rule) rather than relying on it. See `docs/ARCHITECTURE.md` §8b's addendum and `docs/PROJECT.md`'s decisions log for the full finding, including a real, evidence-backed, deliberately-deferred flat-skills-layout follow-up.
+
 ## [0.6.0] - 2026-07-23
 
 ### Added

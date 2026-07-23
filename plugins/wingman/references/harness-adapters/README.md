@@ -61,7 +61,12 @@ a `verified` status with no real evidence):
   `opencode debug skill` and a real `@openai/codex@0.145.0` install's `codex debug prompt-input`
   both listed all 40 skill names when this directory was copied into a scratch project as
   `.agents/skills/`. One shared file serves both harnesses (both read the identical path/format
-  natively — no per-harness translation of the frontmatter/body shape itself).
+  natively — no per-harness translation of the frontmatter/body shape itself). **For Codex CLI
+  specifically, this generated copy is now the secondary path, not the primary one** — see
+  `codex-cli/README.md`'s "2026-07-23 update" for the native `codex plugin marketplace add` +
+  `codex plugin add` install, which reads Wingman's own existing `plugin.json` directly with zero
+  copying at all. OpenCode has no equivalent native mechanism, so `.agents/skills/`/`.opencode/skills/`
+  stay the only real path there.
 - `opencode/.opencode/commands/` — all **24 commands**, generated verbatim from
   `plugins/wingman/commands/**`. **structurally verified (live install)** — `opencode debug config`
   showed all 24 command names, template content byte-identical to the canonical source, when

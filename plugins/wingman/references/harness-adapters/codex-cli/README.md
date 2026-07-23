@@ -19,6 +19,32 @@ load, it's more likely an API detail this research missed than a made-up feature
   this is a genuine capability gap, not an oversight. See "2026-07-22 research update" below for
   what changed on the `secret-guard.mjs` Write/Edit path.
 
+## 2026-07-23 update — the recommended install path is actually native, zero-maintenance
+
+A later research pass, live-tested against the real Wingman repo (not docs prose), found Codex CLI
+**natively installs Wingman's existing, unmodified `.claude-plugin/marketplace.json` + `plugin.json`**
+— no `.codex-plugin/` manifest, no copying, nothing in this directory required for skills specifically:
+
+```
+codex plugin marketplace add /path/to/Wingman   # or a git URL / owner/repo
+codex plugin add wingman@wingman
+```
+
+Verified directly: this cached the real plugin to `~/.codex/plugins/cache/wingman/wingman/<version>/`,
+and a subsequent `codex debug prompt-input` in a fresh project showed **all ~40 skills** genuinely
+discovered (name, description, and a real file pointer into the cache) — no adapter, no generator, no
+translation. **This is the recommended install path for Codex CLI users going forward**, ahead of the
+generated `.agents/skills/` copies in `../shared/.agents/skills/` (which still work, and remain useful
+for a project that wants the files present without going through Codex's plugin-cache mechanism).
+
+**One partial, undocumented behavior worth knowing about, not relying on**: Codex's install step also
+auto-migrates *some* commands into synthetic skill files under a path it generates itself
+(`.codex-plugin/migrated-command-skills/source-command-<name>/SKILL.md`, inside its own cache) — but
+only 4 of Wingman's 24 commands did this in testing (`advisory`, `harness`, `incident`, `research`),
+with no confirmed rule for which commands qualify. Don't rely on it for command coverage — use
+`../codex-cli/commands-as-agents-md.md` (pasted into your project's `AGENTS.md`) for the reliable,
+complete path to all 24 commands instead.
+
 ## 2026-07-22 research update — Bash matcher confirmed, Write/Edit matcher partially confirmed
 
 A follow-up platform-conventions audit fetched OpenAI's official Codex hooks reference

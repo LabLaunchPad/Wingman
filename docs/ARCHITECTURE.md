@@ -293,6 +293,26 @@ not verified: actual model-inference behavior under either harness (no API key c
 sandbox — a `docs/HUMAN-TODOS.md` item, not an engineering gap). See `harness-adapters/README.md`'s
 "What's here" section for the full breakdown and exact commands run.
 
+**Addendum, same day — a bigger discovery than the generator itself**: real precedent research
+(`wshobson/agents`, `affaan-m/ECC`, `obra/superpowers` — all already vendored in this repo, inspected
+directly rather than trusted from search summaries) plus a live test against the real Wingman repo
+found that **Codex CLI natively installs Wingman's existing, unmodified `marketplace.json`+
+`plugin.json`** — `codex plugin marketplace add <repo>` then `codex plugin add wingman@wingman` — with
+zero copying, zero adapter needed, for the skill surface specifically. This is now the documented,
+recommended install path for Codex CLI users (`codex-cli/README.md`'s "2026-07-23 update"); the
+generated `.agents/skills/` copy remains a working secondary path. OpenCode has no equivalent bundle-
+install mechanism (`opencode plugin <module>` only installs single npm-module JS plugins), so its
+generated `.opencode/skills/`+`.opencode/commands/` copies stay the only real path there. A related,
+lower-priority, deliberately-deferred finding: `affaan-m/ECC` and other precedent repos use a **flat**
+`skills/<name>/` layout (no category subdirectory) that's natively `.agents/skills/`-compatible,
+unlike Wingman's own `skills/<category>/<name>/` nesting — real precedent-matching, but its actual
+functional value is smaller than it first looks (OpenCode/Codex CLI's raw-file-discovery paths are
+project-root-relative regardless of Wingman's internal nesting, so the generated-copy step would
+still be needed for those; flattening would only matter for the Codex plugin-cache path, which reads
+Wingman's own tree directly) — logged as a named, evidence-backed, deliberately deferred follow-up,
+not bundled into this pass given its larger blast radius (all 40 `plugin.json` skill paths plus every
+skill's internal cross-references).
+
 - **8 Boardroom seat personas, translated into both harnesses' native agent formats** (Codex CLI
   `.codex/agents/*.toml`; OpenCode `.opencode/agent/*.md`). **Updated 2026-07-23**: both `opencode`
   (v1.18.4) and `codex` (0.145.0) CLIs were actually installed in this dev sandbox (`npm install -g
