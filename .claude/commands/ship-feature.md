@@ -1,5 +1,5 @@
 ---
-description: Experimental — thin client to the agnostic-boardroom Python backend (route_task/retrieve_memories MCP tools + scoped git/gh bash). Not part of the shipped plugin surface; not registered in plugin.json. Still stops at every one of the real 7-stage pipeline checkpoints for founder sign-off — this is not an unattended, fully-autonomous ship command.
+description: Experimental — thin client to the agnostic-boardroom Python backend (route_task/retrieve_memories_tool MCP tools + scoped git/gh bash). Not part of the shipped plugin surface; not registered in plugin.json. Still stops at every one of the real 7-stage pipeline checkpoints for founder sign-off — this is not an unattended, fully-autonomous ship command.
 argument-hint: "<issue-number>"
 ---
 
@@ -31,7 +31,7 @@ and running the scoped `git`/`gh` steps a founder would otherwise type by hand.
 
 ## What it invokes
 
-- `agnostic-boardroom/mcp_server`'s `retrieve_memories` tool — pulls project-durable memory relevant
+- `agnostic-boardroom/mcp_server`'s `retrieve_memories_tool` — pulls project-durable memory relevant
   to the named issue before starting, so the agent isn't starting from zero context.
 - `agnostic-boardroom/knowledge/skill_router.py`'s `route_task` — picks the single most relevant
   Wingman skill for the current stage's work, rather than the agent guessing.

@@ -9,6 +9,16 @@ typed MCP tools.
 
 from __future__ import annotations
 
+import logging
+
+# Real bug found via a live MCP client test: Agno's own INFO logging (e.g.
+# "Creating table: ...", "Adding content from ...") writes to stdout by
+# default, which corrupts the stdio transport's JSON-RPC framing -- stdout
+# must carry protocol messages only. Disabling below CRITICAL process-wide
+# is the standard fix for a stdio MCP server pulling in a chatty dependency;
+# confirmed necessary and sufficient by re-running the client test after.
+logging.disable(logging.WARNING)
+
 from mcp.server.fastmcp import FastMCP
 
 from db.connection import get_connection

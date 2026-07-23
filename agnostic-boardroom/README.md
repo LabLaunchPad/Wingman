@@ -1,10 +1,39 @@
 # Agnostic Boardroom (experimental, in-progress rewrite)
 
-**Status: Phase 1 (Data & Schema) done. Phase 2a (skill-context A/B testing) done. Phase 2 (data
-substrate + memory MCP server + skill router + loop/graph engineering + an experimental slash
-command) done. 36/36 fast tests pass, plus 2/2 real live-model tests (run explicitly, cost real
-money). Not installable as a plugin, not wired into `plugins/wingman/` — this remains a standalone,
-additive backend.**
+**Status: Phase 1 (Data & Schema), Phase 2a (skill-context A/B testing), Phase 2 (data substrate,
+memory MCP server, skill router, loop/graph engineering, an experimental slash command), and Phase
+2b (real MCP client wiring, skill-router→loop integration, an end-to-end dry run) all done. 42/42
+fast tests pass, plus 2/2 real live-model tests (run explicitly, cost real money). Not installable
+as a plugin, not wired into `plugins/wingman/` — this remains a standalone, additive backend.**
+
+## Phase 2b: closing the "built in isolation" gaps
+
+Phase 2 shipped three pieces that were each tested on their own but never proven to work *together*:
+the memory MCP server was never run as a live subprocess, `skill_router.py`'s `route_task()` was
+never actually fed into `agents/loop.py`'s `run_maker_checker_loop()`, and `.claude/commands/
+ship-feature.md`'s described chain (memory → routing → loop) was never exercised end to end. All
+three closed:
+
+- **A real MCP client** (`tests/test_mcp_server_live.py`, using `mcp.client.stdio` + `ClientSession`)
+  spawns `python -m mcp_server.server` as a genuine subprocess and calls its 3 tools over the actual
+  protocol. **Found and fixed a real bug in the process**: Agno's own `INFO` logging writes to
+  stdout by default, which corrupted the stdio transport's JSON-RPC framing — `logging.disable()`
+  in `mcp_server/server.py` fixes it. A second real finding: `python mcp_server/server.py` (script
+  mode) puts `mcp_server/` itself on `sys.path`, not the repo root, breaking `from db.connection
+  import ...` — the fix is invoking as `python -m mcp_server.server` with `cwd` set to the repo root.
+- **`agents/pipeline.py`** wires `route_task()`'s output into `run_maker_checker_loop()`'s `context`
+  for real (`run_task_with_routing`), surfacing `routing.confidence` explicitly rather than
+  swallowing a `low_confidence_fallback` result. Verified with real routing (the real 40-skill
+  index) + a fake, zero-cost `call_model` for the loop side: the routed skill's actual text is
+  confirmed present in what the Maker's prompt received, not just structurally on the result object.
+- **`run_ship_feature_dry_run()`** (also in `agents/pipeline.py`) exercises the full chain: real
+  memory retrieval → real skill routing → the wired loop, with every stage's output inspectable, not
+  just the final answer. `tests/test_end_to_end_dry_run.py` seeds a real memory fact and confirms it
+  genuinely reaches the Maker's prompt alongside the routed skill's text.
+
+Deliberately did **not** re-spend real `claude -p` money proving the Maker/Checker loop's own live
+rejection behavior again here — that's already proven in `tests/test_loop_live.py`; these new tests
+prove the *wiring* is real using mocked, zero-cost model calls.
 
 This is a from-scratch Python backend rebuild of Wingman's Boardroom/pipeline concepts as a
 standalone, agent-agnostic MCP server — LangGraph-style graph orchestration (via
