@@ -62,6 +62,6 @@ accounting this content is scoped against.
 
 `references/org-template/` holds static reference content for context a founder builds up across
 projects (a project-type catalog + 7 playbooks, plus `founder-preferences.md`/`capability-map.md`
-guidance) — cited from `commands/pipeline/discovery.md` and `skills/knowledge/memory`. Deliberately
+guidance) — cited from `commands/pipeline/discovery.md` and `skills/memory`. Deliberately
 scoped down from a much larger founder-org-scaffold proposal; see that directory's own `README.md`
 and `docs/PROJECT.md`'s decisions log (2026-07-22) for what was excluded and why.
