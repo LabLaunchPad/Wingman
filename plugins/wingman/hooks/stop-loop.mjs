@@ -106,6 +106,23 @@ export function evaluate(config, lastText = '', iterationCount = 0, extra = {}) 
 function readStdin() {
   try { return readFileSync(0, 'utf-8'); } catch { return ''; }
 }
+// Assistant message content can be a plain string, or (the common real-world
+// shape, e.g. any message that also includes a tool_use block) an array of
+// content blocks. Found by audit: this previously only handled the string
+// shape, so a real completion message ended up read as '' and the
+// completionPromise check could never match -- silently defeating the "stop
+// once the agent's own message includes the exact promised string" behavior.
+function extractAssistantText(content) {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) {
+    return content
+      .filter((block) => block?.type === 'text')
+      .map((block) => block.text || '')
+      .join('');
+  }
+  return '';
+}
+
 function readLastAssistant(transcriptPath) {
   if (!transcriptPath || !existsSync(transcriptPath)) return '';
   try {
@@ -115,8 +132,9 @@ function readLastAssistant(transcriptPath) {
     for (const line of lines) {
       try {
         const entry = JSON.parse(line);
-        if (entry?.type === 'assistant' && typeof entry.message?.content === 'string') {
-          last = entry.message.content;
+        if (entry?.type === 'assistant') {
+          const text = extractAssistantText(entry.message?.content);
+          if (text) last = text;
         }
       } catch { /* skip non-JSON lines */ }
     }
@@ -127,10 +145,7 @@ function readLastAssistant(transcriptPath) {
 }
 
 // Extracts the most recent `limit` tool calls (name + input) from the
-// transcript, oldest-first, as comparable signature strings. Assistant
-// messages can carry an array of content blocks (text + tool_use) rather
-// than a plain string — readLastAssistant() only handles the string shape,
-// so this walks the array shape separately rather than overloading it.
+// transcript, oldest-first, as comparable signature strings.
 function readRecentToolSignatures(transcriptPath, limit) {
   if (!transcriptPath || !existsSync(transcriptPath)) return [];
   try {

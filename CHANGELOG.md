@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.4] - 2026-07-23
+
+### Fixed
+- **`hooks/stop-loop.mjs`'s `readLastAssistant()` only handled a plain-string assistant message.** Real Claude Code transcripts store assistant `message.content` as an array of content blocks (text + `tool_use`) whenever the same turn also calls a tool — the common real-world shape, not the exception. A completion message shaped that way was silently read as `''`, so the `completionPromise` text-match could never succeed and the loop's "stop once the agent's own message includes the exact promised string" behavior was quietly defeated for any turn that also used a tool. Found by a `/wingman:audit` pass, independently reproduced with a standalone transcript fixture before fixing. Added `extractAssistantText()` to handle both shapes; new regression test in `tests/hooks-integration/hooks-integration.test.mjs` covers the array-content case.
+
 ## [0.6.3] - 2026-07-23
 
 ### Changed

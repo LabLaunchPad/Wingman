@@ -621,6 +621,21 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
       return transcriptPath;
     }
 
+    // Real Claude Code transcripts store assistant content as an array of content
+    // blocks (text + tool_use), not always a plain string -- this is the shape a
+    // /wingman:audit pass found readLastAssistant() previously mishandled entirely.
+    function writeTranscriptClaimingDoneArrayContent(text) {
+      const transcriptPath = path.join(tempDir, 'transcript.jsonl');
+      fs.writeFileSync(
+        transcriptPath,
+        JSON.stringify({
+          type: 'assistant',
+          message: { content: [{ type: 'tool_use', name: 'Bash', input: {} }, { type: 'text', text }] },
+        }) + '\n'
+      );
+      return transcriptPath;
+    }
+
     beforeEach(() => {
       if (fs.existsSync(tempDir)) fs.rmSync(tempDir, { recursive: true, force: true });
       fs.mkdirSync(path.join(tempDir, '.wingman'), { recursive: true });
@@ -667,6 +682,15 @@ describe('New Safety Hooks (secret-guard / stop-loop / prompt-guard)', () => {
       // the rewritten 'exit 1' — so this stops cleanly instead of blocking.
       const res = runStopHook(writeTranscriptClaimingDone('all done DONE'));
       assert.strictEqual(res.status, 0, 'the cached (original) verifyCommand should be used, not the mid-loop rewrite');
+    });
+
+    it('reads the completion promise from array-shaped assistant content (not just a plain string)', () => {
+      fs.writeFileSync(loopPath, JSON.stringify({
+        enabled: true, completionPromise: 'DONE', verifyCommand: 'exit 0',
+      }));
+      const transcriptPath = writeTranscriptClaimingDoneArrayContent('all done DONE');
+      const res = runStopHook(transcriptPath);
+      assert.strictEqual(res.status, 0, 'array-shaped content with a text block containing the promise should still stop cleanly');
     });
   });
 
