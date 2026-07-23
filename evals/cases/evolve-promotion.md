@@ -1,6 +1,6 @@
 # Eval: evolve-promotion
 
-Tests `plugins/wingman/skills/governance/evolve-promotion/SKILL.md` behaviorally. The founder-approval gate (`AskUserQuestion`) can't be genuinely exercised by a background subagent with no real founder to answer it, so this eval is split into two parts: **Part A** tests gathering/clustering/classifying/proposing (steps 1–4, stopping before any write), and **Part B** tests file placement under a simulated approval (step 5 onward).
+Tests `plugins/wingman/skills/governance/evolve-promotion/SKILL.md` and `commands/adaptive/evolve.md` behaviorally. The founder-approval gate (`AskUserQuestion`) can't be genuinely exercised by a background subagent with no real founder to answer it, so this eval is split into two parts: **Part A** tests gathering/clustering/classifying/proposing (steps 1–4, stopping before any write), and **Part B** tests file placement under a simulated approval (step 5 onward). **Run 3** separately tests the command wrapper specifically: a fresh subagent given only `commands/adaptive/evolve.md` (not the skill file directly) must locate and read the skill itself — the one thing Runs 1–2 (which handed the subagent the skill file directly) never actually exercised.
 
 ## Fixtures
 
@@ -75,3 +75,15 @@ Tests `plugins/wingman/skills/governance/evolve-promotion/SKILL.md` behaviorally
 - Made no premature write and did not call `AskUserQuestion` — independently confirmed via `git status` in the fixture returning empty and no `.claude/` directory existing afterward.
 
 Both the positive and negative cases now pass. Promoted to `verified` (see Trust level above).
+
+### Run 3 — 2026-07-23 (command-wrapper coverage, `commands/adaptive/evolve.md`)
+
+**Motivation:** `wingman-health.mjs`'s eval-manifest-based coverage check (see `scripts/generate-eval-manifest.mjs`) correctly flagged that Runs 1–2 only ever handed a subagent the skill file directly — the `evolve` *command* itself (a thin `/wingman:evolve` entry point that just says "use the evolve-promotion skill now") had never actually been exercised. Testing whether a subagent given only the command file correctly locates and follows through to the skill is the one thing distinct from Runs 1–2.
+
+**First attempt — FAIL, real bug found.** A fresh subagent, given only `commands/adaptive/evolve.md` and the same positive fixture as Run 1, correctly located `skills/governance/evolve-promotion/SKILL.md` on its own, correctly gathered and clustered the migration-rollback friction (2 genuine occurrences, correctly excluding the single-occurrence route-naming note), but then **misclassified it as a new skill** (`.claude/skills/migration-rollback-required/SKILL.md`) instead of the specialist agent "Migration Engineer" — even though `references/specialist-catalog.md`'s own "Using this catalog" section names this exact scenario as its worked example. The subagent's own report showed why: it checked the catalog "since specialist was a candidate path" only *after* already leaning toward "skill" via the abstract command/skill/specialist test in step 3, rather than checking the catalog first as the more concrete, evidence-backed signal.
+
+**Root cause confirmed, fixed directly:** `SKILL.md` step 3 presented the catalog check as a naming detail subordinate to the specialist bullet, not as a classification signal to check before the abstract test. Added an explicit priority instruction: check `references/specialist-catalog.md` for a matching row first, and let a match override the abstract judgment call. See `docs/PROJECT.md`'s decisions log for the fix.
+
+**Re-run after the fix — PASS.** A second fresh subagent (fresh fixture copy, same procedure) correctly classified the same cluster as the **Migration Engineer** specialist agent, explicitly citing the new priority rule as the reasoning that resolved what it independently noted "reads ambiguously in isolation." Independently verified: `git status --porcelain` empty, no `.claude/` directory created, no `AskUserQuestion` called, matching Run 1's Part A discipline.
+
+This closes the real coverage gap the manifest-based check surfaced: the command wrapper is now genuinely exercised, not just assumed to inherit the skill's correctness, and the run found and fixed a real classification-ordering bug the skill-direct runs couldn't have caught (they never made the subagent independently resolve the ambiguity — they'd already implicitly framed it by which files were handed over).

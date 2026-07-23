@@ -2,6 +2,28 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.2] - 2026-07-23
+
+### Fixed
+- **`generate-harness-adapters.mjs`'s `ParallelDispatch` detection missed a word-order/line-break variant.** An independent code review (before merging PR #90) found `skills/response/council/SKILL.md` describes genuine parallel subagent dispatch ("Launch three independent voices in parallel... Each subagent...") but the regex required "parallel" to precede the trigger word within one line — missed both the reverse word order and the case where the gap crosses a line break (`.` doesn't match `\n` without the `s` flag). Fixed both; `council`, `boardroom`, and 3 other previously-under-flagged skills/commands now correctly carry the harness note.
+- **`listCommands()` hardcoded `['pipeline', 'adaptive']`** as the only scanned command categories — silently would have skipped a new category directory with no error. Now scans all subdirectories dynamically, matching `listSkills()`'s existing pattern.
+- **`generate-eval-manifest.mjs`'s `COVERS_SENTENCE_RE`** could fail to match at all on a "Tests \`a.md\` and \`b.md\`" line with no em-dash/period before EOF. Added an unconditional end-of-string fallback to the lookahead.
+
+## [0.6.1] - 2026-07-23
+
+### Changed
+- **Documented Codex CLI's native plugin-install path as the recommended route for that harness** (`plugins/wingman/references/harness-adapters/codex-cli/README.md`), superseding the generated `.agents/skills/` copy as the primary method. Verified live against the real repo: `codex plugin marketplace add <repo>` + `codex plugin add wingman@wingman` reads Wingman's existing, unmodified `marketplace.json`/`plugin.json` directly — no adapter, no copying — and correctly discovers all ~40 skills from the cached install. Found via stress-testing the prior harness-parity work against real precedent repos (`wshobson/agents`'s shared-content-plus-manifest-pointer pattern). Also disclosed an undocumented, partial Codex behavior (auto-migrates 4 of 24 commands into synthetic skills, no confirmed selection rule) rather than relying on it. See `docs/ARCHITECTURE.md` §8b's addendum and `docs/PROJECT.md`'s decisions log for the full finding, including a real, evidence-backed, deliberately-deferred flat-skills-layout follow-up.
+
+## [0.6.0] - 2026-07-23
+
+### Added
+- **Full Codex CLI / OpenCode command+skill parity** (`plugins/wingman/references/harness-adapters/`), expanded from the prior Boardroom-seats-only scope on explicit founder request. New `plugins/wingman/scripts/generate-harness-adapters.mjs` generates all 40 skills to a shared `.agents/skills/` path both harnesses read natively, all 24 commands to `.opencode/commands/` for OpenCode, and a `commands-as-agents-md.md` reference for Codex CLI (which has no native command-file primitive, confirmed by direct CLI inspection). Regenerate-and-diff checked in CI (`validate.yml`) so it can't silently drift. Structurally verified against real live installs (`opencode-ai@1.18.4`, `@openai/codex@0.145.0`): all 40 skills and 24 commands confirmed discovered. See `docs/ARCHITECTURE.md` §8b and `harness-adapters/README.md` for full detail, including a disclosed Codex CLI concurrency-count discrepancy (4 vs. a previously-cited 6) and the remaining gap (live model-inference verification needs founder-provided API credentials, tracked in `docs/HUMAN-TODOS.md`).
+
+## [0.5.39] - 2026-07-23
+
+### Fixed
+- **`skills/governance/evolve-promotion/SKILL.md`** — step 3's classification rule let a subagent commit to "skill" vs. "specialist agent" via an abstract judgment call before ever checking `references/specialist-catalog.md` for a concrete matching row, even when the catalog's own worked example directly names the correct answer. Found by a real fresh-subagent simulation testing the `/wingman:evolve` command wrapper (previously untested — only the skill itself had eval coverage): given the migration-rollback fixture, it misclassified the pattern as a new skill instead of the "Migration Engineer" specialist the catalog explicitly names for this exact scenario. Fixed by making the catalog-first priority explicit; re-verified with a second independent subagent run.
+
 ## [0.5.38] - 2026-07-23
 
 ### Changed
