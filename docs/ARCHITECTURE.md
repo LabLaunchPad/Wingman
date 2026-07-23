@@ -641,15 +641,17 @@ Maker/Checker retry loops need genuinely complex branching state later.
    "`active_managers` absent → treat as `[]`" forward-compatibility rule and the
    any-`NO_GO`-blocks `blocks_advancement` gate rule kept as a fixed property, not a tunable
    parameter.
-2. **The MCP Server (not started)** — stand up `mcp_server/server.py`; prove a dummy tool call and a
-   resource read work end-to-end via a real MCP client before adding any AI logic.
-3. **The Micro-Loops (not started)** — an Agno Maker/Checker pair
-   (`agents/departments/engineering_maker.py` + `agents/boardroom/cto_evaluator.py`); prove a real,
-   bounded 3-iteration rejection loop with no human input, escalating to the founder on the 3rd
-   failure.
-4. **The Macro-Graph (not started)** — wrap the micro-loops in Agno's own workflow/topology
-   primitives: Discovery → Define → Build → Ship, with a cyclical escalation edge back to Build when
-   the Ship-stage preflight gate fails.
+2. **The MCP Server (done)** — `mcp_server/server.py`: a real memory MCP server (FastMCP, stdio
+   transport) exposing `store_memory`/`retrieve_memories`/`list_memories` over a dedicated SQLite +
+   LanceDB substrate — see the "Phase 2" writeup below for the full account.
+3. **The Micro-Loops (done)** — a real Maker/Checker pair (`agents/departments/engineering_maker.py`
+   + `agents/boardroom/cto_evaluator.py`) using headless `claude -p` subprocess calls for genuine
+   live inference, not mocked; a real, bounded 3-iteration rejection loop, escalating to the founder
+   on the 3rd failure — see below.
+4. **The Macro-Graph (done)** — `agents/graph.py` wraps the micro-loops in the real, existing
+   7-stage pipeline topology: Discovery → Define → Architecture → UX → Implementation-Planning →
+   Build → Ship, mirrored exactly (not redesigned) to serve as a control group against the old
+   plugin — see below.
 
 **Phase 2a (skill-context A/B testing, follow-up founder request, done).** The founder asked to
 A/B test the blueprint's Pillar II claim specifically, with genuinely purposeful logging rather
@@ -667,6 +669,81 @@ tuned to 800 chars. At that size, real measured results (`systematic-debugging` 
 claimed 60-80% range, earned rather than asserted. Deliberately does **not** log a
 decision-quality-preserved field, since verifying that needs a live agent run against each variant
 and a Definition-of-Done check — that requires model inference not yet wired (Phase 3).
+
+**Phase 2 (data substrate, memory MCP server, skill router, loop/graph engineering, an
+experimental slash command — done).** The founder answered every open question the Phase 2a
+clarifying-questions artifact raised, in a single detailed reply; each answer was independently
+fact-checked (via two dispatched subagents — an `Explore` pass and a `Plan` pass) rather than taken
+at face value before any code was written:
+
+- **Database: SQLite, not Postgres**, one file, one table per concern (`memory`, `checkpoints`,
+  `threat_register`, `debt_ledger`, `traceability`) mirroring the 5 existing Pydantic models exactly.
+  `db/connection.py` applies `journal_mode=WAL`, `busy_timeout=5000`, `synchronous=NORMAL`,
+  `foreign_keys=ON` on every connection (the last is per-connection, not persisted). Every query in
+  `db/repository.py` is parameterized — never string-concatenated — and every write/read
+  round-trips through the exact Pydantic models, directly answering the cited risk class (a real
+  LangGraph SQLite-checkpointer CVE that chained SQL injection into RCE via unvalidated metadata
+  deserialization): a payload failing validation on ingest lands in `threat_register` via
+  `log_schema_deviation`, never silently dropped. Runs alongside `.wingman/*.jsonl`, non-destructive.
+  8 tests pass, including a real WAL concurrency test (a second connection writes successfully while
+  a first holds an open read transaction open — no `SQLITE_BUSY`).
+- **Memory MCP server, scoped strictly to `.wingman/memory/*.md`-equivalent content** — not
+  speculatively expanded to raw checkpoints or cross-project data. "Multi-layered" = a 3-tier
+  `session`/`project`/`org` taxonomy. `mcp_server/memory_tools.py` implements `store_memory`/
+  `retrieve_memories`/`list_memories`; `retrieve_memories` does semantic search reusing
+  `vector_store.py`'s FastEmbed embedder against its own separate LanceDB table (kept
+  infrastructurally separate from the skills index, per the founder's explicit "don't merge
+  skill-routing and memory retrieval" directive). "Stress-tested" scoped exactly to the founder's
+  own stated bar (500 entries, sub-100ms reads, no concurrency claim, since none exists in this
+  project's real usage) — 5 tests pass, including that exact stress scenario.
+- **RAG/retrieval budget**: top 5-10 chunks, hard ceiling 15, cosine-similarity threshold ~0.5,
+  discard below rather than padding. Confirmed empirically before implementing: Agno's high-level
+  `Knowledge.search()` API does not expose a similarity score at all (`reranking_score` is always
+  `None` without a reranker configured) — the real score lives one layer down, on
+  `vector_db.vector_search()`'s raw `_distance` field (cosine distance; similarity = 1 − distance).
+- **Skill router (`knowledge/skill_router.py`)**: cross-skill dispatch at whole-skill granularity
+  (never a mixed cross-skill chunk context, per founder directive) over the already-built 40-skill
+  index. On a low-confidence match, proceeds anyway with the single highest-ranked skill rather than
+  halting — flagged loudly in the code and here as a known, currently-unguarded gap: the "a Checker
+  will catch a wrong pick" safety net has no real teeth until something actually wires this router's
+  output through the Maker/Checker loop below. 3 tests pass, including a real routed query and a
+  real low-confidence-fallback case.
+- **Loop/graph engineering, unblocked**: live Maker/Checker inference originally looked blocked on a
+  missing `ANTHROPIC_API_KEY`. Resolved by the founder: use the AI model already available in the AI
+  coding agent — headless `claude -p "..." --output-format json` subprocess calls
+  (`agents/model_runner.py`), the identical mechanism `evals/run-headless.mjs` already uses and
+  trusts elsewhere in this repo. Verified live in this exact sandbox before committing to the design
+  (a real completion, real `session_id`, real token usage, a real `$0.26` cost for one trivial
+  reply). `agents/departments/engineering_maker.py` + `agents/boardroom/cto_evaluator.py` implement
+  the pair; the Checker fails closed on an unparseable response (treated as reject, never silently
+  accepted). `agents/loop.py` bounds retries at 3 iterations, escalating to the founder on the 3rd
+  failure, with **per-file escalation scope** (never re-feeding an entire project's context back
+  into the Maker for one failing file) — and logs the real `total_cost_usd` every `claude -p` call
+  reports, not an estimate. `agents/graph.py` wraps the loop in the real, existing 7-stage topology,
+  mirrored exactly (a deliberate control group against the old plugin, not a redesign), and never
+  auto-advances past a stage requiring a founder checkpoint. 5 fast mocked-control-flow tests
+  (iteration cap, escalation, cost summation, fail-closed) plus **2 real live tests**
+  (`pytest -m live_model`, real dollar cost, excluded from the default run): a live Checker
+  genuinely rejecting an obviously wrong solution with a real reason, and a full live Maker→Checker
+  pass with real, non-zero logged cost. Plus 4 graph-topology tests (mirrors the real stage order;
+  never auto-advances past a checkpoint; stops rather than silently skipping a stage with no
+  registered handler).
+- **Experimental slash command, real placement correction found by actually running the
+  validator**: the founder's own answer called for `plugins/wingman/commands/experimental/`, but
+  `validate-structure.mjs`'s orphan check treats any `.md` under `plugins/wingman/commands/` not
+  listed in `plugin.json` as a hard error ("it will never load") — confirmed by running it, not
+  assumed. Landed instead at `.claude/commands/ship-feature.md` (Claude Code's real project-scoped
+  custom-command mechanism), outside `plugins/wingman/` entirely, so none of the plugin's own
+  validators apply to it while it's still a genuinely invocable command. States plainly, in prose
+  (matching `skills/git-pr-workflow`'s rationale-first style), that it still stops at every one of
+  the real 7 pipeline checkpoints — it is a thin MCP client, not a bypass of the Boardroom's
+  per-stage governance.
+
+Full validator suite (`validate-structure.mjs`, `check-repo-consistency.mjs`,
+`check-fixtures.mjs`, `check-traceability.mjs`, `check-harness-adapter-drift.mjs`) confirmed passing
+after the `.claude/commands/` correction. 36/36 fast Python tests pass (`pytest tests/`), plus 2/2
+real live-model tests run explicitly. See `docs/PROJECT.md`'s decisions log for the full record of
+the founder's answers and the two subagents' fact-checks.
 
 See `agnostic-boardroom/README.md` for current phase status.
 

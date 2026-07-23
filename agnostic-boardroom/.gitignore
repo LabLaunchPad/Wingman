@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-knowledge/.data/
-knowledge/.lancedb/
+.data/
+.lancedb/
 *.lance/
+*.sqlite3

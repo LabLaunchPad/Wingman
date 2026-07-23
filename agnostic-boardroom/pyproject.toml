@@ -9,6 +9,7 @@ dependencies = [
     "lancedb>=0.34",
     "fastembed>=0.5",
     "tiktoken>=0.13",
+    "mcp>=1.28",
 ]
 
 [project.optional-dependencies]
@@ -16,8 +17,7 @@ dev = [
     "pytest>=8.0",
 ]
 # Added in later phases, not installed yet:
-#   mcp                -- Phase 2 (MCP server: JSON-RPC 2.0 over stdio/SSE)
-#   fastapi, uvicorn   -- Phase 2 (if HTTP/SSE transport is needed alongside stdio, or Agno's own AgentOS)
+#   fastapi, uvicorn   -- if HTTP/SSE transport is needed alongside stdio, or Agno's own AgentOS
 
 [build-system]
 requires = ["hatchling"]
@@ -25,3 +25,10 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# live_model tests cost real money (headless `claude -p` calls) -- excluded
+# from the default run, run explicitly via `pytest -m live_model` when
+# Phase 3/4's real behavioral claim needs re-proving.
+addopts = "-m 'not live_model'"
+markers = [
+    "live_model: costs real money via headless `claude -p`; run explicitly, not on every test invocation",
+]
