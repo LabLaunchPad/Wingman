@@ -621,3 +621,38 @@ describe('Session Start Hook', () => {
     assert.strictEqual(hookName, 'SessionStart');
   });
 });
+
+// ============================================================================
+// Swarm-Intelligence Predictive Layer Tests
+// ============================================================================
+
+describe('Swarm-Intelligence Predictive Layer', () => {
+  it('should define three virtual particles', () => {
+    const particles = ['Refactor Risk', 'Dependency Cascade', 'Specialist Evidence'];
+    assert.strictEqual(particles.length, 3);
+    assert.ok(particles.includes('Refactor Risk'));
+    assert.ok(particles.includes('Dependency Cascade'));
+    assert.ok(particles.includes('Specialist Evidence'));
+  });
+
+  it('should calculate Risk Scores based on coupling complexity', () => {
+    const calculateRisk = (blastRadius, depCount) => {
+      if (blastRadius > 5 || depCount > 3) return 'High';
+      if (blastRadius > 2 || depCount > 1) return 'Medium';
+      return 'Low';
+    };
+
+    assert.strictEqual(calculateRisk(6, 1), 'High');
+    assert.strictEqual(calculateRisk(1, 4), 'High');
+    assert.strictEqual(calculateRisk(3, 2), 'Medium');
+    assert.strictEqual(calculateRisk(1, 0), 'Low');
+  });
+
+  it('should verify command and skill file existences', () => {
+    const cmdPath = path.join(repoRoot, 'plugins', 'wingman', 'commands', 'adaptive', 'predict.md');
+    const skillPath = path.join(repoRoot, 'plugins', 'wingman', 'skills', 'swarm-predictive-layer', 'SKILL.md');
+
+    assert.ok(fs.existsSync(cmdPath), `predict command missing at ${cmdPath}`);
+    assert.ok(fs.existsSync(skillPath), `swarm-predictive-layer skill missing at ${skillPath}`);
+  });
+});

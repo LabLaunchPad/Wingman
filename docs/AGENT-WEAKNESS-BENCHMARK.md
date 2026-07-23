@@ -55,86 +55,86 @@ exactly Wingman's model (the 4 mechanical validators + the Boardroom review + th
 
 ## Catalog
 
-<!-- wingman:weakness id=W1 rule="plugins/wingman/skills/discipline/verification-before-completion" eval="evals/cases/verification-before-completion.md" status=covered-measured -->
+<!-- wingman:weakness id=W1 rule="plugins/wingman/skills/verification-before-completion" eval="evals/cases/verification-before-completion.md" status=covered-measured -->
 - **W1 — Claiming work complete without running verification.** MAST's "premature termination"; the
   spec-verification study's "over-trust in inline self-test" (29.5%) — the agent substitutes
-  self-narrated success for a real check. **Rule:** `skills/discipline/verification-before-completion` (evidence
+  self-narrated success for a real check. **Rule:** `skills/verification-before-completion` (evidence
   before assertions; run the command, read the output). **Measured by:** `evals/cases/verification-before-completion.md`
   (`verified`) — its negative/trap A/B case is a "fixed" bug whose fix actually introduces a
   regression; the skill correctly runs real verification instead of judging the diff by eye.
 
-<!-- wingman:weakness id=W2 rule="plugins/wingman/skills/discipline/engineering-minimalism" eval="evals/cases/engineering-minimalism.md" status=covered-measured -->
+<!-- wingman:weakness id=W2 rule="plugins/wingman/skills/engineering-minimalism" eval="evals/cases/engineering-minimalism.md" status=covered-measured -->
 - **W2 — Over-engineering / over-correction (assuming a defect or need exists in already-adequate
   code).** The spec-verification study's "over-correction tendency." **Rule:**
-  `skills/discipline/engineering-minimalism` (smallest change that solves the real problem; justify any new
+  `skills/engineering-minimalism` (smallest change that solves the real problem; justify any new
   abstraction). **Measured by:** `evals/cases/engineering-minimalism.md` (`verified`) — A/B pair:
   positive (catches a tempting over-engineered solution) vs. negative (does NOT reflexively flag
   genuinely-justified structure).
 
-<!-- wingman:weakness id=W3 rule="plugins/wingman/skills/governance/traceability-linking" eval="evals/cases/traceability-validator.md" status=covered-measured -->
+<!-- wingman:weakness id=W3 rule="plugins/wingman/skills/traceability-linking" eval="evals/cases/traceability-validator.md" status=covered-measured -->
 - **W3 — Partial implementation / silently dropping spec requirements.** The spec-verification
-  study's largest bucket (partial implementation, 42.2%). **Rule:** `skills/governance/traceability-linking`
-  (+ `skills/mechanics/spec-handler`: state inputs/invariants/success criteria before building), so every
+  study's largest bucket (partial implementation, 42.2%). **Rule:** `skills/traceability-linking`
+  (+ `skills/spec-handler`: state inputs/invariants/success criteria before building), so every
   requirement is minted as a trackable ID. **Measured by:** `evals/cases/traceability-validator.md`
   (`verified`) — all three shapes: linked, unlinked, and orphaned requirement IDs.
 
-<!-- wingman:weakness id=W4 rule="plugins/wingman/skills/discipline/anti-rationalization" eval="evals/cases/anti-rationalization.md" status=covered-measured -->
+<!-- wingman:weakness id=W4 rule="plugins/wingman/skills/anti-rationalization" eval="evals/cases/anti-rationalization.md" status=covered-measured -->
 - **W4 — Rationalizing failures / moving the goalposts to declare success.** MAST's reasoning-action
-  mismatch and task-derailment classes. **Rule:** `skills/discipline/anti-rationalization` (the meta-skill every
+  mismatch and task-derailment classes. **Rule:** `skills/anti-rationalization` (the meta-skill every
   discipline skill draws its rationalizations/red-flags table from). **Measured by:**
   `evals/cases/anti-rationalization.md` (`verified`, promoted 2026-07-22) — Run 2 put the skill
   under direct Authority+Scarcity pressure ("senior-approved, skip the tests, we're 4 minutes from
   a freeze") and it still ran the test anyway, catching a genuinely broken "approved" fix.
 
-<!-- wingman:weakness id=W5 rule="plugins/wingman/skills/discipline/systematic-debugging" eval="evals/cases/systematic-debugging.md" status=covered-measured -->
+<!-- wingman:weakness id=W5 rule="plugins/wingman/skills/systematic-debugging" eval="evals/cases/systematic-debugging.md" status=covered-measured -->
 - **W5 — Fixing symptoms before understanding root cause.** A widely-documented debugging failure
   mode; provoked and resisted in this repo's own `evals/cases/hotfix.md`/`incident-response.md` runs.
-  **Rule:** `skills/discipline/systematic-debugging` (required first step of `/wingman:hotfix` before any fix).
+  **Rule:** `skills/systematic-debugging` (required first step of `/wingman:hotfix` before any fix).
   **Measured by:** `evals/cases/systematic-debugging.md` (`verified`, promoted 2026-07-22) — Run 2
   used an order-dependent/flaky-looking bug with a misleading, plausible-but-wrong "race condition"
   red herring, confirming the skill traces to the real root cause instead of chasing the red herring.
 
-<!-- wingman:weakness id=W6 rule="plugins/wingman/skills/discipline/test-driven-development" eval="evals/cases/harness.md" status=covered-measured -->
+<!-- wingman:weakness id=W6 rule="plugins/wingman/skills/test-driven-development" eval="evals/cases/harness.md" status=covered-measured -->
 - **W6 — Skipping or faking tests / trusting a rubber-stamp suite.** MAST's "no or incorrect
   verification"; the spec-verification study's over-trust in self-test. **Rule:**
-  `skills/discipline/test-driven-development` (red-green-refactor, no production code without a failing test)
-  + `skills/governance/definition-of-done` + `/wingman:harness`'s fake-suite detection. **Measured by:**
+  `skills/test-driven-development` (red-green-refactor, no production code without a failing test)
+  + `skills/definition-of-done` + `/wingman:harness`'s fake-suite detection. **Measured by:**
   `evals/cases/harness.md` (`verified`) — the strongest A/B pair in the suite: positive (Wingman's
   own repo, correctly finds the one real CI gap) vs. negative (a fixture whose `npm test` always
   prints "4 passing" regardless of code — correctly distrusted, exact fake mechanism named).
 
-<!-- wingman:weakness id=W7 rule="plugins/wingman/skills/discipline/doubt-driven-development" eval="evals/cases/doubt-driven-development.md" status=covered-measured -->
+<!-- wingman:weakness id=W7 rule="plugins/wingman/skills/doubt-driven-development" eval="evals/cases/doubt-driven-development.md" status=covered-measured -->
 - **W7 — Premature confidence / accepting a false premise without doubt.** MAST; the spec-verification
-  study. **Rule:** `skills/discipline/doubt-driven-development` (treat doubt as a signal to gather evidence
+  study. **Rule:** `skills/doubt-driven-development` (treat doubt as a signal to gather evidence
   before shipping). **Measured by:** `evals/cases/doubt-driven-development.md` (`verified`) — A/B
   across two edges: doubting a claim about test-coverage sufficiency (Run 1) and doubting a
   confidently-stated but false premise about existing code's runtime behavior (Run 2).
 
-<!-- wingman:weakness id=W8 rule="plugins/wingman/skills/knowledge/token-economy" eval="evals/cases/token-economy.md" status=covered-measured -->
+<!-- wingman:weakness id=W8 rule="plugins/wingman/skills/token-economy" eval="evals/cases/token-economy.md" status=covered-measured -->
 - **W8 — Context/token waste degrading multi-step performance.** Industry failure-mode writeups
-  (verbosity/context-bloat degradation). **Rule:** `skills/knowledge/token-economy` (internal-only concision;
+  (verbosity/context-bloat degradation). **Rule:** `skills/token-economy` (internal-only concision;
   never applied to founder-facing output). **Measured by:** `evals/cases/token-economy.md`
   (`verified`) — negative/trap A/B case confirms it refuses to compress away scope-boundary and
   irreversible-action detail, i.e. it doesn't over-compress.
 
-<!-- wingman:weakness id=W9 rule="plugins/wingman/skills/governance/evidence-gated-catalog" eval="evals/cases/evidence-gated-catalog.md" status=covered-measured -->
+<!-- wingman:weakness id=W9 rule="plugins/wingman/skills/evidence-gated-catalog" eval="evals/cases/evidence-gated-catalog.md" status=covered-measured -->
 - **W9 — Untested patterns/abstractions entering the codebase (speculative generality).** The
   over-engineering literature; this repo's own evidence-gate discipline. **Rule:**
-  `skills/governance/evidence-gated-catalog` (no pattern enters the catalog without evidence it works).
+  `skills/evidence-gated-catalog` (no pattern enters the catalog without evidence it works).
   **Measured by:** `evals/cases/evidence-gated-catalog.md` (`verified`) — positive/negative pair: an
   unproven `proven`-claiming entry vs. a genuinely-evidenced `draft`-claiming one.
 
-<!-- wingman:weakness id=W10 rule="plugins/wingman/skills/discipline/verification-loop" eval="evals/cases/verification-loop.md" status=covered-measured -->
+<!-- wingman:weakness id=W10 rule="plugins/wingman/skills/verification-loop" eval="evals/cases/verification-loop.md" status=covered-measured -->
 - **W10 — Multi-step verification decay (early-step success never re-checked at the end).** MAST's
-  verification class. **Rule:** `skills/discipline/verification-loop` (a standing multi-phase verification
+  verification class. **Rule:** `skills/verification-loop` (a standing multi-phase verification
   system). **Measured by:** `evals/cases/verification-loop.md` (`verified`, promoted 2026-07-22) —
   Run 2 used an always-green build script masking a real type error via a fake `echo "succeeded"`,
   confirming the loop reads actual command output rather than trusting exit codes.
 
-<!-- wingman:weakness id=W11 rule="plugins/wingman/skills/discipline/test-driven-development" eval="evals/cases/api-hallucination.md" status=covered-measured -->
+<!-- wingman:weakness id=W11 rule="plugins/wingman/skills/test-driven-development" eval="evals/cases/api-hallucination.md" status=covered-measured -->
 - **W11 — Hallucinating APIs / methods / libraries that don't exist.** One of the most-reported
-  coding-agent failure modes. **Rule:** `skills/discipline/test-driven-development` (a hallucinated API
-  fails its test at red-green time) and `skills/knowledge/research` (check real docs before relying on an API).
+  coding-agent failure modes. **Rule:** `skills/test-driven-development` (a hallucinated API
+  fails its test at red-green time) and `skills/research` (check real docs before relying on an API).
   **Measured by:** `evals/cases/api-hallucination.md` (`verified`) — two differently-shaped traps (an
   unfamiliar-package name mismatch; a genuinely real, since-removed lodash API a model could plausibly
   recall from stale training data). Honestly disclosed limitation in the case's own run log: neither

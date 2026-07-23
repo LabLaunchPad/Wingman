@@ -46,6 +46,7 @@ plain-language-checkpoint	(none: fixture is an inline raw-technical-finding scen
 plan	(retired)	(retired)
 platform-native-reference	evals/fixtures/setup-platform-native-reference-fixture.sh	plugins/wingman/skills/platform-native-reference/SKILL.md
 ponytail-debt-harvesting	evals/fixtures/setup-ponytail-debt-harvesting-fixture.sh	plugins/wingman/skills/ponytail-debt-harvesting/SKILL.md
+predict	(none: evidence comes from a real prediction query against live codebase directories inside a simulated session, not a synthetic fixture)	plugins/wingman/skills/swarm-predictive-layer/SKILL.md; commands/adaptive/predict.md
 prompt-diff-check	evals/fixtures/setup-prompt-diff-check-fixture.sh	plugins/wingman/skills/prompt-diff-check/SKILL.md
 research	(none: evidence comes from a real query against live web search inside a shared consolidated session, not a synthetic fixture)	plugins/wingman/skills/research/SKILL.md; commands/adaptive/research.md
 retro	evals/fixtures/setup-ledger-fixture.sh	plugins/wingman/commands/adaptive/retro.md

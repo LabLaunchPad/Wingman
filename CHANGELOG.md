@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.4] - 2026-07-23
+
+### Added
+- **Swarm-Intelligence Predictive Layer** (`/wingman:predict` adaptive command and `skills/swarm-predictive-layer`) — systematic multi-agent simulation model inspired by PSO/ACO/GWO/OASIS. Evaluates code connectivity, import blast radiuses, dependency cascades, and specialist-agent promotion needs in plain, consequence-first language.
+- **Agent-Weakness Coverage Benchmark Fixes** — resolved the broken references and status mismatches inside `docs/AGENT-WEAKNESS-BENCHMARK.md` caused by the flat-skills-layout refactoring in `0.6.3`. Running `node scripts/wingman-metrics.mjs` now successfully reports 100% path coverage and 0 status mismatches.
+
 ## [0.6.3] - 2026-07-23
 
 ### Changed
