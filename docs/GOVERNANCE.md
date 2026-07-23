@@ -68,6 +68,17 @@ p95/throughput/IOPS benchmark architecture was assessed and declined in favor of
 the coverage benchmark above is the honest, computable alternative for a repo with no runtime to
 instrument.
 
+## Root narrative & historical-ledger files — ownership and cadence
+
+Three root-level files read as narrative rather than governance/policy, so they don't fit the
+tables above. Named here so ownership is never ambiguous:
+
+| File | Status | Owner action | Update cadence |
+|---|---|---|---|
+| `ANNOUNCEMENT.md` | **Active, pending founder action.** Marketplace-listing release draft. | Tracked in `docs/HUMAN-TODOS.md` as the one remaining account-level submission step; content side already complete. | Re-drafted on each marketplace-facing release; content owner is whoever ships that release. |
+| `FIXLOG.md` | **Closed.** All 4 waves of the 2026-07-20 full-spectrum audit remediation loop are `fixed`/`verified`/`wontfix` — no open items. | Referenced by path from `CHANGELOG.md`; kept at root rather than moved so that reference stays valid. | Re-opened only if a future full-spectrum audit produces a new remediation loop of comparable scope — not for routine fixes (those go through `LEARNINGS.md`/retros per the promotion chain in the "Org governance" section above). |
+| `docs/wingman/*.md` (point-in-time audits: `architecture-audit-2026-07-15.md`, `enhancement-review-2026-07-15.md`, `audit-reorg-2026-07-20.md`) | **Historical record.** Each is a dated snapshot; not living docs. | No owner needed to keep current — they're intentionally frozen at their audit date. `docs/audit/` (numbered dossier) is the *current* audit convention; new audits go there, not into `docs/wingman/`. | Never updated in place — a new audit gets a new dated file or a new numbered `docs/audit/NN-*.md` entry. |
+
 ## Reuse — how this whole model gets applied to a new project
 
 The reuse mechanism already exists: installing the plugin (`.claude-plugin/marketplace.json` +

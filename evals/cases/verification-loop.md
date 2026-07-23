@@ -1,5 +1,7 @@
 # Eval: verification-loop
 
+<!-- eval:no-fixture-needed: fixture is a minimal scratch TS project built by hand per run, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/discipline/verification-loop/SKILL.md` behaviorally. This skill runs a comprehensive 8-phase verification after code changes.
 
 ## Fixture

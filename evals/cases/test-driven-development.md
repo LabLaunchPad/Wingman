@@ -1,5 +1,7 @@
 # Eval: test-driven-development
 
+<!-- eval:no-fixture-needed: fixture is a minimal scratch TS project built inline, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/discipline/test-driven-development/SKILL.md` behaviorally. This skill encodes the red-green-refactor TDD discipline that is mandatory for all implementation work in Wingman.
 
 ## Fixture

@@ -18,6 +18,7 @@
 | 7 | [Operational Playbooks](07-operational-playbooks.md) | Retro, learn, evolve, hotfix, incident response, launch, dogfood, telemetry |
 | 8 | [Testing & Quality](08-testing-quality.md) | Eval harness (62 cases, 36 fixtures), integration tests (72 pass), validator suite (5 scripts) |
 | 9 | [Artifacts & Glossary](09-artifacts-glossary.md) | All artifact types, file inventory, data schemas, terminology reference |
+| 10 | [Enterprise Architecture Review](10-enterprise-architecture-review.md) | Evidence-first audit against a harness-agnostic, enterprise-scoped target model; diagnosis, purpose map, governance/promotion trace, migration phases |
 
 ## Methodology
 

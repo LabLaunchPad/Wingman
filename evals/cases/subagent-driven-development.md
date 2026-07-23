@@ -1,5 +1,7 @@
 # Eval: subagent-driven-development
 
+<!-- eval:no-fixture-needed: fixture is a scratch git repo + plan built inline, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/discipline/subagent-driven-development/SKILL.md` behaviorally. This skill orchestrates parallel task execution with fresh subagents, task reviews, and progress tracking.
 
 ## Fixture

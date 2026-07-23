@@ -1,5 +1,7 @@
 # Eval: engineering-minimalism
 
+<!-- eval:no-fixture-needed: fixture is a small scratch Node project built inline, not checked into the repo, not a setup-*.sh script -->
+
 Tests `plugins/wingman/skills/discipline/engineering-minimalism/SKILL.md` — its "smallest step that solves the problem" discipline: refuse speculative abstraction, surface assumptions, mark shortcuts, and follow the output rule.
 
 ## Scenario — A task with a tempting over-engineered solution (positive case)
