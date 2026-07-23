@@ -46,3 +46,6 @@
 [submodule "vendor/ponytail"]
 	path = vendor/ponytail
 	url = https://github.com/DietrichGebert/ponytail.git
+[submodule "vendor/anthropic-cybersecurity-skills"]
+	path = vendor/anthropic-cybersecurity-skills
+	url = https://github.com/mukul975/Anthropic-Cybersecurity-Skills.git

@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.5] - 2026-07-23
+
+### Added
+- **Pinned `vendor/anthropic-cybersecurity-skills` (`mukul975/Anthropic-Cybersecurity-Skills`, Apache-2.0)** — an 817-skill, 29-domain community cybersecurity library — as a new `vendor/` reference submodule, same convention as every other pinned repo (reference material, not a runtime dependency). Scoped deliberately: Wingman itself has no application server, cloud infra, or network to defend, so this isn't cited from Wingman's own security posture. Cited from `security-checklist` and `boardroom-ciso` as a resource for when a **founder's own project** — the one Wingman's pipeline is building — has a real-world attack surface (cloud, AD, network, AI/LLM) this catalog actually covers.
+
 ## [0.6.4] - 2026-07-23
 
 ### Fixed

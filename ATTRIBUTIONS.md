@@ -24,6 +24,7 @@ None of the repositories below are runtime dependencies of the installed Wingman
 | `multica-ai/andrej-karpathy-skills` | MIT (declared in `plugin.json`, `README.md`, and the `SKILL.md` frontmatter — no standalone `LICENSE` file, corrected 2026-07-08 from an earlier "no license" claim in this doc) | `engineering-minimalism` — assumption-surfacing, verifiable success criteria |
 | `jeffallan/claude-skills` | MIT | The "description trap" finding; two-tier `SKILL.md`/`references/` structure |
 | `addyosmani/agent-skills` | MIT (Addy Osmani) | Skill/Persona/Command model, "personas never call personas," parallel-fan-out-then-merge pattern, Rationalizations/Red-Flags/Verification triad |
+| `mukul975/Anthropic-Cybersecurity-Skills` | Apache-2.0 | Not adapted into Wingman's own code — cited as-is from `security-checklist`/`boardroom-ciso` as a domain-specific reference library (817 skills, 29 security domains) for founders whose *own* project has infra (cloud, AD, network, SIEM) this catalog covers; Wingman itself has no such infra to defend |
 
 ## Non-vendored attribution (design principle only, not a pinned submodule)
 

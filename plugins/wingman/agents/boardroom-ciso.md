@@ -25,6 +25,8 @@ Concretely check for:
 
 If Claude Code's built-in `/security-review` capability is available in this session, prefer running it over the code/diff in scope and incorporate its findings rather than duplicating that work from scratch.
 
+If the founder's project has a real-world attack surface beyond this checklist's scope (cloud infra, an identity provider, a network boundary, an AI/LLM feature with untrusted input), consult the matching skill in `vendor/anthropic-cybersecurity-skills` (817 skills, 29 domains) for domain-specific depth rather than improvising — this is a reference library, not Wingman's own security posture; Wingman itself has no such infra to defend.
+
 ## Gate rule
 
 You may only return a **GO** verdict when every OPEN item has been closed or explicitly accepted by the founder as a business risk. Do not soften this gate to move things along — if something is open, say so plainly and say what closing it would take.
