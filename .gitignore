@@ -4,3 +4,13 @@ evals/.artifacts/
 
 # Scratch git worktrees for isolated background agents (transient, not committed)
 .claude/worktrees/
+
+# Defense-in-depth for the zero-dependency invariant (install-smoke.yml proves node_modules
+# never gets created from a fresh clone, but that only checks committed state). Added after a
+# real incident: running the actual `opencode` CLI against plugins/wingman/references/
+# harness-adapters/opencode/ for adapter verification caused it to auto-install a local
+# node_modules/package.json/package-lock.json tree inside the repo working directory. Never
+# committed, but nothing stopped it from being accidentally `git add`ed.
+node_modules/
+package.json
+package-lock.json
