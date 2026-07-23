@@ -10,7 +10,8 @@
 // No dependencies beyond Node's stdlib. Mirrors validate-structure.mjs /
 // check-repo-consistency.mjs: read-only w.r.t. the repo, exit 1 on failure.
 
-import { readdirSync, existsSync, mkdtempSync, rmSync, readFileSync } from 'node:fs';
+import { readdirSync, existsSync, readFileSync } from 'node:fs';
+import { readdir, readFile, mkdtemp, rm } from 'node:fs/promises';
 import { execFile, execSync } from 'node:child_process';
 import { promisify } from 'node:util';
 import { dirname, join } from 'node:path';
@@ -54,7 +55,8 @@ if (!HAS_BASH) {
 
 async function checkOne(f) {
   const script = join(fixturesDir, f);
-  const target = mkdtempSync(join(tmpdir(), 'wingman-fixture-'));
+  // Non-blocking asynchronous folder creation
+  const target = await mkdtemp(join(tmpdir(), 'wingman-fixture-'));
   const localFailures = [];
   try {
     await execFileAsync('bash', [script, target], {
@@ -73,7 +75,8 @@ async function checkOne(f) {
       },
     });
     // A fixture must produce a real, non-empty git project.
-    const entries = readdirSync(target);
+    // Non-blocking asynchronous directory entries read
+    const entries = await readdir(target);
     if (entries.length === 0) {
       localFailures.push(`${f}: ran cleanly but produced an empty target dir`);
     } else if (!existsSync(join(target, '.git'))) {
@@ -90,7 +93,8 @@ async function checkOne(f) {
       // required across all existing fixtures).
       const manifestPath = join(target, '.wingman-fixture-manifest');
       if (existsSync(manifestPath)) {
-        const promised = readFileSync(manifestPath, 'utf-8')
+        // Non-blocking asynchronous file read
+        const promised = (await readFile(manifestPath, 'utf-8'))
           .split('\n')
           .map((l) => l.trim())
           .filter(Boolean);
@@ -105,7 +109,8 @@ async function checkOne(f) {
     const detail = err.stderr ? err.stderr.toString().trim().split('\n').slice(-3).join(' | ') : err.message;
     localFailures.push(`${f}: setup script failed — ${detail}`);
   } finally {
-    rmSync(target, { recursive: true, force: true });
+    // Non-blocking asynchronous folder cleanup
+    await rm(target, { recursive: true, force: true });
   }
   return localFailures;
 }
