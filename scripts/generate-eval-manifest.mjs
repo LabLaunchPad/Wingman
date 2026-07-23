@@ -33,7 +33,7 @@ const NO_FIXTURE_RE = /<!--\s*eval:no-fixture-needed:\s*(.+?)\s*-->/;
 // inside a path like "SKILL.md"), then pulls every backtick-quoted path out
 // of it, since several cases test 2 files (e.g. a skill + the command that
 // invokes it).
-const COVERS_SENTENCE_RE = /Tests\s+.*?(?=\s+—|\.\s|\.$|\n)/;
+const COVERS_SENTENCE_RE = /Tests\s+.*?(?=\s+—|\.\s|\.$|\n|$)/;
 const COVERS_PROSE_RE = /Tests\s+(?:the\s+)?([^.\n]+)/;
 
 export function buildManifest() {

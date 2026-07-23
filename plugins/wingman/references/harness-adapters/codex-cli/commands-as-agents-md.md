@@ -427,6 +427,7 @@ This file is a generated copy of the canonical Claude Code source. It references
 
 - **AskUserQuestion**: Codex CLI has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.
 - **ExitPlanMode**: Codex CLI has no plan-mode concept at all (it uses `approval_policy` for command-level escalation instead, a genuine capability gap, not a missed port). Use `plugins/wingman/scripts/install-git-hooks.mjs` (already harness-agnostic, fires under any `git push` regardless of which agent drove the session) as the real enforcement point instead of a mid-session plan gate.
+- **ParallelDispatch**: Codex CLI has real parallel multi-agent dispatch (confirmed this session via a live install: `spawn_agent` to create a sub-agent, `followup_task`/`send_message` to direct it, `wait_agent` to collect its result -- up to 4 concurrent agent slots, a lower ceiling than Claude Code's Task-tool fan-out, so batch beyond 4 rather than assuming unlimited concurrency).
 
 
 ---

@@ -52,7 +52,12 @@ const codexCommandsRefOut = join(adaptersRoot, 'codex-cli', 'commands-as-agents-
 const PRIMITIVES = [
   { id: 'AskUserQuestion', pattern: /AskUserQuestion/ },
   { id: 'ExitPlanMode', pattern: /ExitPlanMode/ },
-  { id: 'ParallelDispatch', pattern: /\bTask tool\b|\bAgent tool\b|\bparallel\b.{0,30}\b(subagent|dispatch|agents)\b|\bfan[- ]out\b/i },
+  // Both word orders matter, and the gap between them can cross a line break (e.g. a heading
+  // "...in parallel" followed by a blank line then "Each subagent gets:") -- `.` alone doesn't match
+  // `\n` in JS regex without the `s` flag, so `[\s\S]` is used for the gap instead. Found via
+  // skills/response/council/SKILL.md during review, which described parallel dispatch but got no
+  // harness note because "in parallel" preceded "subagent" across a line break, not within one line.
+  { id: 'ParallelDispatch', pattern: /\bTask tool\b|\bAgent tool\b|\bparallel\b[\s\S]{0,60}\b(subagent|dispatch|agents)\b|\b(subagent|dispatch|agents)\b[\s\S]{0,60}\bparallel\b|\bfan[- ]out\b/i },
 ];
 
 function detectPrimitives(body) {
@@ -96,10 +101,12 @@ function listSkills() {
 }
 
 function listCommands() {
+  // Scans every category subdirectory dynamically, matching listSkills()'s pattern -- a hardcoded
+  // ['pipeline', 'adaptive'] list would silently skip a new category directory with no error, and
+  // --check would keep passing since there'd be nothing to diff a missing file against.
   const out = [];
-  for (const sub of ['pipeline', 'adaptive']) {
-    const dir = join(commandsDir, sub);
-    if (!existsSync(dir)) continue;
+  for (const category of readdirSync(commandsDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+    const dir = join(commandsDir, category.name);
     for (const f of readdirSync(dir).filter((f) => f.endsWith('.md') && f !== 'README.md')) {
       out.push({ name: f.replace(/\.md$/, ''), path: join(dir, f) });
     }

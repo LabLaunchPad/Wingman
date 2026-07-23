@@ -186,3 +186,4 @@ This file is a generated copy of the canonical Claude Code source. It references
 
 - **AskUserQuestion**: OpenCode has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.
 - **ExitPlanMode**: OpenCode's real analog is the `plan_exit` tool (confirmed: opencode.ai/docs). The gating logic this canonical file assumes (`boardroom-checkpoint.mjs`'s ExitPlanMode hook) is ported as a real OpenCode plugin at `references/harness-adapters/opencode/.opencode/plugin/wingman-gate.js` -- wire that plugin in rather than re-deriving the gate.
+- **ParallelDispatch**: OpenCode has a real Task tool and a parallel general-purpose agent (confirmed: opencode.ai/docs/agents). Dispatch each seat/subagent as a Task call the same way this file describes; if a single-message N-way fan-out isn't available, dispatch sequentially and consolidate the same way.

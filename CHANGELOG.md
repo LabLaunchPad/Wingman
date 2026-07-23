@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.2] - 2026-07-23
+
+### Fixed
+- **`generate-harness-adapters.mjs`'s `ParallelDispatch` detection missed a word-order/line-break variant.** An independent code review (before merging PR #90) found `skills/response/council/SKILL.md` describes genuine parallel subagent dispatch ("Launch three independent voices in parallel... Each subagent...") but the regex required "parallel" to precede the trigger word within one line — missed both the reverse word order and the case where the gap crosses a line break (`.` doesn't match `\n` without the `s` flag). Fixed both; `council`, `boardroom`, and 3 other previously-under-flagged skills/commands now correctly carry the harness note.
+- **`listCommands()` hardcoded `['pipeline', 'adaptive']`** as the only scanned command categories — silently would have skipped a new category directory with no error. Now scans all subdirectories dynamically, matching `listSkills()`'s existing pattern.
+- **`generate-eval-manifest.mjs`'s `COVERS_SENTENCE_RE`** could fail to match at all on a "Tests \`a.md\` and \`b.md\`" line with no em-dash/period before EOF. Added an unconditional end-of-string fallback to the lookahead.
+
 ## [0.6.1] - 2026-07-23
 
 ### Changed
