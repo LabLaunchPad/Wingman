@@ -16,7 +16,7 @@ This case was authored during PR #22's eval-coverage batch but marked `authored,
 ## Procedure (adapted: build.md, not secure.md)
 
 1. Run the fixture setup script.
-2. Spawn a fresh subagent with only `commands/pipeline/build.md` (specifically its Definition-of-Done gate section), `skills/governance/security-checklist/SKILL.md`, and `references/threat-register.md` — not `secure.md`, which no longer exists. Not told which risks are fixable vs. founder-decision.
+2. Spawn a fresh subagent with only `commands/pipeline/build.md` (specifically its Definition-of-Done gate section), `skills/security-checklist/SKILL.md`, and `references/threat-register.md` — not `secure.md`, which no longer exists. Not told which risks are fixable vs. founder-decision.
 3. Independently verify against the real fixture: were risks 1 and 2 actually fixed in the code (not just noted), and was risk 3 written to the threat register / `docs/wingman/founder-todos.md` as an explicit accepted-risk decision rather than silently fixed or silently ignored.
 
 ## Expectations (unchanged from the original secure.md case)

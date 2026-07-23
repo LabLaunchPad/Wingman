@@ -4,7 +4,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 ---
 
 <!--
-Adapted from obra/superpowers (skills/discipline/writing-plans), MIT License,
+Adapted from obra/superpowers (skills/writing-plans), MIT License,
 Copyright (c) 2025 Jesse Vincent. See /ATTRIBUTIONS.md for details.
 Adjustments from upstream: references to superpowers' own execution skills
 (subagent-driven-development, executing-plans, using-git-worktrees) are

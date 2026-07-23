@@ -1,6 +1,6 @@
 # Eval: platform-native-reference
 
-Tests `plugins/wingman/skills/knowledge/platform-native-reference/SKILL.md` — its cross-layer reference mapping "what you think you need" to "what the platform ships" — against scenarios where native solutions exist.
+Tests `plugins/wingman/skills/platform-native-reference/SKILL.md` — its cross-layer reference mapping "what you think you need" to "what the platform ships" — against scenarios where native solutions exist.
 
 ## Scenario 1 — Dependency that platform already provides (positive case)
 
@@ -37,7 +37,7 @@ skill correctly recommended keeping the library) — see Run log. Corrected 2026
 ### Run 1 — 2026-07-20 — positive case (partial coverage)
 
 Ran `evals/fixtures/setup-platform-native-reference-fixture.sh` into a scratch dir, then spawned a
-fresh un-briefed subagent with only `skills/knowledge/platform-native-reference/SKILL.md` and the fixture
+fresh un-briefed subagent with only `skills/platform-native-reference/SKILL.md` and the fixture
 path. Independently verified the subagent's recommendations by reading the real fixture files.
 
 | Check | Result |
@@ -59,7 +59,7 @@ Deliberately differently-shaped from Run 1: not a browser signup form but a Node
 source at `src/generateReport.js`. Built as a throwaway scratch fixture (not committed to the
 repo, per the "don't touch other files" scope for this task) since no existing `setup-*.sh`
 fixture exercised the Node stdlib / `Intl.NumberFormat` gaps or a genuine negative case. Acted as
-the fresh subagent myself: read only `skills/knowledge/platform-native-reference/SKILL.md` and the
+the fresh subagent myself: read only `skills/platform-native-reference/SKILL.md` and the
 fixture's `FOUNDER_REQUEST.md` + `src/generateReport.js`, produced recommendations, then
 independently re-verified every recommendation by actually running the code — not trusting the
 recommendation's own self-report.

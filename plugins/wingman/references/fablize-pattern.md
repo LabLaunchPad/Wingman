@@ -53,4 +53,4 @@ which is the whole point of the discipline above.
 
 ## Cited by
 
-- `plugins/wingman/skills/governance/definition-of-done/SKILL.md`
+- `plugins/wingman/skills/definition-of-done/SKILL.md`

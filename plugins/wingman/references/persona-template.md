@@ -84,4 +84,4 @@ does for cfo/cmo/cro:
 
 ## Cited by
 
-- `plugins/wingman/skills/governance/evolve-promotion/SKILL.md`
+- `plugins/wingman/skills/evolve-promotion/SKILL.md`

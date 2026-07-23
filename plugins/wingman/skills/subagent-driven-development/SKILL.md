@@ -366,9 +366,9 @@ Done!
 
 ## References
 
-- `skills/mechanics/spec-handler` — every dispatched task is a spec; give the subagent the success criteria, not just the ask.
+- `skills/spec-handler` — every dispatched task is a spec; give the subagent the success criteria, not just the ask.
 - `references/model-selection-guide.md` — pick the model tier from task difficulty, not from habit.
 
 ## Referenced by
 
-- `skills/mechanics/spec-handler`
+- `skills/spec-handler`

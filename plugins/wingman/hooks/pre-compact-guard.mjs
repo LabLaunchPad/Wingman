@@ -6,7 +6,7 @@
  * PreCompact hook. Wingman's own pipeline state already lives in flat files
  * (.wingman/state.json, .wingman/checkpoints.jsonl, plan-file Boardroom
  * Checkpoint markers), not conversational memory, by design (see
- * skills/discipline/subagent-driven-development) -- so a context compaction event
+ * skills/subagent-driven-development) -- so a context compaction event
  * doesn't lose Wingman's own progress the way it would for a plugin that
  * kept state in-conversation. What compaction CAN still lose is the
  * reasoning behind not-yet-committed work: real file changes exist, but the

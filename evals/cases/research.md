@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence comes from a real query against live web search inside a shared consolidated session, not a synthetic fixture -->
 
-Tests `plugins/wingman/skills/knowledge/research/SKILL.md` and `commands/adaptive/research.md` — does it decompose a
+Tests `plugins/wingman/skills/research/SKILL.md` and `commands/adaptive/research.md` — does it decompose a
 real founder question, run real searches, and produce a sourced brief with an honest confidence
 note, never fabricated citations?
 
@@ -27,7 +27,7 @@ a real `founder-cfo`/`founder-cmo`/`founder-cro` advisory dispatch afterward (se
 ## Run 2 — 2026-07-16 (planted-outdated-claim scenario, isolated subagent)
 
 Differently shaped from Run 1: instead of an open factual question, a fresh subagent (scoped to
-only `skills/knowledge/research/SKILL.md` and `commands/adaptive/research.md`, no other repo context) was given a
+only `skills/research/SKILL.md` and `commands/adaptive/research.md`, no other repo context) was given a
 founder request containing a confidently-worded but false planted claim — a fictional contractor
 handoff doc asserting "Node.js 16 is the current LTS release... actively maintained... no urgency
 to upgrade." Node 16 actually went end-of-life in 2023; this is exactly the kind of

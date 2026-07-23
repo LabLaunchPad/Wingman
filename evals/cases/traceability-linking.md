@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script -->
 
-Tests `plugins/wingman/skills/governance/traceability-linking/SKILL.md` — the judgment/instruction layer
+Tests `plugins/wingman/skills/traceability-linking/SKILL.md` — the judgment/instruction layer
 around ID minting and marker placement, distinct from `evals/cases/traceability-validator.md`
 (which tests the mechanical checker script, `check-traceability.mjs`, in isolation).
 `wingman-health.mjs`'s uncovered-skill heuristic matches only by filename prefix, so it lists this

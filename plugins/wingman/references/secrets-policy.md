@@ -54,4 +54,4 @@ plugin — read it before adding any integration that touches a credential.
 
 ## Cited by
 
-- `plugins/wingman/skills/governance/security-checklist/SKILL.md`
+- `plugins/wingman/skills/security-checklist/SKILL.md`

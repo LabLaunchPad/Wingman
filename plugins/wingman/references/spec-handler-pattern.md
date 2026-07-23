@@ -31,4 +31,4 @@ Every pipeline command should be able to answer, in order:
 
 ## Cited by
 
-- `plugins/wingman/skills/mechanics/spec-handler/SKILL.md`
+- `plugins/wingman/skills/spec-handler/SKILL.md`

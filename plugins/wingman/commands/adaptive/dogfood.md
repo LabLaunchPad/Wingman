@@ -125,14 +125,14 @@ Any friction found here is captured the normal way: `/wingman:learn` for a durab
 
 ## References
 
-- `skills/governance/dogfood-gap-classification` — maintainer-mode-only; classifies a maintainer-mode gap into
+- `skills/dogfood-gap-classification` — maintainer-mode-only; classifies a maintainer-mode gap into
   hook / skill / command-instruction / out-of-scope, and drives the fix through implementation,
   reproduction, eval coverage, and a retro before considering it done.
 - `commands/adaptive/harness.md` — audits whether the *existing* test/build harness is honest; this command
   instead *generates and runs* a fixture/feature end to end. Different operations, complementary.
 - `commands/adaptive/audit.md` — on-demand deep review of *existing* project state; same distinction as
   above.
-- `commands/adaptive/evolve.md` / `skills/governance/evolve-promotion` — founder-project-scoped promotion (never writes
+- `commands/adaptive/evolve.md` / `skills/evolve-promotion` — founder-project-scoped promotion (never writes
   to `plugins/wingman/`); the mirror image of `dogfood-gap-classification`'s maintainer scope.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

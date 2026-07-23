@@ -1,6 +1,6 @@
 # Eval: verification-before-completion
 
-Tests `plugins/wingman/skills/discipline/verification-before-completion/SKILL.md` behaviorally. This is the single most load-bearing discipline skill in the project — every other eval's own methodology ("never trust a subagent's self-report, independently verify against the real filesystem") is this skill's principle applied one level up — but it had never itself been directly, deliberately tested with a scenario engineered so the lazy answer is wrong.
+Tests `plugins/wingman/skills/verification-before-completion/SKILL.md` behaviorally. This is the single most load-bearing discipline skill in the project — every other eval's own methodology ("never trust a subagent's self-report, independently verify against the real filesystem") is this skill's principle applied one level up — but it had never itself been directly, deliberately tested with a scenario engineered so the lazy answer is wrong.
 
 ## Fixture
 

@@ -4,7 +4,7 @@ description: Use when encountering any bug, test failure, or unexpected behavior
 ---
 
 <!--
-Adapted from obra/superpowers (skills/discipline/systematic-debugging), MIT License,
+Adapted from obra/superpowers (skills/systematic-debugging), MIT License,
 Copyright (c) 2025 Jesse Vincent. See /ATTRIBUTIONS.md for details.
 Adjustments from upstream: references to supporting files not bundled with
 Wingman (root-cause-tracing.md, defense-in-depth.md, condition-based-waiting.md)

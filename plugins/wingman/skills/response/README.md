@@ -1,1 +1,0 @@
-Part of Wingman's skill taxonomy — see [`AGENTS.md`](../../../../AGENTS.md#skills-and-commands-by-category) for the full categorized index of all skills and commands, and `docs/ARCHITECTURE.md` for why the plugin is shaped this way.

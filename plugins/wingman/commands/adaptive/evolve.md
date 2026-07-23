@@ -26,5 +26,5 @@ This is meant to run occasionally (after a handful of shipped features), not eve
 ## References
 
 - `references/orchestration-patterns.md` — the endorsed multi-agent patterns (and anti-patterns) this promotion decision should respect.
-- `skills/governance/evidence-gated-catalog` — a new pattern only earns a catalog entry once it has evidence behind it.
-- `skills/knowledge/doc-index` — any promoted artifact that becomes documentation must stay discoverable; wire it into an owner and attribute it.
+- `skills/evidence-gated-catalog` — a new pattern only earns a catalog entry once it has evidence behind it.
+- `skills/doc-index` — any promoted artifact that becomes documentation must stay discoverable; wire it into an owner and attribute it.

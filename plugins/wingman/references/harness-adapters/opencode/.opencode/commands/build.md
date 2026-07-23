@@ -23,7 +23,7 @@ Immediately after, use the `management-board-activation` skill to check whether 
 
 Use the `department-lead-activation` skill to check the Legal & Security activation signal too: if this project touches auth, payments, or personal data, create `dept-legal-security` if it doesn't exist yet. Its work now happens inline as part of this stage's Definition-of-Done gate below, rather than as a separate `/wingman:secure` stage — folding a dedicated security pass into Build's own gate, not skipping it (see "Definition-of-Done gate" below).
 
-Use `skills/output/visual-founder-output` to show the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone done, Build now the current stage.
+Use `skills/visual-founder-output` to show the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone done, Build now the current stage.
 
 ## Execution discipline
 
@@ -70,7 +70,7 @@ For every risk found, decide: **CLOSED** (mitigated, or a documented accepted ri
 
 The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**. This implements gsd-plugin's phase-gate pattern: advancement is BLOCKED while **threats_open > 0**.
 
-**Traceability and test presence.** Alongside the threat register, confirm every task this stage executed carries at least one `wingman:req` traceability marker (per `skills/governance/traceability-linking`, minted back in `/wingman:define`/`/wingman:architecture`/`/wingman:uxflow`) and that a corresponding test file exists for every changed non-test source file — an explicit `<!-- wingman:no-test-needed: <reason> -->` marker is the only accepted exception for genuinely test-free changes (docs, config), and it must be logged, not silently assumed.
+**Traceability and test presence.** Alongside the threat register, confirm every task this stage executed carries at least one `wingman:req` traceability marker (per `skills/traceability-linking`, minted back in `/wingman:define`/`/wingman:architecture`/`/wingman:uxflow`) and that a corresponding test file exists for every changed non-test source file — an explicit `<!-- wingman:no-test-needed: <reason> -->` marker is the only accepted exception for genuinely test-free changes (docs, config), and it must be logged, not silently assumed.
 
 **The gate.** This stage does not clear with open risks, missing traceability, or missing tests. If anything is OPEN or missing:
 
@@ -89,13 +89,13 @@ Run `/wingman:boardroom diff` against the accumulated changes, once the Definiti
 
 ## References
 
-- `skills/mechanics/spec-handler` — each task in the plan is a spec; build the handler to its success criteria, then verify against them.
-- `skills/mechanics/testing-patterns` — follow AAA, mock at boundaries, and cover changed paths (>=80%) as you run the verification suite above.
-- `skills/governance/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
-- `skills/governance/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
+- `skills/spec-handler` — each task in the plan is a spec; build the handler to its success criteria, then verify against them.
+- `skills/testing-patterns` — follow AAA, mock at boundaries, and cover changed paths (>=80%) as you run the verification suite above.
+- `skills/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
+- `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
 - `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule the Definition-of-Done gate implements.
-- `skills/governance/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown at the start of this stage.
 
 

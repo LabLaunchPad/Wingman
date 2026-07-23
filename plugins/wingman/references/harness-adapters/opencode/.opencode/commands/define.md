@@ -31,13 +31,13 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2) after the Requirements table above.
 
 Hand off directly to `/wingman:architecture` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
 
 ## References
 
-- `skills/governance/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.

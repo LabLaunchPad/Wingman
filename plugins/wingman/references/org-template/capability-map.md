@@ -32,7 +32,7 @@ existing `evolve-promotion` mechanism, not this doc.
 
 ## References
 
-- `skills/output/plain-language-checkpoint` — where this calibration actually shows up.
-- `skills/knowledge/memory` — if a durable fact about a founder's background is worth remembering
+- `skills/plain-language-checkpoint` — where this calibration actually shows up.
+- `skills/memory` — if a durable fact about a founder's background is worth remembering
   across sessions (e.g. "founder is a former backend engineer"), it goes in `MEMORY.md`, same as any
   other evergreen fact — no separate store.

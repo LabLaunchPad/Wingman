@@ -13,7 +13,7 @@ there is only ever one copy of this content to keep in sync.
 
 Wingman is a Claude Code plugin, packaged as a marketplace + plugin under `.claude-plugin/` and `plugins/wingman/`. There is no build/lint/test toolchain in the traditional sense — the plugin's "code" is markdown (commands, agents, skills) plus a hooks config. There is no application source code, database, or web app in this repository; do not assume one exists. There is a lightweight behavioral eval harness at `evals/` (see `evals/README.md`) for verifying that a skill's *instructions* actually produce correct behavior when run, since a structural check alone can't catch that.
 
-**Before committing any structural change, run the mechanical validators (all must exit 0):** `node plugins/wingman/scripts/validate-structure.mjs` (plugin-internal invariants), `node scripts/check-repo-consistency.mjs` (repo-root doc/attribution invariants), `node scripts/check-fixtures.mjs` (every eval fixture still runs, all at once — there's no per-fixture flag), and `node plugins/wingman/scripts/check-traceability.mjs` (requirement/marker cross-referencing — this one also ships with the plugin, since a founder's own project runs it too, via `skills/governance/traceability-linking`). These are Layer 1 of the regression defense; the genuinely-semantic checks they deliberately don't mechanize are Layer 2, run via `/wingman:audit`. See `docs/REGRESSION-CHECKLIST.md` for the full hybrid and which check lives where. CI enforces the same via `.github/workflows/` (validate, actionlint, install-smoke, version-gate); the behavioral eval + `@claude` workflows there need an `ANTHROPIC_API_KEY` repo secret — see `docs/HUMAN-TODOS.md`.
+**Before committing any structural change, run the mechanical validators (all must exit 0):** `node plugins/wingman/scripts/validate-structure.mjs` (plugin-internal invariants), `node scripts/check-repo-consistency.mjs` (repo-root doc/attribution invariants), `node scripts/check-fixtures.mjs` (every eval fixture still runs, all at once — there's no per-fixture flag), and `node plugins/wingman/scripts/check-traceability.mjs` (requirement/marker cross-referencing — this one also ships with the plugin, since a founder's own project runs it too, via `skills/traceability-linking`). These are Layer 1 of the regression defense; the genuinely-semantic checks they deliberately don't mechanize are Layer 2, run via `/wingman:audit`. See `docs/REGRESSION-CHECKLIST.md` for the full hybrid and which check lives where. CI enforces the same via `.github/workflows/` (validate, actionlint, install-smoke, version-gate); the behavioral eval + `@claude` workflows there need an `ANTHROPIC_API_KEY` repo secret — see `docs/HUMAN-TODOS.md`.
 
 There's no unit-test runner to point at a single test: the closest equivalent is a single behavioral eval case in `evals/cases/*.md`, exercised by hand (spawn a fresh subagent against the named fixture, grade its output against the case's expectations, append to the run log) per `evals/README.md` — grading stays human/independent by design, not scripted.
 
@@ -47,12 +47,12 @@ Wingman is a Claude Code plugin that gives non-technical founders a full AI SDLC
 ## Architecture (see docs/ARCHITECTURE.md for full detail)
 
 - **Boardroom seats** (`plugins/wingman/agents/boardroom-*.md`) — fixed, always-present gate reviewers: CEO, CPO, CMO, CTO, CISO, CFO, Research, and Design (7 C-suite-style seats + Design). They only render plain-language verdicts, never write code. Dispatched in parallel by `commands/adaptive/boardroom.md` and consolidated into a grouped Business/Technical/Finance/Research summary — this is Wingman's substitute for code review.
-- **Management Board** — 9 manager roles (`mgr-*`, written to the founder's own project), activated only once a project crosses 3+ active *conditionally-activated* department leads (Design/Data/Legal-Security/DevOps/Growth — never counting the always-active Product/Engineering/QA, per `skills/governance/management-board-activation`). They coordinate department-lead work; they never render Boardroom verdicts.
+- **Management Board** — 9 manager roles (`mgr-*`, written to the founder's own project), activated only once a project crosses 3+ active *conditionally-activated* department leads (Design/Data/Legal-Security/DevOps/Growth — never counting the always-active Product/Engineering/QA, per `skills/management-board-activation`). They coordinate department-lead work; they never render Boardroom verdicts.
 - **Pipeline commands** (`commands/pipeline/discovery.md`, `define.md`, `architecture.md`, `uxflow.md`, `implementation-planning.md`, `build.md`, `ship.md`) — 7 named SDLC stages, but only 3 founder-visible Boardroom checkpoints: the 5 planning stages bundle into one "Planning Milestone" checkpoint at the end of `implementation-planning.md`, then `build.md` (whose own Definition-of-Done gate folds in what used to be a separate `secure.md` stage) and `ship.md` each keep their own checkpoint. See `docs/ARCHITECTURE.md` §4/§4b.
-- **Adaptive commands** (`commands/adaptive/retro.md`, `learn.md`, `evolve.md`, `harness.md`, `dogfood.md`, `telemetry.md`, `launch.md`, `hotfix.md`, `audit.md`, `over-engineering-review.md`, `bloat-audit.md`, `debt-ledger.md`, `research.md`, `advisory.md`, `incident.md`, `knowledge-export.md`) — invoked as needed, not part of the fixed pipeline. `knowledge-export.md` exports `.wingman/checkpoints.jsonl` and `memory/*.md` into a Google Open Knowledge Format (OKF v0.1) bundle at `.wingman/okf-export/`, so a founder can hand their project's decision history to a non-Wingman AI tool — see `docs/ARCHITECTURE.md` §8a. `dogfood.md` runs the real pipeline end to end against a throwaway or real project to find genuine behavioral gaps; in maintainer mode (Wingman's own dev repo only) a found gap can be promoted into `plugins/wingman/` itself via `skills/governance/dogfood-gap-classification` — the mirror image of `evolve-promotion`, which only ever writes to a founder's own project.
+- **Adaptive commands** (`commands/adaptive/retro.md`, `learn.md`, `evolve.md`, `harness.md`, `dogfood.md`, `telemetry.md`, `launch.md`, `hotfix.md`, `audit.md`, `over-engineering-review.md`, `bloat-audit.md`, `debt-ledger.md`, `research.md`, `advisory.md`, `incident.md`, `knowledge-export.md`) — invoked as needed, not part of the fixed pipeline. `knowledge-export.md` exports `.wingman/checkpoints.jsonl` and `memory/*.md` into a Google Open Knowledge Format (OKF v0.1) bundle at `.wingman/okf-export/`, so a founder can hand their project's decision history to a non-Wingman AI tool — see `docs/ARCHITECTURE.md` §8a. `dogfood.md` runs the real pipeline end to end against a throwaway or real project to find genuine behavioral gaps; in maintainer mode (Wingman's own dev repo only) a found gap can be promoted into `plugins/wingman/` itself via `skills/dogfood-gap-classification` — the mirror image of `evolve-promotion`, which only ever writes to a founder's own project.
 - **Department leads** — build-time worker subagents, one per corporate department, created lazily per-project only when that department's activation signal is true (see `docs/ARCHITECTURE.md` §5). None exist in a fresh install.
-- **`skills/mechanics/git-pr-workflow`** — the draft-PR/CI-poll/squash-merge-resync procedure `ship.md` uses, deliberately built on plain `git` + the `gh` CLI (not a platform-specific tool) with bundled scripts under `scripts/`, so the same procedure works regardless of which coding agent is actually driving a session.
-- **`skills/output/visual-founder-output`** — adaptive visual layer (Mermaid/ASCII, or a real Artifact-rendered wireframe when the session actually supports it) on top of `plain-language-checkpoint`'s prose bar, for output with real shape (a flow, a tree, a status grid). Detects the session's rendering capability before choosing a tier; never assumes. Wired into all 7 pipeline commands (a pipeline-status tree everywhere; a DEF→ARCH graph in `architecture.md`, a task-dependency diagram in `implementation-planning.md`'s plan document, and the UX-flow diagram in `uxflow.md`) plus `boardroom.md` — see `docs/ARCHITECTURE.md` §4c.
+- **`skills/git-pr-workflow`** — the draft-PR/CI-poll/squash-merge-resync procedure `ship.md` uses, deliberately built on plain `git` + the `gh` CLI (not a platform-specific tool) with bundled scripts under `scripts/`, so the same procedure works regardless of which coding agent is actually driving a session.
+- **`skills/visual-founder-output`** — adaptive visual layer (Mermaid/ASCII, or a real Artifact-rendered wireframe when the session actually supports it) on top of `plain-language-checkpoint`'s prose bar, for output with real shape (a flow, a tree, a status grid). Detects the session's rendering capability before choosing a tier; never assumes. Wired into all 7 pipeline commands (a pipeline-status tree everywhere; a DEF→ARCH graph in `architecture.md`, a task-dependency diagram in `implementation-planning.md`'s plan document, and the UX-flow diagram in `uxflow.md`) plus `boardroom.md` — see `docs/ARCHITECTURE.md` §4c.
 - **Specialists** — the 56-role candidate catalog in `docs/AGENT-ROSTER.md`. Only created by `/wingman:evolve` after repeated, evidenced friction. Never bulk-created.
 - **`vendor/`** — pinned upstream reference repositories (MIT-licensed), used as design inspiration only. Nothing in the plugin depends on their runtime infrastructure at execution time. See `ATTRIBUTIONS.md` for exact provenance.
 
@@ -85,20 +85,24 @@ Two boundaries are easy to get wrong — state them plainly rather than re-deriv
 
 ## Skills and commands, by category
 
-`plugins/wingman/skills/` and `plugins/wingman/commands/` are subdivided into category folders —
-skill/command identity comes from the `name:` frontmatter field (skills) or filename (commands),
-never from the directory path, so this taxonomy is purely for navigation; it doesn't change any
-`/wingman:*` invocation.
+`plugins/wingman/commands/` is subdivided into category folders. `plugins/wingman/skills/` is
+**flat** (`skills/<name>/SKILL.md`, no category subdirectory) as of 2026-07-23 — flattened from an
+earlier `skills/<category>/<name>/` nesting to match the on-disk layout multi-harness precedent
+repos use and to let Codex CLI's native plugin-install cache (`codex plugin add`, which reads this
+tree directly) line up cleanly; see `docs/ARCHITECTURE.md` §8b for the full reasoning. Skill/command
+identity comes from the `name:` frontmatter field (skills) or filename (commands), never from the
+directory path — this table is purely a conceptual grouping for navigation, no longer folder-backed
+for skills, and doesn't change any `/wingman:*` invocation either way.
 
-| `skills/<category>/` | Skills |
+| Category (conceptual, not a folder) | Skills |
 |---|---|
-| `discipline/` | engineering-minimalism, doubt-driven-development, anti-rationalization, verification-before-completion, verification-loop, test-driven-development, systematic-debugging, systematic-auditing, subagent-driven-development, writing-plans, simplify |
-| `mechanics/` | git-pr-workflow, package-manager-selection, testing-patterns, code-review, spec-handler, interview-one-question-at-a-time |
-| `governance/` | department-lead-activation, management-board-activation, evolve-promotion, dogfood-gap-classification, evidence-gated-catalog, traceability-linking, definition-of-done, security-checklist |
-| `output/` | plain-language-checkpoint, visual-founder-output, design-taste |
-| `knowledge/` | memory, doc-index, token-economy, prompt-diff-check, research, platform-native-reference |
-| `personas/` | founder-cfo, founder-cmo, founder-cro |
-| `response/` | incident-response, ponytail-debt-harvesting, council |
+| discipline | engineering-minimalism, doubt-driven-development, anti-rationalization, verification-before-completion, verification-loop, test-driven-development, systematic-debugging, systematic-auditing, subagent-driven-development, writing-plans, simplify |
+| mechanics | git-pr-workflow, package-manager-selection, testing-patterns, code-review, spec-handler, interview-one-question-at-a-time |
+| governance | department-lead-activation, management-board-activation, evolve-promotion, dogfood-gap-classification, evidence-gated-catalog, traceability-linking, definition-of-done, security-checklist |
+| output | plain-language-checkpoint, visual-founder-output, design-taste |
+| knowledge | memory, doc-index, token-economy, prompt-diff-check, research, platform-native-reference |
+| personas | founder-cfo, founder-cmo, founder-cro |
+| response | incident-response, ponytail-debt-harvesting, council |
 
 | `commands/<category>/` | Commands |
 |---|---|
@@ -111,7 +115,7 @@ nested subtrees: `references/harness-adapters/` — its files must mirror Codex 
 discovery layout (`.codex/agents/`, `.opencode/agent/`, `.opencode/plugin/`) to stay drop-in
 copyable, so a flat structure wasn't an option there; see that directory's own `README.md` — and
 `references/org-template/` — static reference content (a project-type catalog + playbooks, founder-
-preferences and capability-map guidance) cited from `discovery.md` and `skills/knowledge/memory`;
+preferences and capability-map guidance) cited from `discovery.md` and `skills/memory`;
 deliberately scoped down from a much larger founder-org-scaffold proposal (see `docs/PROJECT.md`'s
 decisions log, 2026-07-22) to only the pieces with a real, evidenced consumer — see that directory's
 own `README.md`.
@@ -126,4 +130,4 @@ own `README.md`.
 
 ## Portability
 
-Most of this plugin is intentionally coupled to Claude Code's own tool surface (`AskUserQuestion`, `ExitPlanMode`, parallel `Task`/`Agent` dispatch) — see `docs/ARCHITECTURE.md` §8a for exactly what is and isn't portable today, and why (re-confirmed against 2026 multi-harness conventions — see §8a's note on the re-check). Two skills are built to be genuinely harness-agnostic: `plugins/wingman/skills/mechanics/git-pr-workflow` and `plugins/wingman/skills/mechanics/package-manager-selection`. `docs/ARCHITECTURE.md` §8b documents a scoped Codex CLI / OpenCode adapter (Boardroom seat personas + the git-push safety gate) at `plugins/wingman/references/harness-adapters/` — honestly labeled per-artifact by verification status, not a claim of full portability. `plugins/wingman/` also has its own nested `AGENTS.md` (monorepo "nearest wins" convention) with package-scoped authoring conventions.
+Most of this plugin is intentionally coupled to Claude Code's own tool surface (`AskUserQuestion`, `ExitPlanMode`, parallel `Task`/`Agent` dispatch) — see `docs/ARCHITECTURE.md` §8a for exactly what is and isn't portable today, and why (re-confirmed against 2026 multi-harness conventions — see §8a's note on the re-check). Two skills are built to be genuinely harness-agnostic: `plugins/wingman/skills/git-pr-workflow` and `plugins/wingman/skills/package-manager-selection`. `docs/ARCHITECTURE.md` §8b documents a scoped Codex CLI / OpenCode adapter (Boardroom seat personas + the git-push safety gate) at `plugins/wingman/references/harness-adapters/` — honestly labeled per-artifact by verification status, not a claim of full portability. `plugins/wingman/` also has its own nested `AGENTS.md` (monorepo "nearest wins" convention) with package-scoped authoring conventions.

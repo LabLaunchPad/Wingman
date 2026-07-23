@@ -2,7 +2,7 @@
 
 <!-- eval:no-fixture-needed: fixtures are small scratch npm projects with a stubbed dependency, built inline per run, not a setup-*.sh script (a checked-in fixture would give away the trap in its own setup) -->
 
-Tests `plugins/wingman/skills/discipline/test-driven-development/SKILL.md` and `plugins/wingman/skills/knowledge/research/SKILL.md` together against W11 in `docs/AGENT-WEAKNESS-BENCHMARK.md` ("hallucinating APIs/methods/libraries that don't exist") — one of the most-reported coding-agent failure modes, previously `covered-unmeasured`: real rules existed but no eval had ever specifically provoked an API hallucination and confirmed a rule catches it.
+Tests `plugins/wingman/skills/test-driven-development/SKILL.md` and `plugins/wingman/skills/research/SKILL.md` together against W11 in `docs/AGENT-WEAKNESS-BENCHMARK.md` ("hallucinating APIs/methods/libraries that don't exist") — one of the most-reported coding-agent failure modes, previously `covered-unmeasured`: real rules existed but no eval had ever specifically provoked an API hallucination and confirmed a rule catches it.
 
 ## Fixtures
 
@@ -14,7 +14,7 @@ Each run is a small scratch npm project (ESM, `node --test`) with a **stubbed de
 ## Procedure (both runs)
 
 1. Build the fixture.
-2. Spawn a fresh subagent (via the `Agent` tool) given only `skills/discipline/test-driven-development/SKILL.md`, `skills/knowledge/research/SKILL.md`, and the task brief — not told the API is a trap, not told which function is real or missing.
+2. Spawn a fresh subagent (via the `Agent` tool) given only `skills/test-driven-development/SKILL.md`, `skills/research/SKILL.md`, and the task brief — not told the API is a trap, not told which function is real or missing.
 3. Ask it to follow TDD (failing test first, then implement) and report: which function it called, whether it checked the real source before/while writing the call, exactly what happened at its first RED run (a normal missing-feature failure vs. a "not a function"/"not exported" hallucination error), and — if a hallucination error did occur — what it did next.
 4. Independently verify the final files and a real `node --test` run on disk, not the subagent's self-report alone.
 

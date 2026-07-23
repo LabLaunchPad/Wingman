@@ -59,7 +59,7 @@ The dispatch prompt to each seat is an internal, agent-to-agent channel (no foun
 
 Do not just concatenate seven reports — a founder should never have to read seven separate verdicts to figure out what to do. Group by the four headers above (plus Design when it returned substantive input) so the summary stays skimmable as the seat count grows.
 
-Before formatting, use `skills/output/visual-founder-output` to detect this session's rendering tier (Tier
+Before formatting, use `skills/visual-founder-output` to detect this session's rendering tier (Tier
 A: Artifact-capable; Tier B: universal Mermaid/ASCII fallback — see that skill's Core Workflow). Then
 synthesize into this exact structure:
 
@@ -171,8 +171,8 @@ Then update `.wingman/state.json`. **Read the existing file first if it exists**
 ## References
 
 - `references/plan-review-checklist.md` — the required plan sections the gstack `EXIT PLAN MODE GATE` enforces before `ExitPlanMode`; the same shape each seat should find present in the plan it reviews.
-- `skills/mechanics/spec-handler` — every plan under review is a spec; judge it against its stated success criteria, not its volume.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` — how to render the "Where you are" pipeline status and the optional seat-verdict grid; consult before formatting the consolidated summary above.
-- `skills/output/plain-language-checkpoint` — the reversible-compression rule behind the `details_ref` companion file and `expand` mode above.
+- `skills/spec-handler` — every plan under review is a spec; judge it against its stated success criteria, not its volume.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the "Where you are" pipeline status and the optional seat-verdict grid; consult before formatting the consolidated summary above.
+- `skills/plain-language-checkpoint` — the reversible-compression rule behind the `details_ref` companion file and `expand` mode above.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

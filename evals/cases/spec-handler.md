@@ -1,6 +1,6 @@
 # Eval: spec-handler
 
-Tests `plugins/wingman/skills/mechanics/spec-handler/SKILL.md` behaviorally — given a task with no stated spec (inputs, invariants, observable success criteria), does a fresh agent state the spec before implementing the handler, judge the handler against that spec, and leave a runnable check — for both a substantial task and a one-line task, since "too small to need a spec" is one of the skill's own named rationalizations.
+Tests `plugins/wingman/skills/spec-handler/SKILL.md` behaviorally — given a task with no stated spec (inputs, invariants, observable success criteria), does a fresh agent state the spec before implementing the handler, judge the handler against that spec, and leave a runnable check — for both a substantial task and a one-line task, since "too small to need a spec" is one of the skill's own named rationalizations.
 
 ## Fixture
 

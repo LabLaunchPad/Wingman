@@ -28,16 +28,16 @@ Enter plan mode (if not already in it). The plan file must include the sections 
 
 The plan document itself is never shown to the founder directly — its reader is whoever executes it
 (a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
-Plain-Language Summary), use `skills/output/visual-founder-output` to append a `## Task Dependencies`
+Plain-Language Summary), use `skills/visual-founder-output` to append a `## Task Dependencies`
 section per `references/visual-output-templates.md` §5, generated from the plan's own task list —
 this defaults to Tier B (Mermaid) regardless of session capability, since a rendered Artifact adds
 nothing for this document's actual reader. This is additive to the checkbox task list, not a
-replacement — `skills/discipline/writing-plans`'s exact-file/exact-step detail still lives in the tasks
+replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
 themselves.
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2), showing all 5 planning sub-stages complete and this
 stage as the last one before the checkpoint. `boardroom.md`'s own report shows this same tree again
 once the checkpoint records — that's expected, not wasted effort: this view is "planning just
@@ -51,10 +51,10 @@ Only once the boardroom checkpoint returns a "ship it" decision should you proce
 
 ## References
 
-- `skills/discipline/writing-plans` — the plan-quality bar.
+- `skills/writing-plans` — the plan-quality bar.
 - `references/plan-review-checklist.md` — the 7 required sections the `boardroom-checkpoint` hook enforces before `ExitPlanMode`.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
   diagram appended to the plan; §2 — the pipeline-status tree above.
-- `skills/governance/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
+- `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

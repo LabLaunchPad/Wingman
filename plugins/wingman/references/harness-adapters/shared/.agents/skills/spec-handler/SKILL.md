@@ -50,5 +50,5 @@ Every handler leaves a runnable check of its spec's success criteria — a test,
 
 - `commands/adaptive/boardroom.md`
 - `commands/pipeline/build.md`
-- `skills/discipline/subagent-driven-development`
-- `skills/discipline/test-driven-development`
+- `skills/subagent-driven-development`
+- `skills/test-driven-development`

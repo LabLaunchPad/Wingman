@@ -1,8 +1,8 @@
 # Visual Output Templates — Cross-Command Reference
 
-Concrete, copy-paste templates for `skills/output/visual-founder-output`. This file holds the actual
+Concrete, copy-paste templates for `skills/visual-founder-output`. This file holds the actual
 Mermaid/ASCII source so the skill's own prose doesn't have to embed large code blocks. Owned by
-`skills/output/visual-founder-output`; cited from all 7 pipeline commands (`discovery.md`, `define.md`,
+`skills/visual-founder-output`; cited from all 7 pipeline commands (`discovery.md`, `define.md`,
 `architecture.md`, `uxflow.md`, `implementation-planning.md`, `build.md`, `ship.md`) and
 `boardroom.md`.
 
@@ -10,12 +10,12 @@ Mermaid/ASCII source so the skill's own prose doesn't have to embed large code b
 commands plus `boardroom.md`, for consistent orientation at every stage — not just at a checkpoint.
 §1 (UX flow), §3 (seat-verdict grid), §4 (DEF→ARCH graph), and §5 (task-dependency diagram) are each
 specific to the one command named in their heading, because their content only has real diagram
-shape in that one place — see `skills/output/visual-founder-output`'s Red Flags before reusing any of them
+shape in that one place — see `skills/visual-founder-output`'s Red Flags before reusing any of them
 somewhere its content doesn't actually have that shape (a flat field list or an independent-item
 table, like `discovery.md`'s output or `define.md`'s requirements, does not get a forced diagram).
 
 Every template below has a Tier A (Artifact-capable) and Tier B (universal fallback) version — see
-`skills/output/visual-founder-output`'s Core Workflow for how to detect which tier applies before picking
+`skills/visual-founder-output`'s Core Workflow for how to detect which tier applies before picking
 one.
 
 ---
@@ -177,7 +177,7 @@ flowchart TD
   them) can and should show as parallel branches, not forced into one chain.
 - Append this diagram as its own subsection in the plan document (e.g. `## Task Dependencies`), after
   the task list — it illustrates the existing checkbox list, never replaces its exact-file/exact-step
-  detail (see `skills/discipline/writing-plans`'s "No Placeholders" rule, which still governs the task list
+  detail (see `skills/writing-plans`'s "No Placeholders" rule, which still governs the task list
   itself).
 
 **Tier A (Artifact):** not typically warranted here — the plan document's own reader (an executing
@@ -200,7 +200,7 @@ unless the founder has explicitly asked to see the plan directly.
 
 ## Cited by
 
-- `plugins/wingman/skills/output/visual-founder-output/SKILL.md`
+- `plugins/wingman/skills/visual-founder-output/SKILL.md`
 - `plugins/wingman/commands/adaptive/boardroom.md`
 - `plugins/wingman/commands/pipeline/architecture.md`
 - `plugins/wingman/commands/pipeline/build.md`

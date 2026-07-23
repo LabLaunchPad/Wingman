@@ -199,4 +199,4 @@ For any system that processes LLM prompts or user-generated text that may be sen
 
 ## Cited by
 
-- `plugins/wingman/skills/governance/security-checklist/SKILL.md`
+- `plugins/wingman/skills/security-checklist/SKILL.md`

@@ -1,6 +1,6 @@
 # Eval: ponytail-debt-harvesting
 
-Tests `plugins/wingman/skills/response/ponytail-debt-harvesting/SKILL.md` — its debt harvesting pattern, `// minimal:` comment format, and DEBT.md ledger — against a fixture with intentional debt patterns.
+Tests `plugins/wingman/skills/ponytail-debt-harvesting/SKILL.md` — its debt harvesting pattern, `// minimal:` comment format, and DEBT.md ledger — against a fixture with intentional debt patterns.
 
 ## Scenario 1 — Code with deliberate shortcuts (positive case)
 
@@ -42,7 +42,7 @@ Corrected 2026-07-20 from `authored, pending first run`.
 
 Ran `evals/fixtures/setup-ponytail-debt-harvesting-fixture.sh` into a scratch dir (confirmed no
 pre-existing `DEBT.md`), then spawned a fresh un-briefed subagent with only
-`skills/response/ponytail-debt-harvesting/SKILL.md` and the fixture path, instructed to run the harvest
+`skills/ponytail-debt-harvesting/SKILL.md` and the fixture path, instructed to run the harvest
 process. Independently verified by reading the file the subagent wrote.
 
 | Check | Result |

@@ -4,7 +4,7 @@ description: Use when about to claim work is complete, fixed, or passing, before
 ---
 
 <!--
-Adapted from obra/superpowers (skills/discipline/verification-before-completion), MIT License,
+Adapted from obra/superpowers (skills/verification-before-completion), MIT License,
 Copyright (c) 2025 Jesse Vincent. See /ATTRIBUTIONS.md for details.
 -->
 

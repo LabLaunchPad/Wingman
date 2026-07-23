@@ -90,7 +90,7 @@ same convention):
 
 ## Show the requirement-to-decision mapping
 
-Immediately after the table, use `skills/output/visual-founder-output` to render the same `ARCH-*` rows as
+Immediately after the table, use `skills/visual-founder-output` to render the same `ARCH-*` rows as
 a DEF→ARCH traceability graph (per `references/visual-output-templates.md` §4, appended to the same
 scratch architecture doc) — detect the session's rendering tier first. The table stays exactly as
 written above; the graph is generated from the same rows, added alongside it, never instead of it.
@@ -101,16 +101,16 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2).
 
 Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
 
 ## References
 
-- `skills/governance/traceability-linking` — the `ARCH-*` ID convention and how it chains back to `DEF-*`.
-- `skills/discipline/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
+- `skills/traceability-linking` — the `ARCH-*` ID convention and how it chains back to `DEF-*`.
+- `skills/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.
 
 
@@ -153,7 +153,7 @@ Translate every finding through `plain-language-checkpoint`'s bar before it reac
 ## References
 
 - `references/orchestration-patterns.md` — the multi-angle parallel audit pattern this command operationalizes.
-- `skills/discipline/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.
+- `skills/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.
 - `commands/adaptive/dogfood.md` — a different, complementary operation: `/wingman:audit` reviews *existing* project state; `/wingman:dogfood` generates and runs a fixture/feature through the real pipeline end to end.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
@@ -300,7 +300,7 @@ The dispatch prompt to each seat is an internal, agent-to-agent channel (no foun
 
 Do not just concatenate seven reports — a founder should never have to read seven separate verdicts to figure out what to do. Group by the four headers above (plus Design when it returned substantive input) so the summary stays skimmable as the seat count grows.
 
-Before formatting, use `skills/output/visual-founder-output` to detect this session's rendering tier (Tier
+Before formatting, use `skills/visual-founder-output` to detect this session's rendering tier (Tier
 A: Artifact-capable; Tier B: universal Mermaid/ASCII fallback — see that skill's Core Workflow). Then
 synthesize into this exact structure:
 
@@ -412,9 +412,9 @@ Then update `.wingman/state.json`. **Read the existing file first if it exists**
 ## References
 
 - `references/plan-review-checklist.md` — the required plan sections the gstack `EXIT PLAN MODE GATE` enforces before `ExitPlanMode`; the same shape each seat should find present in the plan it reviews.
-- `skills/mechanics/spec-handler` — every plan under review is a spec; judge it against its stated success criteria, not its volume.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` — how to render the "Where you are" pipeline status and the optional seat-verdict grid; consult before formatting the consolidated summary above.
-- `skills/output/plain-language-checkpoint` — the reversible-compression rule behind the `details_ref` companion file and `expand` mode above.
+- `skills/spec-handler` — every plan under review is a spec; judge it against its stated success criteria, not its volume.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the "Where you are" pipeline status and the optional seat-verdict grid; consult before formatting the consolidated summary above.
+- `skills/plain-language-checkpoint` — the reversible-compression rule behind the `details_ref` companion file and `expand` mode above.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
@@ -459,7 +459,7 @@ Immediately after, use the `management-board-activation` skill to check whether 
 
 Use the `department-lead-activation` skill to check the Legal & Security activation signal too: if this project touches auth, payments, or personal data, create `dept-legal-security` if it doesn't exist yet. Its work now happens inline as part of this stage's Definition-of-Done gate below, rather than as a separate `/wingman:secure` stage — folding a dedicated security pass into Build's own gate, not skipping it (see "Definition-of-Done gate" below).
 
-Use `skills/output/visual-founder-output` to show the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone done, Build now the current stage.
+Use `skills/visual-founder-output` to show the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone done, Build now the current stage.
 
 ## Execution discipline
 
@@ -506,7 +506,7 @@ For every risk found, decide: **CLOSED** (mitigated, or a documented accepted ri
 
 The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**. This implements gsd-plugin's phase-gate pattern: advancement is BLOCKED while **threats_open > 0**.
 
-**Traceability and test presence.** Alongside the threat register, confirm every task this stage executed carries at least one `wingman:req` traceability marker (per `skills/governance/traceability-linking`, minted back in `/wingman:define`/`/wingman:architecture`/`/wingman:uxflow`) and that a corresponding test file exists for every changed non-test source file — an explicit `<!-- wingman:no-test-needed: <reason> -->` marker is the only accepted exception for genuinely test-free changes (docs, config), and it must be logged, not silently assumed.
+**Traceability and test presence.** Alongside the threat register, confirm every task this stage executed carries at least one `wingman:req` traceability marker (per `skills/traceability-linking`, minted back in `/wingman:define`/`/wingman:architecture`/`/wingman:uxflow`) and that a corresponding test file exists for every changed non-test source file — an explicit `<!-- wingman:no-test-needed: <reason> -->` marker is the only accepted exception for genuinely test-free changes (docs, config), and it must be logged, not silently assumed.
 
 **The gate.** This stage does not clear with open risks, missing traceability, or missing tests. If anything is OPEN or missing:
 
@@ -525,13 +525,13 @@ Run `/wingman:boardroom diff` against the accumulated changes, once the Definiti
 
 ## References
 
-- `skills/mechanics/spec-handler` — each task in the plan is a spec; build the handler to its success criteria, then verify against them.
-- `skills/mechanics/testing-patterns` — follow AAA, mock at boundaries, and cover changed paths (>=80%) as you run the verification suite above.
-- `skills/governance/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
-- `skills/governance/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
+- `skills/spec-handler` — each task in the plan is a spec; build the handler to its success criteria, then verify against them.
+- `skills/testing-patterns` — follow AAA, mock at boundaries, and cover changed paths (>=80%) as you run the verification suite above.
+- `skills/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
+- `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
 - `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule the Definition-of-Done gate implements.
-- `skills/governance/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown at the start of this stage.
 
 
@@ -660,15 +660,15 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2) after the Requirements table above.
 
 Hand off directly to `/wingman:architecture` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
 
 ## References
 
-- `skills/governance/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 
 
@@ -716,7 +716,7 @@ Produce a short artifact — no plan file yet, no Boardroom checkpoint at this s
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
 rendering tier first, never assume.
 
@@ -725,9 +725,9 @@ Hand off directly to `/wingman:define` — do not stop and wait for approval her
 ## References
 
 - `references/org-template/README.md` — the project-type catalog consulted in Step 1, and the two
-  other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/knowledge/memory`
+  other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/memory`
   draws on.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 
 
@@ -862,14 +862,14 @@ Any friction found here is captured the normal way: `/wingman:learn` for a durab
 
 ## References
 
-- `skills/governance/dogfood-gap-classification` — maintainer-mode-only; classifies a maintainer-mode gap into
+- `skills/dogfood-gap-classification` — maintainer-mode-only; classifies a maintainer-mode gap into
   hook / skill / command-instruction / out-of-scope, and drives the fix through implementation,
   reproduction, eval coverage, and a retro before considering it done.
 - `commands/adaptive/harness.md` — audits whether the *existing* test/build harness is honest; this command
   instead *generates and runs* a fixture/feature end to end. Different operations, complementary.
 - `commands/adaptive/audit.md` — on-demand deep review of *existing* project state; same distinction as
   above.
-- `commands/adaptive/evolve.md` / `skills/governance/evolve-promotion` — founder-project-scoped promotion (never writes
+- `commands/adaptive/evolve.md` / `skills/evolve-promotion` — founder-project-scoped promotion (never writes
   to `plugins/wingman/`); the mirror image of `dogfood-gap-classification`'s maintainer scope.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
@@ -916,8 +916,8 @@ This is meant to run occasionally (after a handful of shipped features), not eve
 ## References
 
 - `references/orchestration-patterns.md` — the endorsed multi-agent patterns (and anti-patterns) this promotion decision should respect.
-- `skills/governance/evidence-gated-catalog` — a new pattern only earns a catalog entry once it has evidence behind it.
-- `skills/knowledge/doc-index` — any promoted artifact that becomes documentation must stay discoverable; wire it into an owner and attribute it.
+- `skills/evidence-gated-catalog` — a new pattern only earns a catalog entry once it has evidence behind it.
+- `skills/doc-index` — any promoted artifact that becomes documentation must stay discoverable; wire it into an owner and attribute it.
 
 
 ---
@@ -951,7 +951,7 @@ Every "tests pass" claim Wingman makes during `/wingman:build` (including its De
 5. **Coverage gaps** — is there a category of change (e.g. anything touching payments, auth, or data migrations) with no tests at all?
 6. **Bloat detection** — scan for files over 200 lines, functions over 50 lines, deeply nested code (>3 levels), and repeated patterns. Flag anything that could be simplified using stdlib, native platform features, or existing dependencies. Apply the 5-tag taxonomy (`#delete`, `#stdlib`, `#native`, `#yagni`, `#shrink`).
 7. **Debt ceiling check** — scan for `// minimal:` comments and flag any that have hit their ceiling or are within 20% of it. See `ponytail-debt-harvesting` for the debt harvesting pattern.
-8. **Prompt-diff coverage** — for any command/agent/skill file whose instructions changed since the last audit, check whether its eval case actually exercises the changed section, not just whether a case exists. See `skills/knowledge/prompt-diff-check` for the full discipline.
+8. **Prompt-diff coverage** — for any command/agent/skill file whose instructions changed since the last audit, check whether its eval case actually exercises the changed section, not just whether a case exists. See `skills/prompt-diff-check` for the full discipline.
 
 ## Report
 
@@ -1058,16 +1058,16 @@ Enter plan mode (if not already in it). The plan file must include the sections 
 
 The plan document itself is never shown to the founder directly — its reader is whoever executes it
 (a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
-Plain-Language Summary), use `skills/output/visual-founder-output` to append a `## Task Dependencies`
+Plain-Language Summary), use `skills/visual-founder-output` to append a `## Task Dependencies`
 section per `references/visual-output-templates.md` §5, generated from the plan's own task list —
 this defaults to Tier B (Mermaid) regardless of session capability, since a rendered Artifact adds
 nothing for this document's actual reader. This is additive to the checkbox task list, not a
-replacement — `skills/discipline/writing-plans`'s exact-file/exact-step detail still lives in the tasks
+replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
 themselves.
 
 ## Where you are
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
 `references/visual-output-templates.md` §2), showing all 5 planning sub-stages complete and this
 stage as the last one before the checkpoint. `boardroom.md`'s own report shows this same tree again
 once the checkpoint records — that's expected, not wasted effort: this view is "planning just
@@ -1081,11 +1081,11 @@ Only once the boardroom checkpoint returns a "ship it" decision should you proce
 
 ## References
 
-- `skills/discipline/writing-plans` — the plan-quality bar.
+- `skills/writing-plans` — the plan-quality bar.
 - `references/plan-review-checklist.md` — the 7 required sections the `boardroom-checkpoint` hook enforces before `ExitPlanMode`.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
   diagram appended to the plan; §2 — the pipeline-status tree above.
-- `skills/governance/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
+- `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
 
 <!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
@@ -1479,7 +1479,7 @@ Tell the founder:
 **What happens next:** <e.g. "this needs your approval / a merge click" or "it will merge automatically once checks pass">
 ```
 
-Use `skills/output/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
+Use `skills/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
 
 ## Boardroom checkpoint
 
@@ -1495,7 +1495,7 @@ Suggest the adaptive stages that make sense next, without forcing them:
 
 ## References
 
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 
 
@@ -1572,7 +1572,7 @@ same convention):
 
 ## Show the flow, not just the table
 
-Immediately after the table, use `skills/output/visual-founder-output` to render the same rows as an
+Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
 actual flow diagram — detect the session's rendering tier first, then follow
 `references/visual-output-templates.md`'s UX-flow template (Tier B: a Mermaid flowchart appended to
 the same `docs/wingman/uxflow/<short-slug>.md` file; Tier A: a low-fidelity HTML wireframe per key
@@ -1584,7 +1584,7 @@ Hand off directly to `/wingman:implementation-planning` — this stage doesn't r
 
 ## References
 
-- `skills/governance/traceability-linking` — the `UX-*` ID convention.
-- `skills/output/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
-- `skills/output/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
+- `skills/traceability-linking` — the `UX-*` ID convention.
+- `skills/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.
