@@ -597,6 +597,156 @@ Seven workflows, engineered from a survey of all 66 workflow files across the 16
 
 All actions are pinned to full commit SHAs (not floating version tags), and every workflow declares least-privilege `permissions:` explicitly — supply-chain hygiene the vendor survey found in the more mature repos (`wshobson-agents`, `ecc`) but that this project's own first CI pass hadn't yet adopted.
 
+## 12. `agnostic-boardroom/` — a parallel-track Python rewrite (in progress, additive)
+
+A pasted "Enterprise Blueprint" proposed replacing this entire architecture — the markdown
+commands/agents/skills/hooks documented in §1-11 above — with a standalone Python backend: a
+LangGraph macro-graph, PydanticAI (Maker/Checker) micro-loops, an MCP server, a vector-store skill
+router, and a relational (SQLite/Postgres) state store. Evaluated against this doc's own existing
+decisions before any code was written, it directly reverses three of them: `docs/DATABASE.md`'s
+flat-file state-store choice (a real, revisited decision — schema_version 1→2→3 — not an
+oversight); the Boardroom's unconditional any-`NO_GO`-blocks gate rule (§4), which a near-identical
+"configurable strictness" proposal was already declined for; and §10's v16 audit entry, which
+explicitly dropped local vector search from the roadmap for zero evidenced need across this
+project's entire dogfooding history. Each conflict was named directly to the founder before
+building anything, via `AskUserQuestion` — the founder's answer: build it anyway, as a genuine full
+rewrite. See `docs/PROJECT.md`'s decisions log for the full record.
+
+**Scoped as additive, not destructive.** The new backend lives under a new top-level
+`agnostic-boardroom/` directory — it does not touch, replace, or depend on anything under
+`plugins/wingman/`. Wingman's actual shipped product keeps operating unchanged throughout this
+build-out; nothing here is wired to override it, and nothing gets retired until the replacement is
+proven end-to-end. This directory is **not** part of the installable plugin surface (not listed in
+`plugin.json`, not covered by `validate-structure.mjs`) — it is a separate, standalone codebase that
+happens to live in the same repo, tracked by its own `agnostic-boardroom/pyproject.toml` and test
+suite, exempt from the Node-only zero-dependency invariant `install-smoke.yml` checks (that check is
+scoped to the plugin install path; a Python backend under a directory the plugin manifest never
+references doesn't touch it).
+
+**Framework choice: Agno, not the blueprint's own suggested LangGraph.** A live 2026 research pass
+found Agno's declarative, minimal, transparent-debugging design closer to this project's own
+`engineering-minimalism` discipline than LangGraph's heavier LangChain-lineage stack, and Agno ships
+`AgentOS` (a stateless FastAPI runtime) that satisfies the blueprint's Pillar III MCP-server
+requirement with less custom plumbing. LangGraph's countervailing strength — proven large-scale
+production use and more mature cyclic-graph state primitives — is the documented fallback if the
+Maker/Checker retry loops need genuinely complex branching state later.
+
+**Execution is phased, not attempted in one pass**, tracked via the harness's own task list:
+
+1. **Data & Schema (done)** — `core/state_schema.py`: Pydantic models (`ProjectState`,
+   `BoardroomVerdict`, `ThreatRegisterEntry`, `DebtLedgerEntry`, `TraceabilityLink`) faithfully
+   ported from `docs/DATABASE.md`'s and the threat-register/debt-ledger docs' real, already-shipped
+   shapes — not a speculative new schema. 7 tests pass, two copied verbatim from `docs/DATABASE.md`'s
+   own worked JSON examples to prove the port is faithful, including the documented
+   "`active_managers` absent → treat as `[]`" forward-compatibility rule and the
+   any-`NO_GO`-blocks `blocks_advancement` gate rule kept as a fixed property, not a tunable
+   parameter.
+2. **The MCP Server (done)** — `mcp_server/server.py`: a real memory MCP server (FastMCP, stdio
+   transport) exposing `store_memory`/`retrieve_memories`/`list_memories` over a dedicated SQLite +
+   LanceDB substrate — see the "Phase 2" writeup below for the full account.
+3. **The Micro-Loops (done)** — a real Maker/Checker pair (`agents/departments/engineering_maker.py`
+   + `agents/boardroom/cto_evaluator.py`) using headless `claude -p` subprocess calls for genuine
+   live inference, not mocked; a real, bounded 3-iteration rejection loop, escalating to the founder
+   on the 3rd failure — see below.
+4. **The Macro-Graph (done)** — `agents/graph.py` wraps the micro-loops in the real, existing
+   7-stage pipeline topology: Discovery → Define → Architecture → UX → Implementation-Planning →
+   Build → Ship, mirrored exactly (not redesigned) to serve as a control group against the old
+   plugin — see below.
+
+**Phase 2a (skill-context A/B testing, follow-up founder request, done).** The founder asked to
+A/B test the blueprint's Pillar II claim specifically, with genuinely purposeful logging rather
+than vanity metrics — this axis was chosen over two other candidates (model-tier comparison,
+old-plugin-vs-new-backend) via `AskUserQuestion` because it's the one measurable honestly without
+live model inference. `knowledge/vector_store.py` and `knowledge/ab_harness.py` compare Variant A
+(today's whole-`SKILL.md`-in-context) against Variant B (top-k vector-retrieved chunks, via Agno's
+own `Knowledge` abstraction over an embedded LanceDB table + a local FastEmbed model — no API key,
+no server), logging a real `tiktoken` token count and retrieval latency (Agno's own
+`PerformanceEval`, reused rather than reinvented) per variant to an append-only log mirroring
+`.wingman/checkpoints.jsonl`'s convention. Confirmed empirically, not assumed: Agno's default
+5000-char chunk size barely sub-divided a typical `SKILL.md`, giving near-zero compression until
+tuned to 800 chars. At that size, real measured results (`systematic-debugging` 2211→536 tokens;
+`engineering-minimalism` 2427→545 tokens, both ~76-78% reduction) land inside the blueprint's
+claimed 60-80% range, earned rather than asserted. Deliberately does **not** log a
+decision-quality-preserved field, since verifying that needs a live agent run against each variant
+and a Definition-of-Done check — that requires model inference not yet wired (Phase 3).
+
+**Phase 2 (data substrate, memory MCP server, skill router, loop/graph engineering, an
+experimental slash command — done).** The founder answered every open question the Phase 2a
+clarifying-questions artifact raised, in a single detailed reply; each answer was independently
+fact-checked (via two dispatched subagents — an `Explore` pass and a `Plan` pass) rather than taken
+at face value before any code was written:
+
+- **Database: SQLite, not Postgres**, one file, one table per concern (`memory`, `checkpoints`,
+  `threat_register`, `debt_ledger`, `traceability`) mirroring the 5 existing Pydantic models exactly.
+  `db/connection.py` applies `journal_mode=WAL`, `busy_timeout=5000`, `synchronous=NORMAL`,
+  `foreign_keys=ON` on every connection (the last is per-connection, not persisted). Every query in
+  `db/repository.py` is parameterized — never string-concatenated — and every write/read
+  round-trips through the exact Pydantic models, directly answering the cited risk class (a real
+  LangGraph SQLite-checkpointer CVE that chained SQL injection into RCE via unvalidated metadata
+  deserialization): a payload failing validation on ingest lands in `threat_register` via
+  `log_schema_deviation`, never silently dropped. Runs alongside `.wingman/*.jsonl`, non-destructive.
+  8 tests pass, including a real WAL concurrency test (a second connection writes successfully while
+  a first holds an open read transaction open — no `SQLITE_BUSY`).
+- **Memory MCP server, scoped strictly to `.wingman/memory/*.md`-equivalent content** — not
+  speculatively expanded to raw checkpoints or cross-project data. "Multi-layered" = a 3-tier
+  `session`/`project`/`org` taxonomy. `mcp_server/memory_tools.py` implements `store_memory`/
+  `retrieve_memories`/`list_memories`; `retrieve_memories` does semantic search reusing
+  `vector_store.py`'s FastEmbed embedder against its own separate LanceDB table (kept
+  infrastructurally separate from the skills index, per the founder's explicit "don't merge
+  skill-routing and memory retrieval" directive). "Stress-tested" scoped exactly to the founder's
+  own stated bar (500 entries, sub-100ms reads, no concurrency claim, since none exists in this
+  project's real usage) — 5 tests pass, including that exact stress scenario.
+- **RAG/retrieval budget**: top 5-10 chunks, hard ceiling 15, cosine-similarity threshold ~0.5,
+  discard below rather than padding. Confirmed empirically before implementing: Agno's high-level
+  `Knowledge.search()` API does not expose a similarity score at all (`reranking_score` is always
+  `None` without a reranker configured) — the real score lives one layer down, on
+  `vector_db.vector_search()`'s raw `_distance` field (cosine distance; similarity = 1 − distance).
+- **Skill router (`knowledge/skill_router.py`)**: cross-skill dispatch at whole-skill granularity
+  (never a mixed cross-skill chunk context, per founder directive) over the already-built 40-skill
+  index. On a low-confidence match, proceeds anyway with the single highest-ranked skill rather than
+  halting — flagged loudly in the code and here as a known, currently-unguarded gap: the "a Checker
+  will catch a wrong pick" safety net has no real teeth until something actually wires this router's
+  output through the Maker/Checker loop below. 3 tests pass, including a real routed query and a
+  real low-confidence-fallback case.
+- **Loop/graph engineering, unblocked**: live Maker/Checker inference originally looked blocked on a
+  missing `ANTHROPIC_API_KEY`. Resolved by the founder: use the AI model already available in the AI
+  coding agent — headless `claude -p "..." --output-format json` subprocess calls
+  (`agents/model_runner.py`), the identical mechanism `evals/run-headless.mjs` already uses and
+  trusts elsewhere in this repo. Verified live in this exact sandbox before committing to the design
+  (a real completion, real `session_id`, real token usage, a real `$0.26` cost for one trivial
+  reply). `agents/departments/engineering_maker.py` + `agents/boardroom/cto_evaluator.py` implement
+  the pair; the Checker fails closed on an unparseable response (treated as reject, never silently
+  accepted). `agents/loop.py` bounds retries at 3 iterations, escalating to the founder on the 3rd
+  failure, with **per-file escalation scope** (never re-feeding an entire project's context back
+  into the Maker for one failing file) — and logs the real `total_cost_usd` every `claude -p` call
+  reports, not an estimate. `agents/graph.py` wraps the loop in the real, existing 7-stage topology,
+  mirrored exactly (a deliberate control group against the old plugin, not a redesign), and never
+  auto-advances past a stage requiring a founder checkpoint. 5 fast mocked-control-flow tests
+  (iteration cap, escalation, cost summation, fail-closed) plus **2 real live tests**
+  (`pytest -m live_model`, real dollar cost, excluded from the default run): a live Checker
+  genuinely rejecting an obviously wrong solution with a real reason, and a full live Maker→Checker
+  pass with real, non-zero logged cost. Plus 4 graph-topology tests (mirrors the real stage order;
+  never auto-advances past a checkpoint; stops rather than silently skipping a stage with no
+  registered handler).
+- **Experimental slash command, real placement correction found by actually running the
+  validator**: the founder's own answer called for `plugins/wingman/commands/experimental/`, but
+  `validate-structure.mjs`'s orphan check treats any `.md` under `plugins/wingman/commands/` not
+  listed in `plugin.json` as a hard error ("it will never load") — confirmed by running it, not
+  assumed. Landed instead at `.claude/commands/ship-feature.md` (Claude Code's real project-scoped
+  custom-command mechanism), outside `plugins/wingman/` entirely, so none of the plugin's own
+  validators apply to it while it's still a genuinely invocable command. States plainly, in prose
+  (matching `skills/git-pr-workflow`'s rationale-first style), that it still stops at every one of
+  the real 7 pipeline checkpoints — it is a thin MCP client, not a bypass of the Boardroom's
+  per-stage governance.
+
+Full validator suite (`validate-structure.mjs`, `check-repo-consistency.mjs`,
+`check-fixtures.mjs`, `check-traceability.mjs`, `check-harness-adapter-drift.mjs`) confirmed passing
+after the `.claude/commands/` correction. 36/36 fast Python tests pass (`pytest tests/`), plus 2/2
+real live-model tests run explicitly. See `docs/PROJECT.md`'s decisions log for the full record of
+the founder's answers and the two subagents' fact-checks.
+
+See `agnostic-boardroom/README.md` for current phase status.
+
 ## Open items (planned, not yet built)
 
 - The MCP state-store server documented in `docs/DATABASE.md` (deliberately deferred — see that document's "Why no server yet").
