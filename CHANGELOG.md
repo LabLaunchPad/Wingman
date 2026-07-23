@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.0] - 2026-07-23
+
+### Added
+- **Full Codex CLI / OpenCode command+skill parity** (`plugins/wingman/references/harness-adapters/`), expanded from the prior Boardroom-seats-only scope on explicit founder request. New `plugins/wingman/scripts/generate-harness-adapters.mjs` generates all 40 skills to a shared `.agents/skills/` path both harnesses read natively, all 24 commands to `.opencode/commands/` for OpenCode, and a `commands-as-agents-md.md` reference for Codex CLI (which has no native command-file primitive, confirmed by direct CLI inspection). Regenerate-and-diff checked in CI (`validate.yml`) so it can't silently drift. Structurally verified against real live installs (`opencode-ai@1.18.4`, `@openai/codex@0.145.0`): all 40 skills and 24 commands confirmed discovered. See `docs/ARCHITECTURE.md` §8b and `harness-adapters/README.md` for full detail, including a disclosed Codex CLI concurrency-count discrepancy (4 vs. a previously-cited 6) and the remaining gap (live model-inference verification needs founder-provided API credentials, tracked in `docs/HUMAN-TODOS.md`).
+
 ## [0.5.39] - 2026-07-23
 
 ### Fixed

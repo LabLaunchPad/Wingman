@@ -8,8 +8,18 @@ portable" work is planned absent real, evidenced demand for a specific target ha
 stated bar, and the reason an earlier external "flatten everything" proposal was declined on
 2026-07-18 — see `docs/PROJECT.md`'s decisions log).
 
-This directory is that evidenced-demand case, scoped narrowly to two named harnesses: **Codex CLI**
-and **OpenCode**. It is not a claim that Wingman now runs identically everywhere.
+This directory is that evidenced-demand case, scoped to two named harnesses: **Codex CLI** and
+**OpenCode**. It is not a claim that Wingman now runs identically everywhere.
+
+**2026-07-23 update — full command/skill parity, not just Boardroom + git-push gate.** The founder
+named "agent-agnostic across Claude Code, OpenCode, and Codex CLI" as an explicit MVP goal — the
+kind of real, named demand §8a's own bar requires to revisit "no portability work scheduled." A
+same-session research pass found the earlier "full port = untestable at scale" verdict no longer
+holds the way it used to: both target harnesses turn out to read Claude Code's own skill/command
+*file shapes* almost natively, so "port" mostly means "place the same file where that harness
+already looks," not "hand-translate into a different format." See `plugins/wingman/scripts/generate-harness-adapters.mjs`
+and the "What's here" section below for what that produced — every claim is backed by a real,
+live-install check run this session, not docs prose alone.
 
 ## Verification-status legend
 
@@ -45,13 +55,39 @@ a `verified` status with no real evidence):
   agent (or a human) that runs `git push`, with zero per-harness adaptation — the most robust piece
   of portability this investment produced, precisely because it doesn't depend on any AI harness's
   tool-naming or hook-API details at all.
+- `shared/.agents/skills/` — all **40 skills**, generated verbatim from the canonical
+  `plugins/wingman/skills/**` source by `plugins/wingman/scripts/generate-harness-adapters.mjs`.
+  **structurally verified (live install)**, 2026-07-23 — a real `opencode-ai@1.18.4` install's
+  `opencode debug skill` and a real `@openai/codex@0.145.0` install's `codex debug prompt-input`
+  both listed all 40 skill names when this directory was copied into a scratch project as
+  `.agents/skills/`. One shared file serves both harnesses (both read the identical path/format
+  natively — no per-harness translation of the frontmatter/body shape itself).
+- `opencode/.opencode/commands/` — all **24 commands**, generated verbatim from
+  `plugins/wingman/commands/**`. **structurally verified (live install)** — `opencode debug config`
+  showed all 24 command names, template content byte-identical to the canonical source, when
+  copied into a scratch project as `.opencode/commands/`.
+- `codex-cli/commands-as-agents-md.md` — all 24 commands, one per section, generated for **manual
+  append into a Codex CLI project's own `AGENTS.md`** — Codex CLI has no user-authored slash-command
+  file primitive (confirmed by direct CLI inspection: no `codex commands` subcommand exists; its
+  `prompts/list`/`prompts/get` are MCP protocol methods an MCP *server* exposes, not a local file
+  convention a plugin author can drop files into). This is a genuine capability gap, not a missed
+  port. **structurally verified (live install)** for the fallback mechanism itself — a real Codex
+  CLI install's `codex debug prompt-input` confirmed pasted section content actually reaches the
+  assembled model prompt when placed in a project's `AGENTS.md`.
+- 13 of the 40 skills and 6 of the 24 commands reference a Claude-Code-specific primitive
+  (`AskUserQuestion`, `ExitPlanMode`, or parallel `Task`/`Agent` dispatch). Each generated copy gets
+  an additive, clearly-marked "Harness note" section appended (never a rewrite of the original
+  prose) explaining that harness's real equivalent — see `generate-harness-adapters.mjs`'s
+  `HARNESS_NOTES` table for the exact mapping per primitive.
 
 ## Deliberately not attempted here (and why)
 
-- **Full 1:1 porting of all 26 commands / 40 skills** into Codex TOML or OpenCode markdown formats.
-  Untestable in this sandbox at that scale, and exactly the unverified-breadth pattern this project's
-  own `engineering-minimalism` skill warns against. Revisit if real, evidenced demand for full
-  command-surface parity (not just the Boardroom + safety gate) shows up.
+- **Live, end-to-end model-inference verification** of the generated skill/command surface under
+  either harness — this sandbox has no configured API key/model provider for OpenCode or Codex CLI,
+  so "the file is discovered and its content reaches the assembled prompt" (confirmed, see above) is
+  as far as this pass could verify; "the model then behaves correctly when actually invoked" needs
+  founder-provided credentials (`docs/HUMAN-TODOS.md`'s `ANTHROPIC_API_KEY`-equivalent item for these
+  two harnesses specifically — not yet tracked there, added this update).
 - **Codex CLI's `secret-guard.mjs` Write/Edit-matcher hook path.** A 2026-07-22 follow-up audit
   confirmed the matcher shape via OpenAI's official Codex hooks docs (`apply_patch`/`Edit`/`Write`
   all valid matcher values; hook input's `tool_name` always reports `apply_patch`) — the original
@@ -65,15 +101,44 @@ a `verified` status with no real evidence):
   Codex CLI has no plan-mode tool at all — it uses `approval_policy` instead. This is a genuine
   capability gap in the target harness, not a missed port.
 - **Confirming a single-message N-way parallel subagent-dispatch primitive** for either harness, the
-  way Claude Code's `Task`/`Agent` calls provide. Both harnesses gained real parallel-subagent
-  capability during 2026 (see Sources below), which is new evidence worth recording (§8a's stale
-  claim is corrected in `docs/ARCHITECTURE.md` §8b), but neither adapter's README claims a
-  confirmed one-shot 8-seat fan-out — both document the honest fallback (sequential dispatch,
-  manual consolidation) instead.
+  way Claude Code's `Task`/`Agent` calls provide, at full 7/8-seat Boardroom scale. **Update
+  2026-07-23**: Codex CLI's real mechanism is now confirmed directly (not just documented) —
+  `spawn_agent`/`followup_task`/`send_message`/`wait_agent`, observed live via `codex debug
+  prompt-input`, with a **confirmed 4-concurrent-agent ceiling** (lower than an 8-seat single-message
+  fan-out). OpenCode's Task tool remains confirmed only via docs (§8b), not a live multi-agent run in
+  this sandbox. Neither is confirmed at the exact 7/8-seat scale `boardroom.md` uses in one message —
+  the honest fallback (batch beyond the concurrency ceiling, or dispatch sequentially and consolidate
+  the same way) is what `generate-harness-adapters.mjs`'s `ParallelDispatch` harness note documents.
 
 ## Sources (2026 research)
 
-- Codex CLI subagents GA, 6 concurrent — [Codex CLI 2026 reference](https://www.codegateway.dev/en/blog/openai-codex-cli-complete-guide-2026)
+- **2026-07-23 additions, direct live-install verification (stronger evidence than docs prose,
+  used specifically because an earlier research pass on this same topic found docs prose
+  incomplete/inconsistent — see the `.agents/skills/` finding below):**
+  - OpenCode skill discovery paths (`.opencode/skills/`, `.claude/skills/`, `.agents/skills/`) —
+    [OpenCode skills docs](https://opencode.ai/docs/skills/), confirmed directly via
+    `opencode debug skill` against a real `opencode-ai@1.18.4` install (the docs page alone was
+    trusted only after a same-name-collision false negative in an early test was diagnosed and
+    re-tested with unique names).
+  - OpenCode command format (`.opencode/commands/*.md`, `description`/`agent`/`model`/`subtask`
+    frontmatter, `$ARGUMENTS` templating) — [OpenCode commands docs](https://opencode.ai/docs/commands/),
+    confirmed directly via `opencode debug config` showing byte-identical template content.
+  - Codex CLI skill discovery (`.agents/skills/`, `.codex/skills/`, `$CODEX_HOME/skills`) —
+    confirmed directly via `codex debug prompt-input` against a real `@openai/codex@0.145.0`
+    install (docs prose at `learn.chatgpt.com/docs/build-skills` only mentioned `.agents/skills`;
+    the `$CODEX_HOME/skills` path was found independently via the installed binary's own embedded
+    strings).
+  - Codex CLI has no command/prompt-template file primitive — confirmed by direct `codex --help`/
+    `codex plugin --help` inspection (no such subcommand exists) rather than inferred from docs
+    silence.
+  - Codex CLI real parallel multi-agent primitives (`spawn_agent`, `followup_task`, `send_message`,
+    `wait_agent`, 4 concurrent slots) — found directly in `codex debug prompt-input`'s assembled
+    system prompt, not previously documented anywhere in this repo.
+- Codex CLI subagents GA — [Codex CLI 2026 reference](https://www.codegateway.dev/en/blog/openai-codex-cli-complete-guide-2026)
+  cites 6 concurrent; this session's direct live-install observation (above) saw the system prompt
+  state "4 available concurrency slots." Both are logged rather than silently picking one — the
+  discrepancy may be a version difference (this reference predates the installed `0.145.0`) or a
+  configurable limit; treated as an open, disclosed question, not resolved by assumption.
 - Codex CLI hooks: event list, JSON schema, `hookSpecificOutput.permissionDecision` / exit-code-2
   blocking protocol — [official Codex hooks reference](https://learn.chatgpt.com/docs/hooks)
 - Codex CLI custom-agent TOML config (`.codex/agents/*.toml`), `AGENTS.md` discovery —

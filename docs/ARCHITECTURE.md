@@ -258,14 +258,40 @@ either a working non-Claude-Code path or an honestly-documented degradation):
 
 **Re-checked against 2026 SOTA multi-harness conventions (2026-07-22)**: researched the AGENTS.md open standard (formalized August 2025, donated to the Linux Foundation's Agentic AI Foundation December 2025; 60,000+ adopting projects, 30+ tools) and a real multi-harness precedent (`wshobson/agents`, which auto-generates native per-harness artifacts from one source because its agents don't depend on harness-unique interactive primitives). This section's conclusion holds: `wshobson/agents`' generation approach only works *because* its agents avoid exactly the couplings (`AskUserQuestion`, `ExitPlanMode`, one-message parallel `Task`/`Agent` fan-out) that the Boardroom review loop structurally depends on — applying that pattern here would overclaim portability, not add it. One concrete, low-risk change did come out of the research: the repo now follows the AGENTS.md standard's own convention of `AGENTS.md` as the canonical file with `CLAUDE.md` as a symlink to it (previously reversed) — a documentation-layer change, not an execution-portability one.
 
-## 8b. Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21, re-verified 2026-07-23)
+## 8b. Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21, re-verified 2026-07-23, expanded to full command/skill parity 2026-07-23)
 
 §8a's "revisit if a specific harness with this gap is actually targeted" escape hatch was invoked
 for real: two named harnesses, Codex CLI and OpenCode. `plugins/wingman/references/harness-adapters/`
-holds the result — scoped narrowly (the Boardroom seats + the git-push safety gate, not a full
-command/skill port), and every artifact is labeled with its true verification status rather than
+holds the result. Every artifact is labeled with its true verification status rather than
 overclaiming. Full citation list and the deliberately-not-attempted list live in that directory's own
 `README.md`; summary here:
+
+**2026-07-23 — scope expanded from Boardroom-only to the full 24-command/40-skill surface, on
+explicit founder request.** The original scoping ("Boardroom seats + git-push gate, not a full
+command/skill port — untestable at that scale") was correct *given what porting was assumed to
+mean*: hand-translating 64 files into a different format per harness. A same-session research pass,
+verified against real live installs rather than trusted from docs prose, found that assumption
+false for the majority of the surface: OpenCode reads skills from `.opencode/skills/`, `.claude/skills/`,
+and `.agents/skills/<name>/SKILL.md` — Claude Code's own `name`+`description` frontmatter shape,
+unmodified. Codex CLI reads skills from the same `.agents/skills/` convention plus `.codex/skills/`/
+`$CODEX_HOME/skills`. OpenCode also reads commands from `.opencode/commands/<name>.md` in
+Wingman's own `description`+`$ARGUMENTS` shape, byte-identical. **Real "port" work for the 27/40
+skills and 18/24 commands with no Claude-specific primitive is therefore just placing the same file
+at a path the target harness already scans — not translation.** Built
+`plugins/wingman/scripts/generate-harness-adapters.mjs` to do this mechanically (regenerate-and-diff
+checked in CI, `validate.yml`) rather than a one-time hand port, closing the exact "guaranteed to
+drift" objection that made the original scoping correct at the time. Codex CLI genuinely has no
+command/prompt-template file primitive (confirmed by direct CLI inspection, not inferred) — those 24
+commands instead generate as `codex-cli/commands-as-agents-md.md`, one section per command, meant to
+be pasted into a Codex CLI project's own `AGENTS.md` (confirmed via a real install that pasted
+content does reach the assembled prompt). The 13 skills / 6 commands referencing a Claude-specific
+primitive (`AskUserQuestion`, `ExitPlanMode`, parallel dispatch) get an additive "Harness note"
+appended per primitive, never a rewrite of the canonical prose. **Live-install structural
+verification, this session**: all 40 skills confirmed discovered by both a real `opencode-ai@1.18.4`
+and a real `@openai/codex@0.145.0` install; all 24 commands confirmed discovered by OpenCode. Still
+not verified: actual model-inference behavior under either harness (no API key configured in this
+sandbox — a `docs/HUMAN-TODOS.md` item, not an engineering gap). See `harness-adapters/README.md`'s
+"What's here" section for the full breakdown and exact commands run.
 
 - **8 Boardroom seat personas, translated into both harnesses' native agent formats** (Codex CLI
   `.codex/agents/*.toml`; OpenCode `.opencode/agent/*.md`). **Updated 2026-07-23**: both `opencode`
@@ -304,10 +330,12 @@ overclaiming. Full citation list and the deliberately-not-attempted list live in
   or hook-API details at all.
 - **Deliberately not attempted**: `secret-guard.mjs`'s Write/Edit-matcher hook path for Codex CLI
   (its exact file-edit tool-name string wasn't confirmed by research — a wrong guess would make the
-  hook silently never fire); a confirmed single-message N-way parallel-dispatch primitive for either
-  harness (see the §8a correction above); full 1:1 porting of the other 25 commands / 39 skills
-  (untestable at that scale in this sandbox, and the unverified-breadth pattern
-  `engineering-minimalism` warns against).
+  hook silently never fire); a confirmed single-message N-way parallel-dispatch primitive at full
+  7/8-seat Boardroom scale for either harness (see the §8a correction above — Codex CLI's real
+  primitive is now confirmed, just not at that exact scale in one message); live model-inference
+  verification under either harness (no API key in this sandbox). **No longer on this list as of
+  2026-07-23**: full command/skill porting — see the expansion note above; it turned out not to
+  require the unverified-breadth hand-translation this bullet used to correctly warn against.
 
 `plugins/wingman/AGENTS.md` — a new nested, package-scoped `AGENTS.md` (the monorepo "nearest wins"
 convention) — points into this same directory for any agent landing directly in `plugins/wingman/`.
