@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.4] - 2026-07-23
+
+### Fixed
+- **Optimized test-presence reference scanner in `dod-structural-gate.mjs`** to lazily list and read test files at most once per execution, instead of scanning the test directories and reading files from scratch on every call. This dramatically optimizes turnaround time on tools when verifying test presence by dropping disk walking and reading operations from $O(M \times N)$ to $O(N)$ (where $M$ is the number of changed files and $N$ is the number of test files).
+
 ## [0.6.3] - 2026-07-23
 
 ### Changed

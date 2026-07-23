@@ -232,7 +232,9 @@ function listFilesRecursive(dir) {
 // exactly this layout found the basename-only candidates list above blocked a push despite full,
 // real test coverage. This scans test/tests/__tests__ directories for any test file whose content
 // actually imports/requires the source module by name, before giving up on it.
-function anyTestFileReferencesSource(cwd, baseName) {
+//
+// ⚡ Bolt Optimization: Accept pre-loaded and cached testFiles array to avoid O(M * N) disk walking/reads.
+function anyTestFileReferencesSource(baseName, testFiles) {
   const escaped = escapeRegExp(baseName);
   const importRef = new RegExp(
     `(?:from\\s+['"][^'"]*/${escaped}(?:\\.[a-zA-Z]+)?['"]` +
@@ -241,21 +243,42 @@ function anyTestFileReferencesSource(cwd, baseName) {
     `|from\\s+[\\w.]*${escaped}\\s+import)`,
     'm'
   );
-  for (const dirName of ['test', 'tests', '__tests__']) {
-    const dir = join(cwd, dirName);
-    if (!existsSync(dir) || !statSync(dir).isDirectory()) continue;
-    for (const file of listFilesRecursive(dir)) {
-      if (!TEST_FILE_HINT.test(file)) continue;
-      let content = '';
-      try { content = readFileSync(file, 'utf-8'); } catch { continue; }
-      if (importRef.test(content)) return true;
-    }
+  for (const item of testFiles) {
+    if (importRef.test(item.content)) return true;
   }
   return false;
 }
 
 export function checkTestPresence(cwd, changedFiles) {
   const missing = [];
+
+  // ⚡ Bolt Optimization: Lazily load/cache test files and their contents exactly once
+  // per checkTestPresence invocation. This avoids an O(M * N) synchronous directory traversal
+  // and disk reading loop when there are M changed files and N test files, dropping I/O to O(N).
+  // Kept local to checkTestPresence so it is completely thread-safe and isolated across unit tests.
+  const testFiles = [];
+  let testFilesLoaded = false;
+
+  function ensureTestFiles() {
+    if (testFilesLoaded) return;
+    for (const dirName of ['test', 'tests', '__tests__']) {
+      const dir = join(cwd, dirName);
+      if (existsSync(dir) && statSync(dir).isDirectory()) {
+        for (const file of listFilesRecursive(dir)) {
+          if (TEST_FILE_HINT.test(file)) {
+            try {
+              const content = readFileSync(file, 'utf-8');
+              testFiles.push({ file, content });
+            } catch {
+              // skip unreadable
+            }
+          }
+        }
+      }
+    }
+    testFilesLoaded = true;
+  }
+
   for (const f of changedFiles) {
     if (TEST_FILE_HINT.test(f)) continue; // it's itself a test file
     if (!/\.(js|jsx|ts|tsx|mjs|py|rb|go|java|rs)$/.test(f)) continue; // not source
@@ -275,8 +298,15 @@ export function checkTestPresence(cwd, changedFiles) {
       `test/${baseName}.test.${ext}`, `test/${baseName}.spec.${ext}`, `test/test_${baseName}.${ext}`,
       `tests/${baseName}.test.${ext}`, `tests/${baseName}.spec.${ext}`, `tests/test_${baseName}.${ext}`,
     ];
+
+    // Check direct candidate presence first. If found, avoid walking or loading any test files completely.
+    // If not found, lazily load all test files once and check if any references this source file.
     const hasTest = candidates.some((c) => existsSync(join(cwd, c)))
-      || anyTestFileReferencesSource(cwd, baseName);
+      || (() => {
+        ensureTestFiles();
+        return anyTestFileReferencesSource(baseName, testFiles);
+      })();
+
     if (!hasTest) missing.push(f);
   }
   return missing;
