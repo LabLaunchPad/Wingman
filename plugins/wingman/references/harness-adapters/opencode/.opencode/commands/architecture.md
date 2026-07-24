@@ -13,7 +13,7 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill to ensure `dept-engineering` exists for this project (its activation signal is always true) — create it if it doesn't exist yet, then delegate the technical-design portion of this step to it.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-engineering`.
+Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-engineering`.
 
 ## Design the technical shape
 
@@ -46,8 +46,7 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
-`references/visual-output-templates.md` §2).
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree.
 
 Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
 
