@@ -259,6 +259,11 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Caches to avoid redundant file-system access across multiple source files checked.
+// Cleared at the beginning of checkTestPresence() to prevent cross-run state leaks.
+let listFilesCache = null;
+let fileContentCache = null;
+
 function listFilesRecursive(dir) {
   let results = [];
   let entries;
@@ -286,20 +291,48 @@ function anyTestFileReferencesSource(cwd, baseName) {
     `|from\\s+[\\w.]*${escaped}\\s+import)`,
     'm'
   );
+
+  // Retrieve or compute the recursive test directory file lists (cached)
+  if (!listFilesCache) {
+    listFilesCache = new Map();
+    for (const dirName of ['test', 'tests', '__tests__']) {
+      const dir = join(cwd, dirName);
+      if (existsSync(dir) && statSync(dir).isDirectory()) {
+        listFilesCache.set(dirName, listFilesRecursive(dir));
+      }
+    }
+  }
+
+  if (!fileContentCache) {
+    fileContentCache = new Map();
+  }
+
   for (const dirName of ['test', 'tests', '__tests__']) {
-    const dir = join(cwd, dirName);
-    if (!existsSync(dir) || !statSync(dir).isDirectory()) continue;
-    for (const file of listFilesRecursive(dir)) {
+    const files = listFilesCache.get(dirName);
+    if (!files) continue;
+    for (const file of files) {
       if (!TEST_FILE_HINT.test(file)) continue;
-      let content = '';
-      try { content = readFileSync(file, 'utf-8'); } catch { continue; }
-      if (importRef.test(content)) return true;
+      let content = fileContentCache.get(file);
+      if (content === undefined) {
+        try {
+          content = readFileSync(file, 'utf-8');
+          fileContentCache.set(file, content);
+        } catch {
+          fileContentCache.set(file, null);
+          continue;
+        }
+      }
+      if (content && importRef.test(content)) return true;
     }
   }
   return false;
 }
 
 export function checkTestPresence(cwd, changedFiles) {
+  // Reset caches per-run to keep tests and sequential runs isolated and accurate.
+  listFilesCache = null;
+  fileContentCache = null;
+
   const missing = [];
   for (const f of changedFiles) {
     if (TEST_FILE_HINT.test(f)) continue; // it's itself a test file

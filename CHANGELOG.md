@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.2] - 2026-07-24
+
+### Optimized
+- **Recursive test-file reference checking in `plugins/wingman/hooks/dod-structural-gate.mjs`** — Introduced module-scoped Map caches for recursive directory file listing (`listFilesRecursive`) and file content reads (`readFileSync`) across multiple directories (`test/`, `tests/`, `__tests__/`). Instead of performing $O(N \times M)$ redundant synchronous filesystem operations for $N$ modified source files and $M$ test files on every `checkTestPresence()` invocation, caches reduce I/O cost to $O(1)$ walks and single reads per file, greatly improving push-time performance. Both caches are properly reset at the beginning of each run to prevent state leaks or stale content.
+
 ## [0.7.1] - 2026-07-24
 
 ### Added
