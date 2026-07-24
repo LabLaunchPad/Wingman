@@ -88,6 +88,54 @@ for (const file of files) {
 const errors = [];
 const warnings = [];
 
+// Staleness detection (additive, warning-only — never a hard failure): if a DEF-*/ARCH-*/UX-*
+// source file under docs/wingman/{define,architecture,uxflow}/ has a filesystem mtime newer than
+// a plan file under docs/wingman/plans/ that cites its IDs, the plan may have been written (or last
+// touched) before that requirement/decision/flow was last edited -- flag it so a founder/agent can
+// notice, without blocking the existing PASS/FAIL semantics above.
+const STALENESS_SOURCE_DIRS = ['define', 'architecture', 'uxflow'];
+const plansDir = join(root, 'docs', 'wingman', 'plans');
+let planFiles = [];
+try {
+  planFiles = readdirSync(plansDir).filter((f) => f.endsWith('.md')).map((f) => join(plansDir, f));
+} catch { /* no plans dir -- nothing to check staleness against */ }
+
+if (planFiles.length > 0) {
+  for (const dirName of STALENESS_SOURCE_DIRS) {
+    const dir = join(root, 'docs', 'wingman', dirName);
+    let sourceFiles;
+    try { sourceFiles = readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => join(dir, f)); }
+    catch { continue; }
+
+    for (const sourceFile of sourceFiles) {
+      let sourceContent, sourceMtime;
+      try {
+        sourceContent = readFileSync(sourceFile, 'utf-8');
+        sourceMtime = statSync(sourceFile).mtimeMs;
+      } catch { continue; }
+      const sourceIds = new Set([...sourceContent.matchAll(new RegExp(TABLE_ROW_PATTERN.source, 'gm'))]
+        .map((m) => m[0].match(ID_PATTERN)?.[0])
+        .filter(Boolean));
+      if (sourceIds.size === 0) continue;
+
+      for (const planFile of planFiles) {
+        let planContent, planMtime;
+        try {
+          planContent = readFileSync(planFile, 'utf-8');
+          planMtime = statSync(planFile).mtimeMs;
+        } catch { continue; }
+        const citesSourceId = [...sourceIds].some((id) => planContent.includes(id));
+        if (citesSourceId && sourceMtime > planMtime) {
+          warnings.push(
+            `stale relationship: "${relative(process.cwd(), sourceFile)}" was modified after ` +
+            `"${relative(process.cwd(), planFile)}" was last touched — plan may be based on a stale requirement.`
+          );
+        }
+      }
+    }
+  }
+}
+
 // Orphaned markers: referenced but never defined in any table row.
 for (const [id, refFiles] of referencedIds) {
   if (!definedIds.has(id)) {
