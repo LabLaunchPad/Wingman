@@ -68,7 +68,7 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill to ensure `dept-engineering` exists for this project (its activation signal is always true) — create it if it doesn't exist yet, then delegate the technical-design portion of this step to it.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-engineering`.
+Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-engineering`.
 
 ## Design the technical shape
 
@@ -101,8 +101,7 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2).
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree.
 
 ## Gate checklist
 
@@ -475,17 +474,21 @@ $ARGUMENTS
 
 Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
+Check `.wingman/checkpoints.jsonl` for an entry with `"bundle": "planning-milestone"` for this project. If none exists, do not proceed silently — tell the founder plainly: "No prior Wingman plan found for this project — proceeding without traceability coverage from earlier pipeline stages. If you have your own spec, that's fine; if you meant to run `/wingman:discovery` through `/wingman:implementation-planning` first, stop now and do that instead." Wait for the founder's answer before continuing this stage.
+
+**Resuming on a fresh session.** Before starting or re-starting any task, do not assume the plan's own checkbox state is the whole story — a fresh session has no memory of what an earlier session already did. Check both: (1) the plan file's own checkbox state for the task, and (2) `git log` for a commit that already completed that task (matching the plan's own task description/scope). Only treat a task as not-yet-done when both agree it isn't — a task with an unchecked box but a matching completed commit should be treated as done (and the box corrected), not redone from scratch.
+
 Confirm the project is on a feature branch, not the default branch — check out or create one now (e.g. named for the plan's subject) before the first commit. Doing this here, before any work lands, means `ship.md`'s "on a feature branch" preflight check is a no-op confirmation instead of a late catch after work has already accumulated on the default branch.
 
 If this is a JS/TS project about to need a package manager for the very first time (no lock file, no `package.json` `packageManager` field yet), use the `package-manager-selection` skill before running any install command. This never applies to a project that already has a lock file — that choice is respected, not revisited.
 
 Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly — **except** for a genuinely single-task plan (Implementation Planning named exactly one task): creating and dispatching a full department-lead persona for one small unit of work is overhead disproportionate to the task itself, so this command may execute that one task directly. This exception does not apply once a plan names 2+ tasks — delegate normally from there. (Found via two real maintainer-mode dogfood runs, 2026-07-18 and 2026-07-21 — see `docs/wingman/retros.md`.)
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-engineering`/`mgr-design`/`mgr-data`/`mgr-qa`/`mgr-security` may need creating for whichever department leads are actually active (including `mgr-security`, once `dept-legal-security` is created just below).
+Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-engineering`/`mgr-design`/`mgr-data`/`mgr-qa`/`mgr-security` may need creating for whichever department leads are actually active (including `mgr-security`, once `dept-legal-security` is created just below).
 
 Use the `department-lead-activation` skill to check the Legal & Security activation signal too: if this project touches auth, payments, or personal data, create `dept-legal-security` if it doesn't exist yet. Its work now happens inline as part of this stage's Definition-of-Done gate below, rather than as a separate `/wingman:secure` stage — folding a dedicated security pass into Build's own gate, not skipping it (see "Definition-of-Done gate" below).
 
-Use `skills/visual-founder-output` to show the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone done, Build now the current stage.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to show the pipeline-status tree — Planning Milestone done, Build now the current stage.
 
 ## Execution discipline
 
@@ -707,8 +710,7 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2) after the Requirements table above.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Requirements table above.
 
 ## Gate checklist
 
@@ -769,7 +771,7 @@ If the project's shape clearly matches one of `references/org-template/project-t
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
+Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
 
 ## Step 3: Write the Discovery output
 
@@ -786,9 +788,7 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
-rendering tier first, never assume.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Discovery output above — detect the session's rendering tier first, never assume.
 
 ## Gate checklist
 
@@ -1135,6 +1135,10 @@ The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:b
 
 $ARGUMENTS
 
+## Gather: confirm slug consistency first
+
+Before reading any stage output, list the files actually present in each of `docs/wingman/discovery/`, `docs/wingman/define/`, `docs/wingman/architecture/`, and `docs/wingman/uxflow/` (skip `uxflow` only if the project genuinely has no user-facing surface, per `uxflow.md`). Read each filename's `<short-slug>` and confirm all four (or three) resolve to the exact same slug — the same-slug-filename convention each earlier stage documents is never verified mechanically, so this stage is where a silent mismatch would otherwise first bite. If any stage's directory has more than one slug present, or a stage's file is missing entirely while the others exist, do not guess which one is "the" project — stop and ask the founder explicitly (the equivalent of `AskUserQuestion` for this markdown-instructed step) which slug/project to gather from before proceeding. Only once the slugs agree (or the founder has picked one) move on to writing the plan.
+
 ## Write the plan
 
 Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
@@ -1163,8 +1167,7 @@ themselves.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2), showing all 11 prior stages complete and this stage as
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
 the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
@@ -1208,6 +1211,7 @@ the checkpoint blocks here and names the specific missing item(s) to the founder
 
 This file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real Codex CLI equivalent:
 
+- **AskUserQuestion**: Codex CLI has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.
 - **ExitPlanMode**: Codex CLI has no plan-mode concept at all (it uses `approval_policy` for command-level escalation instead, a genuine capability gap, not a missed port). Use `plugins/wingman/scripts/install-git-hooks.mjs` (already harness-agnostic, fires under any `git push` regardless of which agent drove the session) as the real enforcement point instead of a mid-session plan gate.
 
 
@@ -1998,7 +2002,7 @@ Use the `department-lead-activation` skill to check the DevOps activation signal
 
 Note: there is no separate `/wingman:secure` stage to check for here — its discipline is folded into `/wingman:build`'s own Definition-of-Done gate (threat register, traceability, test presence). The `dod-structural-gate.mjs` hook re-checks those same conditions mechanically, right before the `git push` below runs, so this preflight is a confirmation of work already done, not a fresh review.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-platform` may need creating (only if `dept-devops` is actually active).
+Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-platform` may need creating (only if `dept-devops` is actually active).
 
 Before shipping, confirm all of the following, and stop with a plain-language explanation if any fail:
 
@@ -2031,7 +2035,7 @@ Tell the founder:
 **What happens next:** <e.g. "this needs your approval / a merge click" or "it will merge automatically once checks pass">
 ```
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — Planning Milestone and Build done, Ship now the current stage.
 
 ## Gate checklist
 
@@ -2121,7 +2125,7 @@ $ARGUMENTS
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the flow-design portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
 
-Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
 ## Design the flow
 

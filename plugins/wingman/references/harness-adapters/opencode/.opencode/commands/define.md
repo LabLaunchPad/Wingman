@@ -31,8 +31,7 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2) after the Requirements table above.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Requirements table above.
 
 ## Gate checklist
 
