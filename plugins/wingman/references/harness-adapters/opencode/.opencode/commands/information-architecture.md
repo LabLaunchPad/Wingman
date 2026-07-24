@@ -34,16 +34,31 @@ Append this section to a scratch information-architecture doc (`docs/wingman/inf
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** navigation map, content hierarchy, labels, grouping rules, naming rules.
+- **Must decide:** the section structure, and the navigation logic.
+- **Gate passes only if** the structure is understandable to a first-time user.
+
 ## Information Architecture checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own IA table above. The founder approves or
-sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own IA table above. The checkpoint checks the
+gate checklist above, not just the table in general: it confirms every Must-include item is present
+and every Must-decide question is answered. The founder approves or sends back changes through this
+one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:uxflow`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:uxflow`.
 
 ## References
 
 - `skills/traceability-linking` — the `IA-*` ID convention and how it chains back to `DEF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.

@@ -40,18 +40,36 @@ Append this section to a scratch prototype-usability doc (`docs/wingman/prototyp
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** a testable prototype description, a test script, a participant profile,
+  findings, severity ranking, plus the accessibility/content review folded into this stage: a
+  contrast check, a keyboard/focus check, labels, motion notes, a plain-language rewrite pass.
+- **Must decide:** whether the flow is usable and what must change before build; which
+  accessibility fixes and which content fixes are needed.
+- **Gate passes only if** the prototype was actually tested **and** accessibility/clarity are
+  acceptable — both conditions, not either alone.
+
 ## Prototype & Usability checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own findings table above (`boardroom-design`
 has direct material input here, on top of its usual N/A fast-path for non-visual scopes). The
-founder approves or sends back changes through this one plain-language checkpoint before the
-pipeline moves on.
+checkpoint checks the gate checklist above, not just the findings in general: it confirms every
+Must-include item is present and every Must-decide question is answered. The founder approves or
+sends back changes through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:architecture`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:architecture`.
 
 ## References
 
 - `skills/traceability-linking` — the `PT-*` ID convention and how it chains back to `WF-*`/`VS-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `references/accessibility-checklist.md` — the accessibility lens applied above.
 - `skills/plain-language-checkpoint` — the content-review bar applied above.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status

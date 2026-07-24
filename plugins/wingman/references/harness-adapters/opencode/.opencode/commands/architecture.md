@@ -49,17 +49,33 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2).
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** stack choices, system boundaries, data model direction, integration plan,
+  tradeoff notes, rollback/recovery thinking.
+- **Must decide:** the boring default stack, and the complexity being deliberately rejected.
+- **Gate passes only if** the architecture is simple and fit for the requirements it satisfies.
+
 ## Architecture checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Architecture decisions above (and the
-DEF→ARCH graph). The founder approves or sends back changes through this one plain-language
-checkpoint before the pipeline moves on.
+DEF→ARCH graph). The checkpoint checks the gate checklist above, not just the decisions in general:
+it confirms every Must-include item is present and every Must-decide question is answered. The
+founder approves or sends back changes through this one plain-language checkpoint before the
+pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:implementation-planning`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:implementation-planning`.
 
 ## References
 
 - `skills/traceability-linking` — the `ARCH-*` ID convention and how it chains back to `DEF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.

@@ -80,9 +80,28 @@ The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**.
 
 The `dod-structural-gate.mjs` hook mechanically re-checks the threat-register/traceability/test-presence conditions above before `git push` can run in `/wingman:ship` — this section is what makes that check pass, not a separate step to remember later.
 
+## Gate checklist
+
+Alongside the Definition-of-Done gate above, run the adaptive gap-finding loop and the 8-part output
+format from `references/pipeline-gate-checklist.md`, then confirm this stage's own gate (this is the
+QA and validation checklist a 17-phase spec would have run separately — Build's own
+Definition-of-Done gate already covers it here, so no separate QA stage exists):
+
+- **Must include:** changed files, a progress summary, verification results, plain-English
+  narration, blockers.
+- **Must decide:** whether the implementation matches the plan, and whether any blocker requires
+  rework before shipping.
+- **Gate passes only if** verification passes — tests, typecheck, lint, the threat register, and
+  traceability/test-presence checks above all clear.
+
 ## Boardroom checkpoint
 
 Run `/wingman:boardroom diff` against the accumulated changes, once the Definition-of-Done gate above has cleared. This is the founder's chance to hear, in plain language, whether what got built matches what was promised and whether it's technically sound — the dedicated security pass already happened above, as part of this same stage's gate, not as a separate stage still to come.
+
+The checkpoint checks the gate checklist above, not just the diff in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work."
 
 - If the boardroom returns "ship it": proceed to `/wingman:ship`.
 - If it returns concerns: fix them, then re-run the checkpoint before proceeding.
@@ -94,6 +113,8 @@ Run `/wingman:boardroom diff` against the accumulated changes, once the Definiti
 - `skills/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
 - `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
 - `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule the Definition-of-Done gate implements.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown at the start of this stage.

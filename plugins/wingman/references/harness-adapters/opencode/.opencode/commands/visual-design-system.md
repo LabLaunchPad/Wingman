@@ -34,16 +34,31 @@ Append this section to a scratch visual-design-system doc (`docs/wingman/visual-
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** typography, spacing, color, components, variants, tokens, usage rules.
+- **Must decide:** the design direction, and the source of truth for it.
+- **Gate passes only if** the system is consistent and reusable across screens.
+
 ## Visual Design System checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own spec table above. The founder approves
-or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own spec table above. The checkpoint checks
+the gate checklist above, not just the spec in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:prototype-usability`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:prototype-usability`.
 
 ## References
 
 - `skills/traceability-linking` — the `VS-*` ID convention and how it chains back to `WF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/design-taste` — the quality bar this spec becomes, enforced later at `/wingman:build` time; this stage produces the spec, `design-taste` enforces it.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.

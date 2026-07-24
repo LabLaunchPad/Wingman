@@ -104,17 +104,33 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2).
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** stack choices, system boundaries, data model direction, integration plan,
+  tradeoff notes, rollback/recovery thinking.
+- **Must decide:** the boring default stack, and the complexity being deliberately rejected.
+- **Gate passes only if** the architecture is simple and fit for the requirements it satisfies.
+
 ## Architecture checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Architecture decisions above (and the
-DEF→ARCH graph). The founder approves or sends back changes through this one plain-language
-checkpoint before the pipeline moves on.
+DEF→ARCH graph). The checkpoint checks the gate checklist above, not just the decisions in general:
+it confirms every Must-include item is present and every Must-decide question is answered. The
+founder approves or sends back changes through this one plain-language checkpoint before the
+pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:implementation-planning`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:implementation-planning`.
 
 ## References
 
 - `skills/traceability-linking` — the `ARCH-*` ID convention and how it chains back to `DEF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.
@@ -526,9 +542,28 @@ The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**.
 
 The `dod-structural-gate.mjs` hook mechanically re-checks the threat-register/traceability/test-presence conditions above before `git push` can run in `/wingman:ship` — this section is what makes that check pass, not a separate step to remember later.
 
+## Gate checklist
+
+Alongside the Definition-of-Done gate above, run the adaptive gap-finding loop and the 8-part output
+format from `references/pipeline-gate-checklist.md`, then confirm this stage's own gate (this is the
+QA and validation checklist a 17-phase spec would have run separately — Build's own
+Definition-of-Done gate already covers it here, so no separate QA stage exists):
+
+- **Must include:** changed files, a progress summary, verification results, plain-English
+  narration, blockers.
+- **Must decide:** whether the implementation matches the plan, and whether any blocker requires
+  rework before shipping.
+- **Gate passes only if** verification passes — tests, typecheck, lint, the threat register, and
+  traceability/test-presence checks above all clear.
+
 ## Boardroom checkpoint
 
 Run `/wingman:boardroom diff` against the accumulated changes, once the Definition-of-Done gate above has cleared. This is the founder's chance to hear, in plain language, whether what got built matches what was promised and whether it's technically sound — the dedicated security pass already happened above, as part of this same stage's gate, not as a separate stage still to come.
+
+The checkpoint checks the gate checklist above, not just the diff in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work."
 
 - If the boardroom returns "ship it": proceed to `/wingman:ship`.
 - If it returns concerns: fix them, then re-run the checkpoint before proceeding.
@@ -540,6 +575,8 @@ Run `/wingman:boardroom diff` against the accumulated changes, once the Definiti
 - `skills/definition-of-done` — the standing cross-skill gate every executed task must satisfy before the checkpoint.
 - `skills/security-checklist` — the enforced STRIDE + OWASP + prompt-injection discipline behind the Definition-of-Done gate's threat picture above.
 - `references/threat-register.md` — the full CLOSED/OPEN disposition model and the `threats_open > 0` blocking rule the Definition-of-Done gate implements.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/traceability-linking` — the marker convention the Definition-of-Done gate checks for.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown at the start of this stage.
@@ -673,17 +710,32 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Requirements table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** a plain-language requirements table, must-have items, should-have items,
+  optional items, non-goals, acceptance criteria.
+- **Must decide:** the locked MVP scope, and what is explicitly excluded.
+- **Gate passes only if** the scope is clear and realistic for a solo founder to build.
+
 ## Define checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The founder
-approves or sends back changes through this one plain-language checkpoint before the pipeline moves
-on.
+Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The checkpoint
+checks the gate checklist above, not just the table in general: it confirms every Must-include item
+is present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:information-architecture`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:information-architecture`.
 
 ## References
 
 - `skills/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
@@ -738,19 +790,37 @@ Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
 rendering tier first, never assume.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** problem statement, user statement, jobs-to-be-done notes, trigger/why-now,
+  constraints, success criteria, scope boundary, solo-founder realism check.
+- **Must decide:** what problem is being solved, who the primary user is, and whether the idea is
+  too large for one solo founder to build.
+- **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
+  large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
+
 ## Discovery checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
-not a preview of later stages. The founder approves or sends back changes through this one
-plain-language checkpoint before the pipeline moves on.
+not a preview of later stages. The checkpoint checks the gate checklist above, not just the output
+in general: it confirms every Must-include item is present and every Must-decide question is
+answered. The founder approves or sends back changes through this one plain-language checkpoint
+before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:research-synthesis`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:research-synthesis`.
 
 ## References
 
 - `references/org-template/README.md` — the project-type catalog consulted in Step 1, and the two
   other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/memory`
   draws on.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
@@ -1099,16 +1169,32 @@ the last one before Build. `boardroom.md`'s own report shows this same tree agai
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** task breakdown, effort buckets, dependencies, milestones, risk list, sequencing
+  logic.
+- **Must decide:** the build order, and what gets explicitly deferred.
+- **Gate passes only if** the plan is realistic for a solo founder to actually execute.
+
 ## Implementation Planning checkpoint
 
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 
-Only once the boardroom checkpoint returns a "ship it" decision should you proceed to `/wingman:build`.
+The checkpoint checks the gate checklist above, not just the plan in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work." Only once the boardroom checkpoint returns a "ship it" decision should you proceed to
+`/wingman:build`.
 
 ## References
 
 - `skills/writing-plans` — the plan-quality bar.
 - `references/plan-review-checklist.md` — the 7 required sections the `boardroom-checkpoint` hook enforces before `ExitPlanMode`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
   diagram appended to the plan; §2 — the pipeline-status tree above.
 - `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
@@ -1200,16 +1286,31 @@ Append this section to a scratch information-architecture doc (`docs/wingman/inf
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** navigation map, content hierarchy, labels, grouping rules, naming rules.
+- **Must decide:** the section structure, and the navigation logic.
+- **Gate passes only if** the structure is understandable to a first-time user.
+
 ## Information Architecture checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own IA table above. The founder approves or
-sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own IA table above. The checkpoint checks the
+gate checklist above, not just the table in general: it confirms every Must-include item is present
+and every Must-decide question is answered. The founder approves or sends back changes through this
+one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:uxflow`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:uxflow`.
 
 ## References
 
 - `skills/traceability-linking` — the `IA-*` ID convention and how it chains back to `DEF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
@@ -1264,16 +1365,32 @@ never instead of it.
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table/diagram above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** first thought, trigger, decision points, friction points, emotional shifts,
+  drop-off risks.
+- **Must decide:** where to reduce friction first.
+- **Gate passes only if** the full journey is mapped, end to end.
+
 ## Journey Mapping checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own journey map above. The founder approves
-or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own journey map above. The checkpoint checks
+the gate checklist above, not just the map in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:define`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:define`.
 
 ## References
 
 - `skills/traceability-linking` — the `JM-*` ID convention and how it chains back to `PJ-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
   journey diagram above; consult before choosing a rendering tier.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
@@ -1533,17 +1650,33 @@ Append this section to a scratch personas-jobs doc (`docs/wingman/personas-jobs/
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** primary persona, secondary persona if needed, goals, frustrations, context,
+  jobs to be done.
+- **Must decide:** which user takes priority as the primary persona, and which job this project
+  supports first.
+- **Gate passes only if** the target user and the job to be done are both clear.
+
 ## Personas & Jobs checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own personas/jobs table above. The founder
-approves or sends back changes through this one plain-language checkpoint before the pipeline moves
-on.
+Run `/wingman:boardroom` with scope set to this stage's own personas/jobs table above. The checkpoint
+checks the gate checklist above, not just the table in general: it confirms every Must-include item
+is present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:journey-mapping`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:journey-mapping`.
 
 ## References
 
 - `skills/traceability-linking` — the `PJ-*` ID convention and how it chains back to `RS-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
@@ -1648,18 +1781,36 @@ Append this section to a scratch prototype-usability doc (`docs/wingman/prototyp
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** a testable prototype description, a test script, a participant profile,
+  findings, severity ranking, plus the accessibility/content review folded into this stage: a
+  contrast check, a keyboard/focus check, labels, motion notes, a plain-language rewrite pass.
+- **Must decide:** whether the flow is usable and what must change before build; which
+  accessibility fixes and which content fixes are needed.
+- **Gate passes only if** the prototype was actually tested **and** accessibility/clarity are
+  acceptable — both conditions, not either alone.
+
 ## Prototype & Usability checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own findings table above (`boardroom-design`
 has direct material input here, on top of its usual N/A fast-path for non-visual scopes). The
-founder approves or sends back changes through this one plain-language checkpoint before the
-pipeline moves on.
+checkpoint checks the gate checklist above, not just the findings in general: it confirms every
+Must-include item is present and every Must-decide question is answered. The founder approves or
+sends back changes through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:architecture`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:architecture`.
 
 ## References
 
 - `skills/traceability-linking` — the `PT-*` ID convention and how it chains back to `WF-*`/`VS-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `references/accessibility-checklist.md` — the accessibility lens applied above.
 - `skills/plain-language-checkpoint` — the content-review bar applied above.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
@@ -1748,17 +1899,33 @@ Append this section to a scratch research-synthesis doc (`docs/wingman/research-
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** themes, evidence summary, contradictions, assumptions, open questions, source
+  confidence.
+- **Must decide:** what the evidence actually supports, and what remains unknown.
+- **Gate passes only if** the findings are grounded — every theme is tagged known/unknown/assumed,
+  and no assumption is presented as a known fact.
+
 ## Research Synthesis checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own synthesis table above. The founder
-approves or sends back changes through this one plain-language checkpoint before the pipeline moves
-on.
+Run `/wingman:boardroom` with scope set to this stage's own synthesis table above. The checkpoint
+checks the gate checklist above, not just the table in general: it confirms every Must-include item
+is present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:personas-jobs`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:personas-jobs`.
 
 ## References
 
 - `skills/traceability-linking` — the `RS-*` ID convention and how it chains back to `DISC-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
@@ -1866,9 +2033,24 @@ Tell the founder:
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** release notes, deploy verification, a rollback plan, post-release checks, a
+  safety sign-off.
+- **Must decide:** whether the release is safe to ship now.
+- **Gate passes only if** deploy verification passed and a rollback plan is ready.
+
 ## Boardroom checkpoint
 
 Run `/wingman:boardroom diff` one last time before merging, so the founder gets a final plain-language go/no-go rather than being asked to interpret CI output themselves — every pipeline stage ends in a checkpoint, `ship` included, not just the "meaningful" ones (that judgment call is exactly the kind of code-review-substitute decision the Boardroom exists so the founder never has to make alone).
+
+The checkpoint checks the gate checklist above, not just the diff in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work."
 
 ## After shipping
 
@@ -1880,6 +2062,8 @@ Suggest the adaptive stages that make sense next, without forcing them:
 
 ## References
 
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 
@@ -1965,17 +2149,32 @@ screen, published as an Artifact). The table stays exactly as written above — 
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** the happy path, alternate paths, error paths, empty states, decision points.
+- **Must decide:** the core flow, and how exceptions get handled.
+- **Gate passes only if** the main flow and its key exceptions both exist.
+
 ## UX Flow checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own UX flow table and diagram above (skip
-this step, same as the rest of this stage, if there is no user-facing surface). The founder approves
-or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+this step, same as the rest of this stage, if there is no user-facing surface). The checkpoint checks
+the gate checklist above, not just the table in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:wireframes`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:wireframes`.
 
 ## References
 
 - `skills/traceability-linking` — the `UX-*` ID convention.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.
@@ -2023,16 +2222,31 @@ Append this section to a scratch visual-design-system doc (`docs/wingman/visual-
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** typography, spacing, color, components, variants, tokens, usage rules.
+- **Must decide:** the design direction, and the source of truth for it.
+- **Gate passes only if** the system is consistent and reusable across screens.
+
 ## Visual Design System checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own spec table above. The founder approves
-or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own spec table above. The checkpoint checks
+the gate checklist above, not just the spec in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:prototype-usability`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:prototype-usability`.
 
 ## References
 
 - `skills/traceability-linking` — the `VS-*` ID convention and how it chains back to `WF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/design-taste` — the quality bar this spec becomes, enforced later at `/wingman:build` time; this stage produces the spec, `design-taste` enforces it.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
@@ -2090,16 +2304,31 @@ it, never instead of it.
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table/diagram above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** low-fidelity screen layouts, annotations, state coverage, responsive notes.
+- **Must decide:** the layout structure, and the screen order.
+- **Gate passes only if** the layout is clear and usable.
+
 ## Wireframes checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own wireframes above. The founder approves
-or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own wireframes above. The checkpoint checks
+the gate checklist above, not just the wireframes in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:visual-design-system`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:visual-design-system`.
 
 ## References
 
 - `skills/traceability-linking` — the `WF-*` ID convention and how it chains back to `UX-*`/`IA-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
   layout sketches above; consult before choosing a rendering tier.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.

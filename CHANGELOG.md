@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.1] - 2026-07-24
+
+### Added
+- **New shared reference `plugins/wingman/references/pipeline-gate-checklist.md`** — implements the maintainer's enterprise phase-gate governance spec (hardcoded gate checklist + adaptive gap-finding loop) across all 14 pipeline stages, without duplicating the mechanics 14 times: the adaptive gap-finding loop (verbatim 7-step procedure), the 11 mandatory self-critique questions, the gap-register schema and rules, and the 8-part per-stage output format all live here once. Each of the 14 stage files (`discovery.md` through `ship.md`) gained its own stage-specific "Gate checklist" section (Must-include / Must-decide / Gate-passes-only-if, mapped from the maintainer's spec) and updated checkpoint language stating explicitly that the checkpoint checks the gate checklist, not just the output in general, and blocks with the specific missing item(s) named to the founder rather than a generic "needs work."
+- **Design decision, stated explicitly in the new reference:** the spec's 9 "required global artifacts" (phase-summary, decision-log, open-issues, risks, acceptance-criteria, handoff-notes, gate-checklist, gap-register, carry-forward) are sections inside each stage's existing `docs/wingman/<stage>/<slug>.md` doc, not 9 new files per stage — 14 stages × 9 files would be up to 126 new files in a solo founder's project for content that's a few short paragraphs per stage. The one exception is the gap register, which is a genuine cross-pipeline artifact and lives in one shared `docs/wingman/gap-register.md`, not per stage.
+- **`commands/adaptive/post-launch.md` reviewed against the writing standard** (active voice, present tense, sentence-case headings, conditions before instructions) — already compliant, no changes needed. Confirmed `build.md`'s existing Definition-of-Done gate already covers the spec's QA/validation checklist items (changed files, verification results, blockers), so no separate QA pipeline stage was added.
+
 ## [0.7.0] - 2026-07-24
 
 ### Changed

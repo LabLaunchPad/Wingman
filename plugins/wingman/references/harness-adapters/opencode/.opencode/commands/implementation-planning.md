@@ -43,16 +43,32 @@ the last one before Build. `boardroom.md`'s own report shows this same tree agai
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** task breakdown, effort buckets, dependencies, milestones, risk list, sequencing
+  logic.
+- **Must decide:** the build order, and what gets explicitly deferred.
+- **Gate passes only if** the plan is realistic for a solo founder to actually execute.
+
 ## Implementation Planning checkpoint
 
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 
-Only once the boardroom checkpoint returns a "ship it" decision should you proceed to `/wingman:build`.
+The checkpoint checks the gate checklist above, not just the plan in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work." Only once the boardroom checkpoint returns a "ship it" decision should you proceed to
+`/wingman:build`.
 
 ## References
 
 - `skills/writing-plans` — the plan-quality bar.
 - `references/plan-review-checklist.md` — the 7 required sections the `boardroom-checkpoint` hook enforces before `ExitPlanMode`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
   diagram appended to the plan; §2 — the pipeline-status tree above.
 - `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.

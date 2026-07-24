@@ -42,19 +42,37 @@ Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
 rendering tier first, never assume.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** problem statement, user statement, jobs-to-be-done notes, trigger/why-now,
+  constraints, success criteria, scope boundary, solo-founder realism check.
+- **Must decide:** what problem is being solved, who the primary user is, and whether the idea is
+  too large for one solo founder to build.
+- **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
+  large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
+
 ## Discovery checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
-not a preview of later stages. The founder approves or sends back changes through this one
-plain-language checkpoint before the pipeline moves on.
+not a preview of later stages. The checkpoint checks the gate checklist above, not just the output
+in general: it confirms every Must-include item is present and every Must-decide question is
+answered. The founder approves or sends back changes through this one plain-language checkpoint
+before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:research-synthesis`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:research-synthesis`.
 
 ## References
 
 - `references/org-template/README.md` — the project-type catalog consulted in Step 1, and the two
   other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/memory`
   draws on.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per

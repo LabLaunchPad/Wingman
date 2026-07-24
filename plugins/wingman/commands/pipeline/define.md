@@ -34,17 +34,32 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Requirements table above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** a plain-language requirements table, must-have items, should-have items,
+  optional items, non-goals, acceptance criteria.
+- **Must decide:** the locked MVP scope, and what is explicitly excluded.
+- **Gate passes only if** the scope is clear and realistic for a solo founder to build.
+
 ## Define checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The founder
-approves or sends back changes through this one plain-language checkpoint before the pipeline moves
-on.
+Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The checkpoint
+checks the gate checklist above, not just the table in general: it confirms every Must-include item
+is present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:information-architecture`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:information-architecture`.
 
 ## References
 
 - `skills/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per

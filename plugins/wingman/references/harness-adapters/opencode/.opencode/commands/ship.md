@@ -50,9 +50,24 @@ Tell the founder:
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per `references/visual-output-templates.md` §2) — Planning Milestone and Build done, Ship now the current stage.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** release notes, deploy verification, a rollback plan, post-release checks, a
+  safety sign-off.
+- **Must decide:** whether the release is safe to ship now.
+- **Gate passes only if** deploy verification passed and a rollback plan is ready.
+
 ## Boardroom checkpoint
 
 Run `/wingman:boardroom diff` one last time before merging, so the founder gets a final plain-language go/no-go rather than being asked to interpret CI output themselves — every pipeline stage ends in a checkpoint, `ship` included, not just the "meaningful" ones (that judgment call is exactly the kind of code-review-substitute decision the Boardroom exists so the founder never has to make alone).
+
+The checkpoint checks the gate checklist above, not just the diff in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work."
 
 ## After shipping
 
@@ -64,5 +79,7 @@ Suggest the adaptive stages that make sense next, without forcing them:
 
 ## References
 
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.

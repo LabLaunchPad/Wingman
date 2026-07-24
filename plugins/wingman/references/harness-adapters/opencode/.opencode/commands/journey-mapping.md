@@ -43,16 +43,32 @@ never instead of it.
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table/diagram above.
 
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** first thought, trigger, decision points, friction points, emotional shifts,
+  drop-off risks.
+- **Must decide:** where to reduce friction first.
+- **Gate passes only if** the full journey is mapped, end to end.
+
 ## Journey Mapping checkpoint
 
-Run `/wingman:boardroom` with scope set to this stage's own journey map above. The founder approves
-or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+Run `/wingman:boardroom` with scope set to this stage's own journey map above. The checkpoint checks
+the gate checklist above, not just the map in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
 
-Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:define`.
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:define`.
 
 ## References
 
 - `skills/traceability-linking` — the `JM-*` ID convention and how it chains back to `PJ-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
   journey diagram above; consult before choosing a rendering tier.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
