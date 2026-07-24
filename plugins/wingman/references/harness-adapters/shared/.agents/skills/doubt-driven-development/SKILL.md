@@ -1,6 +1,6 @@
 ---
 name: doubt-driven-development
-description: Treat doubt as a quality signal that triggers evidence-gathering before shipping.
+description: Use when you catch yourself assuming correctness, completeness, or safety without evidence — writing or reviewing code, declaring tests sufficient, or about to ship/merge/promote. Treat doubt as a quality signal that triggers evidence-gathering before shipping.
 ---
 
 # Doubt-Driven Development
