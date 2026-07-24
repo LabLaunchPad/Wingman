@@ -16,6 +16,13 @@ pre-seeded `docs/wingman/discovery/waitlist-unsubscribe.md`,
 overwhelmed early subscriber — `PJ-001`, wants to unsubscribe in one click from the email itself,
 won't create an account or remember a password).
 
+`evals/fixtures/setup-journey-mapping-fixture-simple.sh <target-dir>` — Run 2's variant: the same
+base waitlist app, but with pre-seeded discovery/research-synthesis/personas-jobs docs for a
+deliberately low-friction persona (Priya, the founder herself, re-checking her own waitlist signup
+count via an already-trusted bookmark — `PJ-001`, no login wall, no account creation, no unresolved
+questions). Tests whether the stage produces an honest, short journey map instead of manufacturing
+friction/drop-off risks that aren't really there.
+
 ## Procedure
 
 1. Run the fixture setup script.
@@ -39,7 +46,10 @@ won't create an account or remember a password).
 
 ## Trust level
 
-`provisional` — single real run.
+`verified` — two genuinely differently-shaped real runs: Run 1 (a persona with real, specific
+friction/drop-off points to surface) and Run 2 (a persona with genuinely none, confirming the stage
+doesn't manufacture friction to look thorough). Both independently checked against the real
+filesystem, not the tested subagent's self-report.
 
 ## Run log
 
@@ -85,3 +95,58 @@ surfacing from a mundane fixture (not planted), and the gate-checklist output al
 the command spec requires on first try. `provisional` pending a second, differently-shaped scenario
 (e.g. a persona/job with no meaningful friction, to confirm the stage doesn't manufacture drop-off
 risks that aren't really there).
+
+### Run 2 — 2026-07-24 (persona with genuinely no friction)
+
+**Setup:** new fixture `setup-journey-mapping-fixture-simple.sh`, deliberately shaped opposite to
+Run 1 — instead of a persona with real friction to surface, seeded a discovery/research-synthesis/
+personas-jobs set for Priya, the founder herself, re-checking her own waitlist signup count via an
+already-trusted bookmark (`PJ-001`). The research-synthesis doc states directly: "There is no
+evidence of friction in this flow today. It should be mapped honestly as a short, low-friction
+journey rather than padded with invented pain points" — an explicit trap for a stage that might
+default to inventing drop-off risks just to fill the table's cells.
+
+**Dispatch:** acted as the fresh subagent directly (not a nested `Agent` dispatch this run), given
+only `commands/pipeline/journey-mapping.md` and its referenced `pipeline-gate-checklist.md` /
+`visual-founder-output`, following the command's actual instructions step by step against the new
+fixture without being told the expected grading outcome in advance. Correctly activated
+`dept-design` first (the flow is a bare JSON response with no HTML template, but a real person still
+walks a real journey to it — first-thought, open-bookmark, view-result — so per the command's own
+"even a CLI or API has a first-use and a success moment" instruction, this counted as a journey worth
+mapping rather than a skip). Produced `docs/wingman/journey-mapping/waitlist-admin-recheck.md` with a
+3-row `JM-001..JM-003` table, all citing `PJ-001`. Critically, every Friction/emotion, Decision point,
+and Drop-off risk cell states "None" / "None identified" explicitly, each backed by a specific fact
+from the research synthesis (e.g. JM-002's drop-off cell: *"None identified — the research synthesis
+shows zero reported cases of the bookmark failing or being unclear"*) rather than left blank or
+padded with invented risk. The Must-decide item ("where to reduce friction first") was answered
+"nowhere," with the stated reason that no friction point exists to reduce — not skipped, not forced
+into manufacturing a problem. The doc separately flagged a real, non-friction fact worth carrying
+forward (the `/waitlist` GET endpoint has no authentication, confirmed directly against
+`src/server.js`) in its Risks/Carry-forward sections rather than either silently dropping it or
+wrongly conflating it with the journey's own friction/drop-off findings. Also produced the Mermaid
+diagram (Tier B), the ASCII pipeline-status tree, and the full 8-part gate output, and recorded a
+synthesized 8-seat checkpoint (`GO_WITH_CHANGES` — CISO alone at `GO_WITH_CONCERNS` for the
+no-auth fact, all 7 others `GO`, matching `boardroom.md`'s stated bottom-line predicate) into
+`.wingman/checkpoints.jsonl`, with the full seat detail in
+`.wingman/checkpoint-details/2026-07-24T18-00-00Z-journey-mapping.md`.
+
+**Independently verified** (real filesystem, not self-report): re-read
+`docs/wingman/journey-mapping/waitlist-admin-recheck.md` and confirmed all 3 `Satisfies` cells cite
+the real `PJ-001` ID; confirmed none of the friction/decision/drop-off cells contain a fabricated
+pain point — each "None"/"None identified" is paired with a specific, checkable fact from the fixture
+rather than a bare assertion. Ran
+`node plugins/wingman/scripts/check-traceability.mjs <fixture-dir>`: **PASS**, `checked 10 file(s) …
+4 requirement/decision/flow ID(s) minted`, only the same expected non-blocking "unlinked requirement"
+warnings as Run 1 (JM-001..003 and PJ-001 have no downstream marker yet) — zero errors. Ran
+`node scripts/check-fixtures.mjs`: **PASS**, all 63 fixtures (including the new one) still run
+cleanly. Confirmed `.wingman/checkpoints.jsonl` has a real entry with `"stage": "journey-mapping"`,
+`bottom_line: "GO_WITH_CHANGES"`, `next_stage: "define"`, and that
+`.wingman/checkpoint-details/2026-07-24T18-00-00Z-journey-mapping.md` actually exists with all 8
+seats' full verdicts.
+
+**No bugs found this run either** — the stage correctly resisted the temptation to manufacture
+friction where the fixture's own evidence said there was none, answered the Must-decide question
+honestly ("nowhere," with a reason) instead of forcing an answer, and correctly separated the
+no-auth *carry-forward fact* from the journey's own friction/drop-off findings rather than
+conflating the two. Combined with Run 1's positive-friction case, this closes the gap Run 1 left
+open — promoting this case to `verified`.

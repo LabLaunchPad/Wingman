@@ -38,7 +38,11 @@ store, doesn't scale), RS-003 (assumed — untested whether users expect a confi
 
 ## Trust level
 
-`provisional` — single real run.
+`verified` — two genuinely differently-shaped real runs: Run 1 (3 distinct, well-evidenced `RS-*`
+rows, confirming the stage produces a real multi-persona table with honest primary/secondary
+distinction) and Run 2 (a single, thin/`Assumed` `RS-*` row, confirming the stage correctly refuses
+to invent additional personas and lets its own gate fail rather than rubber-stamping unclear
+evidence). Both independently checked against the real files.
 
 ## Run log
 
@@ -75,6 +79,35 @@ primary/secondary judgment call, the honest-thin-evidence handling, and the gate
 all behaved exactly as the command spec requires on first try. The one notable environment
 limitation (no live `/wingman:boardroom` invocable from inside a subagent dispatch) is the same
 constraint every other eval case's run log already notes for solo-stage dispatches, not a defect in
-this command. `provisional` pending a second, differently-shaped scenario (e.g. a research-synthesis
-doc with zero evidenced themes, to confirm the stage correctly blocks rather than inventing a
-persona).
+this command.
+
+### Run 2 — 2026-07-24 (thin/zero-evidence scenario)
+
+**Setup:** new fixture `evals/fixtures/setup-personas-jobs-thin-evidence-fixture.sh` — a
+research-synthesis doc with exactly **one** row (`RS-001`), itself marked `Assumed` (not `Known`),
+with the phase summary explicitly stating no theme reached a firm evidence bar. Deliberate inverse
+of Run 1's 3-row, 2-`Known`-plus-1-`Assumed` fixture — tests whether the stage manufactures extra
+personas/confidence from a single thin data point.
+
+**Dispatch** (fresh subagent, given only `personas-jobs.md` plus referenced skills, not told the
+expected answer): produced exactly **one** row, `PJ-001`, explicitly labeled
+`SPECULATIVE, not a confirmed persona` in its own Desired-progress cell — quoting the command's own
+"do not invent facts" instruction as the reason no second/third persona was invented from the single
+input theme. Gate check: **FAIL** — "Gate passes only if the target user and the job to be done are
+both clear: FAIL. Both are explicitly marked Assumed/Unclear upstream and remain so here, neither is
+clear." Bottom line: **NO-GO / blocked** — explicitly does not hand off to `/wingman:journey-mapping`
+until real evidence resolves the logged gap or the founder explicitly accepts the risk. Synthesized
+checkpoint disclosed via an explicit `checkpoint_source: "synthesized"` field (not a live dispatch),
+CPO and Research seats `NO_GO`, `bottom_line: "DO NOT SHIP"`.
+
+**Independently verified** (real files, not the subagent's self-report): confirmed
+`docs/wingman/personas-jobs/waitlist-referrals.md` contains exactly one `PJ-*` row, its
+evidence-confidence language matches the quoted text above verbatim, and the gate-check section
+marks the Must-decide item as failed rather than passed-with-caveats. Confirmed
+`.wingman/checkpoints.jsonl` and `.wingman/state.json` both parse as valid JSON
+(`current_stage_status: "blocked"`), and the checkpoint-detail file's opening line honestly
+discloses the synthesized (non-live) source.
+
+**No bugs found** — the stage correctly resisted inventing a second persona or confidence it didn't
+have, and let its own gate legitimately fail rather than rubber-stamping thin evidence. Promoted
+trust level from `provisional` to `verified`.

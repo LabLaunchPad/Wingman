@@ -16,6 +16,12 @@ wireframes (WF-001 confirmation page, WF-002 error state) artifacts. WF-002 expl
 "Try again" button reuses WF-001's "Resubscribe" button component — the fixture's one deliberate
 reuse signal.
 
+`evals/fixtures/setup-visual-design-system-nofui-fixture.sh <target-dir>` — the negative-case
+fixture: a real `linecount` CLI tool (built on `setup-minimal-cli.sh`) with pre-seeded discovery/
+define/architecture docs that explicitly state there is no user-facing surface at all (pure argv/
+stdout/stderr interaction), and deliberately no uxflow/wireframes docs and no
+`.claude/agents/dept-design.md` — since a no-UI project skips those stages too.
+
 ## Procedure
 
 1. Run the fixture setup script.
@@ -40,9 +46,9 @@ reuse signal.
 
 ## Trust level
 
-`provisional` — passed one real run, single scenario (positive case: a UI-bearing project with a
-genuine component-reuse signal). No negative case (a no-UI project skipping the stage) has been run
-yet for this specific command.
+`verified` — passed two differently-shaped scenarios: Run 1 (positive, a UI-bearing project with a
+genuine component-reuse signal) and Run 2 (negative, a genuinely no-UI CLI project, confirming the
+stage correctly no-ops rather than fabricating a design system).
 
 ## Run log
 
@@ -82,6 +88,44 @@ again' (primary emphasis, WF-002)" — genuine one-component reuse, not two dupl
 **No bugs found this run.** The command correctly stuck to producing the spec/tokens document and did
 not attempt to re-run `design-taste`'s anti-slop/accessibility enforcement itself (no contrast-ratio
 verification, no anti-slop checklist walkthrough appear in this stage's output) — the spec-vs-
-enforcement boundary held as designed. Still `provisional`: only the positive/UI-bearing scenario has
-been exercised; a negative (no-UI project, skip-cleanly) run is the natural next scenario before
-promoting to `verified`.
+enforcement boundary held as designed. Still `provisional` after this run: only the positive/UI-bearing
+scenario had been exercised; a negative (no-UI project, skip-cleanly) run was the natural next
+scenario before promoting to `verified` — see Run 2 below.
+
+### Run 2 — 2026-07-24 (no-UI negative case: linecount CLI)
+
+**Setup:** New fixture `setup-visual-design-system-nofui-fixture.sh`, built on the existing
+`setup-minimal-cli.sh` negative-case app ("linecount", a pure argv/stdout/stderr CLI with no
+frontend). Pre-seeded real discovery/define/architecture docs for it, each explicitly stating there
+is no user-facing surface: `docs/wingman/architecture/linecount.md` reads verbatim: "No user-facing
+surface exists for this project — `uxflow` and `wireframes` were both skipped for the same reason
+`visual-design-system` should be: there is no screen to design." Deliberately did NOT pre-seed any
+uxflow/wireframes docs and did NOT create `.claude/agents/dept-design.md`, matching a project that
+never had a UI surface to begin with.
+
+**Dispatch (fresh `general-purpose` subagent, given only `commands/pipeline/visual-design-system.md`
+plus its referenced skills, and the fixture project directory — not told the expected answer, and not
+shown this case file or Run 1's log):** read the three pre-seeded docs plus `index.js` itself
+(confirming it's a plain CLI script with no rendering/UI code), confirmed
+`.claude/agents/` does not exist in the project, and — per the command's own first instruction ("If
+there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in
+one plain sentence") — skipped the entire stage. Did not check Design department activation, did not
+check management-board activation, did not write a design-system spec doc, did not run the gate
+checklist, and did not run a Boardroom checkpoint. Produced exactly the one plain sentence the
+command calls for: "This project has no user-facing surface — it's a pure command-line tool with no
+GUI, web page, or API consumed by a browser — so the Visual Design System stage is skipped entirely,
+same as `uxflow`/`wireframes` were."
+
+**Independently verified** (real filesystem, not the subagent's self-report): `git status --short` in
+the fixture project was empty (clean working tree, nothing staged or modified) and `git log --oneline`
+showed only the fixture's own pre-seed commit (`bc8b111`) on top of the base CLI commit — no new
+commit was made. `find docs -type d` showed only `discovery`/`define`/`architecture` — no
+`docs/wingman/visual-design-system/` directory was created. `.claude/` and `.wingman/` do not exist in
+the project at all (confirmed via direct `ls`), so no `dept-design.md` was fabricated and no
+checkpoint was recorded.
+
+**No bugs found.** The command correctly recognized the no-UI signal from real upstream artifacts and
+produced a genuine no-op rather than inventing typography/color/component tokens for a project with
+no visual surface. Promoting to `verified`: two differently-shaped scenarios (positive UI-bearing with
+component reuse; negative no-UI skip-cleanly) have both passed with independent filesystem
+verification.
