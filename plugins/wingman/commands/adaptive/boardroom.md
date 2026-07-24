@@ -104,7 +104,7 @@ Every checkpoint's bottom line maps to who actually needs to act on it — this 
 
 After presenting the summary, use `AskUserQuestion` to get an explicit decision — do not assume silence means approval:
 
-- "Ship it" — proceed with the next pipeline stage (e.g. from the Planning Milestone continue to `/wingman:build`, from `/wingman:build` continue to `/wingman:ship`, from `/wingman:ship` actually ship).
+- "Ship it" — proceed with the next pipeline stage (e.g. from any of the 12 individual pre-build checkpoints continue to the next stage in the 14-stage sequence, from `/wingman:build` continue to `/wingman:ship`, from `/wingman:ship` actually ship).
 - "Fix the concerns first" — go address the listed items, then re-run `/wingman:boardroom` before proceeding.
 - "Let me see the details" — show the full, unabridged output from each seat. This same detail is also persisted (see "Record the checkpoint" below) and retrievable later via `/wingman:boardroom expand <checkpoint_id>` — the founder doesn't have to ask in this exact turn or lose it once the session ends.
 
@@ -133,10 +133,10 @@ Then append one line to `.wingman/checkpoints.jsonl` at the project root with ex
 
 ```json
 {
-  "schema_version": 4,
-  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>",
-  "stage": "discovery | define | architecture | uxflow | implementation-planning | build | ship | <free-text for an ad-hoc run>, OR an array of stage names when bundle is not null (e.g. [\"discovery\",\"define\",\"architecture\",\"uxflow\",\"implementation-planning\"])",
-  "bundle": "planning-milestone | build | ship | null",
+  "schema_version": 5,
+  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage-name>",
+  "stage": "discovery | research-synthesis | personas-jobs | journey-mapping | define | information-architecture | uxflow | wireframes | visual-design-system | prototype-usability | architecture | implementation-planning | build | ship | <free-text for an ad-hoc run, e.g. post-launch>",
+  "bundle": "<same value as stage — every stage is its own bundle-of-one as of schema_version 5, kept as a field for shape-uniformity across schema versions rather than dropped>",
   "scope_ref": "<path to the plan file reviewed, \"diff\", or a short description of the directly-passed content and where it's headed (e.g. \"content passed directly: CHANGELOG.md entry + announcement copy\") when the calling command handed over content that's neither a plan nor a diff>",
   "seats": [
     { "seat": "ceo",      "verdict": "GO | GO_WITH_CONCERNS | NO_GO", "summary": "<one line>" },
@@ -155,6 +155,8 @@ Then append one line to `.wingman/checkpoints.jsonl` at the project root with ex
   "details_ref": ".wingman/checkpoint-details/<checkpoint_id>.md"
 }
 ```
+
+**Schema note (14-stage individual-checkpoint pipeline, schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction bundling decision — see `docs/ARCHITECTURE.md` §4d for the full rationale. The pipeline expands from 7 stages / 1 bundled pre-build checkpoint to 14 stages / 12 individual pre-build checkpoints. Every stage — including the 4 that used to run silently unbundled (`discovery`/`define`/`architecture`/`uxflow`) — now records its own solo checkpoint immediately after itself; `implementation-planning.md` no longer reviews the combined output of 5 planning stages as one `"bundle": "planning-milestone"` entry. `stage` is always a scalar as of `schema_version: 5` (never an array); `bundle` is kept as a field, set to the same value as `stage`, rather than dropped, so every entry has a uniform field set regardless of schema version. See `docs/DATABASE.md` for the full old→new stage mapping. This is an append-only audit log, never rewritten — existing `schema_version: 3`/`4` entries keep their bundled/array shape permanently; any consumer must still check whether `stage` is an array before iterating.
 
 **Schema note (reversible-compression / `expand`, schema_version 3 → 4, 2026):** adds `details_ref`, a path to the full-seat-verdict companion file the step above writes — this is what closes the gap `docs/DATABASE.md` had named ("checkpoints.jsonl — Boardroom verdicts only, no rationale beyond a one-line seat summary"): the rationale now exists, just not inline in the append-only log itself (keeping it lean). Omit `details_ref` entirely if the companion-file write failed (never write a `details_ref` pointing at a file that doesn't actually exist) — `expand` treats its absence as "no detail available for this one," not an error. Existing `schema_version: 3` and earlier entries have no `details_ref` and never will — this is an append-only audit log, never rewritten.
 

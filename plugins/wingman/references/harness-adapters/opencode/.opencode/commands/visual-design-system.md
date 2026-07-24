@@ -1,0 +1,65 @@
+---
+description: Produce the typography/spacing/color/component/state spec (tokens doc) the design-taste skill enforces at build time — the spec, not the enforcement.
+argument-hint: "[optional: focus area, e.g. a specific component]"
+---
+
+# Wingman: Visual Design System
+
+The ninth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow`/`/wingman:wireframes` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Write the design system spec
+
+For each `WF-*` wireframe in scope, derive the concrete design tokens and component states it needs: typography (a small type scale, not a font-per-screen), spacing (a scale, not arbitrary pixel values), color (a limited palette with defined roles — primary/secondary/error/success/neutral — not an unbounded set), the reusable component inventory this project actually needs (buttons, inputs, cards, etc. — only what's used, never a speculative full library), and each interactive component's states (default/hover/focus/disabled/error, at minimum). Tag each row with the `VS-` traceability prefix, pointing back to the `WF-*` wireframe(s) it specs for.
+
+Append this section to a scratch visual-design-system doc (`docs/wingman/visual-design-system/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Visual design system
+
+| ID | Token/component | Values/states | Satisfies |
+|---|---|---|---|
+| VS-001 | <e.g. "Primary button"> | <e.g. default/hover/focus/disabled color+spacing values> | WF-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** typography, spacing, color, components, variants, tokens, usage rules.
+- **Must decide:** the design direction, and the source of truth for it.
+- **Gate passes only if** the system is consistent and reusable across screens.
+
+## Visual Design System checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own spec table above. The checkpoint checks
+the gate checklist above, not just the spec in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
+
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:prototype-usability`.
+
+## References
+
+- `skills/traceability-linking` — the `VS-*` ID convention and how it chains back to `WF-*`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
+- `skills/design-taste` — the quality bar this spec becomes, enforced later at `/wingman:build` time; this stage produces the spec, `design-taste` enforces it.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.

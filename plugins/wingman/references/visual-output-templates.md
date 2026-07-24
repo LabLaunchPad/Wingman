@@ -2,17 +2,22 @@
 
 Concrete, copy-paste templates for `skills/visual-founder-output`. This file holds the actual
 Mermaid/ASCII source so the skill's own prose doesn't have to embed large code blocks. Owned by
-`skills/visual-founder-output`; cited from all 7 pipeline commands (`discovery.md`, `define.md`,
-`architecture.md`, `uxflow.md`, `implementation-planning.md`, `build.md`, `ship.md`) and
-`boardroom.md`.
+`skills/visual-founder-output`; cited from all 14 pipeline commands (`discovery.md`,
+`research-synthesis.md`, `personas-jobs.md`, `journey-mapping.md`, `define.md`,
+`information-architecture.md`, `uxflow.md`, `wireframes.md`, `visual-design-system.md`,
+`prototype-usability.md`, `architecture.md`, `implementation-planning.md`, `build.md`, `ship.md`)
+and `boardroom.md`.
 
-**Which template applies where:** §2 (pipeline-status tree) is generic and used by all 7 pipeline
+**Which template applies where:** §2 (pipeline-status tree) is generic and used by all 14 pipeline
 commands plus `boardroom.md`, for consistent orientation at every stage — not just at a checkpoint.
 §1 (UX flow), §3 (seat-verdict grid), §4 (DEF→ARCH graph), and §5 (task-dependency diagram) are each
 specific to the one command named in their heading, because their content only has real diagram
 shape in that one place — see `skills/visual-founder-output`'s Red Flags before reusing any of them
 somewhere its content doesn't actually have that shape (a flat field list or an independent-item
 table, like `discovery.md`'s output or `define.md`'s requirements, does not get a forced diagram).
+`journey-mapping.md` and `wireframes.md` each render their own additional diagram inline in their own
+command file (a journey flowchart and a low-fidelity layout sketch, respectively) rather than adding
+new numbered sections here, since both are one-command-specific the same way §1/§4/§5 already are.
 
 Every template below has a Tier A (Artifact-capable) and Tier B (universal fallback) version — see
 `skills/visual-founder-output`'s Core Workflow for how to detect which tier applies before picking
@@ -55,43 +60,38 @@ Rendered fresh each time from `.wingman/state.json` (`current_stage`) and `.wing
 
 ```
 Wingman pipeline
-├─ Planning Milestone  [discovery → define → architecture → uxflow → implementation-planning]
-│    ✔ done — cleared 2026-07-15
-├─ Build
-│    ▶ you are here
-└─ Ship
-     ○ not started
+├─ 1. Discovery                    ✔ done — cleared 2026-07-15
+├─ 2. Research Synthesis           ✔ done — cleared 2026-07-15
+├─ 3. Personas & Jobs              ✔ done — cleared 2026-07-15
+├─ 4. Journey Mapping              ✔ done — cleared 2026-07-15
+├─ 5. Define                       ✔ done — cleared 2026-07-16
+├─ 6. Information Architecture     ▶ you are here
+├─ 7. UX Flow                      ○ not started
+├─ 8. Wireframes                   ○ not started
+├─ 9. Visual Design System         ○ not started
+├─ 10. Prototype & Usability       ○ not started
+├─ 11. Architecture                ○ not started
+├─ 12. Implementation Planning     ○ not started
+├─ Build                           ○ not started
+└─ Ship                            ○ not started
 ```
 
-- Three rows only — Planning Milestone, Build, Ship — matching the 3 real founder-visible
-  checkpoints (not all 7 pipeline stages; the 5 planning-stage names appear once, bracketed, inside
-  the Planning Milestone row, since they never get their own checkpoint).
+- One row per pipeline stage (all 14, per `docs/ARCHITECTURE.md` §4d), each with its own checkpoint
+  status — no bundled row and no bracketed sub-stage list; every stage 1–12 records its own solo
+  checkpoint (`schema_version: 5`, see `docs/DATABASE.md`), so every row's status is read directly
+  from its own `checkpoints.jsonl` entry.
 - Marker legend: `✔ done` (checkpoint recorded, `GO` or founder chose "ship it" after `GO WITH
   CHANGES`), `▶ you are here` (current stage per `state.json`), `○ not started`.
 - If the current/most recent checkpoint's `bottom_line` was `DO NOT SHIP`, replace `▶ you are here`
   with `✖ blocked — see concerns below` on that row.
+- If `/wingman:uxflow`/`wireframes.md`/`visual-design-system.md`/`prototype-usability.md` were
+  skipped because the project has no user-facing surface, mark those rows `— skipped (no
+  user-facing surface)` rather than `○ not started`, so the tree doesn't read as if those stages are
+  still pending.
 
-**Mid-planning variant** (`discovery.md`/`define.md`/`architecture.md`/`uxflow.md` — no Planning
-Milestone checkpoint recorded yet): mark the Planning Milestone row `▶ you are here` too, and add
-which of the 5 bracketed sub-stages is current so a founder isn't stuck reading "you are here" next
-to a 5-name list with no indication of progress within it:
-
-```
-Wingman pipeline
-├─ Planning Milestone  [discovery → define → architecture → uxflow → implementation-planning]
-│    ▶ you are here — currently: architecture
-├─ Build
-│    ○ not started
-└─ Ship
-     ○ not started
-```
-
-The current sub-stage is simply which command just ran (`architecture.md` running this step means
-`currently: architecture`) — no new state field, read from which command produced this output.
-
-**Tier A (Artifact, rendered status strip):** the same three-row structure as a small horizontal
-step indicator (three labeled segments, current segment highlighted, done segments checked) — no
-extra chrome, no separate app shell; this is one small element inside the boardroom report's
+**Tier A (Artifact, rendered status strip):** the same 14-row structure as a small vertical step
+indicator (each stage its own labeled row, current row highlighted, done rows checked, skipped rows
+dimmed) — no extra chrome, no separate app shell; this is one element inside the boardroom report's
 Artifact, not a standalone dashboard.
 
 ---
@@ -202,10 +202,17 @@ unless the founder has explicitly asked to see the plan directly.
 
 - `plugins/wingman/skills/visual-founder-output/SKILL.md`
 - `plugins/wingman/commands/adaptive/boardroom.md`
-- `plugins/wingman/commands/pipeline/architecture.md`
-- `plugins/wingman/commands/pipeline/build.md`
-- `plugins/wingman/commands/pipeline/define.md`
 - `plugins/wingman/commands/pipeline/discovery.md`
-- `plugins/wingman/commands/pipeline/implementation-planning.md`
-- `plugins/wingman/commands/pipeline/ship.md`
+- `plugins/wingman/commands/pipeline/research-synthesis.md`
+- `plugins/wingman/commands/pipeline/personas-jobs.md`
+- `plugins/wingman/commands/pipeline/journey-mapping.md`
+- `plugins/wingman/commands/pipeline/define.md`
+- `plugins/wingman/commands/pipeline/information-architecture.md`
 - `plugins/wingman/commands/pipeline/uxflow.md`
+- `plugins/wingman/commands/pipeline/wireframes.md`
+- `plugins/wingman/commands/pipeline/visual-design-system.md`
+- `plugins/wingman/commands/pipeline/prototype-usability.md`
+- `plugins/wingman/commands/pipeline/architecture.md`
+- `plugins/wingman/commands/pipeline/implementation-planning.md`
+- `plugins/wingman/commands/pipeline/build.md`
+- `plugins/wingman/commands/pipeline/ship.md`

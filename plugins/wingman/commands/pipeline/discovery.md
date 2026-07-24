@@ -5,7 +5,7 @@ argument-hint: "<what you want built, in your own words>"
 
 # Wingman: Discovery
 
-The first of Wingman's 5 planning stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
+The first of Wingman's 14 pipeline stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
 
 $ARGUMENTS
 
@@ -25,7 +25,7 @@ Immediately after, use the `management-board-activation` skill to check the Mana
 
 ## Step 3: Write the Discovery output
 
-Produce a short artifact — no plan file yet, no Boardroom checkpoint at this stage (that happens once, at the end of `implementation-planning.md`, reviewing all 5 planning stages together). Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
+Produce a short artifact. Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
 
 ```markdown
 ## Discovery output
@@ -40,12 +40,38 @@ Produce a short artifact — no plan file yet, no Boardroom checkpoint at this s
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Discovery output above — detect the session's rendering tier first, never assume.
 
-Hand off directly to `/wingman:define` — do not stop and wait for approval here; this stage feeds the bundled Planning Milestone checkpoint at the end of the sequence, not its own gate.
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** problem statement, user statement, jobs-to-be-done notes, trigger/why-now,
+  constraints, success criteria, scope boundary, solo-founder realism check.
+- **Must decide:** what problem is being solved, who the primary user is, and whether the idea is
+  too large for one solo founder to build.
+- **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
+  large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
+
+## Discovery checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
+not a preview of later stages. The checkpoint checks the gate checklist above, not just the output
+in general: it confirms every Must-include item is present and every Must-decide question is
+answered. The founder approves or sends back changes through this one plain-language checkpoint
+before the pipeline moves on.
+
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:research-synthesis`.
 
 ## References
 
 - `references/org-template/README.md` — the project-type catalog consulted in Step 1, and the two
   other founder-context guides (`founder-preferences.md`, `capability-map.md`) `skills/memory`
   draws on.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.

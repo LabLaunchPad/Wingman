@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific screen or flow]"
 
 # Wingman: UX Flow
 
-The fourth of Wingman's 5 planning stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:implementation-planning` rather than manufacturing screens that don't need to exist.
+The seventh of Wingman's 14 pipeline stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:wireframes` rather than manufacturing screens that don't need to exist.
 
 $ARGUMENTS
 
@@ -41,11 +41,34 @@ screen, published as an Artifact). The table stays exactly as written above — 
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
-Hand off directly to `/wingman:implementation-planning` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
+## Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** the happy path, alternate paths, error paths, empty states, decision points.
+- **Must decide:** the core flow, and how exceptions get handled.
+- **Gate passes only if** the main flow and its key exceptions both exist.
+
+## UX Flow checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own UX flow table and diagram above (skip
+this step, same as the rest of this stage, if there is no user-facing surface). The checkpoint checks
+the gate checklist above, not just the table in general: it confirms every Must-include item is
+present and every Must-decide question is answered. The founder approves or sends back changes
+through this one plain-language checkpoint before the pipeline moves on.
+
+If the gate does not pass, the checkpoint blocks here and names the specific missing item(s) to the
+founder — never a generic "needs work." Only once the checkpoint returns a "ship it" decision should
+you hand off to `/wingman:wireframes`.
 
 ## References
 
 - `skills/traceability-linking` — the `UX-*` ID convention.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.

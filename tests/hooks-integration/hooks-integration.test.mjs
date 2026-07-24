@@ -198,9 +198,9 @@ describe('Plugin.json Structure', () => {
     assert.strictEqual(plugin.skills.length, 40);
   });
 
-  it('should have 24 commands', () => {
+  it('should have 32 commands', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.commands.length, 24);
+    assert.strictEqual(plugin.commands.length, 32);
   });
 
   it('should have 8 agents', () => {

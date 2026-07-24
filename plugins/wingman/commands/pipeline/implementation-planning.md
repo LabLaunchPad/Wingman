@@ -1,11 +1,11 @@
 ---
-description: Turn Discovery/Define/Architecture/UX Flow's combined output into a concrete, task-by-task implementation plan, then run the single Planning Milestone Boardroom checkpoint before any code is written.
+description: Turn all 11 prior pipeline stages' combined output into a concrete, task-by-task implementation plan, then run this stage's own Boardroom checkpoint before any code is written.
 argument-hint: "[optional: anything to focus the plan on]"
 ---
 
 # Wingman: Implementation Planning
 
-The fifth and last of Wingman's 5 planning stages (Discovery → Define → Architecture → UX Flow → Implementation Planning), immediately followed by `/wingman:build`. This is the only planning stage that runs a Boardroom checkpoint — reviewing the combined output of all 5 stages as one "Planning Milestone," not five separate approvals. A founder should never have to clear 5 checkpoints just to get to the first line of code.
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build`. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
 
 $ARGUMENTS
 
@@ -15,7 +15,7 @@ Before reading any stage output, list the files actually present in each of `doc
 
 ## Write the plan
 
-Gather the Discovery output, the `DEF-*` requirements, the `ARCH-*` decisions, and the `UX-*` flow (if this project has one) into a single concrete implementation plan. <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the `DEF-*`/`ARCH-*`/`UX-*` ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
+Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
 
 Enter plan mode (if not already in it). The plan file must include the sections `references/plan-review-checklist.md` requires (Executive Summary, Current State, Problem Statement, Solution Approach, Success Criteria, Timeline, Risks) — Discovery's problem statement and success signal map directly onto `## Problem Statement` and `## Success Criteria`; Architecture's decisions map onto `## Current State`/`## Solution Approach`. It must also end with a **Plain-Language Summary** section, written for the founder:
 
@@ -25,7 +25,7 @@ Enter plan mode (if not already in it). The plan file must include the sections 
 **What this builds:** <1-2 sentences, no jargon>
 **What changes for your users/business:** <1-2 sentences>
 **What could go wrong:** <the single biggest risk, in plain terms>
-**Rough size:** <small / medium / large — and roughly how many checkpoints to expect (Planning Milestone, Build, Ship — 3 total, regardless of project size)>
+**Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
 ```
 
 ## Show task dependencies
@@ -41,21 +41,37 @@ themselves.
 
 ## Where you are
 
-See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 5 planning sub-stages complete and this
-stage as the last one before the checkpoint. `boardroom.md`'s own report shows this same tree again
-once the checkpoint records — that's expected, not wasted effort: this view is "planning just
-finished," the checkpoint's is "the milestone is now recorded," one step later.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
+the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
+records — that's expected, not wasted effort: this view is "the plan just finished," the
+checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
-## Planning Milestone checkpoint
+## Gate checklist
 
-Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is the **bundled output of all 5 planning stages** (Discovery/Define/Architecture/UX Flow/Implementation Planning), not just this stage alone — `boardroom.md` records this as `"bundle": "planning-milestone"` with `"stage"` as an array of all 5 stage names, not a single scalar. The founder approves or sends back changes through that one plain-language checkpoint, not by reading five separate stage documents.
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
 
-Only once the boardroom checkpoint returns a "ship it" decision should you proceed to `/wingman:build`.
+- **Must include:** task breakdown, effort buckets, dependencies, milestones, risk list, sequencing
+  logic.
+- **Must decide:** the build order, and what gets explicitly deferred.
+- **Gate passes only if** the plan is realistic for a solo founder to actually execute.
+
+## Implementation Planning checkpoint
+
+Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
+
+The checkpoint checks the gate checklist above, not just the plan in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work." Only once the boardroom checkpoint returns a "ship it" decision should you proceed to
+`/wingman:build`.
 
 ## References
 
 - `skills/writing-plans` — the plan-quality bar.
 - `references/plan-review-checklist.md` — the 7 required sections the `boardroom-checkpoint` hook enforces before `ExitPlanMode`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
   diagram appended to the plan; §2 — the pipeline-status tree above.
 - `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.

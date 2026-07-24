@@ -29,10 +29,10 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 
 ```json
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "checkpoint_id": "2026-07-14T14-32-00Z-implementation-planning",
-  "stage": ["discovery", "define", "architecture", "uxflow", "implementation-planning"],
-  "bundle": "planning-milestone",
+  "stage": "implementation-planning",
+  "bundle": "implementation-planning",
   "scope_ref": "docs/wingman/plans/2026-07-14-billing-integration.md",
   "seats": [
     { "seat": "ceo",      "verdict": "GO",              "summary": "Solves the stated problem, scope is right-sized." },
@@ -52,11 +52,11 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 ```
 
 **Field notes:**
-- `schema_version`: `4` adds `details_ref` (see migration note below); `3` for the 7-stage pipeline schema; `2` marks the 7-seat-Boardroom-but-still-4-stage schema; absent/unmarked entries are implicitly `schema_version: 1` (5-seat, 4-stage) — see the migration notes below.
+- `schema_version`: `5` marks the 14-stage individual-checkpoint pipeline (see migration note below); `4` adds `details_ref`; `3` for the original 7-stage/bundled-planning pipeline schema; `2` marks the 7-seat-Boardroom-but-still-4-stage schema; absent/unmarked entries are implicitly `schema_version: 1` (5-seat, 4-stage) — see the migration notes below.
 - `details_ref`: path to the companion file (`checkpoint-details/<checkpoint_id>.md`) holding every seat's full, unabridged verdict text — see migration note below. Absent on `schema_version: 3` and earlier entries, and on any `schema_version: 4`+ entry whose companion-file write itself failed; treat its absence as "no full detail available for this one," never an error.
 - `checkpoint_id`: `<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>`, unique per line.
-- `stage`: one of `discovery`, `define`, `architecture`, `uxflow`, `implementation-planning`, `build`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation — **or an array** of stage names when `bundle` is `"planning-milestone"` (the only case where multiple stages share one checkpoint). Consumers must check whether `stage` is an array before iterating; don't assume scalar.
-- `bundle`: `"planning-milestone"`, `"build"`, or `"ship"` — every `schema_version: 3` checkpoint belongs to exactly one of a project's 3 total bundles. Absent on `schema_version: 2` and earlier entries; treat its absence as "not applicable," never an error.
+- `stage`: as of `schema_version: 5`, always a scalar — one of `discovery`, `research-synthesis`, `personas-jobs`, `journey-mapping`, `define`, `information-architecture`, `uxflow`, `wireframes`, `visual-design-system`, `prototype-usability`, `architecture`, `implementation-planning`, `build`, `ship`, or a free-text label for an ad-hoc `/wingman:boardroom` invocation (e.g. `post-launch`) — every stage now records its own solo checkpoint, so no stage ever shares a checkpoint with another. `schema_version: 3`–`4` entries may still have `stage` as an **array** of 5 stage names when `bundle` was `"planning-milestone"` — that shape is retired going forward but still exists historically; a consumer reading this file across schema versions must check whether `stage` is an array before iterating, never assume scalar.
+- `bundle`: as of `schema_version: 5`, redundant with `stage` and set to the same value as `stage` (kept, rather than dropped, so every checkpoint entry has a uniform field set across schema versions rather than a field that silently disappears) — every stage is its own bundle-of-one. `schema_version: 3`–`4` entries use `"planning-milestone"`, `"build"`, or `"ship"`. Absent on `schema_version: 2` and earlier entries; treat its absence as "not applicable," never an error.
 - `scope_ref`: path to the plan file reviewed, or `"diff"` if the scope was a git diff rather than a plan file.
 - `seats[].seat`: one of `ceo`, `cpo`, `cmo`, `cto`, `ciso`, `cfo`, `research`, `design` (the `design` entry is omitted when Design was N/A for the checkpoint) — see migration note below for the pre-rename names.
 - `seats[].verdict`: one of `GO`, `GO_WITH_CONCERNS`, `NO_GO` — matches each Boardroom agent's own output contract.
@@ -66,6 +66,17 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 - `next_stage`: the pipeline stage `state.json`'s `current_stage` should advance to once this checkpoint is acted on — pinned to the *same* stage (not advanced) whenever `bottom_line` is `"DO NOT SHIP"`, per `commands/adaptive/boardroom.md`'s consolidation step. `plugins/wingman/scripts/query-founder-knowledge.mjs`'s `summary()` (added 2026-07-21, see `docs/PROJECT.md`'s decisions log) reads this field back and compares it against `state.json`'s real `current_stage`, surfacing a `state_stage_mismatch` diagnostic when they disagree — the mechanical drift-detector for "a session wrote a checkpoint but forgot to update `state.json` afterward." Absent on checkpoints written before that field was added; treat its absence as "no mismatch check possible for this entry," never an error.
 
 This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
+
+**Migration note — 14-stage individual-checkpoint pipeline (schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction decision (see `docs/ARCHITECTURE.md` §4d) — the pipeline expands from 7 stages / 1 bundled pre-build checkpoint (`"planning-milestone"`, covering all 5 planning stages) to 14 stages / 12 individual pre-build checkpoints, matching a full enterprise UX process. Stage/checkpoint shape changed:
+
+| Old (`schema_version: 3`–`4`) | New (`schema_version: 5`) |
+|---|---|
+| `discovery`, `define`, `architecture`, `uxflow` each ran with **no** checkpoint of their own — silently folded into the bundle | Each now records its **own** solo checkpoint immediately after itself, `stage` and `bundle` both scalar and equal to the stage name |
+| `implementation-planning` recorded **one** bundled checkpoint reviewing all 5 planning stages together, `stage` as a 5-element array, `bundle: "planning-milestone"` | `implementation-planning` records only its **own** solo checkpoint, same shape as every other stage — no bundling of any kind |
+| 7 total pipeline stages | 14 total pipeline stages — 7 new ones inserted: `research-synthesis`, `personas-jobs`, `journey-mapping` (between `discovery` and `define`); `information-architecture` (between `define` and `uxflow`); `wireframes`, `visual-design-system`, `prototype-usability` (between `uxflow` and `architecture`) |
+| 3 founder-visible checkpoints total (Planning Milestone, Build, Ship) | 14 founder-visible checkpoints total (12 individual pre-build stage checkpoints, Build, Ship) |
+
+This is an **append-only audit log, never rewritten** — existing `schema_version: 3` and `4` entries keep their old bundled/array shape permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) must keep checking whether `stage` is an array before iterating, since `schema_version: 3`–`4` entries with `bundle: "planning-milestone"` still exist in older logs even though no new entry will ever have that shape again.
 
 **Migration note — 7-stage pipeline (schema_version 2 → 3, 2026):** the pipeline expanded from 4 stages to 7 as part of MVP2 (see `docs/ARCHITECTURE.md` §4b/§10 v14), while *reducing* founder-visible checkpoints from 4 to 3 via bundling. Stage names changed:
 
@@ -125,7 +136,7 @@ truth for the next available ID per prefix, so two sessions never mint the same 
 different things.
 
 ```json
-{ "next_id": { "DISC": 1, "DEF": 1, "ARCH": 1, "UX": 1, "IP": 1 } }
+{ "next_id": { "DISC": 1, "RS": 1, "PJ": 1, "JM": 1, "DEF": 1, "IA": 1, "UX": 1, "WF": 1, "VS": 1, "PT": 1, "ARCH": 1, "IP": 1 } }
 ```
 
 Created on first use if it doesn't exist yet; a project that hasn't run any pipeline stage with

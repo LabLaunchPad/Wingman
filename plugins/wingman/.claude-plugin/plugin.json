@@ -1,6 +1,6 @@
 {
   "name": "wingman",
-  "version": "0.6.7",
+  "version": "0.7.1",
   "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
   "author": {
     "name": "LabLaunchPad"
@@ -9,9 +9,16 @@
   "keywords": ["sdlc", "founders", "boardroom", "plan-review", "security", "orchestration"],
   "commands": [
     "./commands/pipeline/discovery.md",
+    "./commands/pipeline/research-synthesis.md",
+    "./commands/pipeline/personas-jobs.md",
+    "./commands/pipeline/journey-mapping.md",
     "./commands/pipeline/define.md",
-    "./commands/pipeline/architecture.md",
+    "./commands/pipeline/information-architecture.md",
     "./commands/pipeline/uxflow.md",
+    "./commands/pipeline/wireframes.md",
+    "./commands/pipeline/visual-design-system.md",
+    "./commands/pipeline/prototype-usability.md",
+    "./commands/pipeline/architecture.md",
     "./commands/pipeline/implementation-planning.md",
     "./commands/pipeline/build.md",
     "./commands/pipeline/ship.md",
@@ -31,7 +38,8 @@
     "./commands/adaptive/research.md",
     "./commands/adaptive/advisory.md",
     "./commands/adaptive/incident.md",
-    "./commands/adaptive/knowledge-export.md"
+    "./commands/adaptive/knowledge-export.md",
+    "./commands/adaptive/post-launch.md"
   ],
   "agents": [
     "./agents/boardroom-ceo.md",

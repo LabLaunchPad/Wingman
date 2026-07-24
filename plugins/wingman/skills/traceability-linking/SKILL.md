@@ -1,19 +1,19 @@
 ---
 name: traceability-linking
-description: Use when minting or referencing a requirement ID during /wingman:define, /wingman:architecture, /wingman:uxflow, /wingman:implementation-planning, or /wingman:build — teaches the wingman:req marker convention that lets every task, commit, and source-code change trace back to the requirement it satisfies.
+description: Use when minting or referencing a requirement ID during /wingman:discovery, /wingman:research-synthesis, /wingman:personas-jobs, /wingman:journey-mapping, /wingman:define, /wingman:information-architecture, /wingman:uxflow, /wingman:wireframes, /wingman:visual-design-system, /wingman:prototype-usability, /wingman:architecture, /wingman:implementation-planning, or /wingman:build — teaches the wingman:req marker convention that lets every task, commit, and source-code change trace back to the requirement it satisfies.
 ---
 
 # Traceability Linking
 
 ## Overview
 
-Wingman's 7-stage pipeline produces a chain of artifacts — a requirement, a design decision, a UX state, a plan task, a code change — that all need to trace back to each other so a founder (or the `dod-structural-gate.mjs` hook) can answer "why does this code exist" without re-deriving it. This skill is the shared marker convention every stage after Discovery uses to mint and reference IDs.
+Wingman's 14-stage pipeline produces a chain of artifacts — a requirement, a design decision, a UX state, a plan task, a code change — that all need to trace back to each other so a founder (or the `dod-structural-gate.mjs` hook) can answer "why does this code exist" without re-deriving it. This skill is the shared marker convention every stage after Discovery uses to mint and reference IDs.
 
 **Core principle:** every downstream artifact names the ID(s) it satisfies; nothing gets built, designed, or coded "just because" with no traceable origin.
 
 ## When To Use
 
-Whenever `/wingman:define`, `/wingman:architecture`, `/wingman:uxflow`, or `/wingman:implementation-planning` mints a new requirement/decision/flow/task ID, or whenever `/wingman:build` writes a task's corresponding source-code change.
+Whenever `/wingman:research-synthesis`, `/wingman:personas-jobs`, `/wingman:journey-mapping`, `/wingman:define`, `/wingman:information-architecture`, `/wingman:uxflow`, `/wingman:wireframes`, `/wingman:visual-design-system`, `/wingman:prototype-usability`, `/wingman:architecture`, or `/wingman:implementation-planning` mints a new requirement/decision/flow/task ID, or whenever `/wingman:build` writes a task's corresponding source-code change.
 
 ## Core Workflow
 
@@ -22,12 +22,19 @@ Whenever `/wingman:define`, `/wingman:architecture`, `/wingman:uxflow`, or `/win
 | Prefix | Minted by | What it identifies |
 |---|---|---|
 | `DISC-` | `/wingman:discovery` | A discovery-stage finding |
+| `RS-` | `/wingman:research-synthesis` | A theme/risk/opportunity/open-question |
+| `PJ-` | `/wingman:personas-jobs` | A persona or job-to-be-done |
+| `JM-` | `/wingman:journey-mapping` | A journey stage/friction point |
 | `DEF-` | `/wingman:define` | A requirement |
-| `ARCH-` | `/wingman:architecture` | A technical design decision |
+| `IA-` | `/wingman:information-architecture` | An IA section/navigation node |
 | `UX-` | `/wingman:uxflow` | A user-facing screen/state |
+| `WF-` | `/wingman:wireframes` | A low-fidelity screen layout |
+| `VS-` | `/wingman:visual-design-system` | A visual-design-system token/component spec |
+| `PT-` | `/wingman:prototype-usability` | A prototype/usability/accessibility finding |
+| `ARCH-` | `/wingman:architecture` | A technical design decision |
 | `IP-` | `/wingman:implementation-planning` | A plan task |
 
-**2. Track the next available number per prefix in `.wingman/traceability.json`** (create it if it doesn't exist: `{"next_id": {"DISC": 1, "DEF": 1, "ARCH": 1, "UX": 1, "IP": 1}}`) — read it, use the current value, increment, write it back. This is what prevents two sessions from minting the same ID for two different things.
+**2. Track the next available number per prefix in `.wingman/traceability.json`** (create it if it doesn't exist: `{"next_id": {"DISC": 1, "RS": 1, "PJ": 1, "JM": 1, "DEF": 1, "IA": 1, "UX": 1, "WF": 1, "VS": 1, "PT": 1, "ARCH": 1, "IP": 1}}`) — read it, use the current value, increment, write it back. This is what prevents two sessions from minting the same ID for two different things.
 
 **3. Every downstream reference uses the marker `<!-- wingman:req <ID> -->`** — an HTML comment in Markdown (requirement tables, plan files), or the equivalent comment-token variant in source code (`// wingman:req DEF-001` for JS/TS, `# wingman:req DEF-001` for Python, etc.). A task or code change may reference more than one ID if it genuinely satisfies more than one requirement — do not merge two distinct requirements into a single ID to save a marker.
 
@@ -81,7 +88,7 @@ intended to reference doesn't show up in its "distinct ID(s) referenced" count, 
 
 ## Verification
 
-Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs` — it must report zero orphaned markers (references to IDs that don't exist) and zero unlinked requirements (a `DEF-*`/`ARCH-*`/`UX-*` ID with no downstream marker anywhere).
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs` — it must report zero orphaned markers (references to IDs that don't exist) and zero unlinked requirements (a `DEF-*`/`ARCH-*`/`UX-*`/`RS-*`/`PJ-*`/`JM-*`/`IA-*`/`WF-*`/`VS-*`/`PT-*` ID with no downstream marker anywhere).
 
 **Expected, non-blocking exception**: `IP-*` (Implementation Planning) IDs — and any ID whose only
 downstream coverage is several hops away rather than a direct marker — will routinely show as
@@ -115,10 +122,18 @@ No founder-facing template — this is an internal linking convention. The found
 
 ## Referenced by
 
-- `commands/pipeline/architecture.md`
-- `commands/pipeline/build.md`
+- `commands/pipeline/discovery.md`
+- `commands/pipeline/research-synthesis.md`
+- `commands/pipeline/personas-jobs.md`
+- `commands/pipeline/journey-mapping.md`
 - `commands/pipeline/define.md`
-- `commands/pipeline/implementation-planning.md`
+- `commands/pipeline/information-architecture.md`
 - `commands/pipeline/uxflow.md`
+- `commands/pipeline/wireframes.md`
+- `commands/pipeline/visual-design-system.md`
+- `commands/pipeline/prototype-usability.md`
+- `commands/pipeline/architecture.md`
+- `commands/pipeline/implementation-planning.md`
+- `commands/pipeline/build.md`
 
 See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

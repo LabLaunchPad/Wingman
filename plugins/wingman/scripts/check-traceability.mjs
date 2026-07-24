@@ -10,8 +10,9 @@
 // check" rather than fail when pointed at a project with no requirement/marker data yet.
 //
 // What it checks (see plugins/wingman/skills/traceability-linking/SKILL.md):
-//   - every requirement/decision/flow ID (DISC-*, DEF-*, ARCH-*, UX-*, IP-*) minted in
-//     a markdown table has at least one downstream `wingman:req <ID>` marker elsewhere.
+//   - every requirement/decision/flow ID (DISC-*, RS-*, PJ-*, JM-*, DEF-*, IA-*, UX-*,
+//     WF-*, VS-*, PT-*, ARCH-*, IP-*) minted in a markdown table has at least one
+//     downstream `wingman:req <ID>` marker elsewhere.
 //   - every `wingman:req <ID>` marker resolves to an ID that was actually minted
 //     somewhere (an "orphaned marker" — the more serious of the two, since it means a
 //     task/commit claims to satisfy a requirement that doesn't exist).
@@ -33,14 +34,14 @@ const root = process.argv[2] ? resolve(process.cwd(), process.argv[2]) : process
 // otherwise be indistinguishable from a real marker/definition by this
 // script's own deliberately syntax-agnostic regex.
 const SKIP_DIRS = new Set(['.git', 'node_modules', 'vendor', '.wingman', 'evals']);
-const ID_PATTERN = /\b(DISC|DEF|ARCH|UX|IP)-\d+\b/;
-const TABLE_ROW_PATTERN = /^\s*\|\s*(DISC|DEF|ARCH|UX|IP)-\d+\s*\|/;
+const ID_PATTERN = /\b(DISC|RS|PJ|JM|DEF|IA|UX|WF|VS|PT|ARCH|IP)-\d+\b/;
+const TABLE_ROW_PATTERN = /^\s*\|\s*(DISC|RS|PJ|JM|DEF|IA|UX|WF|VS|PT|ARCH|IP)-\d+\s*\|/;
 // Matches one `wingman:req` token followed by one or more space-separated IDs on the
 // same line -- found via real dogfooding (docs/wingman/retros.md, 2026-07-15): the
 // original single-ID pattern silently dropped every ID after the first when a task
 // genuinely satisfied more than one requirement,
 // with no warning that anything had been missed.
-const MARKER_PATTERN = /wingman:req((?:\s+(?:DISC|DEF|ARCH|UX|IP)-\d+)+)/g;
+const MARKER_PATTERN = /wingman:req((?:\s+(?:DISC|RS|PJ|JM|DEF|IA|UX|WF|VS|PT|ARCH|IP)-\d+)+)/g;
 
 function walk(dir, files = []) {
   let entries;
