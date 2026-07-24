@@ -41,9 +41,11 @@ not one trivial list.
 
 ## Trust level
 
-`provisional` — single real run, single scenario. No adversarial or negative scenario (e.g. a
-define doc small enough that IA collapses to one section, or a gate that should legitimately block)
-has been run yet.
+`verified` — two genuinely differently-shaped real runs: Run 1 (a define doc spanning two distinct
+audiences/auth boundaries, confirming the stage genuinely splits sections rather than lumping) and
+Run 2 (a single-audience, single-page define doc, confirming the stage collapses to one honest
+section rather than inventing structure to look thorough). Both independently checked against the
+real files.
 
 ## Run log
 
@@ -94,3 +96,44 @@ with a narrow, stage-specific fix.
 **No bugs found in `information-architecture.md`'s own instructions** — the department-activation
 call, the IA table shape, the task-based-naming requirement, the gate checklist, and the checkpoint
 hand-off all behaved exactly as specified on first try.
+
+### Run 2 — 2026-07-24 (single-section collapse scenario)
+
+**Setup:** new fixture `evals/fixtures/setup-information-architecture-fixture-single-section.sh` —
+a single-audience waitlist app: `DEF-001` (submit email on a public signup form) and `DEF-002`
+(check current position), both belonging to one visitor, one page, no second audience and no admin
+console. This is the deliberate inverse of Run 1's two-audience/two-section fixture, testing whether
+the stage will honestly collapse to one section instead of manufacturing a second one to look more
+thorough.
+
+**Dispatch (fresh subagent, given only `information-architecture.md` plus referenced skills, not
+told the expected answer):**
+- Judged the Design-department activation signal true even though the actual codebase is pure
+  JSON-API (`src/server.js`, `src/waitlist.js`, no frontend files) — reasoning that `DEF-001`/
+  `DEF-002` both describe a human visitor interacting with a page, which is a user-facing surface by
+  the requirements' own language even though it isn't built yet (IA runs before uxflow/wireframes).
+  Activated `dept-design`, wrote `.claude/agents/dept-design.md` documenting this reasoning inline.
+- Produced `docs/wingman/information-architecture/waitlist-signup.md`: **one** section, **one** row
+  (`IA-001 | Waitlist | top-level | ... | DEF-001 DEF-002`) — did not split "join" and "check
+  position" into separate nav sections, correctly reasoning both belong to the same single audience
+  on the same single page.
+- Gate: PASS (GO) — all Must-include/Must-decide items satisfied and trivially clear for a one-page
+  product.
+- **A real, unplanted finding surfaced along the way**: reading the actual code, `GET /waitlist`
+  returns the entire unfiltered list of every visitor's email, with no per-visitor lookup or auth —
+  so `DEF-002` ("check my position") can't honestly be built as a single-visitor feature without a
+  fix. Logged as `GAP-001` in a new `docs/wingman/gap-register.md`, correctly treated as an
+  Architecture/Build-stage risk, not an IA-structure defect, and reflected in the synthesized
+  Boardroom checkpoint (`GO_WITH_CHANGES`, CTO/CISO flagging `GAP-001`, no seat at `NO_GO`).
+
+**Independently verified** (real files, not the subagent's self-report): re-read
+`docs/wingman/information-architecture/waitlist-signup.md` — confirmed exactly one `IA-*` row citing
+both real `DEF-*` IDs, no invented second section. Ran `check-traceability.mjs`: PASS, 3 IDs minted
+(`DEF-001`, `DEF-002` pre-existing plus `IA-001` new), one expected non-blocking warning (`IA-001`
+has no downstream marker yet since uxflow hasn't run — the same documented, known limitation
+`traceability-linking` already calls out for terminal-stage IDs, not a new gap).
+
+**No bugs found** — the stage correctly resisted both failure modes (splitting for its own sake, and
+rubber-stamping a gate on a single-visitor requirement that can't actually be honestly satisfied
+without a real fix), and honestly surfaced a genuine, unplanted implementation gap along the way
+rather than staying silent about it. Promoted trust level from `provisional` to `verified`.

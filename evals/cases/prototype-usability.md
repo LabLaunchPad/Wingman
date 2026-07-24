@@ -10,6 +10,8 @@ level, and record a Boardroom checkpoint with `stage: "prototype-usability"`?
 
 ## Fixture
 
+Two fixtures exercise genuinely differently-shaped scenarios (see Run 1 vs. Run 2 below):
+
 `evals/fixtures/setup-prototype-usability-fixture.sh <target-dir>` — the base waitlist app plus
 pre-seeded discovery, define (DEF-001..004), architecture (ARCH-001..004), uxflow (UX-001..002),
 wireframes (WF-001..002), and visual-design-system (VS-001..003) artifacts for a waitlist-unsubscribe
@@ -21,6 +23,14 @@ feature. The wireframes/design-system content plants two real defects:
 - **Usability:** WF-001's primary action is a circular icon-only button (`VS-003`, "no text label by
   default") showing a refresh/reload glyph, with no accessible name specified, whose actual
   destination ("back to signup form") has no relationship to a reload icon.
+
+`evals/fixtures/setup-prototype-usability-clean-fixture.sh <target-dir>` — the same base waitlist app
+plus pre-seeded discovery/define/architecture/uxflow/wireframes/visual-design-system artifacts for a
+different, genuinely simple feature (a waitlist-position lookup, 3 screens: form, found, not-found).
+This variant deliberately plants **no** defects: text-labelled controls throughout, `#222222`-on-
+`#ffffff` body text (~15.9:1 contrast), plain-language copy, a documented logical tab order. It tests
+the inverse risk from Run 1 — whether the stage can honestly report a clean bill of health (a real
+gate pass) instead of manufacturing findings just to look thorough.
 
 ## Procedure
 
@@ -44,7 +54,9 @@ feature. The wireframes/design-system content plants two real defects:
 
 ## Trust level
 
-`provisional` — passed one real run, single scenario, manually graded against the real filesystem.
+`verified` — passed two genuinely differently-shaped real runs, manually graded against the real
+filesystem: Run 1 (defects planted, both caught, gate correctly blocked) and Run 2 (no defects
+planted, gate correctly passed with a real `GO` rather than manufacturing findings for ceremony).
 
 ## Run log
 
@@ -65,3 +77,62 @@ feature. The wireframes/design-system content plants two real defects:
 - **Gate behavior**: the doc's own Gate check section explicitly states "Gate does not pass yet" and marks the stage **blocked** pending PT-002/PT-003, matching `prototype-usability.md`'s "both conditions, not either alone" rule (prototype tested AND accessibility/clarity acceptable) — correctly did not silently pass a gate it had just found blocking defects against.
 
 **No bugs found in `prototype-usability.md` itself this run** — the command's instructions were followed faithfully and produced a genuinely useful, well-differentiated result on first try. No fix was needed. Promoted to `provisional`.
+
+### Run 2 — 2026-07-24 (clean-scenario, no planted defects)
+
+**Why this scenario:** Run 1 already exercised the folded-in accessibility review catching a real
+defect (the distinctive behavior this stage is built to test). A second run of the same shape would
+just re-confirm that. The genuinely different risk Run 1 couldn't test: whether the stage can
+correctly report **no significant findings** when a prototype is actually clean, rather than
+manufacturing busywork findings (inflated severity, invented nitpicks) to look thorough — the command
+text's own "not hypothetical nitpicks" instruction is exactly the thing at risk of being ignored under
+pressure to "find something."
+
+**Setup:** New fixture `setup-prototype-usability-clean-fixture.sh` authored, run fresh into
+`/tmp/wingman-eval-prototype-usability-clean`. A different feature (waitlist-position lookup, not
+waitlist-unsubscribe) with 3 `WF-*` screens, deliberately clean: text-labelled submit button ("Check
+my position", not icon-only), `color-text-body` = `#222222` on `#ffffff`, plain-language copy on both
+result screens, a documented tab order. Independently computed the real WCAG relative-luminance
+contrast ratio for `#222222`/`#ffffff` (Python, standard formula) before dispatch: **~15.9:1**,
+confirming the fixture's own claim rather than trusting it uninspected. `node scripts/check-fixtures.mjs`
+confirms both prototype-usability fixtures (and all 63 total) still execute cleanly.
+
+**Dispatch (acted as the fresh subagent, following only `commands/pipeline/prototype-usability.md`'s
+actual instructions against the clean fixture, not pre-committing to a "should be clean" answer
+before reviewing):** produced `docs/wingman/prototype-usability/waitlist-position.md` with a testable
+prototype description, a 5-step test script including a screen-reader pass, a 3-persona participant
+profile (email-forgetting user, keyboard-only user, low-vision user), and a 5-row `PT-001`..`PT-005`
+findings table.
+
+**Independently verified** (real filesystem, not self-report):
+
+- **Findings table**: `PT-001`/`PT-002` (accessibility) confirm the labelled input/text-labelled
+  button and the ~15.9:1 contrast with no fix needed; `PT-003` (usability) confirms the not-found
+  state gives a real next step; `PT-004` (content) confirms plain-language copy; `PT-005`
+  (accessibility) is the one substantive finding — a low-severity, explicitly **non-blocking**
+  observation that "Back to form" link text would stop being distinguishable *if* a second link were
+  ever added, correctly framed as a future consideration rather than a present defect.
+- **No manufactured findings**: zero blocking/high-severity rows. `grep`-confirmed the wireframe and
+  design-system files genuinely contain no icon-only control and no low-contrast token (`grep -iE
+  "icon-only|#bbbbbb|low.contrast"` on the source docs returns nothing) — the clean result reflects
+  real fixture content, not an incomplete review.
+- **Real severity differentiation preserved even with nothing blocking**: 4 "verified, no fix needed"
+  rows plus 1 explicit low-severity/non-blocking row — not flattened, and not inflated to force a
+  "finding" where none existed.
+- **Traceability**: every `PT-*` row's Satisfies column cites a real `WF-*`/`VS-*`/`UX-*` ID
+  (`grep`-confirmed against the actual table).
+- **Gate behavior (the inverse of Run 1's check)**: the doc's own Gate checklist states "Gate
+  passes" and both conditions (prototype tested, accessibility/clarity acceptable) are named as met —
+  a real, earned `GO`, not a rubber stamp, since PT-005 was still surfaced rather than omitted to keep
+  the table looking spotless.
+- **Checkpoint**: `.wingman/checkpoints.jsonl` (parsed via `python3 -m json`, not eyeballed) has one
+  entry with `stage: "prototype-usability"`, all 7 non-Design seats `GO` with "no material input,"
+  `design` seat `GO` naming the real contrast figure and the one non-blocking finding, `bottom_line:
+  "GO"`, `founder_decision: "ship_it"` — the legitimate opposite of Run 1's `GO_WITH_CHANGES`.
+
+**No bugs found in `prototype-usability.md` this run either** — the command's "note anything genuinely
+confusing, not hypothetical nitpicks" instruction held under an actually-clean scenario: the stage
+reported a real `GO` without either inflating PT-005 into a blocking issue or omitting it entirely to
+look more thorough. Between Run 1 (catches real planted defects, blocks correctly) and Run 2
+(reports a real clean pass, doesn't manufacture findings), both directions of the stage's central
+risk are now covered by independently-verified evidence. Promoted to `verified`.
