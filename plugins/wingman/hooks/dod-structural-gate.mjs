@@ -155,7 +155,32 @@ export function checkVerdictTranscriptionMatchesDetails(checkpoint, cwd) {
   return { ok: true };
 }
 
-function findMostRecentPlanFile(cwd) {
+// With two or more concurrent projects/plans in docs/wingman/plans/, picking by mtime alone can
+// gate `git push` against the WRONG plan (whichever happened to be touched most recently, not
+// necessarily the one the current checkpoint/push actually concerns). Prefer the plan file path
+// recorded on the most recent checkpoint's own `scope_ref` field (boardroom.md records the plan
+// file path it reviewed there — see commands/adaptive/boardroom.md's "Record the checkpoint"
+// section) and fall back to mtime-based selection only when no matching checkpoint/scope_ref is
+// found. In the fallback case, print a clear warning naming every candidate plan file so the
+// ambiguity is visible rather than silently resolved.
+export function findPlanFileFromCheckpoint(cwd) {
+  const file = join(cwd, '.wingman', 'checkpoints.jsonl');
+  if (!existsSync(file)) return null;
+  let lines;
+  try { lines = readFileSync(file, 'utf-8').split('\n').filter(Boolean); } catch { return null; }
+  for (let i = lines.length - 1; i >= 0; i--) {
+    let entry;
+    try { entry = JSON.parse(lines[i]); } catch { continue; }
+    const scopeRef = entry.scope_ref;
+    if (typeof scopeRef === 'string' && scopeRef.endsWith('.md') && scopeRef !== 'diff') {
+      const full = join(cwd, scopeRef);
+      if (existsSync(full)) return full;
+    }
+  }
+  return null;
+}
+
+function findMostRecentPlanFileByMtime(cwd) {
   const plansDir = join(cwd, 'docs', 'wingman', 'plans');
   try {
     const files = readdirSync(plansDir)
@@ -163,10 +188,27 @@ function findMostRecentPlanFile(cwd) {
       .map((f) => join(plansDir, f));
     if (files.length === 0) return null;
     files.sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
-    return readFileSync(files[0], 'utf-8');
+    if (files.length > 1) {
+      console.error(
+        `Wingman dod-structural-gate: multiple plan files found under docs/wingman/plans/ and no ` +
+        `checkpoint scope_ref matched any of them — falling back to the most recently modified one ` +
+        `(${files[0]}). Candidates, most recent first: ${files.join(', ')}`
+      );
+    }
+    return files[0];
   } catch {
     return null;
   }
+}
+
+export function findMostRecentPlanFilePath(cwd) {
+  return findPlanFileFromCheckpoint(cwd) || findMostRecentPlanFileByMtime(cwd);
+}
+
+function findMostRecentPlanFile(cwd) {
+  const path = findMostRecentPlanFilePath(cwd);
+  if (!path) return null;
+  try { return readFileSync(path, 'utf-8'); } catch { return null; }
 }
 
 // build.md's convention is to append the threat register directly to the

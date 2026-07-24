@@ -21,7 +21,7 @@ If the project's shape clearly matches one of `references/org-template/project-t
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
 
-Immediately after, use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
+Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
 
 ## Step 3: Write the Discovery output
 
@@ -38,9 +38,7 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
-rendering tier first, never assume.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Discovery output above — detect the session's rendering tier first, never assume.
 
 ## Gate checklist
 

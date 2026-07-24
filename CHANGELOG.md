@@ -18,6 +18,17 @@ All notable changes to the Wingman Claude Code plugin.
 - **`skills/traceability-linking` and `plugins/wingman/scripts/check-traceability.mjs` extended with 7 new ID prefixes**: `RS-`, `PJ-`, `JM-`, `IA-`, `WF-`, `VS-`, `PT-`, alongside the existing `DISC-`/`DEF-`/`ARCH-`/`UX-`/`IP-`.
 - **No eval coverage added for the 7 new pipeline commands** — an honest, expected gap (not fabricated as `provisional`/`verified`); real behavioral eval cases require actually running the procedure per `evals/README.md`, out of scope for this rollout.
 
+## [0.6.7] - 2026-07-24
+
+### Fixed
+- **6 confirmed gaps in the 7-stage pipeline's phase-transition mechanism**, found via audit:
+  - `implementation-planning.md`'s "Gather" step read Discovery/Define/Architecture/UX Flow docs by same-slug filename convention with no verification they actually agreed — now lists the files found in each stage directory, confirms a single shared slug, and stops to ask the founder on ambiguity or a missing stage file rather than silently guessing.
+  - `check-traceability.mjs` now additionally warns (never a hard failure — additive to existing PASS/FAIL semantics) when a `DEF-*`/`ARCH-*`/`UX-*` source file has a newer mtime than a plan file under `docs/wingman/plans/` that cites its IDs, naming the stale relationship.
+  - `build.md`'s "Before starting" now explicitly documents its resume behavior: check both the plan file's own checkbox state and `git log` for a matching completed commit before treating a task as not-yet-done, so a fresh session doesn't redo already-completed work.
+  - `dod-structural-gate.mjs`'s `findMostRecentPlanFile` picked the wrong plan by mtime alone when multiple projects' plans coexist — now prefers the plan path recorded on the most recent checkpoint's own `scope_ref`, falling back to mtime only when no matching checkpoint is found, and prints every candidate plan file when it does.
+  - `build.md`'s "Before starting" now surfaces a plain-language warning when no `checkpoints.jsonl` entry with `bundle: "planning-milestone"` exists for the project, so a founder doesn't silently lose traceability coverage from earlier stages.
+  - Extracted the repeated Management-Board-activation-threshold and pipeline-status-tree explanatory prose (identical across `discovery.md`/`define.md`/`architecture.md`/`uxflow.md`/`implementation-planning.md`/`build.md`/`ship.md`) into `references/pipeline-stage-boilerplate.md`; each command file now points there instead of repeating the same paragraph, while keeping its own specific skill invocations and manager-role names inline.
+
 ## [0.6.6] - 2026-07-24
 
 ### Fixed

@@ -9,6 +9,10 @@ The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:b
 
 $ARGUMENTS
 
+## Gather: confirm slug consistency first
+
+Before reading any stage output, list the files actually present in each of `docs/wingman/discovery/`, `docs/wingman/define/`, `docs/wingman/architecture/`, and `docs/wingman/uxflow/` (skip `uxflow` only if the project genuinely has no user-facing surface, per `uxflow.md`). Read each filename's `<short-slug>` and confirm all four (or three) resolve to the exact same slug — the same-slug-filename convention each earlier stage documents is never verified mechanically, so this stage is where a silent mismatch would otherwise first bite. If any stage's directory has more than one slug present, or a stage's file is missing entirely while the others exist, do not guess which one is "the" project — stop and ask the founder explicitly (the equivalent of `AskUserQuestion` for this markdown-instructed step) which slug/project to gather from before proceeding. Only once the slugs agree (or the founder has picked one) move on to writing the plan.
+
 ## Write the plan
 
 Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
@@ -37,8 +41,7 @@ themselves.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (per
-`references/visual-output-templates.md` §2), showing all 11 prior stages complete and this stage as
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
 the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
