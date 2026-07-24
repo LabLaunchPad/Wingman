@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.6.6] - 2026-07-24
+
+### Fixed
+- **`doubt-driven-development`'s skill description had no trigger condition.** Its frontmatter `description:` was a philosophical statement ("Treat doubt as a quality signal that triggers evidence-gathering before shipping.") rather than a `Use when X` clause, unlike 38 of Wingman's other 39 skills. Claude Code's skill-matching reads only this frontmatter field, not the body's own well-formed "When to Use This Skill" section, so the skill was structurally less likely to auto-trigger than its siblings. Found via a reference-graph sweep that flagged 4 skills with no explicit command/agent wiring; the other 3 already had solid `Use when` descriptions and were ruled out as auto-trigger-by-design.
+
 ## [0.6.5] - 2026-07-23
 
 ### Added
