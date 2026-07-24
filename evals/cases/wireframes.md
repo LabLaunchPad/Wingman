@@ -35,7 +35,10 @@ distinct `UX-*` states both tracing to `ARCH-004`: `UX-001` (success confirmatio
 
 ## Trust level
 
-`provisional` — single real run.
+`verified` — Run 1 (positive: a real UI surface, 2 distinct `UX-*` states) plus Run 2 (negative:
+zero user-facing surface, confirming the stage correctly skips entirely rather than manufacturing
+screens) — two genuinely differently-shaped scenarios, independently verified against the real
+filesystem.
 
 ## Run log
 
@@ -74,3 +77,44 @@ correct `UX-*` citation, and the gate-checklist output all behaved exactly as th
 requires on first try. `provisional` pending a second, differently-shaped scenario (e.g. a UX flow
 with 3+ states including a loading/empty state, to confirm state coverage genuinely scales rather
 than only being tested at 2 states).
+
+### Run 2 — 2026-07-24 (negative case: zero user-facing surface)
+
+**Setup:** new fixture `evals/fixtures/setup-wireframes-fixture-negative.sh` — same waitlist base
+app, but this time a pure-API feature (waitlist CSV export) where discovery/define/architecture are
+all backend-only. `docs/wingman/architecture/waitlist-export.md` has three decisions, none of them
+user-facing: `ARCH-001` (`toCsv(entries)`, a pure formatting function), `ARCH-002` (`GET
+/waitlist/export.csv` behind a bearer token), `ARCH-003` (401 JSON error on bad/missing token).
+`docs/wingman/uxflow/waitlist-export.md` is pre-seeded exactly as `uxflow.md` documents it should
+behave when there's nothing to do: "This project has no user-facing surface... Skipping UX flow
+entirely; no UX-* IDs minted." No `.wingman/state.json` and no `.claude/agents/` exist yet — nothing
+in the chain has ever activated Design. This is the one shape Run 1 never touched: Run 1's fixture
+had `dept-design` already active from uxflow; this one deliberately has it inactive because the
+underlying signal (frontend framework, HTML templates, or a UI component directory) is genuinely
+false — confirmed directly (`grep -il "html|template|jsx|tsx|react|vue"` over `src/` and
+`package.json` returned nothing; `src/` contains only `server.js` and `waitlist.js`, a JSON API).
+
+**Dispatch** (acted as the fresh subagent myself, following only `wireframes.md`'s actual text, not
+told the answer in advance): per "Confirm the Design department is active," checked the Design
+activation signal against the real fixture and found it false — no frontend framework, no HTML
+templates, no UI component directory, and `uxflow.md`'s own prior output already recorded the same
+conclusion. Per the command's own text ("If there's no user-facing surface, skip this step (and the
+rest of this stage) entirely and say so in one plain sentence"), stopped immediately: did not create
+`dept-design`, did not run the Management-Board-activation check (correctly gated behind "only if
+`dept-design` is active"), did not sketch any `WF-*` rows, did not invoke `visual-founder-output`,
+did not run the gate checklist, and did not record a checkpoint. Output was the one plain sentence:
+"This project has no user-facing surface, so I'm skipping the wireframes stage entirely (no `WF-*`
+screens to sketch, no checkpoint to record)."
+
+**Independently verified** (real filesystem, not self-report, checked after the dispatch): `ls
+docs/wingman/wireframes` — directory does not exist. `ls .claude/agents` — does not exist (no
+`dept-design` created). `ls .wingman` — does not exist (no `state.json`, no `checkpoints.jsonl`).
+`git status --short` — clean, zero side effects of any kind. Every one of these is exactly the
+expected outcome of a genuine skip: no fabricated screens, no spurious department-lead creation, no
+checkpoint recorded for a stage that did nothing.
+
+**No bugs found this run** — `wireframes.md`'s skip clause is a faithful mirror of `uxflow.md`'s own
+documented skip behavior, and it held on first try against a fixture with a genuinely false Design
+signal (not just an absent one — the underlying codebase evidence was checked directly, not assumed).
+Combined with Run 1's positive 2-state scenario, this closes the negative-case requirement for
+`verified`: **promoted to `verified`.**
