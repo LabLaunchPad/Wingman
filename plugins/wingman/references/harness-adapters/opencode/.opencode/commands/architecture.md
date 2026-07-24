@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific requirement ID to design 
 
 # Wingman: Architecture
 
-The third of Wingman's 5 planning stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
+The eleventh of Wingman's 14 pipeline stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
 
 $ARGUMENTS
 
@@ -46,10 +46,16 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2).
 
-Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
+## Architecture checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Architecture decisions above (and the
+DEF→ARCH graph). The founder approves or sends back changes through this one plain-language
+checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:implementation-planning`.
 
 ## References
 
@@ -57,3 +63,5 @@ Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardr
 - `skills/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.

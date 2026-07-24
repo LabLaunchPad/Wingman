@@ -12,8 +12,11 @@
 // to correct once:
 //
 //   1. ExitPlanMode — light check, traceability only. Only engages when the
-//      plan text contains "## Planning Milestone checkpoint" (a heading unique
-//      to commands/pipeline/implementation-planning.md), so an unrelated ExitPlanMode
+//      plan text contains "## Implementation Planning checkpoint" (a heading
+//      unique to commands/pipeline/implementation-planning.md — renamed from
+//      "## Planning Milestone checkpoint" when that stage stopped bundling all
+//      5 planning stages into one checkpoint, see docs/ARCHITECTURE.md §4d),
+//      so an unrelated ExitPlanMode
 //      call elsewhere (including Wingman's own dev-planning sessions, which
 //      have zero wingman:req markers by design) is never touched.
 //   2. Bash matching a real `git push` — the full 4-point check (traceability,
@@ -58,7 +61,7 @@ import { join, dirname } from 'node:path';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const PLANNING_MILESTONE_MARKER = '## Planning Milestone checkpoint';
+const PLANNING_MILESTONE_MARKER = '## Implementation Planning checkpoint';
 const NO_TEST_NEEDED = /<!--\s*wingman:no-test-needed:.*?-->/i;
 const TEST_FILE_HINT = /\.(test|spec)\.|_test\.|test_/;
 function readStdin() {
@@ -439,7 +442,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const failed = !result.ok ? result : (!fileResult.ok ? fileResult : null);
     if (failed) {
       deny(
-        `Wingman dod-structural-gate: this Planning Milestone checkpoint ${failed.reason}. ` +
+        `Wingman dod-structural-gate: this Implementation Planning checkpoint ${failed.reason}. ` +
         `Fix the marker(s) via the traceability-linking skill before exiting plan mode.`
       );
     }

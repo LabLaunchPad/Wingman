@@ -1,0 +1,55 @@
+---
+description: Define primary/secondary personas and jobs-to-be-done (trigger, pain, workaround, desired progress) — evidence-based, not decorative.
+argument-hint: "[optional: path to the Research Synthesis output, defaults to the most recent one]"
+---
+
+# Wingman: Personas & Jobs
+
+The third of Wingman's 14 pipeline stages. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template.
+
+$ARGUMENTS
+
+## Confirm the Product department is active
+
+`dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
+
+## Define personas and jobs
+
+Read the Research Synthesis output (from `/wingman:research-synthesis`, or the path given in `$ARGUMENTS`). For each theme with enough evidence behind it, define:
+
+- **Persona (primary or secondary):** who they are, in the situation this product actually finds them in — not a demographic sketch (age/hobbies) that adds no design signal.
+- **Job-to-be-done:** the **trigger** that makes them look for a solution, the **pain** they're actually feeling, the **workaround** they use today in its absence, and the **desired progress** — what "better" looks like to them, in their own terms.
+
+Mark a persona/job as unsupported plainly rather than inventing evidence for it — a thin evidence base is a real finding to flag, not something to paper over with a confident-sounding paragraph.
+
+Tag each row with the `PJ-` traceability prefix (via the `traceability-linking` skill), pointing back to the `RS-*` theme(s) it's built from.
+
+Append this section to a scratch personas-jobs doc (`docs/wingman/personas-jobs/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Personas & jobs
+
+| ID | Persona (primary/secondary) | Trigger | Pain | Workaround today | Desired progress | Satisfies |
+|---|---|---|---|---|---|---|
+| PJ-001 | <persona name/role> | <what makes them look for a solution> | <the actual pain, not a symptom> | <what they do today instead> | <what "better" looks like to them> | RS-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Personas & Jobs checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own personas/jobs table above. The founder
+approves or sends back changes through this one plain-language checkpoint before the pipeline moves
+on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:journey-mapping`.
+
+## References
+
+- `skills/traceability-linking` — the `PJ-*` ID convention and how it chains back to `RS-*`.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.

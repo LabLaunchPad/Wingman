@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.0] - 2026-07-24
+
+### Changed
+- **Pipeline expanded from 7 stages / 1 bundled pre-build checkpoint to 14 stages / 12 individual pre-build checkpoints** — a founder-approved reversal of the earlier ceremony-reduction bundling decision (see `docs/ARCHITECTURE.md` §4d for the full rationale and tradeoff, named plainly rather than silently overwritten). 7 new pipeline commands inserted at the point in a full enterprise UX process where each naturally belongs: `research-synthesis.md` (`RS-*`), `personas-jobs.md` (`PJ-*`), `journey-mapping.md` (`JM-*`) between Discovery and Define; `information-architecture.md` (`IA-*`) between Define and UX Flow; `wireframes.md` (`WF-*`), `visual-design-system.md` (`VS-*`), `prototype-usability.md` (`PT-*`, which deliberately folds in accessibility/content review rather than existing as a 15th stage) between UX Flow and Architecture. `discovery.md`/`define.md`/`architecture.md`/`uxflow.md` now each record their own solo Boardroom checkpoint (previously silent, feeding a single bundled checkpoint at the end of planning). `implementation-planning.md` no longer bundles all 5 original planning stages into one `"bundle": "planning-milestone"` checkpoint — it records only its own solo checkpoint, and its "Gather" step now reads all 11 prior stage docs instead of 4. `## Planning Milestone checkpoint` renamed to `## Implementation Planning checkpoint` (both the heading and the `hooks/dod-structural-gate.mjs` marker constant it's matched against).
+- **New adaptive command `commands/adaptive/post-launch.md`** — opt-in, founder-run periodically after `/wingman:ship`, reviews real usage/support signals and feeds findings back into the next `/wingman:discovery` pass. Not a pipeline stage; records an ordinary ad-hoc `"stage": "post-launch"` checkpoint.
+- **`checkpoints.jsonl` bumped to `schema_version: 5`** — every stage now records a scalar `stage`/`bundle` (no more array-shaped `stage` for new entries); see `docs/DATABASE.md`'s migration note for the full old→new mapping. This is append-only — existing `schema_version: 3`/`4` entries keep their bundled/array shape permanently.
+- **`skills/traceability-linking` and `plugins/wingman/scripts/check-traceability.mjs` extended with 7 new ID prefixes**: `RS-`, `PJ-`, `JM-`, `IA-`, `WF-`, `VS-`, `PT-`, alongside the existing `DISC-`/`DEF-`/`ARCH-`/`UX-`/`IP-`.
+- **No eval coverage added for the 7 new pipeline commands** — an honest, expected gap (not fabricated as `provisional`/`verified`); real behavioral eval cases require actually running the procedure per `evals/README.md`, out of scope for this rollout.
+
 ## [0.6.6] - 2026-07-24
 
 ### Fixed

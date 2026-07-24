@@ -66,7 +66,7 @@ Every agent/manager/department-lead/specialist template declares a `permissions:
 
 ### Checkpoint audit log
 
-Every boardroom run appends one line to `.wingman/checkpoints.jsonl` at the project root (git-committed, human-readable) — see `docs/DATABASE.md` for the full schema, the `schema_version: 2` migration note, and the old→new seat-name mapping from the 5-seat schema. As of `schema_version: 4`, each entry also gets a companion file at `.wingman/checkpoint-details/<checkpoint_id>.md` holding every seat's full, unabridged verdict — the reversible-compression counterpart to `plain-language-checkpoint`'s one-line summaries, retrievable later via `/wingman:boardroom expand <checkpoint_id>` (see `docs/DATABASE.md`'s `schema_version: 3 → 4` migration note).
+Every boardroom run appends one line to `.wingman/checkpoints.jsonl` at the project root (git-committed, human-readable) — see `docs/DATABASE.md` for the full schema, the `schema_version: 2` migration note, and the old→new seat-name mapping from the 5-seat schema. As of `schema_version: 4`, each entry also gets a companion file at `.wingman/checkpoint-details/<checkpoint_id>.md` holding every seat's full, unabridged verdict — the reversible-compression counterpart to `plain-language-checkpoint`'s one-line summaries, retrievable later via `/wingman:boardroom expand <checkpoint_id>` (see `docs/DATABASE.md`'s `schema_version: 3 → 4` migration note). As of `schema_version: 5`, every one of the 14 pipeline stages records its own checkpoint entry — see §4d.
 
 This is deliberately **not cryptographically signed**. Signing solves multi-party adversarial trust (departments that might lie to each other) — a problem Wingman doesn't have, since there is exactly one trust root: the founder. A plain, git-tracked, append-only log gives a full audit trail without security theater.
 
@@ -75,7 +75,7 @@ This is deliberately **not cryptographically signed**. Signing solves multi-part
 Every discipline skill this project has (`spec-handler`, `definition-of-done`, `verification-before-completion`, `security-checklist`, `testing-patterns`) was, until MVP2, enforced purely by prose cross-reference in a command's References section — compliance depended entirely on the executing agent remembering to apply them, with zero deterministic backing. `hooks/dod-structural-gate.mjs` closes that gap the same way `secret-guard.mjs` already closes it for destructive commands and secret-writing: a hook that checks artifact **presence**, never semantic **quality** (whether a test is actually good stays a Boardroom/human judgment call).
 
 Two narrowly-scoped registrations, deliberately avoiding the class of false-positive over-block `boardroom-checkpoint.mjs` itself hit once (its v12.1 fix):
-- **`PreToolUse`/`ExitPlanMode`** (sibling to `boardroom-checkpoint.mjs`, not merged into it): a light traceability-only check, and only engages when the plan text contains `## Planning Milestone checkpoint` — a heading unique to `commands/pipeline/implementation-planning.md` — so it never touches an unrelated `ExitPlanMode` call, including this project's own dev-planning sessions.
+- **`PreToolUse`/`ExitPlanMode`** (sibling to `boardroom-checkpoint.mjs`, not merged into it): a light traceability-only check, and only engages when the plan text contains `## Implementation Planning checkpoint` — a heading unique to `commands/pipeline/implementation-planning.md` (renamed from `## Planning Milestone checkpoint` when that stage stopped bundling all 5 planning stages into one checkpoint — see §4d) — so it never touches an unrelated `ExitPlanMode` call, including this project's own dev-planning sessions.
 - **`PreToolUse`/`Bash`** matching a real `git push`: the full 4-point check (traceability via `check-traceability.mjs`; test-file presence with a logged `<!-- wingman:no-test-needed: <reason> -->` escape hatch; the project's own test suite actually passing, detected generically across common manifest conventions — not just Node.js, since Wingman builds arbitrary founder projects; threat-register zero-`OPEN`) against the most recent Build-stage entry in `.wingman/checkpoints.jsonl`. If no such checkpoint exists yet, the hook allows — it never blocks ordinary git usage in a project not using Wingman's pipeline. The test-execution check was added after a real eval (`evals/cases/seven-stage-pipeline-e2e.md`) caught the exact gap presence-only checking left open: a test file existing is not the same as it passing.
 
 Every deny names the specific check and file/ID that failed, matching `secret-guard.mjs`'s and `boardroom-checkpoint.mjs`'s own discipline of never returning a generic "gate failed."
@@ -105,12 +105,70 @@ document itself, for whoever executes it — the plan is never shown to the foun
 defaults to Tier B regardless of session capability), and `boardroom.md` (an optional seat-verdict
 grid). `discovery.md`/`define.md`/`build.md`/`ship.md` have no diagram-shaped content of their own
 (a problem statement, an independent-requirement table, a threat register, a field list) and get no
-forced diagram. **Every one of the 7 pipeline commands plus `boardroom.md`** shows the generic
+forced diagram. **Every one of the 14 pipeline commands plus `boardroom.md`** shows the generic
 "Where you are" pipeline-status tree, rendered fresh from `.wingman/state.json`/`checkpoints.jsonl` —
-including a mid-planning variant naming which of the 5 planning sub-stages is current, for the 4
-stages that run before the Planning Milestone checkpoint exists. See
-`references/visual-output-templates.md` for the concrete templates (§1–§5) and which command owns
-each.
+each of the 12 pre-build stages now shows its own row with its own checkpoint status (see §4d), not
+a bracketed sub-stage name inside a single bundled row. See `references/visual-output-templates.md`
+for the concrete templates (§1–§5) and which command owns each.
+
+## 4d. The pipeline (14 stages, 14 checkpoints) — a founder-approved reversal of the v14 bundling decision
+
+**What changed, and why plainly:** MVP2 (v14, below) deliberately *reduced* founder-visible
+checkpoints from 4 to 3 by bundling Discovery/Define/Architecture/UX Flow/Implementation Planning
+into one "Planning Milestone" checkpoint — the reasoning at the time was that a founder shouldn't
+have to clear 5 separate gates just to reach the first line of code. That tradeoff traded
+**completeness for ceremony reduction**, and it held until a founder explicitly asked for the
+opposite tradeoff: full enterprise UX process discipline — research synthesis, personas/JTBD,
+journey mapping, information architecture, wireframes, a visual design system, and prototype/
+usability/accessibility review, each as its own named stage with its own sign-off — even at the
+cost of more checkpoints to clear before `/wingman:build`. This is a deliberate reversal, not a
+silent overwrite of the v14 rationale: the ceremony-reduction argument was correct for the problem
+it was solving (a founder shouldn't *default* into 5 gates), and it remains correct as a default;
+what changed is that this specific, evidenced founder request outweighs it for this pipeline shape.
+Named honestly, the way this document names its other tradeoffs (e.g. the Agent Permission Model's
+"documentation-and-consistency field today, not yet a runtime-enforced permission check" in §4):
+**more checkpoints is more founder review overhead, traded deliberately for less risk of shipping
+something structurally under-designed** (skipped personas, no information architecture, no
+accessibility pass) that a solo founder without a UX background wouldn't otherwise catch until much
+later, when it's expensive to fix.
+
+**The 14 stages, in order** (7 unchanged from the v14 pipeline, 7 new — inserted at the point in the
+enterprise UX process where each naturally belongs, not appended at the end):
+
+| # | Stage | File | New? | Traceability prefix |
+|---|---|---|---|---|
+| 1 | Discovery | `discovery.md` | existing | `DISC-` |
+| 2 | Research Synthesis | `research-synthesis.md` | **new** | `RS-` |
+| 3 | Personas & Jobs | `personas-jobs.md` | **new** | `PJ-` |
+| 4 | Journey Mapping | `journey-mapping.md` | **new** | `JM-` |
+| 5 | Define | `define.md` | existing | `DEF-` |
+| 6 | Information Architecture | `information-architecture.md` | **new** | `IA-` |
+| 7 | UX Flow | `uxflow.md` | existing | `UX-` |
+| 8 | Wireframes | `wireframes.md` | **new** | `WF-` |
+| 9 | Visual Design System | `visual-design-system.md` | **new** | `VS-` |
+| 10 | Prototype & Usability | `prototype-usability.md` | **new** (folds in accessibility/content review — no separate 15th stage) | `PT-` |
+| 11 | Architecture | `architecture.md` | existing | `ARCH-` |
+| 12 | Implementation Planning | `implementation-planning.md` | existing (no longer bundles) | `IP-` |
+| 13 | Build | `build.md` | existing | — |
+| 14 | Ship | `ship.md` | existing | — |
+
+**Every stage 1–12 now records its own solo Boardroom checkpoint immediately after itself** —
+`implementation-planning.md` no longer reviews the combined output of 5 planning stages as one
+`"bundle": "planning-milestone"` entry; it records only its own checkpoint, exactly the same shape
+as any other stage. This makes 12 individual pre-build checkpoints plus Build plus Ship — **14
+founder-visible checkpoints total**, up from 3. See `docs/DATABASE.md`'s `schema_version: 4 → 5`
+migration note for the full `checkpoints.jsonl` shape change, and `commands/adaptive/boardroom.md`
+for the updated schema comment.
+
+`implementation-planning.md`'s "Gather" step reads all 11 prior stage docs by the same
+slug-consistency convention (same short-slug across every `docs/wingman/<stage>/<slug>.md` file in
+the founder's project) rather than the 4 it read under the v14 pipeline.
+
+A new adaptive command, `commands/adaptive/post-launch.md`, is opt-in and founder-run periodically
+after `/wingman:ship` — it reviews usage/support signals and feeds findings back into the next
+`/wingman:discovery` pass. It is not a pipeline stage (no traceability prefix, no dedicated
+checkpoint bundle) — it records an ordinary ad-hoc `"stage": "post-launch"` checkpoint entry like any
+other `/wingman:boardroom`-reviewed content that isn't part of the fixed 14-stage sequence.
 
 ## 5. Department leads (grow 0 → 8, per project)
 
@@ -583,6 +641,7 @@ Not every skill traces to a vendor repo. `skills/systematic-auditing` (paired wi
 - **v17 (the audit's 4 Proven findings, built)**: (1) extracted the byte-identical "Prompt Defense Baseline" block (5 of 6 points, confirmed duplicated verbatim across all 8 Boardroom agent files) into `references/prompt-defense-baseline.md`, keeping only each seat's own "No role changes" anchor inline. (2) `hooks/dod-structural-gate.mjs`'s `git push` check now reads the actual Build-stage checkpoint's `bottom_line`/`seats[].verdict` fields (`checkBoardroomVerdictClean`), not just confirms the entry exists — closing a real governance gap where a recorded `NO_GO` that survived past `ExitPlanMode` wouldn't have been re-checked at push time; covered by 5 new tests (4 unit, 1 full-hook integration), `evals/cases/dod-structural-gate.md` gained an 8th verified shape. (3) New §8a, above, states plainly which mechanisms are agent-agnostic vs. Claude-Code-coupled. (4) `docs/DATABASE.md`'s schema section now documents `.wingman/traceability.json` and `.wingman/memory/*.md`, both real files real skills already wrote with no prior corresponding entry. A retroactive full Boardroom review of these 4 mechanical, already-tested fixes was deliberately not run — see the decisions log's governance-review-scope entry for why.
 - **v18 (post-v17 rollout backfill, PRs #83-92)**: this entry closes a real gap a `/wingman:audit` pass found — 10 merged PRs shipped with no corresponding rollout-log entry, the same "documentation completeness" gap v15.1-v15.4 backfilled once before. (1) Fixed a stale validator count in `CLAUDE.md`'s Commands section (#83). (2) Canonicalized `AGENTS.md`, added per-skill effort-tiering, and introduced a scoped founder-org template under `references/org-template/` (#84), followed by a post-merge audit pass that closed its own findings and added real eval coverage for the template (#85). (3) Promoted the last 3 provisional eval cases to `verified`, bringing the suite to 70/70 (100%) verified at that point (#86). (4) Upgraded the OpenCode harness adapter from `authored, unverified` to `structurally verified (live install)` against a real `opencode-ai@1.18.4` install (#87). (5) Hardened `.gitignore` to actually enforce the zero-dependency invariant `install-smoke.yml` checks for (#88). (6) An evidence-first enterprise-architecture review (#89) — assessment only, no structural change. (7) Fixed a real `evolve-promotion` bug where catalog-matching should beat abstract classification but didn't (#90). (8) An async-I/O performance optimization to `check-fixtures.mjs` (#91). (9) The skills-flattening refactor itself (`skills/<category>/<name>/` → `skills/<name>/`, #92) — executed atomically per a same-session `/wingman:audit` cross-reference check (all commands/agents/skill-to-skill refs/the harness-adapter generator and its generated output confirmed consistent with the new flat layout, zero stale paths introduced by the refactor itself). That same audit pass found and fixed ~15 pre-existing stale category-path references the flatten's own PR had missed sweeping (`plugins/wingman/AGENTS.md`, `docs/DATABASE.md`, `docs/GOVERNANCE.md`, `docs/AGENT-ROSTER.md`, `docs/REGRESSION-CHECKLIST.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `evals/README.md`, and ~15 of `ATTRIBUTIONS.md`'s own section headers describing Wingman's current file locations — vendor-repo citations like `obra/superpowers/skills/discipline/...` were left untouched since those describe the external repo's own real, unrelated layout).
 - **v19 (`vendor/anthropic-cybersecurity-skills` reference, built)**: pinned `mukul975/Anthropic-Cybersecurity-Skills` (Apache-2.0, 817 community-authored skills across 29 security domains — AD/cloud IAM/SIEM/malware-forensics/network/pentest-tooling) as a new `vendor/` submodule, per the same "reference material, not a runtime dependency" convention every other `vendor/` entry follows. Scoped deliberately: Wingman itself has no application server, cloud infra, or network to defend (it's markdown commands/skills/hooks), so this is **not** cited from Wingman's own security posture — it's a resource `security-checklist` and `boardroom-ciso` point founders to when *their own* project (the one Wingman's pipeline is building) has a matching real-world attack surface the 817-skill catalog actually covers. See `ATTRIBUTIONS.md` for the entry.
+- **v20 (14-stage pipeline, founder-approved reversal of v14's bundling decision)**: expanded the 7-stage pipeline to 14 stages / 12 individual pre-build Boardroom checkpoints (up from 1 bundled "Planning Milestone" checkpoint) — see §4d for the full stage list and rationale. 7 new pipeline commands (`research-synthesis.md`, `personas-jobs.md`, `journey-mapping.md`, `information-architecture.md`, `wireframes.md`, `visual-design-system.md`, `prototype-usability.md`) plus 1 new adaptive command (`post-launch.md`). `implementation-planning.md`'s bundled `"bundle": "planning-milestone"` checkpoint is removed — it now records only its own solo checkpoint, and its "Gather" step reads all 11 prior stage docs instead of 4. `checkpoints.jsonl` bumped to `schema_version: 5` (see `docs/DATABASE.md`'s migration note). `skills/traceability-linking` and `check-traceability.mjs` extended with 7 new ID prefixes (`RS-`/`PJ-`/`JM-`/`IA-`/`WF-`/`VS-`/`PT-`). `## Planning Milestone checkpoint` renamed to `## Implementation Planning checkpoint` in both `implementation-planning.md` and `hooks/dod-structural-gate.mjs`'s marker constant.
 
 ## 11. CI/CD (`.github/workflows/`)
 

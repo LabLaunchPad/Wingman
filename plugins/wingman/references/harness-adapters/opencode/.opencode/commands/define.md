@@ -5,7 +5,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Define
 
-The second of Wingman's 5 planning stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
+The fifth of Wingman's 14 pipeline stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
 
 $ARGUMENTS
 
@@ -31,13 +31,21 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Requirements table above.
 
-Hand off directly to `/wingman:architecture` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
+## Define checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The founder
+approves or sends back changes through this one plain-language checkpoint before the pipeline moves
+on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:information-architecture`.
 
 ## References
 
 - `skills/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.

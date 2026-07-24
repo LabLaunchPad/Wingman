@@ -60,7 +60,7 @@ argument-hint: "[optional: focus area, e.g. a specific requirement ID to design 
 
 # Wingman: Architecture
 
-The third of Wingman's 5 planning stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
+The eleventh of Wingman's 14 pipeline stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
 
 $ARGUMENTS
 
@@ -101,10 +101,16 @@ stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2).
 
-Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
+## Architecture checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Architecture decisions above (and the
+DEF→ARCH graph). The founder approves or sends back changes through this one plain-language
+checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:implementation-planning`.
 
 ## References
 
@@ -112,6 +118,8 @@ Hand off directly to `/wingman:uxflow` — this stage doesn't run its own Boardr
 - `skills/engineering-minimalism` — applies here as much as at build time: don't design in complexity the requirements don't call for.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -345,7 +353,7 @@ Every checkpoint's bottom line maps to who actually needs to act on it — this 
 
 After presenting the summary, use `AskUserQuestion` to get an explicit decision — do not assume silence means approval:
 
-- "Ship it" — proceed with the next pipeline stage (e.g. from the Planning Milestone continue to `/wingman:build`, from `/wingman:build` continue to `/wingman:ship`, from `/wingman:ship` actually ship).
+- "Ship it" — proceed with the next pipeline stage (e.g. from any of the 12 individual pre-build checkpoints continue to the next stage in the 14-stage sequence, from `/wingman:build` continue to `/wingman:ship`, from `/wingman:ship` actually ship).
 - "Fix the concerns first" — go address the listed items, then re-run `/wingman:boardroom` before proceeding.
 - "Let me see the details" — show the full, unabridged output from each seat. This same detail is also persisted (see "Record the checkpoint" below) and retrievable later via `/wingman:boardroom expand <checkpoint_id>` — the founder doesn't have to ask in this exact turn or lose it once the session ends.
 
@@ -374,10 +382,10 @@ Then append one line to `.wingman/checkpoints.jsonl` at the project root with ex
 
 ```json
 {
-  "schema_version": 4,
-  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>",
-  "stage": "discovery | define | architecture | uxflow | implementation-planning | build | ship | <free-text for an ad-hoc run>, OR an array of stage names when bundle is not null (e.g. [\"discovery\",\"define\",\"architecture\",\"uxflow\",\"implementation-planning\"])",
-  "bundle": "planning-milestone | build | ship | null",
+  "schema_version": 5,
+  "checkpoint_id": "<ISO-8601-timestamp-with-dashes>-<stage-name>",
+  "stage": "discovery | research-synthesis | personas-jobs | journey-mapping | define | information-architecture | uxflow | wireframes | visual-design-system | prototype-usability | architecture | implementation-planning | build | ship | <free-text for an ad-hoc run, e.g. post-launch>",
+  "bundle": "<same value as stage — every stage is its own bundle-of-one as of schema_version 5, kept as a field for shape-uniformity across schema versions rather than dropped>",
   "scope_ref": "<path to the plan file reviewed, \"diff\", or a short description of the directly-passed content and where it's headed (e.g. \"content passed directly: CHANGELOG.md entry + announcement copy\") when the calling command handed over content that's neither a plan nor a diff>",
   "seats": [
     { "seat": "ceo",      "verdict": "GO | GO_WITH_CONCERNS | NO_GO", "summary": "<one line>" },
@@ -396,6 +404,8 @@ Then append one line to `.wingman/checkpoints.jsonl` at the project root with ex
   "details_ref": ".wingman/checkpoint-details/<checkpoint_id>.md"
 }
 ```
+
+**Schema note (14-stage individual-checkpoint pipeline, schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction bundling decision — see `docs/ARCHITECTURE.md` §4d for the full rationale. The pipeline expands from 7 stages / 1 bundled pre-build checkpoint to 14 stages / 12 individual pre-build checkpoints. Every stage — including the 4 that used to run silently unbundled (`discovery`/`define`/`architecture`/`uxflow`) — now records its own solo checkpoint immediately after itself; `implementation-planning.md` no longer reviews the combined output of 5 planning stages as one `"bundle": "planning-milestone"` entry. `stage` is always a scalar as of `schema_version: 5` (never an array); `bundle` is kept as a field, set to the same value as `stage`, rather than dropped, so every entry has a uniform field set regardless of schema version. See `docs/DATABASE.md` for the full old→new stage mapping. This is an append-only audit log, never rewritten — existing `schema_version: 3`/`4` entries keep their bundled/array shape permanently; any consumer must still check whether `stage` is an array before iterating.
 
 **Schema note (reversible-compression / `expand`, schema_version 3 → 4, 2026):** adds `details_ref`, a path to the full-seat-verdict companion file the step above writes — this is what closes the gap `docs/DATABASE.md` had named ("checkpoints.jsonl — Boardroom verdicts only, no rationale beyond a one-line seat summary"): the rationale now exists, just not inline in the append-only log itself (keeping it lean). Omit `details_ref` entirely if the companion-file write failed (never write a `details_ref` pointing at a file that doesn't actually exist) — `expand` treats its absence as "no detail available for this one," not an error. Existing `schema_version: 3` and earlier entries have no `details_ref` and never will — this is an append-only audit log, never rewritten.
 
@@ -634,7 +644,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Define
 
-The second of Wingman's 5 planning stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
+The fifth of Wingman's 14 pipeline stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
 
 $ARGUMENTS
 
@@ -660,16 +670,24 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Requirements table above.
 
-Hand off directly to `/wingman:architecture` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
+## Define checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The founder
+approves or sends back changes through this one plain-language checkpoint before the pipeline moves
+on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:information-architecture`.
 
 ## References
 
 - `skills/traceability-linking` — the `DEF-*` ID convention minted here, and the marker format every later stage/task/commit uses to point back to a requirement.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -683,7 +701,7 @@ argument-hint: "<what you want built, in your own words>"
 
 # Wingman: Discovery
 
-The first of Wingman's 5 planning stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
+The first of Wingman's 14 pipeline stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
 
 $ARGUMENTS
 
@@ -703,7 +721,7 @@ Immediately after, use the `management-board-activation` skill to check whether 
 
 ## Step 3: Write the Discovery output
 
-Produce a short artifact — no plan file yet, no Boardroom checkpoint at this stage (that happens once, at the end of `implementation-planning.md`, reviewing all 5 planning stages together). Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
+Produce a short artifact. Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
 
 ```markdown
 ## Discovery output
@@ -716,11 +734,17 @@ Produce a short artifact — no plan file yet, no Boardroom checkpoint at this s
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
 rendering tier first, never assume.
 
-Hand off directly to `/wingman:define` — do not stop and wait for approval here; this stage feeds the bundled Planning Milestone checkpoint at the end of the sequence, not its own gate.
+## Discovery checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
+not a preview of later stages. The founder approves or sends back changes through this one
+plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:research-synthesis`.
 
 ## References
 
@@ -729,6 +753,8 @@ Hand off directly to `/wingman:define` — do not stop and wait for approval her
   draws on.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -1029,19 +1055,19 @@ Once the Boardroom clears this stage, proceed to `/wingman:ship`. Suggest `/wing
 ## `/wingman:implementation-planning`
 
 ---
-description: Turn Discovery/Define/Architecture/UX Flow's combined output into a concrete, task-by-task implementation plan, then run the single Planning Milestone Boardroom checkpoint before any code is written.
+description: Turn all 11 prior pipeline stages' combined output into a concrete, task-by-task implementation plan, then run this stage's own Boardroom checkpoint before any code is written.
 argument-hint: "[optional: anything to focus the plan on]"
 ---
 
 # Wingman: Implementation Planning
 
-The fifth and last of Wingman's 5 planning stages (Discovery → Define → Architecture → UX Flow → Implementation Planning), immediately followed by `/wingman:build`. This is the only planning stage that runs a Boardroom checkpoint — reviewing the combined output of all 5 stages as one "Planning Milestone," not five separate approvals. A founder should never have to clear 5 checkpoints just to get to the first line of code.
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build`. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
 
 $ARGUMENTS
 
 ## Write the plan
 
-Gather the Discovery output, the `DEF-*` requirements, the `ARCH-*` decisions, and the `UX-*` flow (if this project has one) into a single concrete implementation plan. <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the `DEF-*`/`ARCH-*`/`UX-*` ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
+Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
 
 Enter plan mode (if not already in it). The plan file must include the sections `references/plan-review-checklist.md` requires (Executive Summary, Current State, Problem Statement, Solution Approach, Success Criteria, Timeline, Risks) — Discovery's problem statement and success signal map directly onto `## Problem Statement` and `## Success Criteria`; Architecture's decisions map onto `## Current State`/`## Solution Approach`. It must also end with a **Plain-Language Summary** section, written for the founder:
 
@@ -1051,7 +1077,7 @@ Enter plan mode (if not already in it). The plan file must include the sections 
 **What this builds:** <1-2 sentences, no jargon>
 **What changes for your users/business:** <1-2 sentences>
 **What could go wrong:** <the single biggest risk, in plain terms>
-**Rough size:** <small / medium / large — and roughly how many checkpoints to expect (Planning Milestone, Build, Ship — 3 total, regardless of project size)>
+**Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
 ```
 
 ## Show task dependencies
@@ -1067,15 +1093,15 @@ themselves.
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
-`references/visual-output-templates.md` §2), showing all 5 planning sub-stages complete and this
-stage as the last one before the checkpoint. `boardroom.md`'s own report shows this same tree again
-once the checkpoint records — that's expected, not wasted effort: this view is "planning just
-finished," the checkpoint's is "the milestone is now recorded," one step later.
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2), showing all 11 prior stages complete and this stage as
+the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
+records — that's expected, not wasted effort: this view is "the plan just finished," the
+checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
-## Planning Milestone checkpoint
+## Implementation Planning checkpoint
 
-Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is the **bundled output of all 5 planning stages** (Discovery/Define/Architecture/UX Flow/Implementation Planning), not just this stage alone — `boardroom.md` records this as `"bundle": "planning-milestone"` with `"stage"` as an array of all 5 stage names, not a single scalar. The founder approves or sends back changes through that one plain-language checkpoint, not by reading five separate stage documents.
+Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 
 Only once the boardroom checkpoint returns a "ship it" decision should you proceed to `/wingman:build`.
 
@@ -1132,6 +1158,125 @@ into chaos.
 - Sequence matters: stabilize → contain → triage → diagnose → communicate → fix.
 - Never edit the on-fire code instead of rolling back.
 - Lead with current state, then next action.
+
+
+---
+
+## `/wingman:information-architecture`
+
+---
+description: Organize the product into sections, navigation, and hierarchy — task-based, not system-based — before screens or flows get designed.
+argument-hint: "[optional: focus area, e.g. a specific section]"
+---
+
+# Wingman: Information Architecture
+
+The sixth of Wingman's 14 pipeline stages. This is where the product's shape gets organized around what a user is trying to *do*, not around how the underlying system happens to be built — a task-based hierarchy, not a database-table-shaped one.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's later decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the IA portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Organize the information architecture
+
+For each `DEF-*` requirement that implies a distinct section or navigable area, decide where it lives in the product's overall structure: what section it belongs to, what it's nested under (if anything), and what a user would call it — task-based naming ("Send Money"), not system-based naming ("TransactionController"). Tag each with the `IA-` traceability prefix, pointing back to the `DEF-*`/`JM-*` chain it satisfies.
+
+Append this section to a scratch information-architecture doc (`docs/wingman/information-architecture/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Information architecture
+
+| ID | Section/nav item | Parent (if nested) | Task it serves | Satisfies |
+|---|---|---|---|---|
+| IA-001 | <section or nav item, task-named> | <parent section, or "top-level"> | <the user task this section exists for> | DEF-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Information Architecture checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own IA table above. The founder approves or
+sends back changes through this one plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:uxflow`.
+
+## References
+
+- `skills/traceability-linking` — the `IA-*` ID convention and how it chains back to `DEF-*`.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+
+
+---
+
+## `/wingman:journey-mapping`
+
+---
+description: Map the full user journey from first thought to success — friction points, emotions, decision points, and drop-off risks, for each persona's job-to-be-done.
+argument-hint: "[optional: which persona/job to map first]"
+---
+
+# Wingman: Journey Mapping
+
+The fourth of Wingman's 14 pipeline stages. Personas & Jobs defined *who* and *why* — this stage maps the actual path they walk, end to end, from the moment they first realize they have the problem through to genuinely succeeding at their desired progress.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per later stages' decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the journey-mapping portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence — a journey worth mapping still exists for most projects (even a CLI or API has a first-use and a success moment), so only skip if the project genuinely has no journey a user walks at all.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Map the journey
+
+For each `PJ-*` persona/job in scope, walk the full journey from first thought to success: the stages they pass through, the friction points and emotions at each stage, the decision points where they could go a different direction, and the drop-off risks where they might abandon the journey entirely. Tag each with the `JM-` traceability prefix, pointing back to the `PJ-*` persona/job it maps.
+
+Append this section to a scratch journey-mapping doc (`docs/wingman/journey-mapping/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Journey map
+
+| ID | Stage | Friction/emotion | Decision point | Drop-off risk | Satisfies |
+|---|---|---|---|---|---|
+| JM-001 | <journey stage, e.g. "first search"> | <what's hard, how they feel> | <where they could branch> | <what makes them abandon here, if anything> | PJ-001 |
+```
+
+## Show the journey, not just the table
+
+Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
+actual journey diagram — detect the session's rendering tier first (Tier B: a Mermaid flowchart
+appended to the same `docs/wingman/journey-mapping/<short-slug>.md` file; Tier A: a low-fidelity
+horizontal journey-map Artifact). The table stays exactly as written above — it's what
+`check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
+never instead of it.
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table/diagram above.
+
+## Journey Mapping checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own journey map above. The founder approves
+or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:define`.
+
+## References
+
+- `skills/traceability-linking` — the `JM-*` ID convention and how it chains back to `PJ-*`.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
+  journey diagram above; consult before choosing a rendering tier.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -1345,6 +1490,185 @@ Translate findings through `plain-language-checkpoint` before reporting to found
 
 ---
 
+## `/wingman:personas-jobs`
+
+---
+description: Define primary/secondary personas and jobs-to-be-done (trigger, pain, workaround, desired progress) — evidence-based, not decorative.
+argument-hint: "[optional: path to the Research Synthesis output, defaults to the most recent one]"
+---
+
+# Wingman: Personas & Jobs
+
+The third of Wingman's 14 pipeline stages. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template.
+
+$ARGUMENTS
+
+## Confirm the Product department is active
+
+`dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
+
+## Define personas and jobs
+
+Read the Research Synthesis output (from `/wingman:research-synthesis`, or the path given in `$ARGUMENTS`). For each theme with enough evidence behind it, define:
+
+- **Persona (primary or secondary):** who they are, in the situation this product actually finds them in — not a demographic sketch (age/hobbies) that adds no design signal.
+- **Job-to-be-done:** the **trigger** that makes them look for a solution, the **pain** they're actually feeling, the **workaround** they use today in its absence, and the **desired progress** — what "better" looks like to them, in their own terms.
+
+Mark a persona/job as unsupported plainly rather than inventing evidence for it — a thin evidence base is a real finding to flag, not something to paper over with a confident-sounding paragraph.
+
+Tag each row with the `PJ-` traceability prefix (via the `traceability-linking` skill), pointing back to the `RS-*` theme(s) it's built from.
+
+Append this section to a scratch personas-jobs doc (`docs/wingman/personas-jobs/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Personas & jobs
+
+| ID | Persona (primary/secondary) | Trigger | Pain | Workaround today | Desired progress | Satisfies |
+|---|---|---|---|---|---|---|
+| PJ-001 | <persona name/role> | <what makes them look for a solution> | <the actual pain, not a symptom> | <what they do today instead> | <what "better" looks like to them> | RS-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Personas & Jobs checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own personas/jobs table above. The founder
+approves or sends back changes through this one plain-language checkpoint before the pipeline moves
+on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:journey-mapping`.
+
+## References
+
+- `skills/traceability-linking` — the `PJ-*` ID convention and how it chains back to `RS-*`.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+
+
+---
+
+## `/wingman:post-launch`
+
+---
+description: Opt-in, founder-run review of usage/support signals after /wingman:ship — feeds real findings back into the next /wingman:discovery pass. Not a pipeline stage.
+argument-hint: "[optional: what to focus the review on, e.g. a specific feature or complaint]"
+---
+
+# Wingman: Post-Launch
+
+An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review.
+
+$ARGUMENTS
+
+## Gather real signals
+
+Ask the founder (or read whatever they've already gathered) for real post-launch evidence: support tickets or complaints, usage patterns if instrumented, direct user feedback, anything that shipped but clearly isn't working the way `implementation-planning.md`'s Plain-Language Summary said it would. Do not manufacture signal that doesn't exist — if the founder has nothing concrete yet, say so plainly and stop here rather than inventing plausible-sounding "findings."
+
+## Review against what was intended
+
+For each real signal gathered, compare it against the original `DEF-*` requirements and `DISC-*` problem statement it traces back to (if traceable — some post-launch signal legitimately falls outside anything scoped originally, and that's a finding in itself, not a gap to paper over). Note where reality diverged from what was planned, and by how much.
+
+## Write the review
+
+Produce a short, plain-language summary for the founder:
+
+```markdown
+## Post-launch review — <YYYY-MM-DD>
+
+**What we looked at:** <the real signals gathered above>
+**What's working:** <concrete, evidence-based — not a vibe>
+**What isn't:** <concrete, evidence-based, with the closest DEF-*/DISC-* ID it traces back to if any>
+**What this means for the next Discovery pass:** <specific, actionable — feeds directly into the next `/wingman:discovery` run, not a vague "keep monitoring">
+```
+
+Append this to `docs/wingman/post-launch/<short-slug>.md` in the founder's project (creating the directory if needed, same slug convention as the rest of the pipeline where a slug applies).
+
+## Record the checkpoint
+
+Run `/wingman:boardroom` with scope set to this review — this is an ad-hoc `/wingman:boardroom` invocation, not one of the 14 pipeline-stage checkpoints, so it records with a free-text `"stage": "post-launch"` (and `"bundle"` set to the same value) in `.wingman/checkpoints.jsonl`, per `docs/DATABASE.md`'s schema. No new traceability prefix is minted by this command.
+
+## Feed it forward
+
+If the review surfaces something that should change what gets built next, hand it directly to the founder's next `/wingman:discovery` run as input — this is the loop this command exists to close: real post-launch evidence flowing back into planning, not a one-off report that gets read once and forgotten.
+
+## References
+
+- `docs/ARCHITECTURE.md` §4d — why this is an adaptive command, not a 15th pipeline stage.
+- `docs/DATABASE.md` — the `checkpoints.jsonl` schema this command's ad-hoc entry follows.
+- `commands/pipeline/discovery.md` — where this review's findings feed back into.
+
+
+---
+
+## `/wingman:prototype-usability`
+
+---
+description: Turn key flows into testable prototypes, validate with usability checks, and fold in accessibility/content review (contrast, focus order, keyboard, labels, plain-language content) — deliberately one stage, not two.
+argument-hint: "[optional: focus area, e.g. a specific flow to prototype]"
+---
+
+# Wingman: Prototype & Usability
+
+The tenth of Wingman's 14 pipeline stages, and the last of the design stages before `/wingman:architecture`. Skipped entirely for projects with no user-facing surface, same as the other design-tier stages. This stage deliberately folds accessibility and content review into itself rather than existing as a separate 15th stage — the maintainer's explicit call: an accessibility pass makes the most sense reviewed alongside the same testable prototype a usability check runs against, not as a disconnected downstream audit.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from the earlier design-tier stages if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Prototype, validate usability, and review accessibility/content
+
+For each key flow spanning the `WF-*` wireframes and `VS-*` design system, turn it into a testable prototype description (the concrete sequence of screens/states/interactions a real usability check would walk through — this stays a description Wingman produces, not a claim that a live clickable prototype tool was actually run). Then validate it against three lenses in the same pass:
+
+- **Usability:** does a first-time user actually complete the flow without getting stuck? Note anything genuinely confusing, not hypothetical nitpicks.
+- **Accessibility:** color contrast, focus order, full keyboard operability, and labeled interactive elements — per `references/accessibility-checklist.md`.
+- **Content:** is the copy plain-language (per `plain-language-checkpoint`'s own bar), free of unexplained jargon, and does every label/instruction say what it means?
+
+Tag each finding with the `PT-` traceability prefix, pointing back to the `WF-*`/`VS-*` element it validates.
+
+Append this section to a scratch prototype-usability doc (`docs/wingman/prototype-usability/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Prototype & usability findings
+
+| ID | Flow/element | Lens (usability/accessibility/content) | Finding | Satisfies |
+|---|---|---|---|---|
+| PT-001 | <flow or element under test> | <usability / accessibility / content> | <what was found, and the fix if not already applied> | WF-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Prototype & Usability checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own findings table above (`boardroom-design`
+has direct material input here, on top of its usual N/A fast-path for non-visual scopes). The
+founder approves or sends back changes through this one plain-language checkpoint before the
+pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:architecture`.
+
+## References
+
+- `skills/traceability-linking` — the `PT-*` ID convention and how it chains back to `WF-*`/`VS-*`.
+- `references/accessibility-checklist.md` — the accessibility lens applied above.
+- `skills/plain-language-checkpoint` — the content-review bar applied above.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+
+
+---
+
 ## `/wingman:research`
 
 ---
@@ -1377,6 +1701,67 @@ founder-facing entry point to the `research` skill.
 - Never fabricate citations; only cite sources you actually opened.
 - Lead with consequence, not mechanism.
 - Do not write or edit code; this is research only.
+
+
+---
+
+## `/wingman:research-synthesis`
+
+---
+description: Turn Discovery's raw notes into themes, risks, opportunities, and open questions — separating what's known, unknown, and merely assumed before requirements get scoped.
+argument-hint: "[optional: path to the Discovery output, defaults to the most recent one]"
+---
+
+# Wingman: Research Synthesis
+
+The second of Wingman's 14 pipeline stages. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve.
+
+$ARGUMENTS
+
+## Confirm the Product department is active
+
+`dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
+
+## Synthesize the research
+
+Read the Discovery output (from `/wingman:discovery`, or the path given in `$ARGUMENTS`). Do not just restate it — actively separate the signal from the noise:
+
+- **Themes:** patterns that recur across whatever evidence Discovery gathered (multiple mentions of the same friction, the same workaround, the same complaint).
+- **Known / Unknown / Assumed:** for each theme, is this something the evidence actually shows, something nobody has checked yet, or something the team is quietly assuming without evidence? Do not let an assumption masquerade as a known fact — that's exactly the gap this stage exists to close before Personas & Jobs and Journey Mapping build on top of it.
+- **Risks and opportunities:** what could make this go wrong, and what upside is the raw research hinting at that Discovery's problem statement alone didn't capture?
+- **Open questions:** anything genuinely unresolved that a later stage (or the founder directly) needs to answer.
+
+Tag each row with the `RS-` traceability prefix (via the `traceability-linking` skill), pointing back to the `DISC-*` finding(s) it synthesizes.
+
+Append this section to a scratch research-synthesis doc (`docs/wingman/research-synthesis/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as Discovery's own file, same convention):
+
+```markdown
+## Research synthesis
+
+| ID | Theme/risk/opportunity/question | Known/Unknown/Assumed | Satisfies |
+|---|---|---|---|
+| RS-001 | <one concrete theme, risk, opportunity, or open question> | <known / unknown / assumed> | DISC-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Research Synthesis checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own synthesis table above. The founder
+approves or sends back changes through this one plain-language checkpoint before the pipeline moves
+on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:personas-jobs`.
+
+## References
+
+- `skills/traceability-linking` — the `RS-*` ID convention and how it chains back to `DISC-*`.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -1544,7 +1929,7 @@ argument-hint: "[optional: focus area, e.g. a specific screen or flow]"
 
 # Wingman: UX Flow
 
-The fourth of Wingman's 5 planning stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:implementation-planning` rather than manufacturing screens that don't need to exist.
+The seventh of Wingman's 14 pipeline stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:wireframes` rather than manufacturing screens that don't need to exist.
 
 $ARGUMENTS
 
@@ -1580,7 +1965,13 @@ screen, published as an Artifact). The table stays exactly as written above — 
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
-Hand off directly to `/wingman:implementation-planning` — this stage doesn't run its own Boardroom checkpoint; it feeds the bundled Planning Milestone checkpoint at the end of the 5-stage planning sequence.
+## UX Flow checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own UX flow table and diagram above (skip
+this step, same as the rest of this stage, if there is no user-facing surface). The founder approves
+or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:wireframes`.
 
 ## References
 
@@ -1588,3 +1979,127 @@ Hand off directly to `/wingman:implementation-planning` — this stage doesn't r
 - `skills/design-taste` — the quality bar this flow gets built against later, at `/wingman:build` time.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.
+
+
+---
+
+## `/wingman:visual-design-system`
+
+---
+description: Produce the typography/spacing/color/component/state spec (tokens doc) the design-taste skill enforces at build time — the spec, not the enforcement.
+argument-hint: "[optional: focus area, e.g. a specific component]"
+---
+
+# Wingman: Visual Design System
+
+The ninth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow`/`/wingman:wireframes` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Write the design system spec
+
+For each `WF-*` wireframe in scope, derive the concrete design tokens and component states it needs: typography (a small type scale, not a font-per-screen), spacing (a scale, not arbitrary pixel values), color (a limited palette with defined roles — primary/secondary/error/success/neutral — not an unbounded set), the reusable component inventory this project actually needs (buttons, inputs, cards, etc. — only what's used, never a speculative full library), and each interactive component's states (default/hover/focus/disabled/error, at minimum). Tag each row with the `VS-` traceability prefix, pointing back to the `WF-*` wireframe(s) it specs for.
+
+Append this section to a scratch visual-design-system doc (`docs/wingman/visual-design-system/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Visual design system
+
+| ID | Token/component | Values/states | Satisfies |
+|---|---|---|---|
+| VS-001 | <e.g. "Primary button"> | <e.g. default/hover/focus/disabled color+spacing values> | WF-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Visual Design System checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own spec table above. The founder approves
+or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:prototype-usability`.
+
+## References
+
+- `skills/traceability-linking` — the `VS-*` ID convention and how it chains back to `WF-*`.
+- `skills/design-taste` — the quality bar this spec becomes, enforced later at `/wingman:build` time; this stage produces the spec, `design-taste` enforces it.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+
+
+---
+
+## `/wingman:wireframes`
+
+---
+description: Produce low-fidelity screen layouts for the core flows — structure only, no visual polish.
+argument-hint: "[optional: focus area, e.g. a specific screen]"
+---
+
+# Wingman: Wireframes
+
+The eighth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`. This stage produces low-fidelity screen layouts — where things sit and what's on each screen — deliberately before any visual polish; that's `visual-design-system.md`'s job, one stage later.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Sketch the wireframes
+
+For each `UX-*` screen/state in scope, sketch its low-fidelity layout: what regions exist on the screen (header/nav, primary content, primary action, secondary actions), what's in each region, and how they're arranged — structure and hierarchy, never colors, fonts, or spacing values (that's `visual-design-system.md`). Tag each with the `WF-` traceability prefix, pointing back to the `UX-*`/`IA-*` chain it satisfies.
+
+Append this section to a scratch wireframes doc (`docs/wingman/wireframes/<short-slug>.md` in the
+founder's project, creating the directory if needed — same slug as earlier stages' files, same
+convention):
+
+```markdown
+## Wireframes
+
+| ID | Screen | Regions (top to bottom) | Satisfies |
+|---|---|---|---|
+| WF-001 | <screen name, matches a UX-* state> | <header/nav, primary content, primary action, ...> | UX-001 |
+```
+
+## Show the layout, not just the table
+
+Immediately after the table, use `skills/visual-founder-output` to render each row as an actual
+low-fidelity layout — Tier A (Artifact-capable): a bordered-box HTML sketch per screen, no color
+system or real CSS framework, published as an Artifact; Tier B (universal fallback): an ASCII box
+diagram of the same regions, inline in the same `docs/wingman/wireframes/<short-slug>.md` file. The
+table stays exactly as written above — the diagram is generated from the same rows, added alongside
+it, never instead of it.
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table/diagram above.
+
+## Wireframes checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own wireframes above. The founder approves
+or sends back changes through this one plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:visual-design-system`.
+
+## References
+
+- `skills/traceability-linking` — the `WF-*` ID convention and how it chains back to `UX-*`/`IA-*`.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
+  layout sketches above; consult before choosing a rendering tier.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.

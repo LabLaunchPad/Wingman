@@ -1,0 +1,59 @@
+---
+description: Turn key flows into testable prototypes, validate with usability checks, and fold in accessibility/content review (contrast, focus order, keyboard, labels, plain-language content) — deliberately one stage, not two.
+argument-hint: "[optional: focus area, e.g. a specific flow to prototype]"
+---
+
+# Wingman: Prototype & Usability
+
+The tenth of Wingman's 14 pipeline stages, and the last of the design stages before `/wingman:architecture`. Skipped entirely for projects with no user-facing surface, same as the other design-tier stages. This stage deliberately folds accessibility and content review into itself rather than existing as a separate 15th stage — the maintainer's explicit call: an accessibility pass makes the most sense reviewed alongside the same testable prototype a usability check runs against, not as a disconnected downstream audit.
+
+$ARGUMENTS
+
+## Confirm the Design department is active
+
+Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from the earlier design-tier stages if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
+
+Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
+
+## Prototype, validate usability, and review accessibility/content
+
+For each key flow spanning the `WF-*` wireframes and `VS-*` design system, turn it into a testable prototype description (the concrete sequence of screens/states/interactions a real usability check would walk through — this stays a description Wingman produces, not a claim that a live clickable prototype tool was actually run). Then validate it against three lenses in the same pass:
+
+- **Usability:** does a first-time user actually complete the flow without getting stuck? Note anything genuinely confusing, not hypothetical nitpicks.
+- **Accessibility:** color contrast, focus order, full keyboard operability, and labeled interactive elements — per `references/accessibility-checklist.md`.
+- **Content:** is the copy plain-language (per `plain-language-checkpoint`'s own bar), free of unexplained jargon, and does every label/instruction say what it means?
+
+Tag each finding with the `PT-` traceability prefix, pointing back to the `WF-*`/`VS-*` element it validates.
+
+Append this section to a scratch prototype-usability doc (`docs/wingman/prototype-usability/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
+
+```markdown
+## Prototype & usability findings
+
+| ID | Flow/element | Lens (usability/accessibility/content) | Finding | Satisfies |
+|---|---|---|---|---|
+| PT-001 | <flow or element under test> | <usability / accessibility / content> | <what was found, and the fix if not already applied> | WF-001 |
+```
+
+## Where you are
+
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
+`references/visual-output-templates.md` §2) after the table above.
+
+## Prototype & Usability checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own findings table above (`boardroom-design`
+has direct material input here, on top of its usual N/A fast-path for non-visual scopes). The
+founder approves or sends back changes through this one plain-language checkpoint before the
+pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:architecture`.
+
+## References
+
+- `skills/traceability-linking` — the `PT-*` ID convention and how it chains back to `WF-*`/`VS-*`.
+- `references/accessibility-checklist.md` — the accessibility lens applied above.
+- `skills/plain-language-checkpoint` — the content-review bar applied above.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
+  tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.

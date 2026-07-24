@@ -5,7 +5,7 @@ argument-hint: "<what you want built, in your own words>"
 
 # Wingman: Discovery
 
-The first of Wingman's 5 planning stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
+The first of Wingman's 14 pipeline stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
 
 $ARGUMENTS
 
@@ -25,7 +25,7 @@ Immediately after, use the `management-board-activation` skill to check whether 
 
 ## Step 3: Write the Discovery output
 
-Produce a short artifact — no plan file yet, no Boardroom checkpoint at this stage (that happens once, at the end of `implementation-planning.md`, reviewing all 5 planning stages together). Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
+Produce a short artifact. Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
 
 ```markdown
 ## Discovery output
@@ -38,11 +38,17 @@ Produce a short artifact — no plan file yet, no Boardroom checkpoint at this s
 
 ## Where you are
 
-Use `skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant, per
+Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the Discovery output above — detect the session's
 rendering tier first, never assume.
 
-Hand off directly to `/wingman:define` — do not stop and wait for approval here; this stage feeds the bundled Planning Milestone checkpoint at the end of the sequence, not its own gate.
+## Discovery checkpoint
+
+Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
+not a preview of later stages. The founder approves or sends back changes through this one
+plain-language checkpoint before the pipeline moves on.
+
+Only once the checkpoint returns a "ship it" decision should you hand off to `/wingman:research-synthesis`.
 
 ## References
 
@@ -51,3 +57,5 @@ Hand off directly to `/wingman:define` — do not stop and wait for approval her
   draws on.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
+  `docs/ARCHITECTURE.md` §4d.

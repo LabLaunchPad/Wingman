@@ -11,7 +11,7 @@ description: Use whenever producing founder-facing output that has real shape to
 translation, consequence-first, one bottom line. It says nothing about layout, and today nothing in
 Wingman does: every command's report template (verified directly against the actual files) is a
 flat `**Label:** value` list or a plain markdown pipe-table, even for content that is structurally a
-flow (`uxflow.md`'s screens-and-transitions) or a status (which of 7 pipeline stages a founder has
+flow (`uxflow.md`'s screens-and-transitions) or a status (which of 14 pipeline stages a founder has
 actually completed — nowhere shown anywhere). This skill is the visual layer on top of
 `plain-language-checkpoint`'s prose layer: same audience, same "does this actually help a
 non-technical founder" bar, applied to *shape* instead of *words*.
@@ -138,7 +138,14 @@ render the visual layer of their existing templates (see those commands and
 - `commands/pipeline/build.md`
 - `commands/pipeline/define.md`
 - `commands/pipeline/discovery.md`
+- `commands/pipeline/information-architecture.md`
 - `commands/pipeline/implementation-planning.md`
+- `commands/pipeline/journey-mapping.md`
+- `commands/pipeline/personas-jobs.md`
+- `commands/pipeline/prototype-usability.md`
+- `commands/pipeline/research-synthesis.md`
 - `commands/pipeline/ship.md`
 - `commands/pipeline/uxflow.md`
+- `commands/pipeline/visual-design-system.md`
+- `commands/pipeline/wireframes.md`
 - `skills/plain-language-checkpoint`
