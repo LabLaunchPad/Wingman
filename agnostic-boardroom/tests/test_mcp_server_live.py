@@ -21,7 +21,10 @@ from mcp import ClientSession
 from mcp.client.stdio import StdioServerParameters, stdio_client
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CLIENT_TIMEOUT_S = 30
+# Bumped from 30s: the server now also builds the 40-skill index at startup
+# (route_task_tool/run_engineering_review_tool need it), which is real,
+# disclosed embedding work, not instant.
+CLIENT_TIMEOUT_S = 90
 
 
 @pytest.fixture(scope="module")
@@ -89,4 +92,28 @@ async def test_real_tools_are_discoverable_via_list_tools():
 
     result = await _run_with_session(_work)
     tool_names = {t.name for t in result.tools}
-    assert {"store_memory_tool", "retrieve_memories_tool", "list_memories_tool"} <= tool_names
+    assert {
+        "store_memory_tool",
+        "retrieve_memories_tool",
+        "list_memories_tool",
+        "route_task_tool",
+        "run_engineering_review_tool",
+    } <= tool_names
+
+
+@pytest.mark.anyio
+async def test_route_task_tool_over_the_real_protocol_no_model_cost():
+    """route_task_tool costs nothing (no model call, only vector retrieval)
+    -- unlike run_engineering_review_tool, which is deliberately NOT exercised
+    here since it makes real, live `claude -p` calls with real dollar cost."""
+
+    async def _work(session: ClientSession):
+        return await session.call_tool(
+            "route_task_tool",
+            {"task_description": "when should I skip adding error handling for a scenario that cannot happen"},
+        )
+
+    result = await _run_with_session(_work)
+    assert not result.isError
+    text_blocks = [block.text for block in result.content if hasattr(block, "text")]
+    assert any("engineering-minimalism" in text for text in text_blocks)

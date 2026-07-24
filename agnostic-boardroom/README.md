@@ -2,10 +2,52 @@
 
 **Status: Phase 1 (Data & Schema), Phase 2a (skill-context A/B testing), Phase 2 (data substrate,
 memory MCP server, skill router, loop/graph engineering, an experimental slash command), Phase 2b
-(real MCP client wiring, skill-router→loop integration, an end-to-end dry run), and Phase 3
-(decision-quality comparison harness, zero-cost) all done. 47/47 fast tests pass, plus 2/2 real
-live-model tests (run explicitly, cost real money). Not installable as a plugin, not wired into
-`plugins/wingman/` — this remains a standalone, additive backend.**
+(real MCP client wiring, skill-router→loop integration, an end-to-end dry run), Phase 3
+(decision-quality comparison harness, zero-cost), and Phase 4 (a real, invokable engineering-review
+engine + MCP tools + project-level registration) all done. 51/51 fast tests pass, plus 2/2 real
+live-model tests (run explicitly, cost real money). Still not installable as a Wingman plugin and
+`plugins/wingman/commands/adaptive/boardroom.md` is still untouched — see Phase 4's own honest scope
+note below for exactly what "wired in" does and doesn't mean here.**
+
+## Phase 4: a real, invokable engineering-review engine — wired in, honestly scoped
+
+The founder reviewed Phase 1-3's real-metrics readiness report and explicitly chose to proceed on the
+strength of the already-measured token-compression result alone, overriding the earlier
+"prove decision-quality against the shipped plugin first" bar — see `docs/PROJECT.md`'s decisions
+log for the exact exchange. Two things were built as a result:
+
+1. **`agents/boardroom_engine.py`** composes `retrieve_memories` + `route_task` +
+   `run_maker_checker_loop` into a single, real `BoardroomVerdict` — the exact same Pydantic model
+   `core/state_schema.py` already defines, ported faithfully from the shipped plugin's own
+   `.wingman/checkpoints.jsonl` schema. `to_boardroom_verdict()` maps loop outcomes onto it: accepted
+   + a confident skill match → a clean `GO`; accepted but only via a `low_confidence_fallback` route
+   → downgraded to `GO_WITH_CONCERNS` (never silently reported as clean); escalated (never accepted
+   within the iteration cap) → `NO_GO`, `bottom_line: DO NOT SHIP`, `blocks_advancement: true` — the
+   real gate rule, unchanged.
+2. **Two new MCP tools** on the existing memory server (renamed `wingman-agnostic-boardroom` in
+   `.mcp.json` at the repo root, so a real Claude Code session can actually connect to it):
+   `route_task_tool` (zero-cost, vector retrieval only) and `run_engineering_review_tool` (the real
+   engine above, returned as a plain dict matching `BoardroomVerdict.model_dump()`).
+
+**Honest scope, stated plainly rather than overclaimed**: this is **one seat's** worth of judgment —
+a technical/engineering accept-or-reject gate, the same shape of call the Maker/Checker loop already
+proves it can make. It is **not** a replacement for the shipped plugin's other 7 seats (CEO/CPO/CMO/
+CISO/CFO/Research/Design business, security, and financial judgment) — those personas have no
+equivalent in this backend today, and building them was not part of this pass. **The shipped
+`plugins/wingman/commands/adaptive/boardroom.md` itself is deliberately left untouched** — cutting
+over Wingman's real, founder-facing gate to call this engine instead of dispatching its 8 markdown
+personas is a separate, much higher-blast-radius decision (it's the load-bearing check every real
+founder using the installed plugin depends on) than building and registering the engine so it's
+real and callable. 4 new tests (`test_boardroom_engine.py`) cover all 3 verdict paths (clean GO,
+downgraded GO_WITH_CONCERNS, blocking NO_GO) plus the real seeded-memory read-back, all against the
+real 40-skill index and a real seeded memory store, mocked only on the model-call side (zero cost).
+
+**Also generalized in this pass**: `agents/model_runner.py`'s `run_claude_headless` no longer
+hardcodes `"claude"` as the CLI binary — it reads `WINGMAN_MODEL_CLI` (default `claude`), so a second
+harness isn't architecturally impossible. No second adapter ships, though: writing one without a way
+to actually run and verify it against a real second CLI in this sandbox would mean shipping untested
+code claiming to work, which is exactly what this project's own `verification-before-completion`
+discipline exists to prevent.
 
 ## Phase 3: decision-quality harness — proving the methodology before spending real money
 

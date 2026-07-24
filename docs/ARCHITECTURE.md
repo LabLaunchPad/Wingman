@@ -828,6 +828,29 @@ comparison needs two real model runs on identical input and stays the deferred n
 tests, 47/47 fast tests total (agno/pydantic-dependent suites unaffected — this phase's code has
 zero external dependencies beyond the existing `agents.loop` module).
 
+**Phase 4 (a real, invokable engineering-review engine — done).** The founder reviewed the Phase
+1-3 readiness report and explicitly chose to proceed on the token-compression result alone,
+overriding the "prove decision-quality first" bar Phase 3 had just satisfied the zero-cost half of —
+see `docs/PROJECT.md`'s decisions log for the exact exchange. `agents/boardroom_engine.py` composes
+`retrieve_memories` + `route_task` + `run_maker_checker_loop` into a real `BoardroomVerdict` (the
+same Pydantic model already faithfully ported from `.wingman/checkpoints.jsonl`'s real schema):
+accepted + confident route → clean `GO`; accepted but only via a `low_confidence_fallback` route →
+downgraded to `GO_WITH_CONCERNS`, never silently reported clean; escalated → `NO_GO`,
+`DO NOT SHIP`, `blocks_advancement: true` unchanged. Two new MCP tools (`route_task_tool`,
+zero-cost; `run_engineering_review_tool`, real live cost) expose it, and a root-level `.mcp.json`
+registers the server (renamed `wingman-agnostic-boardroom`) so a real Claude Code session can
+actually connect to it — genuinely wired in, not just built. `agents/model_runner.py`'s
+`run_claude_headless` also no longer hardcodes `"claude"` as the CLI binary (now
+`WINGMAN_MODEL_CLI`-configurable, default unchanged) — a real step toward harness-agnosticism,
+though no second adapter ships, since shipping one unverifiable in this sandbox would itself be a
+fabricated capability. **Honest scope, stated plainly**: this is one seat's worth of technical
+judgment, not a replacement for the other 7 (business/security/financial). The shipped
+`plugins/wingman/commands/adaptive/boardroom.md` is deliberately left untouched — cutting Wingman's
+real founder-facing gate over to this engine is a separate, much higher-blast-radius decision than
+building and registering it, and was not part of this pass. 4 new tests
+(`test_boardroom_engine.py`), covering all 3 verdict paths plus real seeded-memory read-back against
+the real 40-skill index (mocked only on the model-call side, zero cost). 51/51 fast tests total.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)

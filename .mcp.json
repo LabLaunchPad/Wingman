@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "wingman-agnostic-boardroom": {
+      "command": "python3",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "agnostic-boardroom"
+    }
+  }
+}
