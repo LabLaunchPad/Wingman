@@ -1,10 +1,42 @@
 # Agnostic Boardroom (experimental, in-progress rewrite)
 
 **Status: Phase 1 (Data & Schema), Phase 2a (skill-context A/B testing), Phase 2 (data substrate,
-memory MCP server, skill router, loop/graph engineering, an experimental slash command), and Phase
-2b (real MCP client wiring, skill-router→loop integration, an end-to-end dry run) all done. 42/42
-fast tests pass, plus 2/2 real live-model tests (run explicitly, cost real money). Not installable
-as a plugin, not wired into `plugins/wingman/` — this remains a standalone, additive backend.**
+memory MCP server, skill router, loop/graph engineering, an experimental slash command), Phase 2b
+(real MCP client wiring, skill-router→loop integration, an end-to-end dry run), and Phase 3
+(decision-quality comparison harness, zero-cost) all done. 47/47 fast tests pass, plus 2/2 real
+live-model tests (run explicitly, cost real money). Not installable as a plugin, not wired into
+`plugins/wingman/` — this remains a standalone, additive backend.**
+
+## Phase 3: decision-quality harness — proving the methodology before spending real money
+
+After Phase 2b, a real-metrics readiness review (not a self-report — every number traced to a test
+file or a live-confirmed figure) surfaced the actual open question this rewrite hasn't answered yet:
+not "does the pipeline run" (it does), but "does it reach as good a decision as the shipped plugin's
+real Boardroom would, at a cost worth paying." The founder confirmed building toward that comparison
+next, and — given real live-model calls cost real money (confirmed ~$0.26 for a single trivial
+reply) — to prove the comparison *methodology* on scripted, zero-cost scenarios first, deferring any
+live spend to a later, explicitly-authorized round.
+
+`eval/decision_quality.py` is that harness: a `Scenario` names the ground-truth outcome (accepted /
+escalated, at what iteration) a correct Maker/Checker loop should reach for a scripted sequence of
+Maker attempts and Checker verdicts; `run_scenario` runs the real, unmodified
+`agents.loop.run_maker_checker_loop` against that script and checks whether its actual outcome
+matches. The same harness runs unmodified against a real `call_model` (e.g. `run_claude_headless`)
+once live spend is authorized — only the injected model call changes, not the harness.
+
+`eval/scenarios.py` holds 4 labeled scenarios, each exercising a genuinely different code path (not
+a cosmetic restatement of another, per this project's own eval discipline): correct on the first
+try; wrong then fixed via the Checker's real rejection reason; never fixed, escalating after the
+iteration cap; and a Checker response that fails to parse as JSON, proving the fail-closed path
+doesn't get silently treated as acceptance. `tests/test_decision_quality.py` adds the harness's own
+negative case — a scenario with a deliberately wrong expected outcome, proving `run_scenario` can
+actually report a mismatch rather than rubber-stamping every result.
+
+**Known, disclosed limitation**: this proves the loop mechanism reaches the expected decision for a
+scripted exchange. It does not yet compare against a live run of the shipped plugin's own
+`/wingman:boardroom` on the same task — that comparison needs two real model runs, one per system,
+on identical input, and stays the deferred next step once live spend is authorized. See
+`docs/PROJECT.md`'s decisions log for the exact exchange this phase resolves and defers.
 
 ## Phase 2b: closing the "built in isolation" gaps
 
