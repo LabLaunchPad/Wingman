@@ -49,6 +49,7 @@ plain-language-checkpoint	(none: fixture is an inline raw-technical-finding scen
 plan	(retired)	(retired)
 platform-native-reference	evals/fixtures/setup-platform-native-reference-fixture.sh	plugins/wingman/skills/platform-native-reference/SKILL.md
 ponytail-debt-harvesting	evals/fixtures/setup-ponytail-debt-harvesting-fixture.sh	plugins/wingman/skills/ponytail-debt-harvesting/SKILL.md
+post-launch	evals/fixtures/setup-post-launch-fixture.sh	plugins/wingman/commands/adaptive/post-launch.md
 prompt-diff-check	evals/fixtures/setup-prompt-diff-check-fixture.sh	plugins/wingman/skills/prompt-diff-check/SKILL.md
 prototype-usability	evals/fixtures/setup-prototype-usability-fixture.sh	plugins/wingman/commands/pipeline/prototype-usability.md
 research-synthesis	evals/fixtures/setup-research-synthesis-fixture.sh	plugins/wingman/commands/pipeline/research-synthesis.md

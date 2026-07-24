@@ -804,6 +804,53 @@ after the `.claude/commands/` correction. 36/36 fast Python tests pass (`pytest 
 real live-model tests run explicitly. See `docs/PROJECT.md`'s decisions log for the full record of
 the founder's answers and the two subagents' fact-checks.
 
+**Phase 3 (decision-quality comparison harness, zero-cost — done).** A real-metrics readiness
+review of Phase 1-2b (every figure traced to a test file or a live-confirmed run, not asserted)
+surfaced the actual open question this rewrite hasn't answered: not whether the pipeline runs, but
+whether it reaches as good a decision as the shipped plugin's real Boardroom would, at a cost worth
+paying. The founder confirmed building toward that comparison, and — since real `claude -p` calls
+cost real, non-trivial money (confirmed ~$0.26 for a single trivial reply) — to prove the comparison
+*methodology* on scripted, zero-cost scenarios first, deferring any live spend to a later,
+explicitly-authorized round. `eval/decision_quality.py` runs the real, unmodified
+`run_maker_checker_loop` against a scripted `call_model` reproducing a labeled scenario's Maker
+attempts and Checker verdicts, and checks whether the loop's actual outcome (accepted/escalated, at
+what iteration) matches the scenario's declared ground truth — the identical harness runs unmodified
+against a real `call_model` once live spend is authorized, so proving it now costs nothing to redo
+later. `eval/scenarios.py` holds 4 labeled scenarios, each a genuinely different code path (correct
+first try; wrong then fixed via the Checker's real rejection reason; never fixed, escalating at the
+iteration cap; a Checker response that fails to parse as JSON, proving the fail-closed path isn't
+silently treated as acceptance). `tests/test_decision_quality.py` adds the harness's own negative
+case — a scenario with a deliberately wrong expected outcome, proving the harness can report a real
+mismatch rather than rubber-stamping every result. **Known, disclosed limitation**: this proves the
+loop mechanism reaches the expected decision for a scripted exchange; it does not yet compare
+against a live run of the shipped plugin's own `/wingman:boardroom` on the same task — that
+comparison needs two real model runs on identical input and stays the deferred next step. 5 new
+tests, 47/47 fast tests total (agno/pydantic-dependent suites unaffected — this phase's code has
+zero external dependencies beyond the existing `agents.loop` module).
+
+**Phase 4 (a real, invokable engineering-review engine — done).** The founder reviewed the Phase
+1-3 readiness report and explicitly chose to proceed on the token-compression result alone,
+overriding the "prove decision-quality first" bar Phase 3 had just satisfied the zero-cost half of —
+see `docs/PROJECT.md`'s decisions log for the exact exchange. `agents/boardroom_engine.py` composes
+`retrieve_memories` + `route_task` + `run_maker_checker_loop` into a real `BoardroomVerdict` (the
+same Pydantic model already faithfully ported from `.wingman/checkpoints.jsonl`'s real schema):
+accepted + confident route → clean `GO`; accepted but only via a `low_confidence_fallback` route →
+downgraded to `GO_WITH_CONCERNS`, never silently reported clean; escalated → `NO_GO`,
+`DO NOT SHIP`, `blocks_advancement: true` unchanged. Two new MCP tools (`route_task_tool`,
+zero-cost; `run_engineering_review_tool`, real live cost) expose it, and a root-level `.mcp.json`
+registers the server (renamed `wingman-agnostic-boardroom`) so a real Claude Code session can
+actually connect to it — genuinely wired in, not just built. `agents/model_runner.py`'s
+`run_claude_headless` also no longer hardcodes `"claude"` as the CLI binary (now
+`WINGMAN_MODEL_CLI`-configurable, default unchanged) — a real step toward harness-agnosticism,
+though no second adapter ships, since shipping one unverifiable in this sandbox would itself be a
+fabricated capability. **Honest scope, stated plainly**: this is one seat's worth of technical
+judgment, not a replacement for the other 7 (business/security/financial). The shipped
+`plugins/wingman/commands/adaptive/boardroom.md` is deliberately left untouched — cutting Wingman's
+real founder-facing gate over to this engine is a separate, much higher-blast-radius decision than
+building and registering it, and was not part of this pass. 4 new tests
+(`test_boardroom_engine.py`), covering all 3 verdict paths plus real seeded-memory read-back against
+the real 40-skill index (mocked only on the model-call side, zero cost). 51/51 fast tests total.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)
