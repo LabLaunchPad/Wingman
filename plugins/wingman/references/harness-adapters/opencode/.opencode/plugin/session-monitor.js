@@ -55,6 +55,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { pushWarning } from './lib/pending-warnings.js';
 
 // NOTE ON EXPORT SHAPE: OpenCode's plugin loader (confirmed live, 2026-07-25 -- see
 // opencode.log: `error="Plugin export is not a function"`) walks EVERY named export of a file
@@ -314,10 +315,15 @@ export const SessionMonitorPlugin = async ({ directory }) => {
       const healthResult = updateHealthState(healthState, { sessionId });
       saveJsonState(healthPath, healthResult.state);
 
-      // No confirmed way to inject a message into the model's own context from a plugin hook
-      // (see header comment, finding 3) -- log to stderr so a human operator can see it.
+      // 2026-07-25 update: warning-relay.js's own header comment documents the confirmed-working
+      // fix for this file's original finding 3 (no confirmed way to inject a message into the
+      // model's own context). Still logging to stderr (unchanged, a human operator watching the
+      // terminal sees the same thing as before) AND now also pushing onto the shared
+      // `.wingman/pending-warnings.json` queue so warning-relay.js's `experimental.chat.system.
+      // transform` hook can surface it to the model on the next real turn.
       for (const message of [...contextResult.messages, ...healthResult.messages]) {
         console.error(message);
+        pushWarning(cwd, message);
       }
     },
   };
