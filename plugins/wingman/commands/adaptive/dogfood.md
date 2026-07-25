@@ -1,17 +1,21 @@
 ---
-description: Run the real 7-stage pipeline end to end against a throwaway or real small project to find genuine pipeline bugs and friction — no shortcuts, no simulation.
+description: Run the real 14-stage pipeline end to end against a throwaway or real small project to find genuine pipeline bugs and friction — no shortcuts, no simulation.
 argument-hint: "[optional: simple|complex|both (maintainer mode) or a feature idea in your own words (founder mode)]"
 ---
 
 # Wingman: Dogfood
 
 This command exists because a structural review of Wingman's own files can't catch everything —
-some bugs only surface when the actual 7-stage pipeline runs for real, with a real founder-in-the-
-loop decision, real Boardroom dispatch, real test-driven implementation, and a real `git push`
-through the actual installed hooks. Two real runs of this kind (documented in
-`docs/wingman/retros.md`) each found and fixed a genuine bug that no amount of reading the plugin's
-own files would have caught. This command formalizes that process instead of leaving it to happen
-only when a session happens to do it by hand.
+some bugs only surface when the actual 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d — the
+v20 expansion from the original 7-stage sequence to 12 individual pre-build Boardroom checkpoints
+plus Build plus Ship) runs for real, with a real founder-in-the-loop decision at every checkpoint,
+real Boardroom dispatch, real test-driven implementation, and a real `git push` through the actual
+installed hooks. Two real runs of this kind (documented in `docs/wingman/retros.md`) each found and
+fixed a genuine bug that no amount of reading the plugin's own files would have caught — both of
+those runs predate the v20 expansion, so no run has yet exercised the 7 newer stages
+(`research-synthesis`, `personas-jobs`, `journey-mapping`, `information-architecture`, `wireframes`,
+`visual-design-system`, `prototype-usability`) at all. This command formalizes that process instead
+of leaving it to happen only when a session happens to do it by hand.
 
 $ARGUMENTS
 
@@ -47,7 +51,11 @@ never ships to a founder's installed copy of the plugin.
   dispatch produces real, substantive findings on a real plan.
 
 **Run the real pipeline, no shortcuts**, against whichever fixture(s) were generated:
-1. `/wingman:discovery` through `/wingman:ship`, in order, for real — this session stands in as the
+1. `/wingman:discovery` through `/wingman:ship`, in order, for real — all 14 stages
+   (`discovery`, `research-synthesis`, `personas-jobs`, `journey-mapping`, `define`,
+   `information-architecture`, `uxflow`, `wireframes`, `visual-design-system`,
+   `prototype-usability`, `architecture`, `implementation-planning`, `build`, `ship`), never
+   skipping the 7 newer ones just because they're less familiar — this session stands in as the
    founder for every `AskUserQuestion` the pipeline calls for. Answer as a real founder would,
    don't assume or pre-script an answer.
 2. Real `Agent`-tool dispatch for every Boardroom seat, department lead, and Management Board
@@ -82,7 +90,7 @@ execution, real `AskUserQuestion` decisions, the TDD red-then-green sequence, th
   "mode": "maintainer",
   "path": "simple",
   "fixture": "evals/fixtures/setup-dogfood-simple.sh",
-  "stages_run": ["discovery", "define", "architecture", "uxflow", "implementation-planning", "build", "ship"],
+  "stages_run": ["discovery", "research-synthesis", "personas-jobs", "journey-mapping", "define", "information-architecture", "uxflow", "wireframes", "visual-design-system", "prototype-usability", "architecture", "implementation-planning", "build", "ship"],
   "gates_expected_dormant": ["management-board-activation", "dod-structural-gate.mjs threat-register"],
   "gates_expected_active": [],
   "gates_actual_dormant": ["management-board-activation"],
@@ -111,7 +119,7 @@ If `$ARGUMENTS` names a feature idea, use it. If not, propose a tiny, genuinely 
 single small addition with no real business risk) so the founder can safely see the pipeline work
 end to end before trusting it with something that matters.
 
-Run the real 7-stage pipeline against the founder's own actual project — not a synthetic fixture —
+Run the real 14-stage pipeline against the founder's own actual project — not a synthetic fixture —
 exactly like a normal `/wingman:discovery` through `/wingman:ship` sequence, real `AskUserQuestion`
 decisions, real Boardroom dispatch, real TDD, a real `git push` on a feature branch. This is
 functionally identical to using the pipeline commands directly; the only difference is this command
