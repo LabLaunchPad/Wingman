@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.3] - 2026-07-25
+
+### Added
+- **`plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/secret-guard.mjs`** — a real port of `plugins/wingman/hooks/secret-guard.mjs`'s `decide()` logic to Codex CLI's confirmed hook contract, wired into `.codex/hooks.json` against both `Bash` and `apply_patch` matchers. Unblocked by a fresh research pass fetching `learn.chatgpt.com/docs/hooks` directly: hooks are enabled by default in Codex CLI (a secondary source claiming opt-in was wrong), and `apply_patch` reports its scannable content in the same `tool_input.command` field `Bash` uses. Tested end-to-end via a real stdin/stdout JSON round-trip (destructive command → deny, secret pattern → deny, clean input → allow).
+
+### Changed
+- **Codex CLI adapter README** — documents the full 2026-07-25 research pass: hooks-enabled-by-default resolved, `apply_patch` field name resolved, a real disclosed caveat (two open GitHub issues report `apply_patch` hooks not always firing in practice), single-message parallel Boardroom dispatch confirmed real (`agents.max_concurrent_threads_per_session`), and `gpt-5.5` confirmed as a real current default model.
+- **OpenCode adapter README** — documents its own confirmed (negative) finding: no built-in single-message parallel-dispatch primitive, orchestrator-driven/sequential dispatch, citing a real open GitHub issue where even explicitly-requested parallel subagent work runs sequentially in practice.
+
 ## [0.7.2] - 2026-07-25
 
 ### Optimized
