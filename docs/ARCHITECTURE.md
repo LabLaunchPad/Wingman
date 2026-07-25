@@ -304,7 +304,7 @@ irreducible as `fablize`'s own event-name dispatch.
 either a working non-Claude-Code path or an honestly-documented degradation):
 - `AskUserQuestion` → formalized (2026-07-20) as the **`ask_founder` port**: `ask_founder(question, options) → decision ∈ {ship_it, fix_concerns_first, still_reviewing}`. Two adapters already exist, both already-shipped — this formalization names them, it doesn't add anything: the primary adapter is the `AskUserQuestion` tool call itself; the fallback adapter is the `still_reviewing` checkpoint state `commands/adaptive/boardroom.md`'s "Ask for the decision" step already writes whenever no interactive answer is obtainable (the tool is confirmed missing in headless/print-mode sessions, or the session ends before the founder answers) — a checkpoint still gets recorded and the plan file still gets marked either way, later replaceable once a real decision arrives. Naming this a port changes no behavior; it gives a future non-Claude-Code adapter (if the evidence-gate below is ever cleared) a stated contract to implement against instead of one that would need reverse-engineering from `boardroom.md`'s prose. The other two coupling points below remain named-but-not-ported — this formalization is scoped to `ask_founder` only, on explicit request, not a signal to port the rest speculatively.
 - `ExitPlanMode` + its 2 hooks → `plugins/wingman/scripts/dod-pre-push-check.mjs`, a plain CLI wrapper that imports and calls the exact same pure functions `dod-structural-gate.mjs` exports, runnable as a real git `pre-push` hook (or from any harness with shell access) with zero Claude Code involvement. No new decision logic — pure reuse, proving the separation above is real, not just described.
-- `Task`/`Agent` parallel dispatch → genuinely the hardest one, and this claim was **partially stale as of 2026-07-21** (see §8b): `fablize` still offers no pattern here since it shapes single-model behavior, not multi-persona parallel review, but "most other harnesses lack native parallel subagent dispatch" is no longer true of the two harnesses actually targeted in §8b — Codex CLI (subagents GA, 6 concurrent, since the 2026 GPT-5.5 release) and OpenCode (a documented Task tool plus a parallel general-purpose agent) both gained real parallel-subagent capability during 2026. What's still unconfirmed for both is a single built-in primitive equivalent to Claude Code's one-message 8-way `Task`/`Agent` fan-out — so the honest fallback (sequential per-seat dispatch, a real cost: slower, more tokens for context re-establishment per seat) still applies in practice, just not because the harnesses lack subagents entirely.
+- `Task`/`Agent` parallel dispatch → genuinely the hardest one, and the picture is now resolved differently for each harness (2026-07-25 direct research, see §8e/`codex-cli`/`opencode` READMEs): **Codex CLI has a real, confirmed single-message parallel-dispatch capability** (natural-language-driven — "spawn N agents in parallel for X, Y, Z" — with a real `agents.max_concurrent_threads_per_session` config, not a discrete tool call), so the 8-seat Boardroom can genuinely fan out in one message under Codex CLI, just via prompt phrasing rather than a `Task`/`Agent`-shaped call. **OpenCode does not** — confirmed via a direct docs fetch as orchestrator-driven/sequential (`session_child_cycle`), with a live GitHub issue (`anomalyco/opencode#29638`) reporting even explicitly-requested parallel subagent work runs sequentially in practice — so the honest fallback (sequential per-seat dispatch, a real cost: slower, more tokens for context re-establishment per seat) still genuinely applies there.
 
 **A different kind of portability — knowledge/output, not execution.** Everything above in this section is about whether Wingman's own *execution* (the Boardroom review loop, hook wiring) can run under a different coding-agent harness. `commands/adaptive/knowledge-export.md` / `scripts/okf-export.mjs` (2026-07-20) is a distinct, narrower kind of portability: not "can another harness drive Wingman," but "can another AI tool *read what Wingman has already produced* without running Wingman at all." It converts `.wingman/checkpoints.jsonl` and `memory/*.md` — both Wingman-specific formats — into a [Google Open Knowledge Format v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog) bundle: plain markdown with light YAML frontmatter, no Wingman- or Claude-specific reader required. Built on explicit founder request after an OKF feasibility assessment, and directly answers a gap `docs/DATABASE.md` already named: no file unifies `checkpoints.jsonl` and `memory/*.md` into one browsable "what has this project decided and why" surface. Like `dod-pre-push-check.mjs`, the script is runnable standalone with zero Claude Code involvement — a second, cheap, genuine portability win, but of the founder's *knowledge*, not of Wingman's own execution.
 
@@ -542,15 +542,30 @@ has ever hit an actual problem caused by the `commands/` layout) — the same ev
 this project applies to every other "the community does it differently" pitch. Noted here so the
 tradeoff is visible, not silently missed.
 
-**Codex CLI adapter follow-up, same date**: fetching OpenAI's official Codex hooks docs directly
+**Codex CLI adapter follow-up, 2026-07-22**: fetching OpenAI's official Codex hooks docs directly
 (`learn.chatgpt.com/docs/hooks`) resolved one of `references/harness-adapters/codex-cli/`'s two
 previously-unconfirmed blockers — its `Bash` PreToolUse matcher is now a confirmed real tool name,
 and the Write/Edit-matcher path's matcher *values* (`apply_patch`/`Edit`/`Write`) are now confirmed
-too. What remains unconfirmed is the exact `tool_input` JSON field name carrying patch content for
-`apply_patch` calls — needed before `secret-guard.mjs` can be safely wired against it without
-guessing. See `codex-cli/README.md`'s "2026-07-22 research update" section for the full detail,
-including a genuinely unresolved conflict between official docs (hooks enabled by default) and a
-third-party cheatsheet (claimed an opt-in flag) that a live install would be needed to settle.
+too.
+
+**Fully resolved, 2026-07-25**: a follow-up direct fetch of the same official docs (in response to
+an explicit request to ship real Codex CLI/OpenCode adapters) resolved both of that pass's remaining
+open items. The `apply_patch` field name carrying patch content is confirmed as `tool_input.command`
+— the same field `Bash` uses — and hooks are confirmed enabled by default (a third-party source
+claiming opt-in-required was checked directly against the primary docs and found wrong). A real,
+schema-verified `secret-guard.mjs` port now ships in
+`references/harness-adapters/codex-cli/.codex/hooks/secret-guard.mjs`, wired into `hooks.json` for
+both `Bash` and `apply_patch` matchers — tested via a synthetic stdin/stdout JSON round-trip
+(destructive command → deny, secret pattern → deny, clean input → allow), not just written and
+assumed. One real, disclosed caveat found alongside the resolution: open GitHub issues
+(`openai/codex#16732`, `#20204`) report `apply_patch` hook events not firing consistently across all
+Codex CLI versions in practice, despite being documented as supported. Also resolved in the same
+pass: Codex CLI's single-message parallel-dispatch capability (natural-language-driven, a real
+`agents.max_concurrent_threads_per_session` config, not a discrete tool call) and OpenCode's lack of
+one (confirmed sequential/orchestrator-driven, with a live GitHub issue — `anomalyco/opencode#29638`
+— reporting even explicitly-requested parallel work runs sequentially in practice). See
+`codex-cli/README.md`'s "2026-07-25 research pass" and `opencode/README.md`'s "Running a Boardroom
+review" section for the full detail and citations.
 
 ## 8e. Token-efficiency audit of every auto-firing mechanism (2026-07-22)
 

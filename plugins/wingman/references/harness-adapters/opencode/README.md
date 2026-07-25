@@ -46,15 +46,25 @@ logic has never been observed running live, only confirmed to load and enforce p
 
 ## Running a Boardroom review under OpenCode
 
-OpenCode has a documented Task tool and a "General purpose agent" that can run multiple units of
-work in parallel (per [OpenCode's Agents docs](https://opencode.ai/docs/agents/)), plus
-peer-messaging/shared-task-board coordination for parallel agents. Research did not confirm a single
-built-in primitive for "fan out to all 8 named subagents in one message" the way Claude Code's
-`Task`/`Agent` calls do — so, same honest caveat as the Codex CLI adapter: until that's confirmed
-against a real install, invoke each `boardroom-*` subagent (via `@boardroom-cto`, etc., or your
-OpenCode version's Task-tool syntax) and consolidate the `## <SEAT> VERDICT` blocks yourself using
+**Checked directly, 2026-07-25** (fetched [opencode.ai/docs/agents](https://opencode.ai/docs/agents/)
+live): OpenCode does **not** document a built-in single-message fan-out primitive. Subagents are
+invoked either automatically (a primary agent delegates based on description matching) or manually
+via `@mention` (e.g. `@boardroom-cto review this change`) — the docs describe an orchestrator-driven
+model, navigating between child sessions one at a time (`session_child_cycle`), not a discrete
+parallel-dispatch tool call.
+
+**A real, current caveat worth knowing before relying on this**: a live, open GitHub issue
+([anomalyco/opencode#29638](https://github.com/anomalyco/opencode/issues/29638)) reports that even
+when a user explicitly asks for subagents "in parallel," OpenCode currently runs them sequentially —
+each finishing before the next starts. Treat "ask for parallel" as a request, not a guarantee, on
+current OpenCode versions.
+
+**Practical guidance, unchanged in substance**: invoke each `boardroom-*` subagent in turn (via
+`@boardroom-cto`, etc.) and consolidate the `## <SEAT> VERDICT` blocks yourself using
 `commands/adaptive/boardroom.md`'s own rule (any `NO_GO` → `DO NOT SHIP`; any `GO_WITH_CONCERNS` →
-`GO WITH CHANGES`; otherwise `GO`).
+`GO WITH CHANGES`; otherwise `GO`). This costs more wall-clock time than Codex CLI's confirmed
+parallel-dispatch path (see the Codex CLI adapter's own README) or Claude Code's native `Task`/`Agent`
+fan-out — a real, disclosed difference between the three harnesses, not something to paper over.
 
 ## The real, high-confidence win: the git-push gate
 
