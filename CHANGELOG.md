@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.4] - 2026-07-25
+
+### Changed
+- **OpenCode adapter README** — documents a real, live-model-inference test against OpenCode Zen, closing that half of the adapter's "unverified model inference" gap. A real `opencode run --agent boardroom-cto` invocation (using a founder-provided API key, exported as a shell env var only, never written to any file) confirmed live inference genuinely fires and the seat's persona correctly rejects a deliberately bad plan per its own output contract. Also documents a real, non-obvious finding: `opencode run --agent <subagent-name>` falls back to the default primary agent rather than invoking the subagent directly, which then auto-delegates to the named subagent by description-matching — confirmed by inspecting OpenCode's own local session database, not just the printed transcript. Codex CLI's own live-inference half of the same gap remains open (no credential provided for it).
+
 ## [0.7.3] - 2026-07-25
 
 ### Added
