@@ -10,12 +10,6 @@ dependencies = [
     "fastembed>=0.5",
     "tiktoken>=0.13",
     "mcp>=1.28",
-    # Required transitively by `agno.workflow` (its package __init__ imports
-    # `agno.workflow.remote.RemoteWorkflow`, which imports `fastapi` unconditionally,
-    # even though this repo never runs the remote/HTTP workflow surface) -- confirmed
-    # via a real `ModuleNotFoundError` when first importing `agno.workflow` for the
-    # loop/graph Agno-native rewrite, not assumed.
-    "fastapi>=0.110",
 ]
 
 [project.optional-dependencies]
@@ -23,6 +17,8 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=7.0",
 ]
+# Added in later phases, not installed yet:
+#   fastapi, uvicorn   -- if HTTP/SSE transport is needed alongside stdio, or Agno's own AgentOS
 
 [build-system]
 requires = ["hatchling"]

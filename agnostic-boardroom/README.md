@@ -258,7 +258,8 @@ live spend to a later, explicitly-authorized round.
 `eval/decision_quality.py` is that harness: a `Scenario` names the ground-truth outcome (accepted /
 escalated, at what iteration) a correct Maker/Checker loop should reach for a scripted sequence of
 Maker attempts and Checker verdicts; `run_scenario` runs the real, unmodified
-`agents.loop.run_maker_checker_loop` against that script and checks whether its actual outcome
+`loop.workflow.run_maker_checker_loop` (the Agno-native rewrite, see "Agno-native rewrite" below)
+against that script and checks whether its actual outcome
 matches. The same harness runs unmodified against a real `call_model` (e.g. `run_claude_headless`)
 once live spend is authorized — only the injected model call changes, not the harness.
 
@@ -349,18 +350,23 @@ in progress.
    ceiling 15, threshold ~0.5) using `vector_db.vector_search()`'s raw `_distance` field (confirmed:
    the high-level `Knowledge.search()` API doesn't expose a score at all). 3 tests, including a
    real routed query and a real low-confidence-fallback case.
-5. **Loop engineering** (done) — `agents/model_runner.py` + `agents/departments/engineering_maker.py`
-   + `agents/boardroom/cto_evaluator.py`: a real Maker/Checker pair using headless `claude -p`
-   subprocess calls (see "Live model inference" below) for genuine, non-mocked rejection/escalation
-   behavior, bounded at 3 iterations. 5 fast mocked-control-flow tests (iteration cap, escalation,
-   cost summation, Checker fail-closed-on-bad-JSON) plus **2 real live tests** (`test_loop_live.py`,
-   run explicitly via `pytest -m live_model`, real dollar cost): a live Checker genuinely rejecting
-   an obviously wrong solution, and a full live Maker→Checker pass with real, non-zero logged cost.
-6. **Graph engineering** (done) — `agents/graph.py` wraps item 5's loop in the real, existing
-   7-stage pipeline topology (Discovery → Define → Architecture → UX → Implementation-Planning →
-   Build → Ship) — deliberately mirrored, not redesigned. 4 tests proving it never auto-advances
-   past a stage that requires a founder checkpoint, and stops (rather than silently skipping) on a
-   stage with no registered handler.
+5. **Loop engineering** (done, now Agno-native) — `loop/maker.py` + `loop/checker.py`: a real
+   Maker/Checker pair using headless `claude -p` subprocess calls (see "Live model inference" below)
+   for genuine, non-mocked rejection/escalation behavior. `loop/workflow.py` orchestrates the bounded
+   3-iteration retry on Agno's own `Workflow`+`Loop` step primitives (Agno 2.8.2, confirmed installed)
+   rather than a hand-rolled `for` loop — see "Agno-native rewrite" below for why `Loop`, not `Team`,
+   and how the contract stayed identical for every existing caller. 5 fast mocked-control-flow tests
+   (iteration cap, escalation, cost summation, Checker fail-closed-on-bad-JSON) plus **2 real live
+   tests** (`test_loop_live.py`, run explicitly via `pytest -m live_model`, real dollar cost): a live
+   Checker genuinely rejecting an obviously wrong solution, and a full live Maker→Checker pass with
+   real, non-zero logged cost.
+6. **Graph engineering** (done, now Agno-native) — `graph/pipeline_workflow.py` wraps item 5's loop
+   in the real, existing 7-stage pipeline topology (Discovery → Define → Architecture → UX →
+   Implementation-Planning → Build → Ship) — deliberately mirrored, not redesigned — now expressed as
+   a sequential Agno `Workflow` of per-stage `Step`s, using `StepOutput(stop=True)` for early
+   termination (confirmed empirically to halt the workflow, not assumed from docs). 4 tests proving
+   it never auto-advances past a stage that requires a founder checkpoint, and stops (rather than
+   silently skipping) on a stage with no registered handler.
 7. **Experimental slash command** (done) — `.claude/commands/ship-feature.md`, a thin MCP client.
    **Real placement correction, found by actually running the validator, not assumed**: the original
    plan called for `plugins/wingman/commands/experimental/`, but `validate-structure.mjs`'s own
@@ -420,11 +426,54 @@ exact same lifecycle as calling a function directly — no background thread, no
 Today there is exactly **one** registered provider (`gateway/providers/claude_cli.py`'s
 `ClaudeCliProvider`, the same headless `claude -p` invocation this backend has used since Phase 3/4)
 and deliberately **no retry/fallback-on-failure logic** — adding failover against a single-provider
-router would be untested, speculative code with nothing real to fail over to. `agents/model_runner.py`
+router would be untested, speculative code with nothing real to fail over to. `models/model_runner.py`
 is now a thin backward-compatible shim over `gateway.providers.claude_cli` so every existing caller
-(`agents/loop.py`, `agents/boardroom_engine.py`, `agents/pipeline.py`, and others) keeps working
+(`loop/workflow.py`, `engine/boardroom_engine.py`, `engine/pipeline.py`, and others) keeps working
 unchanged; switching those callers' `call_model=` default to `Router(...).run` directly is a
 separate, not-yet-done follow-up.
+
+## Agno-native rewrite: `loop/` and `graph/` on `Workflow`/`Loop`/`Step`
+
+The hand-rolled Maker/Checker `for`-loop (formerly `agents/loop.py`) and the linear stage-dispatch
+pipeline (formerly `agents/graph.py`) are now built on Agno's own `Workflow` orchestration primitives
+instead — the founder's explicit choice, on top of the directory reorg below, since Agno was already
+a dependency here for its Knowledge/RAG layer but its `Agent`/`Workflow`/`Team` classes had never
+been used.
+
+**The one real, load-bearing risk, resolved before any rewrite code was written**: every documented
+Agno `Model` example (LMStudio, Ollama, OpenAI-compatible) talks to an HTTP client — none wrap a
+subprocess CLI, and this backend's actual model call is `subprocess.run(["claude", "-p", ...])`, not
+an HTTP request. Rather than assume this would work, a real spike came first: `models/agno_claude_cli_model.py`
+implements Agno's `Model` abstract base (confirmed via `inspect.getsource(agno.models.base.Model)`,
+not the docs alone — its 6 abstract methods are `invoke`/`ainvoke`/`invoke_stream`/`ainvoke_stream`/
+`_parse_provider_response`/`_parse_provider_response_delta`) by delegating every call to the existing,
+unchanged `ClaudeCliProvider`. A real `Agent(model=AgnoClaudeCliModel()).run("say hi")` call was run
+and inspected before committing to the rewrite — it returned a genuine `RunOutput` with content `"hi"`.
+
+**Why `Loop`, not `Team`, for the Maker/Checker gate**: Agno's `Team` (coordinate/route/collaborate/
+broadcast modes) is built for delegating one task across multiple agents and synthesizing a combined
+answer — not a bounded retry-with-feedback loop where a rejection reason must feed into the *next*
+attempt. `Loop`'s `end_condition` (a callable over the iteration's `StepOutput`s) + `max_iterations`
+(a hard cap) is the closer primitive, and was confirmed empirically (not assumed) to reproduce all
+three of the original contract's real behaviors: accept-on-first-try, accept-with-concerns (the
+`GO_WITH_CONCERNS` path `engine/boardroom_engine.py` depends on), and escalate-after-cap.
+
+**Why a plain sequential `Workflow`, not `Loop`/`Condition`/`Router`, for the pipeline**: the original
+7-stage pipeline has no branching or repetition to model — one ordered stage list, one stop-early
+rule. `StepOutput(stop=True)` (a real Agno field) halts the `Workflow` at the first checkpoint-
+requiring stage; confirmed empirically across 3 scenarios (full completion, mid-pipeline stop, no
+handler registered for a stage) rather than assumed from the field's name alone.
+
+**One new, confirmed dependency**: `agno.workflow`'s own package `__init__` unconditionally imports
+`agno.workflow.remote.RemoteWorkflow`, which imports `fastapi` — even though this backend never runs
+the remote/HTTP workflow surface. This surfaced as a real `ModuleNotFoundError` on first import, not
+a design choice; `fastapi>=0.110` is now a direct dependency in `pyproject.toml` as a result.
+
+**Contract preservation, the actual point of doing this as a rewrite rather than a fresh design**:
+every public function signature and return-dataclass shape (`LoopResult`, `PipelineResult`,
+`EngineeringReview`, `BoardroomVerdict`) is unchanged, so `engine/boardroom_engine.py`'s
+`to_boardroom_verdict()` mapping — the piece the shipped Boardroom checkpoint schema actually depends
+on — needed zero logic changes, only an import-path update.
 
 ## Built-in tools
 

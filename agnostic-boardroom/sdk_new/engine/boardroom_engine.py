@@ -1,0 +1,113 @@
+"""The real, invokable replacement engine for the technical half of a
+Boardroom checkpoint -- built per the founder's explicit decision to wire
+this backend in as the actual engine, overriding the earlier "prove
+decision-quality against the shipped plugin first" bar on the strength of
+the already-measured token-compression result alone (see `docs/PROJECT.md`'s
+decisions log for the exact exchange).
+
+Ported from `agents/boardroom_engine.py` -- only the loop import path
+changed (`loop.workflow` instead of `agents.loop`, the Agno-native rewrite).
+`to_boardroom_verdict()`'s mapping logic is byte-for-byte unchanged, since it
+only depends on `LoopResult`'s field shape, which the rewrite preserves
+exactly.
+
+**Honest scope, stated plainly rather than overclaimed**: this composes
+memory retrieval + skill routing + the Maker/Checker loop into a single
+`BoardroomVerdict` (the same Pydantic model `core/state_schema.py` already
+defines, faithfully ported from the shipped plugin's real
+`.wingman/checkpoints.jsonl` schema). It produces ONE seat's worth of
+judgment -- a technical/engineering accept-or-reject gate. It does **not**
+reproduce the shipped plugin's other 7 seats.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime, timezone
+
+from core.state_schema import BottomLine, BoardroomVerdict, FounderDecision, SeatVerdict, Verdict
+from knowledge.skill_router import RoutedSkill, route_task
+from loop.workflow import DEFAULT_MAX_ITERATIONS, LoopResult, run_maker_checker_loop
+from mcp_server.memory_tools import retrieve_memories
+from models.model_runner import run_claude_headless
+
+
+@dataclass
+class EngineeringReview:
+    routing: RoutedSkill
+    loop: LoopResult
+    memory_hits: list[dict]
+
+
+def run_engineering_review(
+    kb_skills,
+    kb_memory,
+    task_description: str,
+    scope_ref: str,
+    max_iterations: int = DEFAULT_MAX_ITERATIONS,
+    call_model=run_claude_headless,
+) -> EngineeringReview:
+    memory_hits = retrieve_memories(kb_memory, query=task_description, k=5)
+    routed = route_task(kb_skills, task_description)
+
+    context_parts = [routed.skill_text]
+    if memory_hits:
+        memory_text = "\n".join(f"- {m['content']}" for m in memory_hits)
+        context_parts.append(f"\nRelevant prior decisions:\n{memory_text}")
+
+    loop_result = run_maker_checker_loop(
+        task_description,
+        context="\n".join(context_parts),
+        max_iterations=max_iterations,
+        call_model=call_model,
+    )
+    return EngineeringReview(routing=routed, loop=loop_result, memory_hits=memory_hits)
+
+
+def to_boardroom_verdict(review: EngineeringReview, scope_ref: str, checkpoint_id: str | None = None) -> BoardroomVerdict:
+    if review.loop.escalated:
+        cto_verdict = Verdict.NO_GO
+        summary = (
+            f"Escalated after {len(review.loop.iterations)} iterations, never accepted. "
+            f"Last reason: {review.loop.iterations[-1].checker_reason if review.loop.iterations else 'n/a'}"
+        )
+        bottom_line = BottomLine.DO_NOT_SHIP
+        founder_decision = FounderDecision.STILL_REVIEWING
+    else:
+        concern_notes = []
+        if review.loop.final_concerns:
+            concern_notes.append(f"Checker-flagged concern(s): {'; '.join(review.loop.final_concerns)}")
+        if review.routing.confidence == "low_confidence_fallback":
+            concern_notes.append(
+                f"routed to '{review.routing.skill_name}' on a low-confidence match "
+                f"(similarity={review.routing.best_similarity:.2f})"
+            )
+
+        if concern_notes:
+            cto_verdict = Verdict.GO_WITH_CONCERNS
+            summary = (
+                f"Accepted after {len(review.loop.iterations)} iteration(s), but with concerns: "
+                + " | ".join(concern_notes)
+            )
+            bottom_line = BottomLine.GO_WITH_CHANGES
+        else:
+            cto_verdict = Verdict.GO
+            summary = f"Accepted after {len(review.loop.iterations)} iteration(s), routed to '{review.routing.skill_name}'."
+            bottom_line = BottomLine.GO
+        founder_decision = FounderDecision.STILL_REVIEWING
+
+    checkpoint_id = checkpoint_id or f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M-%SZ')}-engineering-review"
+
+    return BoardroomVerdict(
+        checkpoint_id=checkpoint_id,
+        stage="build",
+        scope_ref=scope_ref,
+        seats=[SeatVerdict(seat="cto", verdict=cto_verdict, summary=summary)],
+        bottom_line=bottom_line,
+        founder_decision=founder_decision,
+        founder_notes=(
+            "Produced by agnostic-boardroom's engineering-review engine -- a single technical "
+            "seat, not the full 8-seat Boardroom. See engine/boardroom_engine.py's module "
+            "docstring for the honest scope of what this does and doesn't cover."
+        ),
+    )
