@@ -316,13 +316,25 @@ either a working non-Claude-Code path or an honestly-documented degradation):
 
 **Re-checked against 2026 SOTA multi-harness conventions (2026-07-22)**: researched the AGENTS.md open standard (formalized August 2025, donated to the Linux Foundation's Agentic AI Foundation December 2025; 60,000+ adopting projects, 30+ tools) and a real multi-harness precedent (`wshobson/agents`, which auto-generates native per-harness artifacts from one source because its agents don't depend on harness-unique interactive primitives). This section's conclusion holds: `wshobson/agents`' generation approach only works *because* its agents avoid exactly the couplings (`AskUserQuestion`, `ExitPlanMode`, one-message parallel `Task`/`Agent` fan-out) that the Boardroom review loop structurally depends on — applying that pattern here would overclaim portability, not add it. One concrete, low-risk change did come out of the research: the repo now follows the AGENTS.md standard's own convention of `AGENTS.md` as the canonical file with `CLAUDE.md` as a symlink to it (previously reversed) — a documentation-layer change, not an execution-portability one.
 
-## 8b. Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21, re-verified 2026-07-23, expanded to full command/skill parity 2026-07-23)
+## 8b. Claude Code / Codex CLI / OpenCode adapters (built, partially verified — 2026-07-21, re-verified 2026-07-23, expanded to full command/skill parity 2026-07-23, named symmetrically across all 3 harnesses 2026-07-25)
 
 §8a's "revisit if a specific harness with this gap is actually targeted" escape hatch was invoked
 for real: two named harnesses, Codex CLI and OpenCode. `plugins/wingman/references/harness-adapters/`
 holds the result. Every artifact is labeled with its true verification status rather than
 overclaiming. Full citation list and the deliberately-not-attempted list live in that directory's own
 `README.md`; summary here:
+
+**2026-07-25 — added `claude-code/` as an explicit third entry, not a new port.** The directory
+previously named only Codex CLI and OpenCode, leaving Claude Code an unstated implicit default
+rather than a symmetrically-documented one. `harness-adapters/claude-code/README.md` states plainly
+that no translation exists or is needed — `plugins/wingman/` itself, in Claude Code's own format,
+already is the artifact — and names what's genuinely unique to this harness (`AskUserQuestion`,
+`ExitPlanMode` + its two gates, native parallel `Task`/`Agent` dispatch) so a reader can compare all
+3 harnesses' real capability gaps side by side rather than inferring Claude Code's baseline by
+omission. Same pass also closed a real doc-drift gap this section's own "not attempted" list had
+picked up: Codex CLI's `secret-guard.mjs` Write/Edit-matcher path was still listed as blocked on an
+unconfirmed field name, when the 2026-07-25 research pass (see below) had already resolved and
+shipped it — corrected in `harness-adapters/README.md` rather than left stale.
 
 **2026-07-23 — scope expanded from Boardroom-only to the full 24-command/40-skill surface, on
 explicit founder request.** The original scoping ("Boardroom seats + git-push gate, not a full

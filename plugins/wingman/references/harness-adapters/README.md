@@ -8,8 +8,12 @@ portable" work is planned absent real, evidenced demand for a specific target ha
 stated bar, and the reason an earlier external "flatten everything" proposal was declined on
 2026-07-18 — see `docs/PROJECT.md`'s decisions log).
 
-This directory is that evidenced-demand case, scoped to two named harnesses: **Codex CLI** and
-**OpenCode**. It is not a claim that Wingman now runs identically everywhere.
+This directory names all 3 harnesses Wingman is evaluated against, symmetrically: **Claude Code**
+(`claude-code/` — the native target; no translation exists because none is needed, see that
+directory's own README), **Codex CLI** (`codex-cli/`), and **OpenCode** (`opencode/`). It is not a
+claim that Wingman runs identically everywhere — each directory states plainly what's genuinely
+ported, what's structurally verified vs. authored-but-unverified, and what has no equivalent at all
+in that harness.
 
 **2026-07-23 update — full command/skill parity, not just Boardroom + git-push gate.** The founder
 named "agent-agnostic across Claude Code, OpenCode, and Codex CLI" as an explicit MVP goal — the
@@ -39,16 +43,28 @@ a `verified` status with no real evidence):
 
 ## What's here
 
+- `claude-code/` — **built + tested**, the native target. Not a translated copy — `plugins/wingman/`
+  itself, in Claude Code's own format, already is the artifact. See that directory's own README for
+  what's genuinely unique to this harness (`AskUserQuestion`, `ExitPlanMode` + its gates, native
+  parallel `Task`/`Agent` dispatch) and why the other two adapters exist at all.
 - `codex-cli/` — Boardroom seat personas (8, **authored, unverified** — directory convention and
   field schema independently confirmed correct against official docs, but no Codex CLI account
-  exists in this sandbox to confirm the files are actually recognized at runtime) + a narrow
-  hooks.json subset for the git-push gate (**authored, unverified**) + install/usage notes.
+  exists in this sandbox to confirm the files are actually recognized at runtime) + `hooks.json`
+  wiring a real, tested `secret-guard.mjs` port against both `Bash` and `apply_patch` matchers plus
+  the git-push gate (both **schema-verified via a real stdin/stdout round-trip test**, per the
+  2026-07-25 research pass confirming hooks are enabled by default and `apply_patch`'s field name —
+  see `codex-cli/README.md`) + install/usage notes. Live model inference under a real Codex CLI
+  account is still unconfirmed — no credential provided for it (`docs/HUMAN-TODOS.md`).
 - `opencode/` — Boardroom seat personas (8, **structurally verified (live install)** as of
   2026-07-23 — `opencode agent list`/`debug config`/`debug agent` all confirm real discovery,
   parsing, and permission enforcement) + a real code port of the `boardroom-checkpoint.mjs`
   plan-approval gate as an OpenCode plugin (**structurally verified (live install)** — confirmed
   registered in the resolved plugin config; its hook name and matched tool name are both
-  independently confirmed against real sources) + install/usage notes.
+  independently confirmed against real sources) + install/usage notes. **Live model inference now
+  confirmed, 2026-07-25** — a real `opencode run --agent boardroom-cto` invocation against a real
+  OpenCode Zen API key produced a genuine, persona-correct verdict; see `opencode/README.md`'s "Live
+  model inference — confirmed" section for the full finding (including a real caveat about
+  `--agent`'s fallback-to-default-then-auto-delegate behavior).
 - The single **built + tested** artifact from this investment isn't harness-specific at all:
   `plugins/wingman/scripts/install-git-hooks.mjs`, which wires the existing
   `dod-pre-push-check.mjs` up as a real `.git/hooks/pre-push` hook. That fires under any coding
@@ -88,32 +104,40 @@ a `verified` status with no real evidence):
 ## Deliberately not attempted here (and why)
 
 - **Live, end-to-end model-inference verification** of the generated skill/command surface under
-  either harness — this sandbox has no configured API key/model provider for OpenCode or Codex CLI,
-  so "the file is discovered and its content reaches the assembled prompt" (confirmed, see above) is
-  as far as this pass could verify; "the model then behaves correctly when actually invoked" needs
-  founder-provided credentials (`docs/HUMAN-TODOS.md`'s `ANTHROPIC_API_KEY`-equivalent item for these
-  two harnesses specifically — not yet tracked there, added this update).
-- **Codex CLI's `secret-guard.mjs` Write/Edit-matcher hook path.** A 2026-07-22 follow-up audit
-  confirmed the matcher shape via OpenAI's official Codex hooks docs (`apply_patch`/`Edit`/`Write`
-  all valid matcher values; hook input's `tool_name` always reports `apply_patch`) — the original
-  "tool-name strings weren't confirmed" blocker is resolved. What's still unconfirmed is the exact
-  JSON field name inside `apply_patch`'s `tool_input` holding the patch content itself (the
-  equivalent of Claude Code's `toolInput.content`/`new_string`), so `secret-guard.mjs` still isn't
-  wired here — guessing that field risks a hook that runs but silently never matches anything,
-  worse than not porting it and saying so plainly. See `codex-cli/README.md`'s "2026-07-22 research
-  update" section and `codex-cli/.codex/hooks.json`'s own inline comment for the full detail.
+  either harness. **Partially resolved, 2026-07-25**: given a real OpenCode Zen API key, a live
+  `opencode run --agent boardroom-cto` call confirmed real model inference and persona-correct
+  behavior — see `opencode/README.md`'s "Live model inference — confirmed" section. Codex CLI's half
+  of this remains genuinely unattempted — no credential has been provided for it
+  (`docs/HUMAN-TODOS.md`'s open item).
+- ~~Codex CLI's `secret-guard.mjs` Write/Edit-matcher hook path~~ — **resolved, 2026-07-25**. A fresh
+  research pass fetching `learn.chatgpt.com/docs/hooks` directly confirmed the exact field:
+  `apply_patch` reports its scannable content in the same `tool_input.command` field `Bash` uses. A
+  real, tested port now ships at `codex-cli/.codex/hooks/secret-guard.mjs`, wired into
+  `codex-cli/.codex/hooks.json` for both matchers — see `codex-cli/README.md`'s "2026-07-25 research
+  pass" section for the full finding, including a disclosed caveat (two open GitHub issues report
+  `apply_patch` hooks not always firing consistently in practice, despite being documented).
 - **A Codex CLI equivalent of the `ExitPlanMode`/`boardroom-checkpoint.mjs` plan-approval gate.**
   Codex CLI has no plan-mode tool at all — it uses `approval_policy` instead. This is a genuine
   capability gap in the target harness, not a missed port.
 - **Confirming a single-message N-way parallel subagent-dispatch primitive** for either harness, the
   way Claude Code's `Task`/`Agent` calls provide, at full 7/8-seat Boardroom scale. **Update
-  2026-07-23**: Codex CLI's real mechanism is now confirmed directly (not just documented) —
+  2026-07-23**: Codex CLI's mechanism was confirmed directly at the tool-call layer —
   `spawn_agent`/`followup_task`/`send_message`/`wait_agent`, observed live via `codex debug
-  prompt-input`, with a **confirmed 4-concurrent-agent ceiling** (lower than an 8-seat single-message
-  fan-out). OpenCode's Task tool remains confirmed only via docs (§8b), not a live multi-agent run in
-  this sandbox. Neither is confirmed at the exact 7/8-seat scale `boardroom.md` uses in one message —
-  the honest fallback (batch beyond the concurrency ceiling, or dispatch sequentially and consolidate
-  the same way) is what `generate-harness-adapters.mjs`'s `ParallelDispatch` harness note documents.
+  prompt-input`, with a **confirmed 4-concurrent-agent ceiling** at that layer. **A real,
+  disclosed inconsistency with the 2026-07-25 pass, not silently reconciled**: that later pass,
+  fetching `learn.chatgpt.com/docs/agent-configuration/subagents` directly, found a *different*,
+  natural-language-driven dispatch surface (no discrete tool call — "spawn N agents in parallel for
+  X, Y, Z" in one message) governed by a separate `agents.max_concurrent_threads_per_session` config
+  (example configs use `8`). Both are real findings from direct primary-source verification at
+  different times; the most likely explanation is that `spawn_agent`/etc. are the underlying
+  mechanism the natural-language interface compiles down to, with the two passes observing different
+  layers of the same system rather than two competing truths — but this hasn't been independently
+  re-tested to confirm that reconciliation, so it's stated as an open question, not resolved by
+  assumption. OpenCode's Task tool remains confirmed only via docs (§8b), not a live multi-agent run
+  in this sandbox. Neither harness is confirmed at the exact 7/8-seat scale `boardroom.md` uses in
+  one message — the honest fallback (batch beyond the concurrency ceiling, or dispatch sequentially
+  and consolidate the same way) is what `generate-harness-adapters.mjs`'s `ParallelDispatch` harness
+  note documents.
 
 ## Sources (2026 research)
 
