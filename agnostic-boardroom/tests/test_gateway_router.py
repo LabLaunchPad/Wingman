@@ -1,5 +1,5 @@
 """Zero-cost regression tests for gateway.Router: dispatch-by-name and the
-shim's parity with the pre-refactor `agents.model_runner.run_claude_headless`
+shim's parity with the pre-refactor `agents.model_runner.run_claude_headless` (now `models.model_runner`)
 behavior. No real model calls -- `subprocess.run` is mocked throughout."""
 
 import json
@@ -48,10 +48,10 @@ def test_router_construction_rejects_a_default_not_in_providers():
 
 
 def test_shim_reproduces_pre_refactor_run_claude_headless_behavior(monkeypatch):
-    """Parity check: the agents.model_runner shim must return the exact same
+    """Parity check: the models.model_runner shim must return the exact same
     result shape as calling ClaudeCliProvider directly -- proving the move
     didn't silently change behavior."""
-    from agents.model_runner import run_claude_headless
+    from models.model_runner import run_claude_headless
 
     payload = {"result": "hello", "total_cost_usd": 0.05, "session_id": "sess-1", "is_error": False}
     monkeypatch.setattr(

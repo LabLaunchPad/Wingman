@@ -31,8 +31,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from agents.loop import LoopResult, run_maker_checker_loop
-from agents.model_runner import RunResult
+from loop.workflow import LoopResult, run_maker_checker_loop
+from models.model_runner import RunResult
 
 
 @dataclass

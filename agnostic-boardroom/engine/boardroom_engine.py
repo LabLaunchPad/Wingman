@@ -5,18 +5,19 @@ decision-quality against the shipped plugin first" bar on the strength of
 the already-measured token-compression result alone (see `docs/PROJECT.md`'s
 decisions log for the exact exchange).
 
+Ported from `agents/boardroom_engine.py` -- only the loop import path
+changed (`loop.workflow` instead of `agents.loop`, the Agno-native rewrite).
+`to_boardroom_verdict()`'s mapping logic is byte-for-byte unchanged, since it
+only depends on `LoopResult`'s field shape, which the rewrite preserves
+exactly.
+
 **Honest scope, stated plainly rather than overclaimed**: this composes
 memory retrieval + skill routing + the Maker/Checker loop into a single
 `BoardroomVerdict` (the same Pydantic model `core/state_schema.py` already
 defines, faithfully ported from the shipped plugin's real
 `.wingman/checkpoints.jsonl` schema). It produces ONE seat's worth of
-judgment -- a technical/engineering accept-or-reject gate, the same shape
-of call the Maker/Checker loop already proves it can make. It does **not**
-reproduce the shipped plugin's other 7 seats (CEO/CPO/CMO/CISO/CFO/Research/
-Design business, security, and financial judgment) -- those personas have
-no equivalent in this backend today. Calling this a full Boardroom
-replacement would overclaim; it replaces the CTO seat's technical gate
-specifically, nothing else, until the other seats are built too.
+judgment -- a technical/engineering accept-or-reject gate. It does **not**
+reproduce the shipped plugin's other 7 seats.
 """
 
 from __future__ import annotations
@@ -24,17 +25,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from agents.loop import DEFAULT_MAX_ITERATIONS, LoopResult, run_maker_checker_loop
-from agents.model_runner import run_claude_headless
 from core.state_schema import BottomLine, BoardroomVerdict, FounderDecision, SeatVerdict, Verdict
 from knowledge.skill_router import RoutedSkill, route_task
+from loop.workflow import DEFAULT_MAX_ITERATIONS, LoopResult, run_maker_checker_loop
 from mcp_server.memory_tools import retrieve_memories
+from models.model_runner import run_claude_headless
 
 
 @dataclass
 class EngineeringReview:
-    """The engine's own full result, before compression into a BoardroomVerdict."""
-
     routing: RoutedSkill
     loop: LoopResult
     memory_hits: list[dict]
@@ -48,13 +47,6 @@ def run_engineering_review(
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
     call_model=run_claude_headless,
 ) -> EngineeringReview:
-    """Runs the real, composed pipeline: retrieve relevant memory, route to
-    the matching skill, then run the bounded Maker/Checker loop with both
-    fed into context. Every piece here is already independently tested
-    (test_pipeline_wiring.py, test_loop_mocked.py/test_loop_live.py,
-    test_skill_router.py) -- this function's own job is only the
-    composition, same discipline as `agents/pipeline.py`.
-    """
     memory_hits = retrieve_memories(kb_memory, query=task_description, k=5)
     routed = route_task(kb_skills, task_description)
 
@@ -73,22 +65,6 @@ def run_engineering_review(
 
 
 def to_boardroom_verdict(review: EngineeringReview, scope_ref: str, checkpoint_id: str | None = None) -> BoardroomVerdict:
-    """Compresses an EngineeringReview into a real BoardroomVerdict matching
-    the shipped plugin's own `.wingman/checkpoints.jsonl` schema, so a
-    caller consuming this can't tell the difference in shape from a real
-    checkpoint entry -- only in seat coverage (see module docstring).
-
-    Mapping: loop.accepted with no concerns and a confident route -> CTO seat
-    GO; accepted but with a real, Checker-named concern (`loop.final_concerns`)
-    OR only a low-confidence skill route -> GO_WITH_CONCERNS; loop.escalated
-    (never resolved) -> CTO seat NO_GO, consolidated bottom_line DO NOT SHIP.
-    Two independent, non-exclusive reasons can produce GO_WITH_CONCERNS --
-    a content-based one (the Checker itself flagged something, however minor)
-    and a routing-based one (`route_task`'s own low_confidence_fallback is an
-    explicitly unguarded gap, see `knowledge/skill_router.py`'s docstring) --
-    both are surfaced in the summary when both are present, never silently
-    dropped in favor of the other.
-    """
     if review.loop.escalated:
         cto_verdict = Verdict.NO_GO
         summary = (
@@ -131,7 +107,7 @@ def to_boardroom_verdict(review: EngineeringReview, scope_ref: str, checkpoint_i
         founder_decision=founder_decision,
         founder_notes=(
             "Produced by agnostic-boardroom's engineering-review engine -- a single technical "
-            "seat, not the full 8-seat Boardroom. See agents/boardroom_engine.py's module "
+            "seat, not the full 8-seat Boardroom. See engine/boardroom_engine.py's module "
             "docstring for the honest scope of what this does and doesn't cover."
         ),
     )

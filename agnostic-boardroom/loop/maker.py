@@ -1,9 +1,10 @@
-"""The Maker: generates a solution for one task (optionally re-attempting
-with the Checker's prior rejection reason folded in)."""
+"""The Maker: generates a solution for one task (optionally re-attempting with the
+Checker's prior rejection reason folded in). Ported verbatim from
+`agents/departments/engineering_maker.py` -- only the module location changed."""
 
 from __future__ import annotations
 
-from agents.model_runner import RunResult, run_claude_headless
+from models.model_runner import RunResult, run_claude_headless
 
 
 def generate(

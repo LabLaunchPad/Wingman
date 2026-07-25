@@ -2,22 +2,19 @@
 context into the Maker/Checker loop, and (for the end-to-end dry run) memory
 retrieval feeds context in too.
 
-Confirmed before writing this: `route_task()` and `run_maker_checker_loop()`
-were built and tested in complete isolation -- grepped, zero cross-references
-either direction. `route_task`'s own docstring names the consequence
-directly: the "a Checker will catch a wrong skill pick" safety net has no
-real teeth until something actually wires the router's output through the
-loop. This module is that wiring.
+Ported from `agents/pipeline.py` -- only the loop import path changed
+(`loop.workflow` instead of `agents.loop`, the Agno-native rewrite), logic
+unchanged.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
-from agents.loop import DEFAULT_MAX_ITERATIONS, LoopResult, run_maker_checker_loop
-from agents.model_runner import run_claude_headless
 from knowledge.skill_router import RoutedSkill, route_task
+from loop.workflow import DEFAULT_MAX_ITERATIONS, LoopResult, run_maker_checker_loop
 from mcp_server.memory_tools import retrieve_memories
+from models.model_runner import run_claude_headless
 
 
 @dataclass
@@ -32,14 +29,6 @@ def run_task_with_routing(
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
     call_model=run_claude_headless,
 ) -> RoutedLoopResult:
-    """Routes to the best-matching skill, then runs the Maker/Checker loop
-    with that skill's full text as context.
-
-    `routing.confidence` is always surfaced on the returned object -- a
-    `low_confidence_fallback` result must be visible to the caller, never
-    silently swallowed, matching `route_task`'s own existing honesty
-    standard.
-    """
     routed = route_task(kb, task_description)
     loop_result = run_maker_checker_loop(
         task_description,
@@ -64,10 +53,6 @@ def run_ship_feature_dry_run(
     max_iterations: int = DEFAULT_MAX_ITERATIONS,
     call_model=run_claude_headless,
 ) -> DryRunResult:
-    """The real `.claude/commands/ship-feature.md` chain, exercised end to
-    end: retrieve relevant memory, route to the best skill, run the loop
-    with both folded into context. Every stage's own output is returned, not
-    just the final answer, so a caller can inspect the full chain."""
     memory_hits = retrieve_memories(kb_memory, query=task_description, k=5)
     routed = route_task(kb_skills, task_description)
 

@@ -14,7 +14,7 @@ import json
 import re
 from pathlib import Path
 
-from agents.model_runner import run_claude_headless
+from models.model_runner import run_claude_headless
 
 LOG_PATH = Path(__file__).parent / ".data" / "checker_rubric_ab_results.jsonl"
 

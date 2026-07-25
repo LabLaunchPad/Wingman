@@ -29,8 +29,8 @@ import json
 import re
 from pathlib import Path
 
-from agents.boardroom_engine import run_engineering_review, to_boardroom_verdict
-from agents.model_runner import run_claude_headless
+from engine.boardroom_engine import run_engineering_review, to_boardroom_verdict
+from models.model_runner import run_claude_headless
 from db.connection import get_connection
 from db.schema import init_schema
 from knowledge.vector_store import build_skill_knowledge

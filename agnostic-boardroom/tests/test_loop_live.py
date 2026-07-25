@@ -11,8 +11,8 @@ a single trivial reply).
 
 import pytest
 
-from agents.boardroom.cto_evaluator import evaluate
-from agents.loop import run_maker_checker_loop
+from loop.checker import evaluate
+from loop.workflow import run_maker_checker_loop
 
 pytestmark = pytest.mark.live_model
 

@@ -10,8 +10,8 @@ free while still proving the wiring is real.
 
 import pytest
 
-from agents.model_runner import RunResult
-from agents.pipeline import run_task_with_routing
+from models.model_runner import RunResult
+from engine.pipeline import run_task_with_routing
 from knowledge.vector_store import build_skill_knowledge
 
 

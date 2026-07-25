@@ -11,8 +11,8 @@ stages is real.
 
 import pytest
 
-from agents.model_runner import RunResult
-from agents.pipeline import run_ship_feature_dry_run
+from models.model_runner import RunResult
+from engine.pipeline import run_ship_feature_dry_run
 from knowledge.vector_store import build_skill_knowledge
 from mcp_server.memory_tools import build_memory_knowledge, store_memory
 from db.connection import get_connection
