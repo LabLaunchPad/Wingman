@@ -2,6 +2,20 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.5] - 2026-07-25
+
+### Added
+- **`plugins/wingman/references/harness-adapters/claude-code/README.md`** — a new, explicit third adapter entry naming Claude Code alongside Codex CLI and OpenCode. Not a new port: it's a pointer documenting that `plugins/wingman/` itself, in Claude Code's own format, already is the artifact, plus what's genuinely unique to this harness (`AskUserQuestion`, `ExitPlanMode` + its two gates, native parallel `Task`/`Agent` dispatch) that the other two harnesses don't have a direct equivalent for.
+
+### Changed
+- **`harness-adapters/README.md`** — reconciled 2 stale claims found during this pass: the "deliberately not attempted" list still described Codex CLI's `secret-guard.mjs` Write/Edit-matcher path as blocked on an unconfirmed field name, when the 2026-07-25 research pass had already resolved and shipped it; and surfaced a real, previously-unreconciled inconsistency between the 2026-07-23 pass (Codex CLI's `spawn_agent`/`followup_task` tool-call layer, 4-concurrent-agent ceiling) and the 2026-07-25 pass (a separate natural-language parallel-dispatch surface governed by `agents.max_concurrent_threads_per_session`) — disclosed as an open, unreconciled question rather than silently picking one.
+- **`AGENTS.md`/`CLAUDE.md`** (symlinked) and **`docs/ARCHITECTURE.md` §8b** — updated to name all 3 harnesses symmetrically rather than only Codex CLI/OpenCode.
+
+## [0.7.4] - 2026-07-25
+
+### Changed
+- **OpenCode adapter README** — documents a real, live-model-inference test against OpenCode Zen, closing that half of the adapter's "unverified model inference" gap. A real `opencode run --agent boardroom-cto` invocation (using a founder-provided API key, exported as a shell env var only, never written to any file) confirmed live inference genuinely fires and the seat's persona correctly rejects a deliberately bad plan per its own output contract. Also documents a real, non-obvious finding: `opencode run --agent <subagent-name>` falls back to the default primary agent rather than invoking the subagent directly, which then auto-delegates to the named subagent by description-matching — confirmed by inspecting OpenCode's own local session database, not just the printed transcript. Codex CLI's own live-inference half of the same gap remains open (no credential provided for it).
+
 ## [0.7.3] - 2026-07-25
 
 ### Added

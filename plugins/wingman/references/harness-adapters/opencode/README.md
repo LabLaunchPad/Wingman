@@ -16,9 +16,38 @@ directly in this dev sandbox). Confirmed for real, not just checked against docu
   independently confirmed against real sources beyond this project's own research (a documented
   OpenCode plugin hook, and a real GitHub issue referencing `plan_exit` by name).
 
-**What's still unverified**: actual live model inference — a real Boardroom review firing end to
-end. This sandbox has no configured model provider/API key for OpenCode, so the throw-on-reject gate
-logic has never been observed running live, only confirmed to load and enforce policy correctly.
+**Live model inference — confirmed, 2026-07-25.** Given a real OpenCode Zen API key, ran
+`opencode run --agent boardroom-cto "..."` in a throwaway scratch project (never inside this repo)
+against a deliberately bad plan ("store passwords in plaintext, hash later"). Real findings, not
+assumed:
+
+- `opencode run --agent <subagent-name>` does **not** invoke the subagent directly — it warns
+  `agent "boardroom-cto" is a subagent, not a primary agent. Falling back to default agent` and runs
+  the default primary agent (`build`) instead. The primary agent then **automatically delegated to
+  `boardroom-cto` by description-matching**, confirmed by inspecting OpenCode's own local session DB
+  (`~/.local/share/opencode/opencode.db`, `message` table): a real `boardroom-cto`-attributed message
+  row exists alongside the primary's, using the model configured in `boardroom-cto.md`'s frontmatter
+  — this is the automatic-delegation path the docs describe, now observed firing for real, not just
+  documented.
+- The response came back correctly formatted per the seat's own output contract (`**Boardroom CTO
+  Verdict** / Decision: REJECT`), citing the actual security defect (plaintext passwords) with
+  concrete remediation (bcrypt/scrypt/Argon2id) — genuine persona-correct reasoning, not a templated
+  echo.
+- **Real, disclosed caveat on cost observability**: OpenCode's local telemetry reported `cost: 0` for
+  every message in this run. This may reflect real Zen pricing (some models are usage-included) or
+  simply mean the local price table has no entry for the `opencode` provider — **not independently
+  confirmed against Zen's own billing dashboard**, so don't treat `$0` as a proven-free result.
+- The API key used for this test was provided directly in chat by the founder and was **never
+  written to any file in this repository** — it was exported as a shell environment variable only,
+  referenced from a throwaway scratch project's `opencode.json` via `{env:OPENCODE_ZEN_API_KEY}`
+  substitution, and unset immediately after the test. If you're the founder reading this: since the
+  key was pasted in a chat transcript, consider rotating it as routine hygiene regardless of this
+  test's outcome.
+
+**What's still unverified**: the `.opencode/plugin/wingman-gate.js` throw-on-reject gate's behavior
+under a real live `plan_exit` invocation specifically — this test exercised a Boardroom seat
+persona's live inference, not the plan-mode gate itself, which still has no configured trigger path
+tested end to end.
 
 ## What's here
 
