@@ -22,6 +22,61 @@ against a real running session. Treat it as a schema-verified starting point, no
   `plugins/wingman/hooks/secret-guard.mjs`. Not just written and assumed: tested with a real
   stdin/stdout JSON round-trip (destructive command → `deny`, secret pattern → `deny`, clean input →
   `allow`), matching Codex's confirmed hook contract exactly.
+- `.codex/hooks/{prompt-guard,secret-scanner,content-injection-scanner,context-monitor,session-health,
+  session-start,pre-compact-guard,stop-loop}.mjs` — 8 more ports, added in the 2026-07-25
+  hook-porting pass below. Each has a passing unit-test file under
+  `tests/opencode-gate/codex-*.test.mjs` and a real stdin/stdout round-trip was manually checked for
+  several of them (see that section for exactly what's wired vs. disclosed as a gap).
+
+## 2026-07-25 hook-porting pass — 8 more canonical hooks, real ports plus honest limits
+
+A follow-up session (same day as the research pass below, after PR #118 finished porting 6 of
+Wingman's 9 shipped hooks to a real OpenCode plugin adapter) ported as many of the remaining 8
+canonical `plugins/wingman/hooks/*.mjs` files to this Codex CLI adapter as the confirmed hook
+surface actually supports. Two fresh direct fetches of
+[learn.chatgpt.com/docs/hooks](https://learn.chatgpt.com/docs/hooks) resolved several previously-open
+questions before any of this was built — see the exact citations in each new file's own header
+comment. **No live Codex CLI install exists in this sandbox** (same constraint as the rest of this
+adapter) — everything below is schema-confirmed, not live-tested, and one fetch specifically used
+WebFetch's AI-summarization pass over the page rather than a raw text dump, which is disclosed as a
+slightly weaker citation than a raw fetch where it matters (see the `UserPromptSubmit`/`SessionStart`
+entries below).
+
+**New files, all under `.codex/hooks/`, all with `node --check`-clean syntax and a passing
+`node --test` suite under `tests/opencode-gate/codex-*.test.mjs`** (that directory's existing name,
+even though these are Codex CLI ports, not OpenCode — it's simply where this project's harness-adapter
+hook tests already live):
+
+| Canonical hook | Codex event | Status | Genuine gap disclosed |
+|---|---|---|---|
+| `prompt-guard.mjs` | `UserPromptSubmit` — **CONFIRMED to exist**, fires "before model processes user input", prompt text in field `prompt` (same name Claude Code uses) | Wired | Exact output JSON nesting for a block decision not independently re-verified (field names only) |
+| `secret-scanner.mjs` | `PostToolUse`, no matcher — tool output in field `tool_response` (**CONFIRMED**, same name Claude Code uses) | Wired, warn-only | Same output-nesting caveat as above |
+| `content-injection-scanner.mjs` | `PostToolUse`, no matcher — same `tool_response` field | Wired, warn-only | Same caveat; reuses `prompt-guard.mjs`'s `INJECTION` list via import, no duplicate |
+| `context-monitor.mjs` | `PostToolUse`, no matcher | Wired | Scope-creep half is a real ADAPTATION, not a field-name translation: apply_patch has no `file_path` field, so file paths are parsed from apply_patch's own V4A patch-header lines (`*** Update File: ...`) — a reasonable inference, not an independently-cited field mapping |
+| `session-health.mjs` | `PostToolUse`, no matcher | Wired | Only the output-nesting caveat; call-count logic is a clean, direct port |
+| `session-start.mjs` | `SessionStart` — **CONFIRMED to exist**, matcher values `startup`/`resume`/`clear`/`compact` (superset of Claude Code's own 3), input fields include `cwd` | Wired | Output-nesting caveat only |
+| `pre-compact-guard.mjs` | `PreCompact` — **CONFIRMED to exist**, matcher `manual`/`auto` | Wired | Documented input fields (`trigger`, `turn_id`, `session_id`) do **not** list `cwd` — falls back to `process.cwd()` |
+| `stop-loop.mjs` | `Stop` — **CONFIRMED to exist**, no matcher, input `turn_id`/`stop_hook_active`/`last_assistant_message` | Wired | No documented tool-call-history field for this event, so `evaluate()`'s stall-detection check is wired as a permanent no-op (always passed `[]`) until such a field is confirmed; also no `cwd` field, same `process.cwd()` fallback |
+
+**Deliberately NOT ported as a new Codex-specific hook**: `dod-structural-gate.mjs`'s `Bash`/`git push`
+half. Its exact PreToolUse schema (`Bash` matcher, `tool_input.command`) is now just as confirmed as
+`secret-guard.mjs`'s own wiring above — but `plugins/wingman/scripts/dod-pre-push-check.mjs` already
+reuses this hook's pure functions (`checkBoardroomVerdictClean`,
+`checkVerdictTranscriptionMatchesDetails`, `checkTestPresence`, `detectTestCommand`, `runTestSuite`,
+`checkThreatRegisterCleanAcrossArtifacts`) as a real git pre-push hook — which fires at the git level
+under any harness, including this one, with zero Codex-specific wiring, and additionally catches a
+human typing `git push` directly, which a `hooks.json` entry never would. Adding a second,
+Codex-hooks.json-specific wrapper around the identical pure functions would be pure duplication with
+no behavioral gain. See `hooks.json`'s own `_dod_structural_gate_decision` entry for the same
+reasoning inline.
+
+This pass exceeded what earlier research assumed was possible: the equivalent OpenCode investigation
+(`../opencode/SESSION-LIFECYCLE-FINDINGS.md`) found `stop-loop.mjs` genuinely **UNCLEAR** after real
+live testing, because OpenCode's one-shot CLI process tears down before a plugin-triggered follow-up
+turn can complete. Codex CLI's situation is structurally different (a real, documented `Stop` event
+with its own input/output schema exists), so its port is wired here rather than left unwired — but
+"documented to exist" is still a materially weaker claim than OpenCode's "live-tested end to end",
+and this file says so rather than blurring the two together.
 
 ## 2026-07-25 research pass — every previously-open question resolved or narrowed, sourced directly
 
