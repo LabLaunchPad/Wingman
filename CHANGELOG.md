@@ -2,6 +2,19 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.8] - 2026-07-25
+
+### Added
+- **Codex CLI adapter: 8 more of the 9 shipped hooks ported, schema-confirmed against OpenAI's official Codex hooks docs** (no live Codex CLI install exists in this dev sandbox, so nothing here is claimed live-tested — only schema-confirmed): `prompt-guard.mjs` → `UserPromptSubmit`, `secret-scanner.mjs`/`content-injection-scanner.mjs` → `PostToolUse` (`tool_response` field), `context-monitor.mjs`/`session-health.mjs` → `PostToolUse`, `session-start.mjs` → `SessionStart`, `pre-compact-guard.mjs` → `PreCompact`, `stop-loop.mjs` → `Stop`. `dod-structural-gate.mjs`'s git-push half deliberately left unported as a new Codex-specific hook — `dod-pre-push-check.mjs` already covers it as a real git pre-push hook under any harness. 55 new tests.
+- **OpenCode adapter: closed 2 of the 3 remaining real gaps found during the hook-porting pass, plus a new native tool.**
+  - `stop-loop.js` (the ralph-loop) now CONFIRMED WORKING under a real `opencode serve` process (not the one-shot `opencode run`) — `session.idle` + `client.session.prompt()` genuinely completes one real automatic continuation per externally-driven turn (does not yet self-sustain a multi-iteration loop without an external trigger; disclosed plainly, not oversold).
+  - Output-scanner and session-monitor warnings now genuinely reach the model's own context via `experimental.chat.system.transform` (`warning-relay.js`, backed by a shared `.wingman/pending-warnings.json` queue) — previously these warnings only reached stderr/a log file.
+  - New `wingman_boardroom_verdict` custom tool (via the `tool()` helper from `@opencode-ai/plugin`) lets the model read the latest Boardroom checkpoint verdict directly, without a `Bash` roundtrip through `.wingman/checkpoints.jsonl`.
+  - `permission.ask` investigated and confirmed NOT reachable in `opencode run`'s non-interactive mode — logged honestly rather than forced in.
+  - Found and fixed a costly OpenCode loader bug along the way: it auto-invokes every named export as a plugin factory, and a pure function returning `null` crashed the entire server — fixed by moving pure logic outside auto-discovery (`.opencode/plugin/lib/`).
+  - 27 new tests (171 total across the OpenCode+Codex CLI adapters).
+- Fixed `plugins/wingman/commands/adaptive/dogfood.md`'s stale references to the old 7-stage pipeline — never updated when the pipeline expanded to 14 stages in v20 (0.7.0).
+
 ## [0.7.7] - 2026-07-25
 
 ### Added
