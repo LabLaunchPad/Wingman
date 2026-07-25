@@ -96,6 +96,27 @@ def test_cost_is_summed_across_all_iterations_not_just_the_last():
     assert result.total_cost_usd == pytest.approx(4.5)
 
 
+def test_oversized_context_does_not_crash_the_loops_own_wiring():
+    """Real coverage gap found while auditing untested code paths: nothing
+    exercised a pathological (very large) task/context input. This proves
+    the loop's own Python wiring (string concatenation, prompt assembly)
+    doesn't choke on a large input -- it does NOT prove the real `claude -p`
+    CLI itself degrades gracefully at its own limits, since that would
+    require a live, cost-bearing call to actually test. Disclosed here
+    rather than silently implied by a passing mocked test."""
+    huge_context = "x" * 50_000  # ~50KB, matching the audited "poisoned input" concern
+    seen_prompts = []
+
+    def call_model(prompt):
+        seen_prompts.append(prompt)
+        return _maker() if len(seen_prompts) == 1 else _checker_json(True, "fine")
+
+    result = run_maker_checker_loop("do the thing", context=huge_context, call_model=call_model)
+
+    assert result.accepted
+    assert huge_context in seen_prompts[0]
+
+
 def test_checker_fails_closed_on_unparseable_response():
     call_model = lambda prompt: RunResult(
         text="I think this looks fine!", total_cost_usd=0.05, session_id="s", is_error=False

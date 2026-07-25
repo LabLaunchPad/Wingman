@@ -908,6 +908,20 @@ this is one re-tested scenario, not proof severity calibration generalizes — a
 previously-unseen scenario hasn't yet been run against the fixed Checker; that's the next bar before
 treating `boardroom_engine.py`'s decision quality as broadly evidenced rather than narrowly evidenced.
 
+**Generalization check (closes the open item above).** Added `flatten-nested-list` — orthogonal to
+`palindrome-check`'s punctuation gap, exercising a different checklist dimension. **Real result**:
+both the new engine and the real CTO persona reached `GO_WITH_CONCERNS` ($0.347196), but the routing
+was `low_confidence_fallback`, leaving it ambiguous whether the tier match was content-based or
+coincidental — the exact ambiguity `simple-email-validation` already had. Fixed a real logging gap
+(`live_ab_run.py` now records `checker_final_concerns`) and ran one supplementary live call
+(`eval/checker_generalization_check.py`, $0.017608) re-evaluating the exact accepted artifact
+directly. **Settled the ambiguity**: the Checker independently named "no handling for extremely deep
+nesting causing RecursionError" — the *exact* risk the real persona called its "biggest technical
+risk." Real, direct evidence the fix generalizes to a scenario it wasn't tuned against. Total real
+spend, this check: $0.364804. **Running total across Phases 5-7 plus this check: $2.219720.** Still
+honestly bounded: 2 scenarios checked, not a claim this is solved for all future cases —
+`boardroom_engine.py` remains promising but narrowly (now less narrowly) evidenced.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)

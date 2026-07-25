@@ -15,6 +15,21 @@ def kb():
     )
 
 
+def test_empty_index_raises_a_clear_error_rather_than_silently_returning_nothing(tmp_path):
+    """Real coverage gap found while auditing untested code paths: an empty
+    knowledge base (no skills indexed) hits `route_task`'s explicit
+    `ValueError` -- a real fail-fast, but never previously exercised."""
+    empty_skills_dir = tmp_path / "no_skills_here"
+    empty_skills_dir.mkdir()
+    empty_kb = build_skill_knowledge(
+        lancedb_uri=str(tmp_path / "empty_lancedb"),
+        table_name="empty_skills",
+        skills_dir=empty_skills_dir,
+    )
+    with pytest.raises(ValueError, match="No skills indexed"):
+        route_task(empty_kb, "any task at all")
+
+
 def test_routes_a_clear_task_to_the_matching_skill_with_confidence(kb):
     routed = route_task(kb, "how do I write a minimal reproduction before fixing a bug")
     assert routed.confidence == "matched"

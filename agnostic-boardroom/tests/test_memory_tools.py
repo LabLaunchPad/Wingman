@@ -61,6 +61,14 @@ def test_list_memories_newest_first_and_tag_filtered(conn, kb):
     assert tagged[0]["content"] == "fact B"
 
 
+def test_retrieve_on_an_empty_store_returns_an_empty_list_not_an_error(kb):
+    """Real coverage gap found while auditing untested code paths: nothing
+    exercised the zero-hit case (querying before anything's ever been
+    stored) -- confirms it degrades gracefully instead of raising."""
+    results = retrieve_memories(kb, "anything at all", k=5)
+    assert results == []
+
+
 def test_500_entry_stress_scoped_to_founders_own_bar(conn, kb):
     """The founder's own stated stress-test bar: 500 entries, sub-100ms reads,
     rapid sequential read/write with no corruption -- NOT a concurrency/load

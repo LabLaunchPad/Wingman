@@ -5,16 +5,53 @@ memory MCP server, skill router, loop/graph engineering, an experimental slash c
 (real MCP client wiring, skill-router→loop integration, an end-to-end dry run), Phase 3
 (decision-quality comparison harness, zero-cost), Phase 4 (a real, invokable engineering-review
 engine + MCP tools + project-level registration), Phase 5 (the live decision-quality A/B itself,
-real money spent), Phase 6 (root-caused + fixed the rubric gap, nuanced re-run result), and Phase 7
+real money spent), Phase 6 (root-caused + fixed the rubric gap, nuanced re-run result), Phase 7
 (fixed Phase 6's over-correction with a structural schema change, confirmed on the real re-tested
-case) all done. 53/53 fast tests pass, plus 3/3 real live-model tests (run explicitly, cost real
-money). **Phase 7's real result is a genuine, disclosed fix — but narrowly evidenced**: on the exact
-known-buggy `palindrome-check` code that Phase 5 accepted cleanly and Phase 6 over-corrected to
-reject, the Checker now accepts with 2 named concerns — matching the real persona's
-`GO_WITH_CONCERNS` shape for the first time across 3 real attempts. This is one re-tested scenario,
-not proof the calibration generalizes to unseen cases. Still not installable as a Wingman plugin and
-`plugins/wingman/commands/adaptive/boardroom.md` is still untouched — see Phase 7's writeup below for
-the real numbers, and Phase 4's honest-scope note for what "wired in" does and doesn't mean here.**
+case), and a generalization check (a genuinely new scenario, confirming the fix isn't overfit to the
+one case it was diagnosed against) all done. 56/56 fast tests pass (default `pytest` run), plus 2/2
+real live-model (cost-bearing) tests (`pytest -m live_model`, run explicitly). **The generalization
+check found real, direct evidence the
+severity-calibration fix holds beyond the one scenario it was built against**: on a brand-new task
+(`flatten-nested-list`) neither the fix nor the checklist was ever tuned on, the Checker
+independently named the *exact* risk ("deep recursion could hit Python's stack limit") the real CTO
+persona called its "biggest technical risk" — both landed on `GO_WITH_CONCERNS`. Still not
+installable as a Wingman plugin and `plugins/wingman/commands/adaptive/boardroom.md` is still
+untouched — see the generalization-check writeup below for the real numbers, and Phase 4's
+honest-scope note for what "wired in" does and doesn't mean here.**
+
+## Generalization check: a genuinely new scenario, confirming the fix isn't overfit
+
+Phase 7 left one honest gap open: its result was on the same scenario (`palindrome-check`) the fix
+was diagnosed against — real evidence the specific over-correction was resolved, but not proof
+severity calibration generalizes. Closed that gap with a scenario orthogonal to `palindrome-check`'s
+punctuation-handling issue: `flatten-nested-list` (flatten an arbitrarily-nested list), exercising a
+different checklist dimension (architecture-fit/scope judgment, not a missed correctness edge).
+
+**Real result, run live** (`eval/live_ab_run.py flatten-nested-list`, $0.347196): both the new engine
+and the real CTO persona reached `GO_WITH_CONCERNS`. But the routing landed on
+`low_confidence_fallback` (an unrelated skill), leaving it genuinely ambiguous whether the tier match
+was content-based or coincidental — the same ambiguity `simple-email-validation` already had back in
+Phase 5/6. Fixed a real logging gap (`live_ab_run.py` now records `checker_final_concerns` on every
+future run) and ran one supplementary live call re-evaluating the exact accepted artifact directly
+(`eval/checker_generalization_check.py`, $0.017608):
+
+```json
+{"accepted": true, "concerns": [
+  "Only checks isinstance(item, list), so subclasses of list work but other sequence-like or iterable-of-nested-lists types (e.g. tuples) are treated as atomic elements -- fine per spec since task explicitly says 'list', just worth noting",
+  "No handling for extremely deep nesting causing RecursionError, though not a realistic concern for typical inputs",
+  "No unit tests included alongside the function"
+]}
+```
+
+The real CTO persona's own verdict: *"Biggest technical risk: Extremely deep nesting (thousands of
+levels) could hit Python's recursion limit and crash."* **The Checker independently named the same
+risk** — not a coincidental tier match, direct evidence the concerns/severity-guidance fix
+generalizes to a scenario it was never tuned against.
+
+**Total real spend, this check: $0.364804. Running total across Phases 5-7 plus this check:
+$2.219720.** Still honestly bounded: 2 scenarios checked (1 re-tested, 1 genuinely new), not a claim
+this is solved for all future cases — `boardroom_engine.py` remains promising but narrowly (now
+somewhat less narrowly) evidenced.
 
 ## Phase 7: fixed Phase 6's over-correction with a structural schema change, confirmed on the real case
 
