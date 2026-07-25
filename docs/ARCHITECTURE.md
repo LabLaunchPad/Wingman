@@ -851,6 +851,27 @@ building and registering it, and was not part of this pass. 4 new tests
 (`test_boardroom_engine.py`), covering all 3 verdict paths plus real seeded-memory read-back against
 the real 40-skill index (mocked only on the model-call side, zero cost). 51/51 fast tests total.
 
+**Phase 5 (the live decision-quality A/B, real money spent — done, result is a real caution).** The
+founder asked for the deferred live A/B directly, explicitly using the same headless `claude -p`
+mechanism (no separate API key) and asking for token efficiency — so `eval/live_ab_run.py` ran only
+2 real scenarios, `max_iterations=2`. Methodology: `boardroom_engine.py`'s real Maker/Checker loop
+runs to its real conclusion on a task, and that exact artifact is handed to a single live call
+framed with the real, unmodified CTO seat persona (`plugins/wingman/agents/boardroom-cto.md`, read
+from disk at run time, never copy-pasted) to get its independent verdict on the same artifact. **The
+real result, re-read directly from `eval/.data/live_ab_results.jsonl`, is a genuine caution, not
+reassurance**: on `palindrome-check`, the new engine accepted a solution that strips spaces but not
+punctuation (`GO_WITH_CONCERNS`) — the real CTO persona correctly rejected it (`NO_GO`), naming the
+exact gap and demanding a fix plus test cases. On `simple-email-validation`, both landed on a
+shippable verdict, but for different reasons (the new engine's `GO_WITH_CONCERNS` came from a
+low-confidence skill route, not a content concern; the persona said clean `GO`). Total real cost:
+$0.855020 (`palindrome-check` $0.153924, `simple-email-validation` $0.701096 — a genuine 2nd Maker
+iteration was needed, confirmed by the loop's own iteration count). **Honest conclusion**: 2
+scenarios is nowhere near enough for a rate, but the one real disagreement observed points against
+readiness, not toward it — the new engine was wrong in the more dangerous direction (too lenient). A
+real bug in the harness itself was found and fixed while running this: it only wrote results to disk
+after every scenario succeeded, so a later scenario's real, paid-for failure would have silently
+discarded an earlier scenario's already-spent result — fixed to write incrementally.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)

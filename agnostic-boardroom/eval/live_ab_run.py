@@ -88,7 +88,8 @@ def _run_cto_persona_review(task: str, candidate_solution: str, persona_body: st
     }
 
 
-def main() -> None:
+def main(scenarios=None) -> None:
+    scenarios = scenarios if scenarios is not None else SCENARIOS
     persona_body = _extract_persona_body(CTO_PERSONA_PATH)
     kb_skills = build_skill_knowledge()
     kb_memory = build_memory_knowledge()
@@ -97,8 +98,9 @@ def main() -> None:
 
     total_cost = 0.0
     records = []
+    LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    for scenario in SCENARIOS:
+    for scenario in scenarios:
         print(f"=== {scenario['name']} ===", flush=True)
         review = run_engineering_review(
             kb_skills,
@@ -138,16 +140,21 @@ def main() -> None:
         }
         records.append(record)
         print(json.dumps(record, indent=2, default=str), flush=True)
-
-    LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with LOG_PATH.open("a") as f:
-        for r in records:
-            f.write(json.dumps(r, default=str) + "\n")
+        # Write incrementally -- a later scenario's real (paid-for) call
+        # failing must not lose an earlier scenario's already-spent result.
+        with LOG_PATH.open("a") as f:
+            f.write(json.dumps(record, default=str) + "\n")
 
     agreements = sum(1 for r in records if r["verdicts_agree"])
     print(f"\nAgreement: {agreements}/{len(records)} scenarios")
-    print(f"TOTAL REAL COST: ${total_cost:.6f}")
+    print(f"TOTAL REAL COST (this invocation): ${total_cost:.6f}")
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if len(sys.argv) > 1:
+        names = set(sys.argv[1:])
+        main(scenarios=[s for s in SCENARIOS if s["name"] in names])
+    else:
+        main()

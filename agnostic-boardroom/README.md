@@ -3,11 +3,59 @@
 **Status: Phase 1 (Data & Schema), Phase 2a (skill-context A/B testing), Phase 2 (data substrate,
 memory MCP server, skill router, loop/graph engineering, an experimental slash command), Phase 2b
 (real MCP client wiring, skill-router→loop integration, an end-to-end dry run), Phase 3
-(decision-quality comparison harness, zero-cost), and Phase 4 (a real, invokable engineering-review
-engine + MCP tools + project-level registration) all done. 51/51 fast tests pass, plus 2/2 real
-live-model tests (run explicitly, cost real money). Still not installable as a Wingman plugin and
-`plugins/wingman/commands/adaptive/boardroom.md` is still untouched — see Phase 4's own honest scope
-note below for exactly what "wired in" does and doesn't mean here.**
+(decision-quality comparison harness, zero-cost), Phase 4 (a real, invokable engineering-review
+engine + MCP tools + project-level registration), and Phase 5 (the live decision-quality A/B itself,
+real money spent) all done. 52/52 fast tests pass, plus 2/2 real live-model tests (run explicitly,
+cost real money). **Phase 5's real result is a genuine caution, not a green light**: the new engine
+disagreed with the shipped plugin's real CTO persona on 1 of 2 scenarios — and disagreed by being
+*too lenient*, accepting a bug the real persona caught. Still not installable as a Wingman plugin and
+`plugins/wingman/commands/adaptive/boardroom.md` is still untouched — see Phase 5's writeup below for
+the real numbers, and Phase 4's honest-scope note for what "wired in" does and doesn't mean here.**
+
+## Phase 5: the live decision-quality A/B — real money, real result, a real caution
+
+The one experiment every prior phase deferred: does `boardroom_engine.py` reach as good a decision
+as the shipped plugin's real Boardroom, not a scripted stand-in for one. Run via
+`eval/live_ab_run.py`, kept deliberately small for cost efficiency (2 real scenarios,
+`max_iterations=2` not the harness's default 3, one extra call per scenario) — **no separate API
+key**, the same headless `claude -p` mechanism this whole rewrite has used from the start.
+
+**Methodology**: for each scenario, `boardroom_engine.py`'s real Maker/Checker loop runs to its
+real, live conclusion (a real candidate solution, really accepted or escalated). That exact
+artifact is then handed to a single live call framed with the real, unmodified CTO seat persona
+(`plugins/wingman/agents/boardroom-cto.md`, read from disk at run time, never copy-pasted, so it
+can't silently drift from what's actually shipped) — asking whether the shipped plugin's own CTO
+seat would independently reach the same verdict on the same artifact.
+
+**Real results** (both entries in `eval/.data/live_ab_results.jsonl`, independently re-read, not
+trusted from the script's own printed summary):
+
+| Scenario | New engine | Shipped CTO persona | Agree? |
+|---|---|---|---|
+| `palindrome-check` | `GO_WITH_CONCERNS` (accepted a solution that strips spaces but not punctuation) | **`NO_GO`** — named the exact punctuation gap and demanded a fix + test cases before shipping | **No** |
+| `simple-email-validation` | `GO_WITH_CONCERNS` (downgraded only because of a low-confidence skill route, not a content concern) | `GO` — clean, no concerns | Nominally yes, but for different reasons |
+
+**Total real cost: $0.855020** (`palindrome-check`: $0.153924; `simple-email-validation`:
+$0.701096 — a genuinely wrong-first-attempt case that needed a real 2nd Maker iteration, confirmed
+by the loop's own `iterations` count).
+
+**The honest reading, not a rounded-up "50% agreement"**: on the one scenario where the two systems
+actually disagreed in substance, the new engine was *wrong in the more dangerous direction* — it
+accepted code with a real bug that the shipped, already-working plugin caught and named specifically.
+The "agreement" on the second scenario wasn't even reached the same way: the new engine's
+`GO_WITH_CONCERNS` came from routing uncertainty (`low_confidence_fallback`), not from any actual
+concern about the code, while the real CTO persona said clean `GO` for a genuinely different reason.
+Two scenarios is nowhere near enough to conclude a rate, but it's enough to answer the actual
+question asked: **no, this hasn't yet demonstrated it's as good as the shipped plugin's real
+judgment — the one real disagreement observed points the other way.** This is exactly the caution a
+"prove decision-quality first" bar exists to catch, and exactly why overriding that bar to build and
+register the engine anyway (Phase 4) doesn't mean the engine is ready to actually decide anything for
+a real founder yet.
+
+A real bug in the harness itself was also found and fixed while running this: the original script
+only wrote results to `eval/.data/live_ab_results.jsonl` after every scenario succeeded, so a later
+scenario's real (paid-for) failure would have silently discarded an earlier scenario's already-spent
+result. Fixed to write incrementally, one scenario at a time.
 
 ## Phase 4: a real, invokable engineering-review engine — wired in, honestly scoped
 
