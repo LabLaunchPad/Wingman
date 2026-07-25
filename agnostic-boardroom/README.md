@@ -57,7 +57,32 @@ only wrote results to `eval/.data/live_ab_results.jsonl` after every scenario su
 scenario's real (paid-for) failure would have silently discarded an earlier scenario's already-spent
 result. Fixed to write incrementally, one scenario at a time.
 
-## Phase 4: a real, invokable engineering-review engine — wired in, honestly scoped
+## Phase 6: root-caused the gap, fixed it, re-ran the A/B — result is nuanced, not a clean win
+
+Direct comparison of the real prompt templates found the gap: `boardroom-cto.md` has an explicit
+5-point checklist; `cto_evaluator.py`'s Checker prompt had none. `eval/checker_rubric_ab.py` proved
+this in isolation — injecting the checklist into the Checker's prompt flipped its verdict on the
+known-buggy `palindrome-check` code from accepted to rejected ($0.097233). The checklist was then
+ported permanently into `cto_evaluator.py`, and the original 2-scenario A/B was re-run for real.
+
+**Real re-run result** (`eval/.data/live_ab_results.jsonl`, entries 3-4):
+
+| Scenario | New engine (post-fix) | Shipped CTO persona | Agree? |
+|---|---|---|---|
+| `palindrome-check` | `NO_GO`, **escalated** (rejected its own fix attempt — `[c for c in s if c.isalnum()]` strips more than the fix needed) | `GO_WITH_CONCERNS` — same concern, but judged shippable | **No** |
+| `simple-email-validation` | `GO_WITH_CONCERNS` (routing uncertainty, unchanged) | `GO` | Nominally yes |
+
+Total re-run cost: **$0.804398** (combined with the original run + rubric test: **$1.756651** real
+spend across this whole investigation so far).
+
+**Honest reading — this is not "the fix worked"**: agreement is still 1 of 2, the same rate as
+before. What changed is the *direction* of the one real disagreement: pre-fix, the Checker was too
+lenient (accepted a real bug the persona caught). Post-fix, it swung to too strict — it escalated
+(blocked shipping entirely) on a solution the persona would have shipped with a documented caveat.
+The checklist fixed the specific miss it was built to fix (confirmed in isolation), but calibrating
+a rubric-bearing Checker to match a persona's actual judgment — not just "notice more things," but
+weigh severity the same way — is evidently a harder, unsolved problem than adding the checklist
+alone. This is real, disclosed evidence against declaring the gap closed, not for it.
 
 The founder reviewed Phase 1-3's real-metrics readiness report and explicitly chose to proceed on the
 strength of the already-measured token-compression result alone, overriding the earlier

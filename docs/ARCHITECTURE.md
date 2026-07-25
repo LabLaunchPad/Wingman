@@ -872,6 +872,21 @@ real bug in the harness itself was found and fixed while running this: it only w
 after every scenario succeeded, so a later scenario's real, paid-for failure would have silently
 discarded an earlier scenario's already-spent result — fixed to write incrementally.
 
+**Phase 6 (root-caused the gap, fixed it, re-ran the A/B — done, nuanced result).** Direct comparison
+of the real prompt templates found the actual gap: `boardroom-cto.md` has an explicit 5-point
+checklist; `cto_evaluator.py`'s Checker prompt had none. `eval/checker_rubric_ab.py` isolated this
+for one live call ($0.097233): injecting the checklist into the Checker's prompt flipped its verdict
+on the known-buggy `palindrome-check` code from accepted to rejected. The checklist was ported
+permanently into `cto_evaluator.py`, and the original 2-scenario A/B was re-run for real
+($0.804398). **Result is nuanced, not a clean win**: agreement stayed at 1 of 2 (unchanged rate),
+but the *direction* of the one real disagreement flipped — pre-fix, the Checker was too lenient
+(accepted a real bug); post-fix, it escalated (`NO_GO`, blocked entirely) on a solution the real
+persona would have shipped with a documented caveat (`GO_WITH_CONCERNS`). The checklist fixed the
+specific miss it was built to fix (confirmed in isolation), but calibrating a rubric-bearing Checker
+to weigh severity the way a real persona does is evidently a harder, still-unsolved problem than
+adding the checklist alone. Total real spend across the whole investigation (original A/B + rubric
+isolation test + re-run): $1.756651. This is disclosed evidence against declaring the gap closed.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)
