@@ -306,6 +306,30 @@ Deliberately did **not** re-spend real `claude -p` money proving the Maker/Check
 rejection behavior again here — that's already proven in `tests/test_loop_live.py`; these new tests
 prove the *wiring* is real using mocked, zero-cost model calls.
 
+## First real dogfood run: the whole chain, live, in one pass
+
+The gap left above (mocked-wiring tests only) was closed with a real dogfood run:
+`engine.pipeline.run_ship_feature_dry_run()` called live (no mocked `call_model`), in a throwaway
+scratch SQLite/LanceDB substrate, seeded with one real memory fact, given a genuine small task ("write
+a minimal Python script that reproduces a bug: a function meant to add two numbers instead subtracts
+them"). **Three real, disclosed findings**:
+
+1. The seeded memory fact was genuinely retrieved and present in `memory_hits` — the memory-retrieval
+   half of the chain works for real, not just in `test_end_to_end_dry_run.py`'s mocked setup.
+2. `route_task` hit its own documented `low_confidence_fallback` path for real, on a realistic task,
+   for the first time — routed to `engineering-minimalism` at `best_similarity=0.43`, below the ~0.5
+   threshold. Previously this path was only exercised by a synthetic nonsense query
+   (`test_nonsense_query_falls_back_but_still_returns_a_skill`); this is the first live confirmation
+   the "unguarded gap" `knowledge/skill_router.py`'s own docstring names is a real, live risk surface,
+   not just a test artifact.
+3. Despite the mismatched skill context, the live Maker/Checker loop still accepted a genuinely
+   correct solution on the first iteration (real cost `$0.2179`, 2 real Checker-named concerns about
+   test coverage breadth) — the Checker wasn't fooled by the wrong context *this time*. This is
+   informative, not proof the low-confidence-routing gap is safe in general across other tasks — a
+   single run is one data point, not a closed risk.
+
+See `docs/PROJECT.md`'s decisions log for the full record.
+
 This is a from-scratch Python backend rebuild of Wingman's Boardroom/pipeline concepts as a
 standalone, agent-agnostic MCP server — LangGraph-style graph orchestration (via
 [Agno](https://github.com/agno-agi/agno), chosen over LangGraph for its smaller footprint and
