@@ -28,6 +28,7 @@ class IterationLog:
     checker_cost_usd: float
     accepted: bool
     checker_reason: str
+    concerns: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -37,6 +38,11 @@ class LoopResult:
     iterations: list[IterationLog] = field(default_factory=list)
     total_cost_usd: float = 0.0
     escalated: bool = False
+    # Concerns the Checker named on the accepted iteration -- non-empty means
+    # the Checker judged this shippable but with a real, named caveat (the
+    # content-based path to GO_WITH_CONCERNS, distinct from a routing-based
+    # low-confidence downgrade). Always [] when escalated=True.
+    final_concerns: list[str] = field(default_factory=list)
 
 
 def run_maker_checker_loop(
@@ -65,11 +71,18 @@ def run_maker_checker_loop(
                 checker_cost_usd=verdict.cost_usd,
                 accepted=verdict.accepted,
                 checker_reason=verdict.reason,
+                concerns=verdict.concerns,
             )
         )
 
         if verdict.accepted:
-            return LoopResult(accepted=True, final_output=output, iterations=iterations, total_cost_usd=total_cost)
+            return LoopResult(
+                accepted=True,
+                final_output=output,
+                iterations=iterations,
+                total_cost_usd=total_cost,
+                final_concerns=verdict.concerns,
+            )
 
         feedback = verdict.reason
 

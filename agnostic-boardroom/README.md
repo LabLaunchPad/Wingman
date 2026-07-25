@@ -4,13 +4,59 @@
 memory MCP server, skill router, loop/graph engineering, an experimental slash command), Phase 2b
 (real MCP client wiring, skill-router→loop integration, an end-to-end dry run), Phase 3
 (decision-quality comparison harness, zero-cost), Phase 4 (a real, invokable engineering-review
-engine + MCP tools + project-level registration), and Phase 5 (the live decision-quality A/B itself,
-real money spent) all done. 52/52 fast tests pass, plus 2/2 real live-model tests (run explicitly,
-cost real money). **Phase 5's real result is a genuine caution, not a green light**: the new engine
-disagreed with the shipped plugin's real CTO persona on 1 of 2 scenarios — and disagreed by being
-*too lenient*, accepting a bug the real persona caught. Still not installable as a Wingman plugin and
-`plugins/wingman/commands/adaptive/boardroom.md` is still untouched — see Phase 5's writeup below for
+engine + MCP tools + project-level registration), Phase 5 (the live decision-quality A/B itself,
+real money spent), Phase 6 (root-caused + fixed the rubric gap, nuanced re-run result), and Phase 7
+(fixed Phase 6's over-correction with a structural schema change, confirmed on the real re-tested
+case) all done. 53/53 fast tests pass, plus 3/3 real live-model tests (run explicitly, cost real
+money). **Phase 7's real result is a genuine, disclosed fix — but narrowly evidenced**: on the exact
+known-buggy `palindrome-check` code that Phase 5 accepted cleanly and Phase 6 over-corrected to
+reject, the Checker now accepts with 2 named concerns — matching the real persona's
+`GO_WITH_CONCERNS` shape for the first time across 3 real attempts. This is one re-tested scenario,
+not proof the calibration generalizes to unseen cases. Still not installable as a Wingman plugin and
+`plugins/wingman/commands/adaptive/boardroom.md` is still untouched — see Phase 7's writeup below for
 the real numbers, and Phase 4's honest-scope note for what "wired in" does and doesn't mean here.**
+
+## Phase 7: fixed Phase 6's over-correction with a structural schema change, confirmed on the real case
+
+Root cause, found by re-reading Phase 5/6's real logs directly (not by taking either my own prior
+"add a checklist" fix or a proposed "enumerate more edge cases" theory at face value): `CheckerVerdict`
+was strictly binary (`accepted: bool`) with no way to express "shippable, but here's a real concern"
+— exactly the real CTO persona's `GO_WITH_CONCERNS` middle tier. Before this fix,
+`boardroom_engine.py`'s `GO_WITH_CONCERNS` path could *only* ever be reached via a low-confidence
+skill route, never via the Checker's own content judgment.
+
+**Fix**: added `CheckerVerdict.concerns: list[str]` (threaded through `IterationLog` and
+`LoopResult.final_concerns`), plus a `_SEVERITY_GUIDANCE` prompt addition telling the Checker to
+distinguish a genuine correctness gap (reject) from a real-but-shippable concern (accept + name it).
+`boardroom_engine.to_boardroom_verdict()` now combines both the content-based concern signal and the
+routing-based low-confidence signal into `GO_WITH_CONCERNS`, naming both when both are present.
+
+**Real result** (`eval/checker_severity_ab.py`, one live call reusing the exact known-buggy
+`palindrome-check` code, cost **$0.098265**, logged to
+`eval/.data/checker_severity_ab_results.jsonl`):
+
+```json
+{"accepted": true, "concerns": [
+  "Only strips literal space characters, not other whitespace/punctuation, but that matches the stated spec of 'ignoring case and spaces' exactly",
+  "No test cases included, but the task only asked for the function definition"
+]}
+```
+
+This is the first of 3 real attempts on this scenario (Phase 5: accepted, no concern named; Phase 6:
+escalated/rejected; Phase 7: accepted with named concerns) where the verdict shape actually lands on
+`GO_WITH_CONCERNS` — matching the real persona's tier instead of either extreme. A new unit test,
+`test_accepted_matched_route_with_checker_concerns_produces_go_with_concerns`, proves the
+content-based path is independently reachable under a confident (`matched`) route, not just riding on
+the pre-existing routing-based path.
+
+**Total real spend across Phases 5+6+7: $1.854916.**
+
+**Still open, stated plainly rather than rounded up further**: this confirms the specific
+over-correction from Phase 6 is resolved on the scenario it was diagnosed against — it does not prove
+severity calibration is solved in general. A genuinely new, previously-unseen scenario (not
+`palindrome-check` again) hasn't yet been run against the fixed Checker. That's the next evidence bar
+before treating `boardroom_engine.py`'s decision quality as broadly evidenced rather than narrowly
+evidenced.
 
 ## Phase 5: the live decision-quality A/B — real money, real result, a real caution
 

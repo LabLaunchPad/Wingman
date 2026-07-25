@@ -887,6 +887,27 @@ to weigh severity the way a real persona does is evidently a harder, still-unsol
 adding the checklist alone. Total real spend across the whole investigation (original A/B + rubric
 isolation test + re-run): $1.756651. This is disclosed evidence against declaring the gap closed.
 
+**Phase 7 (structural fix for the over-correction, real result confirms it).** Root cause:
+`CheckerVerdict` was strictly binary (accept/reject) with no way to express "shippable, but here's a
+real concern" — exactly the real persona's `GO_WITH_CONCERNS` tier. Before this fix,
+`boardroom_engine.py`'s `GO_WITH_CONCERNS` path could only ever be reached via a low-confidence skill
+route, never via the Checker's own judgment about the code. Fixed by adding
+`CheckerVerdict.concerns: list[str]` (threaded through `IterationLog`/`LoopResult.final_concerns`
+into `to_boardroom_verdict()`, which now combines content-based and routing-based signals) plus a
+`_SEVERITY_GUIDANCE` prompt addition telling the Checker to distinguish a genuine correctness gap
+(reject) from a real-but-shippable concern (accept + name it). **Real result**
+(`eval/checker_severity_ab.py`, one live call against the identical known-buggy `palindrome-check`
+code, $0.098265, logged to `eval/.data/checker_severity_ab_results.jsonl`): `accepted: true` with 2
+named concerns — the first of 3 real attempts (Phase 5 accept-no-concern, Phase 6 reject/escalate,
+this Phase 7 result) where the verdict shape actually lands on `GO_WITH_CONCERNS` rather than either
+extreme. A new unit test
+(`test_accepted_matched_route_with_checker_concerns_produces_go_with_concerns`) proves the
+content-based path is independently reachable under a confident route, not just riding on the
+routing-based path. Total real spend across all 3 phases: $1.854916. **Still open, stated plainly**:
+this is one re-tested scenario, not proof severity calibration generalizes — a genuinely new,
+previously-unseen scenario hasn't yet been run against the fixed Checker; that's the next bar before
+treating `boardroom_engine.py`'s decision quality as broadly evidenced rather than narrowly evidenced.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)
