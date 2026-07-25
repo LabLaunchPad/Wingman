@@ -16,9 +16,38 @@ directly in this dev sandbox). Confirmed for real, not just checked against docu
   independently confirmed against real sources beyond this project's own research (a documented
   OpenCode plugin hook, and a real GitHub issue referencing `plan_exit` by name).
 
-**What's still unverified**: actual live model inference — a real Boardroom review firing end to
-end. This sandbox has no configured model provider/API key for OpenCode, so the throw-on-reject gate
-logic has never been observed running live, only confirmed to load and enforce policy correctly.
+**Live model inference — confirmed, 2026-07-25.** Given a real OpenCode Zen API key, ran
+`opencode run --agent boardroom-cto "..."` in a throwaway scratch project (never inside this repo)
+against a deliberately bad plan ("store passwords in plaintext, hash later"). Real findings, not
+assumed:
+
+- `opencode run --agent <subagent-name>` does **not** invoke the subagent directly — it warns
+  `agent "boardroom-cto" is a subagent, not a primary agent. Falling back to default agent` and runs
+  the default primary agent (`build`) instead. The primary agent then **automatically delegated to
+  `boardroom-cto` by description-matching**, confirmed by inspecting OpenCode's own local session DB
+  (`~/.local/share/opencode/opencode.db`, `message` table): a real `boardroom-cto`-attributed message
+  row exists alongside the primary's, using the model configured in `boardroom-cto.md`'s frontmatter
+  — this is the automatic-delegation path the docs describe, now observed firing for real, not just
+  documented.
+- The response came back correctly formatted per the seat's own output contract (`**Boardroom CTO
+  Verdict** / Decision: REJECT`), citing the actual security defect (plaintext passwords) with
+  concrete remediation (bcrypt/scrypt/Argon2id) — genuine persona-correct reasoning, not a templated
+  echo.
+- **Real, disclosed caveat on cost observability**: OpenCode's local telemetry reported `cost: 0` for
+  every message in this run. This may reflect real Zen pricing (some models are usage-included) or
+  simply mean the local price table has no entry for the `opencode` provider — **not independently
+  confirmed against Zen's own billing dashboard**, so don't treat `$0` as a proven-free result.
+- The API key used for this test was provided directly in chat by the founder and was **never
+  written to any file in this repository** — it was exported as a shell environment variable only,
+  referenced from a throwaway scratch project's `opencode.json` via `{env:OPENCODE_ZEN_API_KEY}`
+  substitution, and unset immediately after the test. If you're the founder reading this: since the
+  key was pasted in a chat transcript, consider rotating it as routine hygiene regardless of this
+  test's outcome.
+
+**What's still unverified**: the `.opencode/plugin/wingman-gate.js` throw-on-reject gate's behavior
+under a real live `plan_exit` invocation specifically — this test exercised a Boardroom seat
+persona's live inference, not the plan-mode gate itself, which still has no configured trigger path
+tested end to end.
 
 ## What's here
 
@@ -46,15 +75,25 @@ logic has never been observed running live, only confirmed to load and enforce p
 
 ## Running a Boardroom review under OpenCode
 
-OpenCode has a documented Task tool and a "General purpose agent" that can run multiple units of
-work in parallel (per [OpenCode's Agents docs](https://opencode.ai/docs/agents/)), plus
-peer-messaging/shared-task-board coordination for parallel agents. Research did not confirm a single
-built-in primitive for "fan out to all 8 named subagents in one message" the way Claude Code's
-`Task`/`Agent` calls do — so, same honest caveat as the Codex CLI adapter: until that's confirmed
-against a real install, invoke each `boardroom-*` subagent (via `@boardroom-cto`, etc., or your
-OpenCode version's Task-tool syntax) and consolidate the `## <SEAT> VERDICT` blocks yourself using
+**Checked directly, 2026-07-25** (fetched [opencode.ai/docs/agents](https://opencode.ai/docs/agents/)
+live): OpenCode does **not** document a built-in single-message fan-out primitive. Subagents are
+invoked either automatically (a primary agent delegates based on description matching) or manually
+via `@mention` (e.g. `@boardroom-cto review this change`) — the docs describe an orchestrator-driven
+model, navigating between child sessions one at a time (`session_child_cycle`), not a discrete
+parallel-dispatch tool call.
+
+**A real, current caveat worth knowing before relying on this**: a live, open GitHub issue
+([anomalyco/opencode#29638](https://github.com/anomalyco/opencode/issues/29638)) reports that even
+when a user explicitly asks for subagents "in parallel," OpenCode currently runs them sequentially —
+each finishing before the next starts. Treat "ask for parallel" as a request, not a guarantee, on
+current OpenCode versions.
+
+**Practical guidance, unchanged in substance**: invoke each `boardroom-*` subagent in turn (via
+`@boardroom-cto`, etc.) and consolidate the `## <SEAT> VERDICT` blocks yourself using
 `commands/adaptive/boardroom.md`'s own rule (any `NO_GO` → `DO NOT SHIP`; any `GO_WITH_CONCERNS` →
-`GO WITH CHANGES`; otherwise `GO`).
+`GO WITH CHANGES`; otherwise `GO`). This costs more wall-clock time than Codex CLI's confirmed
+parallel-dispatch path (see the Codex CLI adapter's own README) or Claude Code's native `Task`/`Agent`
+fan-out — a real, disclosed difference between the three harnesses, not something to paper over.
 
 ## The real, high-confidence win: the git-push gate
 
