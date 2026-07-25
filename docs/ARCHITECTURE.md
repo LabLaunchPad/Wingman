@@ -972,6 +972,43 @@ change. This does **not** change or soften the Phase 5 finding above (the engine
 dangerous, too-lenient direction on a live A/B) — the gateway addition organizes existing, already-
 scoped work; it does not claim new evidence of readiness.
 
+**Agno-native rewrite of `loop`/`graph` + directory reorg (2026-07-25).** Follow-up founder request:
+a "disciplined, modular, composable, scaling-efficient" directory, scoped through
+`AskUserQuestion` to mean `agnostic-boardroom/` specifically (`plugins/wingman/` stays untouched, no
+concrete friction named for it), combined with the founder's separately-confirmed choice from the
+gateway work above — do a full rewrite of the hand-rolled Maker/Checker loop and pipeline using
+Agno's own `Agent`/`Workflow`/`Team` primitives, since Agno was already a dependency here for its
+Knowledge/RAG layer but its own orchestration classes had never been used.
+
+*The one real, load-bearing risk, resolved before any rewrite code was written*: every documented
+Agno `Model` example (LMStudio, Ollama, OpenAI-compatible) talks to an HTTP client; none wrap a
+subprocess CLI, and this backend's actual model call is `subprocess.run(["claude", "-p", ...])`, not
+an HTTP request. Given the choice to proceed on this risk without a separate spike-then-ask gate
+first, the spike was sequenced as literally the first code written rather than skipped: a real
+`Agent(model=AgnoClaudeCliModel()).run("say hi")` call was run and inspected — it returned a genuine
+`RunOutput` with content `"hi"` — before any `Workflow`/`Loop` code was built on top of it.
+
+*What changed*: `agents/loop.py` → `loop/workflow.py` (Agno `Workflow`+`Loop`, `end_condition`
+reading the Checker's verdict, `max_iterations` enforcing the same 3-iteration cap); `agents/graph.py`
+→ `graph/pipeline_workflow.py` (a plain sequential Agno `Workflow` of per-stage `Step`s, using
+`StepOutput(stop=True)` — confirmed empirically, not assumed from the field's name, to halt the
+workflow at the first checkpoint-requiring stage). `agents/boardroom_engine.py` → `engine/
+boardroom_engine.py`, `agents/pipeline.py` → `engine/pipeline.py`: moved with import-path updates
+only — `to_boardroom_verdict()`'s mapping logic is byte-for-byte unchanged, since it depends only on
+`LoopResult`'s field shape, which the rewrite preserves exactly. `agents/model_runner.py` →
+`models/model_runner.py` (unchanged shim). One new, confirmed (not assumed) dependency: `agno.workflow`'s
+own package `__init__` unconditionally imports `agno.workflow.remote.RemoteWorkflow`, which imports
+`fastapi` — surfaced as a real `ModuleNotFoundError` on first import, now a direct dependency in
+`pyproject.toml`.
+
+*What did not change*: no `sdk/`-shaped rename, no `Protocol`/tool-registry/routing-adapter layer
+from an earlier, separately-evaluated pasted proposal — those were never justified by a named
+friction point. `core/`, `db/`, `knowledge/`, `mcp_server/`, `eval/`, `gateway/` kept their existing
+names and locations (moved as directories, no internal rename), same "zero renames without a named
+reason" discipline the gateway addition above already established. Verified via a full pytest
+collection diff (76/78 tests, matching the pre-change baseline exactly) and a full non-live test run
+before and after cutover.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)

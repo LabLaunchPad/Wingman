@@ -1,7 +1,7 @@
 """Phase 2 item 6 verification: the graph never auto-advances past a stage
 that requires a founder checkpoint, and mirrors the real 7-stage order."""
 
-from agents.graph import STAGES, StageResult, run_pipeline
+from graph.pipeline_workflow import STAGES, StageResult, run_pipeline
 
 
 def test_stages_match_the_real_pipeline_order_exactly():

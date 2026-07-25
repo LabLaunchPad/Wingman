@@ -18,7 +18,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from agents.boardroom.cto_evaluator import evaluate
+from loop.checker import evaluate
 
 LOG_PATH = Path(__file__).parent / ".data" / "checker_generalization_check_results.jsonl"
 

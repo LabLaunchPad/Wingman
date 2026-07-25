@@ -22,7 +22,7 @@ logging.disable(logging.WARNING)
 
 from mcp.server.fastmcp import FastMCP
 
-from agents.boardroom_engine import run_engineering_review, to_boardroom_verdict
+from engine.boardroom_engine import run_engineering_review, to_boardroom_verdict
 from db.connection import DEFAULT_DB_PATH, get_connection
 from db.schema import init_schema
 from knowledge.skill_router import route_task

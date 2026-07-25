@@ -7,9 +7,9 @@ money and is run deliberately, not on every test invocation.
 
 import pytest
 
-from agents.boardroom.cto_evaluator import evaluate
-from agents.loop import run_maker_checker_loop
-from agents.model_runner import RunResult
+from loop.checker import evaluate
+from loop.workflow import run_maker_checker_loop
+from models.model_runner import RunResult
 
 
 def _fake_model_sequence(responses: list[RunResult]):

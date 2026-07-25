@@ -8,7 +8,7 @@ import subprocess
 
 import pytest
 
-from agents.model_runner import run_claude_headless
+from models.model_runner import run_claude_headless
 
 
 def test_cli_defaults_to_claude_when_env_var_unset(monkeypatch):

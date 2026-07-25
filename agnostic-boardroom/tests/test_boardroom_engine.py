@@ -7,8 +7,8 @@ same discipline as `test_pipeline_wiring.py`.
 
 import pytest
 
-from agents.boardroom_engine import run_engineering_review, to_boardroom_verdict
-from agents.model_runner import RunResult
+from engine.boardroom_engine import run_engineering_review, to_boardroom_verdict
+from models.model_runner import RunResult
 from core.state_schema import BottomLine, FounderDecision, Verdict
 from db.connection import get_connection
 from db.schema import init_schema
