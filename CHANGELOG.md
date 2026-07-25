@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.7] - 2026-07-25
+
+### Added
+- **6 of the shipped plugin's 9 `hooks/*.mjs` files now have real, live-tested OpenCode ports**, dispatched as 5 parallel worktree-isolated subagents and merged: `secret-guard.js` (`tool.execute.before` on bash/write/edit, confirmed blocking), `prompt-guard.js` (`chat.message`, confirmed firing with the real prompt text and confirmed blocking via a thrown Error), `dod-gate.js` (the Bash/git-push half of `dod-structural-gate.mjs`, confirmed blocking a `DO NOT SHIP` checkpoint and allowing a clean one, verified against real bare-repo remotes), `output-scanners.js` (`secret-scanner.mjs` + `content-injection-scanner.mjs` combined, `tool.execute.after`, confirmed firing but — honestly disclosed — with no confirmed channel back into the model's own context, so warnings land in stderr/a log file only), `session-monitor.js` (`context-monitor.mjs` + `session-health.mjs` combined, `tool.execute.after`, keyed by OpenCode's own real `sessionID`), and `pre-compact-guard.js` + `session-start.js` (via `experimental.session.compacting` and `config()` respectively, both confirmed working live).
+- **`stop-loop.mjs` has no confirmed OpenCode analog** — `session.idle` fires and `client.session.prompt()` is real, but two live tests showed `opencode run`'s one-shot process exits before a plugin-triggered follow-up turn completes. Only the pure logic (`evaluate`, `extractAssistantText`, `loadLoopConfig`) was ported, with no plugin wiring, per this project's own "don't build unconfirmed integrations" discipline. Full writeup in the new `references/harness-adapters/opencode/SESSION-LIFECYCLE-FINDINGS.md`.
+- Real bug found and fixed along the way: OpenCode's plugin loader auto-discovers every top-level `.js` file under `.opencode/plugin/` and silently fails the *entire module* to load if any named export isn't itself a function (e.g. a bare regex-array export) — `secret-guard.js`'s `SECRET` list had to move behind a `getSecretPatterns()` accessor to unblock `output-scanners.js`'s own registration.
+- 90 new `node:test` cases across 6 new files under `tests/opencode-gate/`, all passing.
+
 ## [0.7.6] - 2026-07-25
 
 ### Added

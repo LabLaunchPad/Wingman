@@ -101,6 +101,52 @@ specifically, not about whether the file format itself would work elsewhere. Con
   are high-confidence (the pure `evaluateCheckpoint` logic) vs. lower-confidence (the exact plugin
   wiring shape).
 
+## All Claude Code hook capabilities, ported and live-verified where genuinely possible (2026-07-25)
+
+Following on from the skills port, the shipped plugin's 9 `plugins/wingman/hooks/*.mjs` files were
+each investigated against OpenCode's real plugin hook surface — dispatched as 5 parallel,
+worktree-isolated subagents, each required to live-test its port with a real `opencode run` call
+(never `opencode debug agent --tool`, which is confirmed to bypass all plugin hooks) before
+reporting done. 6 of 9 landed with a confirmed-working wiring; 1 is confirmed dead by design
+(matches the already-documented `wingman-gate.js` finding); 1 has no confirmed OpenCode analog.
+
+**Confirmed working, live-tested:**
+- `.opencode/plugin/secret-guard.js` — `tool.execute.before` on `bash`/`write`/`edit`, confirmed to
+  genuinely block (a thrown `Error` stops the tool call).
+- `.opencode/plugin/prompt-guard.js` — `chat.message`, confirmed to fire with the founder's real
+  prompt text in `output.parts[].text`, and confirmed to genuinely block the turn.
+- `.opencode/plugin/dod-gate.js` — the `Bash`/`git push` half of `dod-structural-gate.mjs` (the
+  `ExitPlanMode` half is out of scope, same dead-`plan_exit` reason as `wingman-gate.js`), confirmed
+  to block a `DO NOT SHIP` checkpoint and allow a clean one, verified against real bare-repo git
+  remotes (not just the model's own transcript).
+- `.opencode/plugin/output-scanners.js` — `secret-scanner.mjs` + `content-injection-scanner.mjs`
+  combined, `tool.execute.after`, confirmed firing on real matching tool output. **Honest caveat**:
+  no confirmed channel exists to inject a warning back into the model's own context the way Claude
+  Code's `hookSpecificOutput.message` does — warnings are logged to stderr and a
+  `.opencode-wingman-warnings.log` file only.
+- `.opencode/plugin/session-monitor.js` — `context-monitor.mjs` + `session-health.mjs` combined,
+  `tool.execute.after`, keyed by OpenCode's own real `sessionID` (an improvement over the canonical
+  hooks' synthesized session IDs). Same message-visibility caveat as above.
+- `.opencode/plugin/pre-compact-guard.js` — `experimental.session.compacting`, confirmed firing via
+  the real `/session/{id}/summarize` route, warning appended to `output.context`.
+- `.opencode/plugin/session-start.js` — `config()`, confirmed to fire once per `opencode run`
+  invocation (including `--continue`), correctly printing the previous-session summary on a second
+  run.
+
+**A real bug found and fixed along the way**: OpenCode's plugin loader auto-discovers every
+top-level `.js` file under `.opencode/plugin/` and silently fails the *whole module* to load if any
+named export isn't itself a function — a bare `export { SECRET }` (a regex array) broke
+`secret-guard.js`'s own registration. Fixed by exposing it via a `getSecretPatterns()` accessor.
+
+**No confirmed analog**: `stop-loop.js` — `session.idle` fires and `client.session.prompt()` is a
+real, callable method, but two live tests showed `opencode run`'s one-shot process exits before a
+plugin-triggered follow-up turn actually completes. Only the pure logic (`evaluate`,
+`extractAssistantText`, `loadLoopConfig`) is ported, with no plugin wiring — see
+`SESSION-LIFECYCLE-FINDINGS.md` for the full investigation.
+
+90 new `node:test` cases across 6 files under `../../../../../tests/opencode-gate/` cover every
+ported pure function, independent of the live-wiring question.
+
 ## Install
 
 A real, tested installer replaces the old manual `cp -r` steps:
