@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.2] - 2026-07-25
+
+### Optimized
+- **`checkTestPresence`'s test-file-reference fallback in `plugins/wingman/hooks/dod-structural-gate.mjs`** — `anyTestFileReferencesSource()` used to re-scan and re-read every file under `test/`/`tests/`/`__tests__/` from scratch for every changed source file needing the fallback, an O(changed-files × test-files) disk-I/O cost on a push touching many files. Now loads and reads every test file at most once per `checkTestPresence()` call (a plain local array, not module-level cache state — no shared mutable state to reset between calls, so it stays safe under repeated invocations in the same process, e.g. across unit tests). Synthesized from two independent Jules/Bolt-authored PRs proposing the same fix (#97, #105); this version follows #97's closure-scoped design over #105's module-level-cache design, since the former has no reset-on-every-call footgun.
+
 ## [0.7.1] - 2026-07-24
 
 ### Added
