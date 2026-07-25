@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.6] - 2026-07-25
+
+### Added
+- **`plugins/wingman/references/harness-adapters/opencode/install.mjs`** — a real, tested installer replacing the old 3-step manual `cp -r .opencode ...` instructions. Copies the adapter's `.opencode/` into a target project, optionally installs the git pre-push DoD gate via `install-git-hooks.mjs`, and auto-writes a minimal `opencode.json` when the target has none (a real, live-confirmed requirement for OpenCode's skill discovery, not documented anywhere before this). 13 tests (`tests/opencode-gate/`).
+- **All 40 Wingman skills ported to the OpenCode adapter** (`.opencode/skills/<name>/SKILL.md`) — a major, real finding: OpenCode's project-level skill discovery reads the exact same `SKILL.md` frontmatter format Claude Code uses, confirmed live via OpenCode's own built-in `customize-opencode` skill's documented path table. A fresh install confirmed all 40 discovered by `opencode debug skill`. `check-harness-adapter-drift.mjs` extended with a strict byte-equality check across all 40.
+
+### Changed
+- **`wingman-gate.js`'s verification status downgraded from "unverified" to "confirmed likely broken."** Using a genuinely free OpenCode model (zero cost, zero API key) to avoid the earlier Zen billing wall, `opencode debug agent plan` showed `plan_exit` is not a registered tool in the plan agent's real `tools` list — only a `permission` entry — contradicting the earlier research-based assumption it was a real, model-invokable tool. The pure decision logic (`evaluateCheckpoint`) is confirmed correct and now has 5 tests; the correct OpenCode wiring for plan-mode exit remains unknown.
+
 ## [0.7.5] - 2026-07-25
 
 ### Added

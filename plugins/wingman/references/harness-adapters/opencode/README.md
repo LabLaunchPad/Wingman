@@ -44,10 +44,45 @@ assumed:
   key was pasted in a chat transcript, consider rotating it as routine hygiene regardless of this
   test's outcome.
 
-**What's still unverified**: the `.opencode/plugin/wingman-gate.js` throw-on-reject gate's behavior
-under a real live `plan_exit` invocation specifically — this test exercised a Boardroom seat
-persona's live inference, not the plan-mode gate itself, which still has no configured trigger path
-tested end to end.
+**`wingman-gate.js`'s wiring: confirmed likely broken, not merely unverified (2026-07-25).** A real
+live investigation using a genuinely free OpenCode model (`opencode/deepseek-v4-flash-free`, zero
+cost, zero API key needed) found `plan_exit` is **not** a registered tool in the real `plan` agent's
+`tools` list (`opencode debug agent plan` shows only `invalid, question, bash, read, glob, grep,
+edit, write, task, webfetch, todowrite, skill`) — it appears only as a `permission` entry, not a
+callable tool. Directly invoking it (`opencode debug agent plan --tool plan_exit ...`) fails with
+`"Tool plan_exit not found for agent plan"`. This contradicts the earlier research-based assumption
+(a GitHub issue referencing `plan_exit` by name) that it was a real, model-invokable tool. Practical
+conclusion: the plugin's `tool.execute.before` hook, matched on `input.tool !== 'plan_exit'`, likely
+never fires via the standard tool-call path in current OpenCode versions — plan-mode exit appears to
+be a TUI-level/session-level action, not something the model calls as an ordinary tool. **The
+decision logic itself (`evaluateCheckpoint`) is confirmed correct** — `tests/opencode-gate/opencode-gate.test.mjs`
+covers all 5 real scenarios (no plan touched, unmarked plan, `DO NOT SHIP`, missing sections, fully
+approved) and all pass. The correct real hook point for plan-mode exit is still unknown; fixing this
+needs either OpenCode's own plugin-API source or a maintainer answer, not something resolvable from
+this sandbox alone.
+
+## All 40 skills ported with zero translation (2026-07-25, a major, real finding)
+
+Live investigation found OpenCode's project-level skill discovery
+(`.opencode/skills/<name>/SKILL.md`, confirmed via OpenCode's own built-in `customize-opencode`
+skill's documented path table) reads the **exact same `SKILL.md` frontmatter format** Claude Code
+uses (`name:`/`description:` YAML frontmatter + markdown body) — no translation needed at all. This
+reverses the earlier framing that only 2 skills (`git-pr-workflow`, `package-manager-selection`) were
+genuinely harness-agnostic; that framing was about Claude Code's own auto-invocation mechanism
+specifically, not about whether the file format itself would work elsewhere. Confirmed live:
+
+1. Copied `plugins/wingman/skills/engineering-minimalism/` verbatim into
+   `.opencode/skills/engineering-minimalism/` — `opencode debug skill` returned it with its exact
+   real content, byte-for-byte, no reformatting.
+2. **One real, non-obvious requirement found along the way, not documented anywhere before this**:
+   project-level skill discovery silently found zero skills until the target project had an
+   `opencode.json` present (even a minimal one, `{"$schema": "..."}`) — confirmed by a direct A/B
+   test (same skill file, same path, discovery failed with no `opencode.json`, succeeded the moment
+   one existed). `install.mjs` now writes one automatically if the target project has none.
+3. All 40 real `plugins/wingman/skills/*/SKILL.md` (including their `references/*.md` subdirectories,
+   e.g. `engineering-minimalism`'s `references/continuous-execution.md`) are copied verbatim into
+   this adapter's `.opencode/skills/`. A fresh live install (`install.mjs` + a written `opencode.json`)
+   confirmed all 40 discovered by `opencode debug skill` — not a subset, not sampled, the real count.
 
 ## What's here
 
@@ -56,6 +91,8 @@ tested end to end.
   (`mode: subagent`, `description`, `model`, `permission`). The review criteria and
   `## <SEAT> VERDICT` output contract are copied faithfully — the highest-confidence part of this
   adapter, same as the Codex CLI adapter.
+- `.opencode/skills/<name>/SKILL.md` (40 directories) — every real Wingman skill, copied verbatim,
+  confirmed live-discovered by OpenCode with zero translation (see above).
 - `.opencode/plugin/wingman-gate.js` — a genuine code port (not just documentation) of
   `boardroom-checkpoint.mjs`'s decision logic, wired to OpenCode's `tool.execute.before` plugin hook
   matched against `plan_exit` — OpenCode's own plan-mode-exit tool, which is a real structural analog
@@ -66,12 +103,28 @@ tested end to end.
 
 ## Install
 
-1. Copy this directory's `.opencode/` folder into your project root: `cp -r .opencode /path/to/your/project/`.
-2. Edit each `boardroom-*.md`'s `model:` field to a model your OpenCode install actually has
-   configured (the placeholders here are guesses, not confirmed defaults).
-3. Confirm `.opencode/plugin/wingman-gate.js` actually loads — this specific loading path and hook
-   registration are confirmed working against OpenCode v1.18.4 (`opencode debug config` shows the
-   file registered); if a different version doesn't pick it up, check that version's own plugin docs.
+A real, tested installer replaces the old manual `cp -r` steps:
+
+```
+node install.mjs /path/to/your/project              # copies .opencode/ only
+node install.mjs /path/to/your/project --with-git-hook  # also installs the git pre-push DoD gate
+```
+
+Verified live in this session (`tests/opencode-gate/opencode-install.test.mjs`, 5 tests): copies
+every file from this adapter's `.opencode/` into the target (confirmed 41/41 file parity), is
+idempotent on re-run, only installs the git hook when `--with-git-hook` is passed, and refuses a
+non-existent target directory with a clear error rather than silently failing.
+
+After running it:
+
+1. Edit each `.opencode/agent/boardroom-*.md`'s `model:` field to a model your OpenCode install
+   actually has configured (the shipped placeholders are guesses, not confirmed defaults).
+2. Confirm `.opencode/plugin/wingman-gate.js` actually loads — run `opencode debug config` in the
+   target project and check its `plugin` array lists the file (confirmed working against a real
+   OpenCode v1.18.5 install, from its new installed location, not just the adapter source location).
+3. Read the "`wingman-gate.js`'s wiring: confirmed likely broken" section below before relying on
+   the plan-exit gate specifically — its decision logic is correct and tested, but its OpenCode
+   wiring is currently known-unreliable, not merely unverified.
 
 ## Running a Boardroom review under OpenCode
 
