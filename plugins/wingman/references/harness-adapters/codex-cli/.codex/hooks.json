@@ -1,10 +1,10 @@
 {
-  "_comment": "Codex CLI hooks adapter for Wingman's git-push safety gate. Verification status: authored, unverified -- no live Codex CLI install in the Wingman dev sandbox. Schema per https://learn.chatgpt.com/docs/hooks, OpenAI's official Codex hooks reference (confirmed 2026-07-22, redirected from developers.openai.com/codex/hooks): PreToolUse/PostToolUse officially intercept 'Bash, file edits performed through apply_patch, MCP tool calls, and other local function tools' -- so the Bash matcher below is now a CONFIRMED tool name, not a guess. That same source also confirms matcher values 'apply_patch', 'Edit', or 'Write' are all valid for the file-edit hook path (the hook input's own tool_name field always reports 'apply_patch' regardless of which matcher value is used) -- so the earlier blocker ('Codex's tool-name strings for file edits weren't confirmed') is resolved. Still NOT wired here: secret-guard.mjs's actual payload scan needs the JSON field name(s) inside apply_patch's tool_input (equivalent to Claude Code's toolInput.content/new_string) to know what to scan for secrets -- that specific field name is not stated in the fetched docs, so wiring it now would mean guessing the one thing this project's own culture treats as worse than not porting at all (a hook that runs but silently never actually catches anything). A live Codex CLI session's own hook/audit log (via `/hooks`) would confirm the field name in one inspection -- flagged as the concrete next step, not attempted here. Also unresolved: whether hooks are enabled by default (official docs say yes, with `[features] hooks = false` to disable, `codex_hooks` as a deprecated alias) or require opt-in (a third-party cheatsheet claimed `codex_hooks = true` opt-in with silent no-ops otherwise) -- the two sources disagree; official docs are trusted here but this hasn't been confirmed against a live install either. Deliberately NOT included: the ExitPlanMode-matcher boardroom-checkpoint gate (Codex CLI has no plan-mode tool at all; it uses approval_policy instead -- there is nothing to gate here, not a missed port).",
+  "_comment": "Codex CLI hooks adapter: the git-push safety gate + secret-guard.mjs, both PreToolUse. Verification status, updated 2026-07-25 via a direct fetch of https://learn.chatgpt.com/docs/hooks (OpenAI's official Codex hooks reference, redirected from developers.openai.com/codex/hooks) -- schema-confirmed, still NOT tested against a live Codex CLI install (no configured model provider in this dev sandbox). What that fetch resolved, all previously open questions: (1) hooks are ENABLED BY DEFAULT (feature key `hooks`, `codex_hooks` a deprecated alias for the same flag; a third-party source claiming opt-in-required was checked directly against the primary docs and found wrong) -- no config.toml change needed to use this file. (2) `Bash` and `apply_patch` (file edits) both emit PreToolUse events, and BOTH scannable-content fields are the exact same JSON key -- `tool_input.command` -- confirmed directly, not guessed; secret-guard.mjs is now wired below using that confirmed field. (3) The stdin/stdout hook contract (`hookSpecificOutput.{hookEventName,permissionDecision,permissionDecisionReason}`) is byte-identical in shape to Claude Code's own -- Codex modeled its hooks system on it directly. Still genuinely open, disclosed rather than hidden: real GitHub issues (openai/codex#16732, #20204) report apply_patch hook events not firing consistently across all Codex CLI versions despite being documented as supported -- treat secret-guard.mjs as 'should fire per spec,' verify with a trivial known-bad edit on your own install before trusting it silently. Deliberately NOT included: the ExitPlanMode-matcher boardroom-checkpoint gate (Codex CLI has no plan-mode tool at all; it uses approval_policy instead -- nothing to gate here, not a missed port).",
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Bash",
-        "_matcher_comment": "CONFIRMED (2026-07-22) via OpenAI's official Codex hooks docs (learn.chatgpt.com/docs/hooks): 'Bash' is a real, documented intercepted tool for PreToolUse/PostToolUse. Previously flagged here as an unconfirmed assumption -- upgraded to confirmed by direct research, not a live install test.",
+        "_matcher_comment": "CONFIRMED via OpenAI's official Codex hooks docs: 'Bash' is a real, documented intercepted tool for PreToolUse/PostToolUse.",
         "hooks": [
           {
             "type": "command",
@@ -12,6 +12,26 @@
             "_command_comment": "Replace <PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN> with wherever Claude Code's plugin marketplace installed Wingman on this machine (or a checked-out copy of the LabLaunchPad/Wingman repo). Reuses the real script unmodified -- see plugins/wingman/scripts/dod-pre-push-check.mjs, which already runs standalone with zero Claude Code involvement. Simpler and more robust than this hooks.json path: install it as a real git pre-push hook instead (item 3 of the harness-adapters README) -- that fires under any harness, including this one, with no Codex-specific wiring at all.",
             "timeout": 120,
             "statusMessage": "Wingman: checking Boardroom verdict, tests, and threat register before allowing a git push"
+          },
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/secret-guard.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/secret-guard.mjs -- blocks destructive commands and real secret patterns before they run. Real, tested (schema-verified via a synthetic stdin/stdout round-trip, not just written and assumed), not just written and assumed.",
+            "timeout": 10,
+            "statusMessage": "Wingman: scanning for destructive commands and secret patterns"
+          }
+        ]
+      },
+      {
+        "matcher": "apply_patch",
+        "_matcher_comment": "CONFIRMED via the same official docs: file edits performed through apply_patch emit PreToolUse events, with the patch/diff text in tool_input.command -- the same field name Bash uses, not a separate content/new_string field like Claude Code's Write/Edit.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/secret-guard.mjs\"",
+            "_command_comment": "Same script as the Bash matcher above -- it reads tool_input.command regardless of tool_name, so one script covers both matchers.",
+            "timeout": 10,
+            "statusMessage": "Wingman: scanning file edit for secret patterns"
           }
         ]
       }
