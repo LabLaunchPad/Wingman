@@ -949,6 +949,29 @@ spend, this check: $0.364804. **Running total across Phases 5-7 plus this check:
 honestly bounded: 2 scenarios checked, not a claim this is solved for all future cases —
 `boardroom_engine.py` remains promising but narrowly (now less narrowly) evidenced.
 
+**`gateway/` — a stateless routing module, added on explicit founder request for a "modular,
+composable AI Agent SDK" shape (2026-07-25).** Asked what was actually driving a proposed "full
+repo refactor," the founder named the real goal: workflow/loop/graph engineering, an AI gateway,
+and built-in tools. Two `Explore` passes and a `Plan` pass (all read-only) found this ambition
+already mostly built under `agnostic-boardroom/` — the loop (`agents/loop.py`), the graph
+(`agents/graph.py`), and built-in tools (`mcp_server/`) all already existed; only the gateway piece
+was missing (confirmed by grep — zero prior "gateway" concept anywhere in the repo). Real precedent
+research (LangGraph's, CrewAI's, and Mastra's own project scaffolds; Agno's actual module layout;
+LiteLLM as the concrete "AI gateway" precedent) found that most of `agnostic-boardroom/`'s existing
+directories already map correctly to how real agent-SDK scaffolds organize this content — **zero
+renames of existing, tested files were made**, since no concrete friction point justified moving
+anything already correctly named. The one new addition: `gateway/router.py`'s `Router` class,
+modeled on LiteLLM's own `router.py` (a stateless-per-call class) as distinct from LiteLLM's
+`proxy/` (the actual always-on HTTP gateway server) — this project needs the former, not the
+latter, given §2's "no persistent runtime" rule. `agents/model_runner.py` became a thin
+backward-compatible shim over the new `gateway/providers/claude_cli.py` (the same logic, moved
+verbatim) so every existing caller (`agents/loop.py`, `agents/boardroom_engine.py`,
+`agents/pipeline.py`, and others) kept working with zero forced import changes — confirmed directly
+by grepping every real call site before writing any code. `plugins/wingman/` is untouched by this
+change. This does **not** change or soften the Phase 5 finding above (the engine erred in the more
+dangerous, too-lenient direction on a live A/B) — the gateway addition organizes existing, already-
+scoped work; it does not claim new evidence of readiness.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)

@@ -1,0 +1,62 @@
+"""Zero-cost regression tests for gateway.Router: dispatch-by-name and the
+shim's parity with the pre-refactor `agents.model_runner.run_claude_headless`
+behavior. No real model calls -- `subprocess.run` is mocked throughout."""
+
+import json
+import subprocess
+
+import pytest
+
+from gateway.providers.claude_cli import ClaudeCliProvider, RunResult
+from gateway.router import Router
+
+
+def _fake_completed_process(returncode=0, stdout="", stderr=""):
+    return subprocess.CompletedProcess(args=[], returncode=returncode, stdout=stdout, stderr=stderr)
+
+
+def test_router_dispatches_to_the_named_provider(monkeypatch):
+    payload = {"result": "hi", "total_cost_usd": 0.01, "session_id": "s1", "is_error": False}
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(stdout=json.dumps(payload))
+    )
+    router = Router({"claude-cli": ClaudeCliProvider()})
+    result = router.run("hi", provider="claude-cli")
+    assert isinstance(result, RunResult)
+    assert result.text == "hi"
+
+
+def test_router_uses_default_provider_when_none_named(monkeypatch):
+    payload = {"result": "hi", "total_cost_usd": 0.01, "session_id": "s1", "is_error": False}
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(stdout=json.dumps(payload))
+    )
+    router = Router({"claude-cli": ClaudeCliProvider()}, default="claude-cli")
+    result = router.run("hi")
+    assert result.text == "hi"
+
+
+def test_router_rejects_an_unknown_provider_name():
+    router = Router({"claude-cli": ClaudeCliProvider()})
+    with pytest.raises(ValueError, match="unknown provider"):
+        router.run("hi", provider="does-not-exist")
+
+
+def test_router_construction_rejects_a_default_not_in_providers():
+    with pytest.raises(ValueError, match="not in providers"):
+        Router({"claude-cli": ClaudeCliProvider()}, default="does-not-exist")
+
+
+def test_shim_reproduces_pre_refactor_run_claude_headless_behavior(monkeypatch):
+    """Parity check: the agents.model_runner shim must return the exact same
+    result shape as calling ClaudeCliProvider directly -- proving the move
+    didn't silently change behavior."""
+    from agents.model_runner import run_claude_headless
+
+    payload = {"result": "hello", "total_cost_usd": 0.05, "session_id": "sess-1", "is_error": False}
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(stdout=json.dumps(payload))
+    )
+    via_shim = run_claude_headless("hi")
+    via_provider = ClaudeCliProvider().run("hi")
+    assert via_shim == via_provider

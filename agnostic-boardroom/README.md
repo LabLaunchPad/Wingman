@@ -8,9 +8,10 @@ engine + MCP tools + project-level registration), Phase 5 (the live decision-qua
 real money spent), Phase 6 (root-caused + fixed the rubric gap, nuanced re-run result), Phase 7
 (fixed Phase 6's over-correction with a structural schema change, confirmed on the real re-tested
 case), a generalization check (a genuinely new scenario, confirming the fix isn't overfit to the one
-case it was diagnosed against), and a real, tool-measured coverage audit (90%→93%, every module at
-100% except 2 disclosed exceptions) all done. 71/71 fast tests pass (default `pytest` run), plus 2/2
-real live-model (cost-bearing) tests (`pytest -m live_model`, run explicitly). **The generalization
+case it was diagnosed against), a real, tool-measured coverage audit (90%→93%, every module at
+100% except 2 disclosed exceptions), and a `gateway/` stateless routing module (see below) all done.
+76/76 fast tests pass (default `pytest` run), plus 2/2 real live-model (cost-bearing) tests
+(`pytest -m live_model`, run explicitly). **The generalization
 check found real, direct evidence the
 severity-calibration fix holds beyond the one scenario it was built against**: on a brand-new task
 (`flatten-nested-list`) neither the fix nor the checklist was ever tuned on, the Checker
@@ -407,9 +408,35 @@ against each variant and a Definition-of-Done check on its output, which needs l
 inference (Phase 3, the Maker/Checker loop, not built yet). Logging a fabricated quality score here
 would be exactly the "purposeless data" this A/B layer exists to avoid.
 
+## Gateway (stateless routing library)
+
+`gateway/` is a plain, importable, stateless routing layer — not a persistent service. Modeled on
+LiteLLM's own `router.py` (a stateless-per-call `Router` class) as distinct from LiteLLM's `proxy/`
+(the actual always-on HTTP gateway server, only needed for cross-process auth/spend-tracking). This
+project needs the former, not the latter: `docs/ARCHITECTURE.md` §2's "no persistent runtime" rule
+rules out an always-on daemon for the shipped Claude Code plugin, and `gateway.Router.run()` has the
+exact same lifecycle as calling a function directly — no background thread, no listening socket.
+
+Today there is exactly **one** registered provider (`gateway/providers/claude_cli.py`'s
+`ClaudeCliProvider`, the same headless `claude -p` invocation this backend has used since Phase 3/4)
+and deliberately **no retry/fallback-on-failure logic** — adding failover against a single-provider
+router would be untested, speculative code with nothing real to fail over to. `agents/model_runner.py`
+is now a thin backward-compatible shim over `gateway.providers.claude_cli` so every existing caller
+(`agents/loop.py`, `agents/boardroom_engine.py`, `agents/pipeline.py`, and others) keeps working
+unchanged; switching those callers' `call_model=` default to `Router(...).run` directly is a
+separate, not-yet-done follow-up.
+
+## Built-in tools
+
+`mcp_server/memory_tools.py` is the built-in tools registry — plain Python functions
+(`store_memory`, `retrieve_memories`, `list_memories`); `mcp_server/server.py` is the thin MCP
+transport wrapper exposing them as `@mcp.tool()`-decorated functions over stdio. This is the same
+registry/transport split real agent-SDK scaffolds (CrewAI's `tools/`, Mastra's `tools/`) use, just
+named for the actual transport (MCP) this project uses rather than a generic folder name.
+
 ## Running this today
 
-`cd agnostic-boardroom && python -m pytest tests/` runs the fast suite (36 tests, no live model
+`cd agnostic-boardroom && python -m pytest tests/` runs the fast suite (76 tests, no live model
 calls, no real cost). `pytest -m live_model` additionally runs the 2 tests that make real,
 non-trivial-cost `claude -p` calls — run those deliberately, not as part of routine iteration.
 `python mcp_server/server.py` starts the real memory MCP server over stdio. There is still no
