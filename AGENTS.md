@@ -30,7 +30,7 @@ node plugins/wingman/scripts/validate-structure.mjs   # plugin-internal invarian
 node scripts/check-repo-consistency.mjs                # repo-root doc/attribution invariants
 node scripts/check-fixtures.mjs                        # every eval fixture (evals/fixtures/setup-*.sh) still runs clean
 node plugins/wingman/scripts/check-traceability.mjs     # requirement/marker cross-referencing (also shippable, runs in founder projects)
-node plugins/wingman/scripts/check-harness-adapter-drift.mjs  # checks the Codex CLI/OpenCode Boardroom adapters haven't drifted from the canonical agents/boardroom-*.md
+node plugins/wingman/scripts/check-harness-adapter-drift.mjs  # checks the Codex CLI/OpenCode Boardroom adapters (and OpenCode's 40 ported skills) haven't drifted from canonical
 node scripts/wingman-health.mjs                         # read-only dev-health report: built vs. verified vs. gaps
 node scripts/query-wingman-knowledge.mjs                # dev-repo-only: query the wingman:log markers by type/category/status, or --recurring
 node scripts/wingman-metrics.mjs                        # dev-repo-only: real cost/quality/debt signals, not a service benchmark
@@ -112,8 +112,9 @@ for skills, and doesn't change any `/wingman:*` invocation either way.
 `agents/` (8 Boardroom seats) stays flat — small and homogeneous enough that subdividing it would
 be churn without benefit. `references/` is mostly flat (15 top-level files) but also holds two
 nested subtrees: `references/harness-adapters/` — its files must mirror Codex CLI's/OpenCode's own
-discovery layout (`.codex/agents/`, `.opencode/agent/`, `.opencode/plugin/`) to stay drop-in
-copyable, so a flat structure wasn't an option there; see that directory's own `README.md` — and
+discovery layout (`.codex/agents/`, `.opencode/agent/`, `.opencode/plugin/`, `.opencode/skills/`) to
+stay drop-in copyable, so a flat structure wasn't an option there; see that directory's own
+`README.md` — and
 `references/org-template/` — static reference content (a project-type catalog + playbooks, founder-
 preferences and capability-map guidance) cited from `discovery.md` and `skills/memory`;
 deliberately scoped down from a much larger founder-org-scaffold proposal (see `docs/PROJECT.md`'s
@@ -130,4 +131,4 @@ own `README.md`.
 
 ## Portability
 
-Most of this plugin is intentionally coupled to Claude Code's own tool surface (`AskUserQuestion`, `ExitPlanMode`, parallel `Task`/`Agent` dispatch) — see `docs/ARCHITECTURE.md` §8a for exactly what is and isn't portable today, and why (re-confirmed against 2026 multi-harness conventions — see §8a's note on the re-check). Two skills are built to be genuinely harness-agnostic: `plugins/wingman/skills/git-pr-workflow` and `plugins/wingman/skills/package-manager-selection`. `docs/ARCHITECTURE.md` §8b documents adapters for all 3 harnesses Wingman is evaluated against — Claude Code (`claude-code/`, the native target, no translation needed), Codex CLI, and OpenCode (Boardroom seat personas + the git-push safety gate) — at `plugins/wingman/references/harness-adapters/`, honestly labeled per-artifact by verification status, not a claim of full portability. `plugins/wingman/` also has its own nested `AGENTS.md` (monorepo "nearest wins" convention) with package-scoped authoring conventions.
+Most of this plugin is intentionally coupled to Claude Code's own tool surface (`AskUserQuestion`, `ExitPlanMode`, parallel `Task`/`Agent` dispatch) — see `docs/ARCHITECTURE.md` §8a for exactly what is and isn't portable today, and why (re-confirmed against 2026 multi-harness conventions — see §8a's note on the re-check). Two skills (`plugins/wingman/skills/git-pr-workflow`, `plugins/wingman/skills/package-manager-selection`) are built to be genuinely harness-agnostic in *how they're invoked*. Separately, a live 2026-07-25 finding established that all 40 skills' `SKILL.md` *file format* itself is directly readable by OpenCode's own project-level skill discovery with zero translation (confirmed via a live install, not assumed) — the two claims are about different things: invocation-mechanism portability vs. file-format compatibility with one specific other harness. `docs/ARCHITECTURE.md` §8b documents adapters for all 3 harnesses Wingman is evaluated against — Claude Code (`claude-code/`, the native target, no translation needed), Codex CLI, and OpenCode (Boardroom seat personas, all 40 skills ported, a real `install.mjs`, and the git-push safety gate) — at `plugins/wingman/references/harness-adapters/`, honestly labeled per-artifact by verification status, not a claim of full portability. `plugins/wingman/` also has its own nested `AGENTS.md` (monorepo "nearest wins" convention) with package-scoped authoring conventions.

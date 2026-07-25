@@ -2,6 +2,23 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.7] - 2026-07-25
+
+### Added
+- **6 of the shipped plugin's 9 `hooks/*.mjs` files now have real, live-tested OpenCode ports**, dispatched as 5 parallel worktree-isolated subagents and merged: `secret-guard.js` (`tool.execute.before` on bash/write/edit, confirmed blocking), `prompt-guard.js` (`chat.message`, confirmed firing with the real prompt text and confirmed blocking via a thrown Error), `dod-gate.js` (the Bash/git-push half of `dod-structural-gate.mjs`, confirmed blocking a `DO NOT SHIP` checkpoint and allowing a clean one, verified against real bare-repo remotes), `output-scanners.js` (`secret-scanner.mjs` + `content-injection-scanner.mjs` combined, `tool.execute.after`, confirmed firing but — honestly disclosed — with no confirmed channel back into the model's own context, so warnings land in stderr/a log file only), `session-monitor.js` (`context-monitor.mjs` + `session-health.mjs` combined, `tool.execute.after`, keyed by OpenCode's own real `sessionID`), and `pre-compact-guard.js` + `session-start.js` (via `experimental.session.compacting` and `config()` respectively, both confirmed working live).
+- **`stop-loop.mjs` has no confirmed OpenCode analog** — `session.idle` fires and `client.session.prompt()` is real, but two live tests showed `opencode run`'s one-shot process exits before a plugin-triggered follow-up turn completes. Only the pure logic (`evaluate`, `extractAssistantText`, `loadLoopConfig`) was ported, with no plugin wiring, per this project's own "don't build unconfirmed integrations" discipline. Full writeup in the new `references/harness-adapters/opencode/SESSION-LIFECYCLE-FINDINGS.md`.
+- Real bug found and fixed along the way: OpenCode's plugin loader auto-discovers every top-level `.js` file under `.opencode/plugin/` and silently fails the *entire module* to load if any named export isn't itself a function (e.g. a bare regex-array export) — `secret-guard.js`'s `SECRET` list had to move behind a `getSecretPatterns()` accessor to unblock `output-scanners.js`'s own registration.
+- 90 new `node:test` cases across 6 new files under `tests/opencode-gate/`, all passing.
+
+## [0.7.6] - 2026-07-25
+
+### Added
+- **`plugins/wingman/references/harness-adapters/opencode/install.mjs`** — a real, tested installer replacing the old 3-step manual `cp -r .opencode ...` instructions. Copies the adapter's `.opencode/` into a target project, optionally installs the git pre-push DoD gate via `install-git-hooks.mjs`, and auto-writes a minimal `opencode.json` when the target has none (a real, live-confirmed requirement for OpenCode's skill discovery, not documented anywhere before this). 13 tests (`tests/opencode-gate/`).
+- **All 40 Wingman skills ported to the OpenCode adapter** (`.opencode/skills/<name>/SKILL.md`) — a major, real finding: OpenCode's project-level skill discovery reads the exact same `SKILL.md` frontmatter format Claude Code uses, confirmed live via OpenCode's own built-in `customize-opencode` skill's documented path table. A fresh install confirmed all 40 discovered by `opencode debug skill`. `check-harness-adapter-drift.mjs` extended with a strict byte-equality check across all 40.
+
+### Changed
+- **`wingman-gate.js`'s verification status downgraded from "unverified" to "confirmed likely broken."** Using a genuinely free OpenCode model (zero cost, zero API key) to avoid the earlier Zen billing wall, `opencode debug agent plan` showed `plan_exit` is not a registered tool in the plan agent's real `tools` list — only a `permission` entry — contradicting the earlier research-based assumption it was a real, model-invokable tool. The pure decision logic (`evaluateCheckpoint`) is confirmed correct and now has 5 tests; the correct OpenCode wiring for plan-mode exit remains unknown.
+
 ## [0.7.5] - 2026-07-25
 
 ### Added

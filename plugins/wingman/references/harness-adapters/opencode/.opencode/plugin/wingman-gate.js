@@ -1,25 +1,31 @@
 // Wingman Boardroom-checkpoint gate, ported to an OpenCode plugin.
 //
-// Verification status: authored, unverified. No live OpenCode install exists in the Wingman dev
-// sandbox this was built in. The DECISION LOGIC below (isApprovedCheckpoint, the marker/section/
-// "ship it" checks) is a direct, faithful port of
-// plugins/wingman/hooks/boardroom-checkpoint.mjs's own isApprovedCheckpoint function -- same
-// MARKER text, same REQUIRED_PLAN_SECTIONS, same "DO NOT SHIP" veto, same two-source (inline +
-// most-recent plan file) check. That part is high-confidence: it's plain string/regex logic with
-// no OpenCode-specific dependency.
+// Verification status (updated 2026-07-25, real live investigation): the DECISION LOGIC below
+// (isApprovedCheckpoint/evaluateCheckpoint, the marker/section/"ship it" checks) is a direct,
+// faithful port of plugins/wingman/hooks/boardroom-checkpoint.mjs's own isApprovedCheckpoint
+// function -- same MARKER text, same REQUIRED_PLAN_SECTIONS, same "DO NOT SHIP" veto, same
+// two-source (inline + most-recent plan file) check. This part is CONFIRMED CORRECT: plain
+// string/regex logic with no OpenCode dependency, covered by tests/opencode-gate/opencode-gate.test.mjs
+// (5 real scenarios, all passing).
 //
-// The WIRING below -- the `tool.execute.before` hook shape, its argument names, and matching the
-// `plan_exit` tool specifically -- is lower-confidence. It's based on public research (OpenCode's
-// plugin docs describe a `tool.execute.before` hook that can throw to block a tool call; OpenCode's
-// `plan_exit` tool is the documented analog to Claude Code's `ExitPlanMode` -- see this adapter's
-// README for citations), not a live install. A known OpenCode bug (tracked upstream as issue #5894)
-// means `tool.execute.before` does not currently intercept tool calls made by SUBAGENTS -- that's
-// fine here, since `plan_exit` is called by the PRIMARY agent, not a subagent, but worth knowing if
-// this hook doesn't seem to fire in a nested-agent context.
+// **The WIRING below is CONFIRMED LIKELY BROKEN, not merely unverified.** A real, live investigation
+// (`opencode debug agent plan` against a real OpenCode v1.18.5 install) found `plan_exit` is NOT a
+// registered tool in the plan agent's actual `tools` list -- the real list is `invalid, question,
+// bash, read, glob, grep, edit, write, task, webfetch, todowrite, skill`. `plan_exit` only appears as
+// a `permission` entry (a name in the permission-gate config), not as a callable tool the model can
+// invoke or that `tool.execute.before` would see fire. This directly contradicts the earlier
+// research-based assumption (a GitHub issue referencing `plan_exit` by name) that it was a real,
+// invokable tool. Attempts to invoke it directly (`opencode debug agent plan --tool plan_exit ...`)
+// failed with "Tool plan_exit not found for agent plan". Practical conclusion: this hook's
+// `input.tool !== 'plan_exit'` match likely never fires via the standard tool-call path in current
+// OpenCode versions -- plan-mode exit appears to be a TUI-level/session-level action, not a
+// model-invokable tool call, so `tool.execute.before` (which fires around actual tool calls) may
+// never see it. The correct hook point (if one exists) is still unknown and would need either
+// OpenCode's own plugin-API source or a maintainer answer to pin down.
 //
-// If the exact hook signature below doesn't match your OpenCode version, the decision logic
-// (isApprovedCheckpoint and everything above the plugin export) is the part worth keeping --
-// re-wire it to whatever the real plugin API expects.
+// If you're re-wiring this for a real install: the decision logic (evaluateCheckpoint and everything
+// above the plugin export) is the part worth keeping -- it's correct and tested. The plugin export
+// at the bottom is the part to replace once the real completion/exit event is identified.
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
