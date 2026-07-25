@@ -8,6 +8,7 @@ import subprocess
 import pytest
 
 from gateway.providers.claude_cli import ClaudeCliProvider, RunResult
+from gateway.providers.opencode import OpenCodeProvider
 from gateway.router import Router
 
 
@@ -45,6 +46,32 @@ def test_router_rejects_an_unknown_provider_name():
 def test_router_construction_rejects_a_default_not_in_providers():
     with pytest.raises(ValueError, match="not in providers"):
         Router({"claude-cli": ClaudeCliProvider()}, default="does-not-exist")
+
+
+def test_router_dispatches_to_a_second_real_provider_opencode(monkeypatch):
+    """Proves the Router genuinely dispatches by provider name across 2 real,
+    different provider implementations (not just re-testing claude-cli twice)
+    -- OpenCodeProvider parses newline-delimited JSON, a real, different wire
+    format from ClaudeCliProvider's single JSON object, confirmed against real
+    captured OpenCode output in test_opencode_provider.py."""
+    success_stdout = (
+        '{"type":"text","sessionID":"ses_1","part":{"type":"text","text":"hi"}}\n'
+        '{"type":"step_finish","sessionID":"ses_1","part":{"type":"step-finish","cost":0}}\n'
+    )
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(stdout=success_stdout)
+    )
+    router = Router(
+        {
+            "claude-cli": ClaudeCliProvider(),
+            "opencode": OpenCodeProvider(config_dir="/tmp/fake-opencode-project"),
+        },
+        default="claude-cli",
+    )
+    result = router.run("hi", provider="opencode")
+    assert isinstance(result, RunResult)
+    assert result.text == "hi"
+    assert result.session_id == "ses_1"
 
 
 def test_shim_reproduces_pre_refactor_run_claude_headless_behavior(monkeypatch):

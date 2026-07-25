@@ -423,10 +423,19 @@ project needs the former, not the latter: `docs/ARCHITECTURE.md` §2's "no persi
 rules out an always-on daemon for the shipped Claude Code plugin, and `gateway.Router.run()` has the
 exact same lifecycle as calling a function directly — no background thread, no listening socket.
 
-Today there is exactly **one** registered provider (`gateway/providers/claude_cli.py`'s
-`ClaudeCliProvider`, the same headless `claude -p` invocation this backend has used since Phase 3/4)
-and deliberately **no retry/fallback-on-failure logic** — adding failover against a single-provider
-router would be untested, speculative code with nothing real to fail over to. `models/model_runner.py`
+Today there are **two** registered providers: `gateway/providers/claude_cli.py`'s `ClaudeCliProvider`
+(the same headless `claude -p` invocation this backend has used since Phase 3/4) and
+`gateway/providers/opencode.py`'s `OpenCodeProvider` (headless `opencode run --format json`, parsing
+its real, genuinely-different newline-delimited-JSON event stream). **`OpenCodeProvider` is honestly,
+only partially live-verified**: 2 real completions were captured via the raw CLI (confirming the wire
+format and a real, non-obvious mechanic — OpenCode resolves its project config via the `$PWD` env var,
+not merely a subprocess's OS-level cwd), but the OpenCode Zen workspace then hit a real billing wall
+before the class itself completed a live round-trip. `tests/test_opencode_provider.py`'s fixtures are
+the *actual* captured JSONL from those 2 real calls, not fabricated data — see `docs/PROJECT.md`'s
+decisions log for the full, disclosed account. Deliberately **no retry/fallback-on-failure logic yet**
+even with 2 providers registered — `Router` requires the caller to name a provider or rely on
+`default`; automatic failover on error is a real future increment, not built speculatively here.
+`models/model_runner.py`
 is now a thin backward-compatible shim over `gateway.providers.claude_cli` so every existing caller
 (`loop/workflow.py`, `engine/boardroom_engine.py`, `engine/pipeline.py`, and others) keeps working
 unchanged; switching those callers' `call_model=` default to `Router(...).run` directly is a
