@@ -23,6 +23,13 @@ fabricated capability this project's own `verification-before-completion`
 discipline exists to prevent. The parameterization is real and tested (the
 `claude` path); a second harness's own output-format flag and JSON shape
 would need to be confirmed against a real installation before landing here.
+
+`WINGMAN_MODEL_CLI` is read fresh on every call, not cached at import time --
+a module-level `os.environ.get(...)` would freeze whatever value existed
+when `agents.model_runner` was first imported, silently ignoring a later
+`os.environ["WINGMAN_MODEL_CLI"] = ...` set by a caller (a test, a
+subprocess wrapper, a future harness adapter) after that point. Reading it
+inside the function itself avoids that class of stale-env-var bug entirely.
 """
 
 from __future__ import annotations
@@ -31,8 +38,6 @@ import json
 import os
 import subprocess
 from dataclasses import dataclass
-
-DEFAULT_MODEL_CLI = os.environ.get("WINGMAN_MODEL_CLI", "claude")
 
 
 @dataclass
@@ -46,17 +51,18 @@ class RunResult:
 def run_claude_headless(prompt: str, timeout_s: int = 120, cli: str | None = None) -> RunResult:
     """Shells out to `<cli> -p <prompt> --output-format json` and parses the result.
 
-    `cli` defaults to `DEFAULT_MODEL_CLI` (itself overridable via the
-    `WINGMAN_MODEL_CLI` env var) rather than a hardcoded `"claude"` literal --
-    the one real, tested step toward this module not being permanently
-    single-harness, without claiming a second harness actually works (see
-    module docstring).
+    `cli` defaults to the `WINGMAN_MODEL_CLI` env var (read at call time, not
+    import time -- see module docstring), falling back to `"claude"` --
+    rather than a hardcoded `"claude"` literal. The parameterization is real
+    and tested (the `claude` path); a second harness's own output-format
+    flag and JSON shape would need to be confirmed against a real
+    installation before landing here.
 
     Raises subprocess.TimeoutExpired if the model doesn't respond in time, and
     RuntimeError if the CLI itself reports an error (`is_error: true`) rather
     than silently returning an empty/garbage result.
     """
-    cli = cli or DEFAULT_MODEL_CLI
+    cli = cli or os.environ.get("WINGMAN_MODEL_CLI", "claude")
     proc = subprocess.run(
         [cli, "-p", prompt, "--output-format", "json"],
         capture_output=True,
