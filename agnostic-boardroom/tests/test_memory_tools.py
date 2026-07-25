@@ -61,6 +61,24 @@ def test_list_memories_newest_first_and_tag_filtered(conn, kb):
     assert tagged[0]["content"] == "fact B"
 
 
+def test_retrieve_respects_k_even_with_more_matching_entries_available(conn, kb):
+    """Real coverage gap found via a coverage audit: no existing test ever
+    had more matching entries than k, so the early-break-at-k branch in
+    retrieve_memories was never exercised."""
+    for i in range(5):
+        store_memory(conn, kb, f"the founder's stack preference number {i}: pnpm", layer="project")
+    results = retrieve_memories(kb, "founder stack preference", k=2)
+    assert len(results) == 2
+
+
+def test_retrieve_on_an_empty_store_returns_an_empty_list_not_an_error(kb):
+    """Real coverage gap found while auditing untested code paths: nothing
+    exercised the zero-hit case (querying before anything's ever been
+    stored) -- confirms it degrades gracefully instead of raising."""
+    results = retrieve_memories(kb, "anything at all", k=5)
+    assert results == []
+
+
 def test_500_entry_stress_scoped_to_founders_own_bar(conn, kb):
     """The founder's own stated stress-test bar: 500 entries, sub-100ms reads,
     rapid sequential read/write with no corruption -- NOT a concurrency/load

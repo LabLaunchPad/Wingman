@@ -10,6 +10,7 @@ typed MCP tools.
 from __future__ import annotations
 
 import logging
+import os
 
 # Real bug found via a live MCP client test: Agno's own INFO logging (e.g.
 # "Creating table: ...", "Adding content from ...") writes to stdout by
@@ -22,17 +23,38 @@ logging.disable(logging.WARNING)
 from mcp.server.fastmcp import FastMCP
 
 from agents.boardroom_engine import run_engineering_review, to_boardroom_verdict
-from db.connection import get_connection
+from db.connection import DEFAULT_DB_PATH, get_connection
 from db.schema import init_schema
 from knowledge.skill_router import route_task
 from knowledge.vector_store import build_skill_knowledge
-from mcp_server.memory_tools import build_memory_knowledge, list_memories, retrieve_memories, store_memory
+from mcp_server.memory_tools import (
+    DEFAULT_MEMORY_LANCEDB_URI,
+    DEFAULT_MEMORY_TABLE_NAME,
+    build_memory_knowledge,
+    list_memories,
+    retrieve_memories,
+    store_memory,
+)
 
 mcp = FastMCP("wingman-memory")
 
-_conn = get_connection()
+# Every path below defaults to the real, persistent production location
+# (unchanged behavior for a real founder session) but is overridable via env
+# var -- a real bug found by running the full test suite: `test_mcp_server_live.py`
+# spawns this exact server as a subprocess with no isolation, so every test
+# run appended to the same persistent SQLite/LanceDB store on disk. That
+# store grows without bound across every dev and CI run, and a query's
+# top-k similarity results become non-deterministic as it grows -- a test
+# that passed in isolation failed when run after the rest of the suite had
+# already added its own entries via the same server. These overrides let
+# tests point at a fresh temp location instead of silently sharing (and
+# polluting) the real one.
+_conn = get_connection(os.environ.get("WINGMAN_AB_DB_PATH", DEFAULT_DB_PATH))
 init_schema(_conn)
-_kb = build_memory_knowledge()
+_kb = build_memory_knowledge(
+    lancedb_uri=os.environ.get("WINGMAN_AB_MEMORY_LANCEDB_URI", DEFAULT_MEMORY_LANCEDB_URI),
+    table_name=os.environ.get("WINGMAN_AB_MEMORY_TABLE", DEFAULT_MEMORY_TABLE_NAME),
+)
 # Building the 40-skill index takes real time (real embedding, not
 # instant) -- a disclosed startup cost, same one test_skill_router.py's
 # own module-scoped fixture pays once per test session.

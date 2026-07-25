@@ -872,6 +872,56 @@ real bug in the harness itself was found and fixed while running this: it only w
 after every scenario succeeded, so a later scenario's real, paid-for failure would have silently
 discarded an earlier scenario's already-spent result — fixed to write incrementally.
 
+**Phase 6 (root-caused the gap, fixed it, re-ran the A/B — done, nuanced result).** Direct comparison
+of the real prompt templates found the actual gap: `boardroom-cto.md` has an explicit 5-point
+checklist; `cto_evaluator.py`'s Checker prompt had none. `eval/checker_rubric_ab.py` isolated this
+for one live call ($0.097233): injecting the checklist into the Checker's prompt flipped its verdict
+on the known-buggy `palindrome-check` code from accepted to rejected. The checklist was ported
+permanently into `cto_evaluator.py`, and the original 2-scenario A/B was re-run for real
+($0.804398). **Result is nuanced, not a clean win**: agreement stayed at 1 of 2 (unchanged rate),
+but the *direction* of the one real disagreement flipped — pre-fix, the Checker was too lenient
+(accepted a real bug); post-fix, it escalated (`NO_GO`, blocked entirely) on a solution the real
+persona would have shipped with a documented caveat (`GO_WITH_CONCERNS`). The checklist fixed the
+specific miss it was built to fix (confirmed in isolation), but calibrating a rubric-bearing Checker
+to weigh severity the way a real persona does is evidently a harder, still-unsolved problem than
+adding the checklist alone. Total real spend across the whole investigation (original A/B + rubric
+isolation test + re-run): $1.756651. This is disclosed evidence against declaring the gap closed.
+
+**Phase 7 (structural fix for the over-correction, real result confirms it).** Root cause:
+`CheckerVerdict` was strictly binary (accept/reject) with no way to express "shippable, but here's a
+real concern" — exactly the real persona's `GO_WITH_CONCERNS` tier. Before this fix,
+`boardroom_engine.py`'s `GO_WITH_CONCERNS` path could only ever be reached via a low-confidence skill
+route, never via the Checker's own judgment about the code. Fixed by adding
+`CheckerVerdict.concerns: list[str]` (threaded through `IterationLog`/`LoopResult.final_concerns`
+into `to_boardroom_verdict()`, which now combines content-based and routing-based signals) plus a
+`_SEVERITY_GUIDANCE` prompt addition telling the Checker to distinguish a genuine correctness gap
+(reject) from a real-but-shippable concern (accept + name it). **Real result**
+(`eval/checker_severity_ab.py`, one live call against the identical known-buggy `palindrome-check`
+code, $0.098265, logged to `eval/.data/checker_severity_ab_results.jsonl`): `accepted: true` with 2
+named concerns — the first of 3 real attempts (Phase 5 accept-no-concern, Phase 6 reject/escalate,
+this Phase 7 result) where the verdict shape actually lands on `GO_WITH_CONCERNS` rather than either
+extreme. A new unit test
+(`test_accepted_matched_route_with_checker_concerns_produces_go_with_concerns`) proves the
+content-based path is independently reachable under a confident route, not just riding on the
+routing-based path. Total real spend across all 3 phases: $1.854916. **Still open, stated plainly**:
+this is one re-tested scenario, not proof severity calibration generalizes — a genuinely new,
+previously-unseen scenario hasn't yet been run against the fixed Checker; that's the next bar before
+treating `boardroom_engine.py`'s decision quality as broadly evidenced rather than narrowly evidenced.
+
+**Generalization check (closes the open item above).** Added `flatten-nested-list` — orthogonal to
+`palindrome-check`'s punctuation gap, exercising a different checklist dimension. **Real result**:
+both the new engine and the real CTO persona reached `GO_WITH_CONCERNS` ($0.347196), but the routing
+was `low_confidence_fallback`, leaving it ambiguous whether the tier match was content-based or
+coincidental — the exact ambiguity `simple-email-validation` already had. Fixed a real logging gap
+(`live_ab_run.py` now records `checker_final_concerns`) and ran one supplementary live call
+(`eval/checker_generalization_check.py`, $0.017608) re-evaluating the exact accepted artifact
+directly. **Settled the ambiguity**: the Checker independently named "no handling for extremely deep
+nesting causing RecursionError" — the *exact* risk the real persona called its "biggest technical
+risk." Real, direct evidence the fix generalizes to a scenario it wasn't tuned against. Total real
+spend, this check: $0.364804. **Running total across Phases 5-7 plus this check: $2.219720.** Still
+honestly bounded: 2 scenarios checked, not a claim this is solved for all future cases —
+`boardroom_engine.py` remains promising but narrowly (now less narrowly) evidenced.
+
 See `agnostic-boardroom/README.md` for current phase status.
 
 ## Open items (planned, not yet built)

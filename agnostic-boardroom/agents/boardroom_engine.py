@@ -78,14 +78,16 @@ def to_boardroom_verdict(review: EngineeringReview, scope_ref: str, checkpoint_i
     caller consuming this can't tell the difference in shape from a real
     checkpoint entry -- only in seat coverage (see module docstring).
 
-    Mapping: loop.accepted -> CTO seat GO; loop still resolved before the
-    iteration cap but with concerns noted via a low-confidence route ->
-    GO_WITH_CONCERNS; loop.escalated (never resolved) -> CTO seat NO_GO,
-    consolidated bottom_line DO NOT SHIP. This is a deliberately conservative
-    mapping -- a low-confidence skill match downgrades an otherwise-accepted
-    result to GO_WITH_CONCERNS rather than silently reporting a clean GO,
-    since `route_task`'s own low_confidence_fallback is an explicitly
-    unguarded gap (see `knowledge/skill_router.py`'s docstring).
+    Mapping: loop.accepted with no concerns and a confident route -> CTO seat
+    GO; accepted but with a real, Checker-named concern (`loop.final_concerns`)
+    OR only a low-confidence skill route -> GO_WITH_CONCERNS; loop.escalated
+    (never resolved) -> CTO seat NO_GO, consolidated bottom_line DO NOT SHIP.
+    Two independent, non-exclusive reasons can produce GO_WITH_CONCERNS --
+    a content-based one (the Checker itself flagged something, however minor)
+    and a routing-based one (`route_task`'s own low_confidence_fallback is an
+    explicitly unguarded gap, see `knowledge/skill_router.py`'s docstring) --
+    both are surfaced in the summary when both are present, never silently
+    dropped in favor of the other.
     """
     if review.loop.escalated:
         cto_verdict = Verdict.NO_GO
@@ -95,19 +97,27 @@ def to_boardroom_verdict(review: EngineeringReview, scope_ref: str, checkpoint_i
         )
         bottom_line = BottomLine.DO_NOT_SHIP
         founder_decision = FounderDecision.STILL_REVIEWING
-    elif review.routing.confidence == "low_confidence_fallback":
-        cto_verdict = Verdict.GO_WITH_CONCERNS
-        summary = (
-            f"Accepted after {len(review.loop.iterations)} iteration(s), but routed to "
-            f"'{review.routing.skill_name}' on a low-confidence match (similarity="
-            f"{review.routing.best_similarity:.2f}) -- worth a human second look."
-        )
-        bottom_line = BottomLine.GO_WITH_CHANGES
-        founder_decision = FounderDecision.STILL_REVIEWING
     else:
-        cto_verdict = Verdict.GO
-        summary = f"Accepted after {len(review.loop.iterations)} iteration(s), routed to '{review.routing.skill_name}'."
-        bottom_line = BottomLine.GO
+        concern_notes = []
+        if review.loop.final_concerns:
+            concern_notes.append(f"Checker-flagged concern(s): {'; '.join(review.loop.final_concerns)}")
+        if review.routing.confidence == "low_confidence_fallback":
+            concern_notes.append(
+                f"routed to '{review.routing.skill_name}' on a low-confidence match "
+                f"(similarity={review.routing.best_similarity:.2f})"
+            )
+
+        if concern_notes:
+            cto_verdict = Verdict.GO_WITH_CONCERNS
+            summary = (
+                f"Accepted after {len(review.loop.iterations)} iteration(s), but with concerns: "
+                + " | ".join(concern_notes)
+            )
+            bottom_line = BottomLine.GO_WITH_CHANGES
+        else:
+            cto_verdict = Verdict.GO
+            summary = f"Accepted after {len(review.loop.iterations)} iteration(s), routed to '{review.routing.skill_name}'."
+            bottom_line = BottomLine.GO
         founder_decision = FounderDecision.STILL_REVIEWING
 
     checkpoint_id = checkpoint_id or f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H-%M-%SZ')}-engineering-review"

@@ -60,6 +60,21 @@ SCENARIOS = [
             "Respond with only the function definition, no explanation."
         ),
     },
+    {
+        "name": "flatten-nested-list",
+        # A genuinely new scenario (Phase 7's still-open item): orthogonal to
+        # palindrome-check's punctuation-handling gap, exercising a different
+        # checklist dimension (architecture fit / scope-of-spec judgment
+        # rather than a missed correctness edge case) -- added to test
+        # whether the concerns/severity-guidance fix generalizes beyond the
+        # one scenario it was diagnosed and fixed against.
+        "task": (
+            "Write a Python function flatten(nested) that takes a list which may contain "
+            "other lists nested to arbitrary depth, and returns a single flat list containing "
+            "all the non-list elements, in their original order. Respond with only the function "
+            "definition, no explanation."
+        ),
+    },
 ]
 
 _VERDICT_RE = re.compile(r"##\s*CTO VERDICT:\s*(GO_WITH_CONCERNS|GO|NO_GO)")
@@ -130,6 +145,14 @@ def main(scenarios=None) -> None:
                 "iterations": len(review.loop.iterations),
                 "routed_skill": review.routing.skill_name,
                 "routing_confidence": review.routing.confidence,
+                # Logged explicitly so a GO_WITH_CONCERNS result's real cause
+                # (content-based, routing-based, or both) is never ambiguous
+                # after the fact -- a gap found while checking whether the
+                # Phase 7 severity fix generalizes, not just coincidentally
+                # landing on the same tier as the persona for an unrelated
+                # reason (the exact ambiguity `simple-email-validation`'s
+                # Phase 5/6 "nominal agreement" already had).
+                "checker_final_concerns": review.loop.final_concerns,
                 "seat_verdict": new_engine_verdict,
                 "bottom_line": verdict.bottom_line.value,
                 "cost_usd": review.loop.total_cost_usd,
