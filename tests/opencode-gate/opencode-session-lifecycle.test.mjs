@@ -11,11 +11,20 @@ import assert from 'node:assert/strict';
 
 import { countRelevantChanges } from '../../plugins/wingman/references/harness-adapters/opencode/.opencode/plugin/pre-compact-guard.js';
 import { buildSessionUpdate } from '../../plugins/wingman/references/harness-adapters/opencode/.opencode/plugin/session-start.js';
+// 2026-07-25 update: these pure functions moved to lib/stop-loop-logic.js -- stop-loop.js itself is
+// now a real, WIRED plugin (confirmed working under `opencode serve`; see its own header comment).
+// They moved out of the top-level, auto-discovered file because OpenCode's plugin loader invokes
+// EVERY named export of a discovered file as if it were its own plugin factory, and calling
+// `loadLoopConfig` that way (with a plugin-context object instead of a real path) returned `null` --
+// a correct, intentional value for its real contract, but fatal to the loader, which then crashed
+// trying to read `.config`/`.event` off that `null`. See stop-loop.js's and lib/stop-loop-logic.js's
+// own header comments for the full write-up; this import path change is the direct consequence.
 import {
   evaluate,
   extractAssistantText,
   loadLoopConfig,
-} from '../../plugins/wingman/references/harness-adapters/opencode/.opencode/plugin/stop-loop.js';
+  extractLoopSignals,
+} from '../../plugins/wingman/references/harness-adapters/opencode/.opencode/plugin/lib/stop-loop-logic.js';
 
 // --- countRelevantChanges (pre-compact-guard.js) ---
 
@@ -177,8 +186,79 @@ test('extractAssistantText: non-string, non-array -> empty string', () => {
   assert.equal(extractAssistantText(42), '');
 });
 
-// --- loadLoopConfig (stop-loop.js) ---
+// --- loadLoopConfig (lib/stop-loop-logic.js) ---
 
 test('loadLoopConfig: missing file -> null', () => {
   assert.equal(loadLoopConfig('/nonexistent/path/loop.json'), null);
+});
+
+test('loadLoopConfig: non-string argument -> null, does not throw (the confirmed loader-crash guard)', () => {
+  // Real, live-confirmed finding (see stop-loop.js's own header comment): OpenCode's plugin loader
+  // auto-discovers every top-level file under .opencode/plugin/ and invokes every named export as
+  // if it were its own plugin factory, i.e. with a plugin-context OBJECT as the sole argument, not a
+  // string path. existsSync() would throw synchronously on a non-string argument if this function
+  // didn't guard against it -- this is exactly why the pure logic moved to lib/ (not auto-discovered)
+  // AND why this function stays defensive regardless.
+  assert.equal(loadLoopConfig({ client: {}, directory: '/tmp' }), null);
+  assert.equal(loadLoopConfig(undefined), null);
+  assert.equal(loadLoopConfig(42), null);
+});
+
+// --- extractLoopSignals (lib/stop-loop-logic.js) -- new in this pass, reads OpenCode's real
+// GET /session/{id}/message shape (`[{ info: {...}, parts: [...] }]`) instead of a Claude Code
+// JSONL transcript. ---
+
+test('extractLoopSignals: empty/non-array input -> no signals', () => {
+  assert.deepEqual(extractLoopSignals(undefined, 3), {
+    lastAssistantId: null,
+    lastAssistantText: '',
+    recentToolSignatures: [],
+  });
+  assert.deepEqual(extractLoopSignals([], 3), {
+    lastAssistantId: null,
+    lastAssistantText: '',
+    recentToolSignatures: [],
+  });
+});
+
+test('extractLoopSignals: finds the LAST assistant message with real text, ignores user messages', () => {
+  const messages = [
+    { info: { role: 'user', id: 'msg_u1' }, parts: [{ type: 'text', text: 'do the thing' }] },
+    { info: { role: 'assistant', id: 'msg_a1' }, parts: [{ type: 'text', text: 'first reply' }] },
+    { info: { role: 'user', id: 'msg_u2' }, parts: [{ type: 'text', text: 'keep going' }] },
+    { info: { role: 'assistant', id: 'msg_a2' }, parts: [{ type: 'text', text: 'second reply, DONE' }] },
+  ];
+  const result = extractLoopSignals(messages, 3);
+  assert.equal(result.lastAssistantId, 'msg_a2');
+  assert.equal(result.lastAssistantText, 'second reply, DONE');
+});
+
+test('extractLoopSignals: assistant messages with no text part (tool-only steps) do not overwrite the last real text', () => {
+  const messages = [
+    { info: { role: 'assistant', id: 'msg_a1' }, parts: [{ type: 'text', text: 'real reply' }] },
+    { info: { role: 'assistant', id: 'msg_a2' }, parts: [{ type: 'tool', tool: 'bash', state: { input: { command: 'ls' } } }] },
+  ];
+  const result = extractLoopSignals(messages, 3);
+  // msg_a2 has no text part, so the last real text/id stay at msg_a1's.
+  assert.equal(result.lastAssistantId, 'msg_a1');
+  assert.equal(result.lastAssistantText, 'real reply');
+});
+
+test('extractLoopSignals: collects tool-call signatures across assistant messages, capped at stallThreshold', () => {
+  const messages = [
+    { info: { role: 'assistant', id: 'a1' }, parts: [{ type: 'tool', tool: 'bash', state: { input: { command: 'ls' } } }] },
+    { info: { role: 'assistant', id: 'a2' }, parts: [{ type: 'tool', tool: 'bash', state: { input: { command: 'ls' } } }] },
+    { info: { role: 'assistant', id: 'a3' }, parts: [{ type: 'tool', tool: 'bash', state: { input: { command: 'ls' } } }] },
+  ];
+  const result = extractLoopSignals(messages, 2);
+  assert.equal(result.recentToolSignatures.length, 2); // capped, not 3
+  assert.equal(result.recentToolSignatures[0], 'bash:{"command":"ls"}');
+});
+
+test('extractLoopSignals: stallThreshold 0 disables tool-signature collection', () => {
+  const messages = [
+    { info: { role: 'assistant', id: 'a1' }, parts: [{ type: 'tool', tool: 'bash', state: { input: {} } }] },
+  ];
+  const result = extractLoopSignals(messages, 0);
+  assert.deepEqual(result.recentToolSignatures, []);
 });

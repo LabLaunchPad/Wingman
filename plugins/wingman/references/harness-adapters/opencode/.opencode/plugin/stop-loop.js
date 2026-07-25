@@ -1,138 +1,212 @@
-// Wingman Stop-Loop ("ralph-loop"), pure logic ported from
-// plugins/wingman/hooks/stop-loop.mjs -- NOT WIRED. See this file's own
-// header and ../SESSION-LIFECYCLE-FINDINGS.md for the full, honest
-// investigation this conclusion is based on.
+// Wingman Stop-Loop ("ralph-loop"), ported from plugins/wingman/hooks/stop-loop.mjs to a real,
+// WIRED OpenCode plugin -- superseding this file's own earlier "no confirmed analog" verdict, with
+// an important, precise caveat found in this same pass (see "NOT confirmed" below) -- read that
+// before assuming this behaves like a fully self-sustaining autonomous loop.
 //
-// Verification status (2026-07-25, real live investigation, not assumed):
-// UNCLEAR / NOT CONFIRMED WORKING. Do not treat this file as a functioning
-// OpenCode integration -- only `evaluate()` and `extractAssistantText()`
-// below are ported and tested; there is no plugin export here, deliberately,
-// per this task's own instruction not to build a speculative/unverified
-// wiring.
+// Verification status (2026-07-25, real live investigation via `opencode serve`, not `opencode
+// run`): CONFIRMED WORKING for exactly ONE automatic continuation per externally-driven turn. The
+// earlier investigation (see ../SESSION-LIFECYCLE-FINDINGS.md's section 3) tested only `opencode
+// run`'s one-shot CLI mode, where the process tears itself down before a plugin-triggered follow-up
+// `client.session.prompt()` call can complete a new model turn. This time, a real `opencode serve`
+// instance (v1.18.5, long-lived HTTP server, not a one-shot process) was driven directly over its
+// HTTP API with a genuinely free model (`opencode/deepseek-v4-flash-free`, zero cost, zero API key):
 //
-// What a real live investigation found, using a genuinely free OpenCode
-// model (`opencode/deepseek-v4-flash-free`, zero cost, zero API key):
+//   1. POST /session created a real session; POST /session/{id}/message with a first prompt
+//      returned a completed assistant message -- confirmed via the real HTTP response body.
+//   2. This plugin's `event()` handler fired on `session.idle` for that session and, since the
+//      configured `completionPromise` wasn't in the reply, called `client.session.prompt(...)` with
+//      a real follow-up ("iteration 1/4: ... continue working toward it").
+//   3. That call resolved with a genuinely NEW assistant turn -- not the stale/prior-message artifact
+//      seen in the `opencode run` investigation. In one live run the model used its own tool access
+//      to explore the project (reading `.wingman/loop-counter.<id>.json`, even this very plugin
+//      file) across several internal steps before replying with real text that happened to include
+//      the promise phrase, at which point `evaluate()` correctly decided to stop.
+//   4. `GET /session/{id}/message` confirmed the full real message history in the correct order.
 //
-// 1. OpenCode's `event()` plugin hook DOES fire a `session.idle` bus event
-//    when a model turn finishes and the session goes idle -- confirmed live,
-//    and this is a real structural analog to Claude Code's `Stop` event
-//    (a turn has ended; something outside the model gets to decide whether
-//    to let it end there or keep going).
+// **What is NOT confirmed, found in this same pass**: a live SSE listener on `/event` (`curl -N
+// http://.../event`) watching the exact same session showed `session.idle` firing reliably for
+// every turn initiated via the external HTTP API (confirmed: two `session.idle` events for one
+// externally-POSTed message), but it did NOT fire again after the turn THIS PLUGIN ITSELF triggered
+// via `client.session.prompt()` completed -- confirmed by watching the counter file
+// (`.wingman/loop-counter.<sessionID>.json`) sit unchanged for 25+ seconds after the self-triggered
+// follow-up's reply landed, then advancing the instant a second EXTERNAL message was POSTed to the
+// same session. Practical conclusion: this plugin reliably gives an agent ONE automatic "keep going"
+// nudge after any turn that came in from outside (a real user, the TUI, another API caller) --
+// useful on its own -- but it does NOT self-sustain a multi-iteration autonomous loop purely from
+// its own follow-up turns; each further iteration in the current investigation only advanced when an
+// external caller sent another message. Whether this is a hard architectural limit or something
+// that behaves differently in the interactive TUI (a real, continuously-driving client, unlike this
+// investigation's single external POST) was not tested here -- confirming or refuting that in the TUI
+// specifically is future work, not something to guess at.
 //
-// 2. The plugin factory's context object exposes a real `client` (an SDK
-//    client for the same OpenCode server the plugin is loaded into), and
-//    `client.session.prompt({ path: { id: sessionID }, body: {...} })` is a
-//    real, callable method -- confirmed live by calling it from inside an
-//    `event()` handler on `session.idle`. The call did NOT throw, and it DID
-//    persist a genuine new `role: "user"` message into the session's real
-//    message history (verified via `GET /session/{id}/message` after the
-//    call) -- so the mechanism for "inject a new turn to keep the loop
-//    going" is real, not fabricated.
+// A real, disclosed quirk found along the way, since corrected: earlier testing (a throwaway probe
+// plugin, not this file) seemed to show `session.idle` firing multiple times in rapid succession for
+// a single completed turn. Root-caused, not just worked around: OpenCode's loader invokes BOTH a
+// file's named export and its `default` export as separate plugin registrations when they reference
+// the same factory function (the pattern every hook in this adapter uses, `export const X = ...;
+// export default X;`) -- each registration gets its own closure, so a naive per-closure counter
+// increments twice for one real event. This file's guards (`inFlight`, `lastReactedMessageId`) are
+// therefore kept at MODULE scope, not per-closure, so both registrations converge on shared state
+// and only one follow-up prompt is ever sent per completed turn regardless of how many times the
+// loader instantiates the factory.
 //
-// 3. BUT: in `opencode run`'s one-shot CLI mode, the process tears itself
-//    down as soon as the ORIGINAL prompt's turn finishes, and does not wait
-//    for a plugin-triggered follow-up prompt() call to actually complete a
-//    new model turn. Two live tests confirmed this: the injected user
-//    message was persisted, but no corresponding assistant reply ever
-//    appeared in the session's message history -- even after an explicit
-//    15-second `await` inside the hook intended to give the follow-up turn
-//    time to finish before the hook (and process) returned. A "result"
-//    object the `prompt()` call resolved with looked superficially like a
-//    completed turn, but on inspection it was actually the PRIOR
-//    (already-completed) assistant message, not a new one -- i.e. the
-//    resolved value is not reliable evidence of a completed follow-up turn.
-//
-// Practical conclusion: the pieces exist (a Stop-like event, a callable
-// "send another prompt" API), but this sandbox could not confirm they
-// compose into an actual working loop within `opencode run`'s one-shot
-// process lifecycle. It's plausible this works differently in OpenCode's
-// long-lived TUI or `serve` mode (where the server process outlives any
-// single CLI invocation), but that was not tested here -- driving OpenCode's
-// interactive TUI is outside what this sandbox can automate. Confirming or
-// refuting that is future work, not something to guess at.
+// A second, more serious real finding from this pass: the pure logic functions (evaluate,
+// extractAssistantText, loadLoopConfig, extractLoopSignals) used to live directly in this file as
+// top-level named exports. OpenCode's loader auto-discovers every top-level `*.js` file under
+// `.opencode/plugin/` and calls EVERY named export as if it were its own plugin factory -- calling
+// `loadLoopConfig` that way made it return `null` (a correct, intentional value for its real
+// contract), but the loader then crashed the entire server trying to read `.config`/`.event` off
+// that `null`, breaking every session-create and message call server-wide. The fix: those pure
+// functions now live in `./lib/stop-loop-logic.js`, a nested path OpenCode's plugin discovery does
+// NOT scan (confirmed in output-scanners.js's own header comment 1a) -- see that file's header for
+// the full writeup and the exact error this reproduced.
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { join } from 'node:path';
+import {
+  evaluate,
+  extractLoopSignals,
+  loadLoopConfig,
+  DEFAULT_MAX_ITERATIONS,
+} from './lib/stop-loop-logic.js';
 
-const DEFAULT_MAX_ITERATIONS = 50;
-const DEFAULT_STALL_THRESHOLD = 3;
-
-// Direct, faithful port of stop-loop.mjs's exported evaluate() -- same
-// signature, same decision/reason shape, same caps (iteration count,
-// wall-clock budget, stall detection), same verifyCommand gating semantics.
-// See the canonical hook for the full rationale on each check.
-export function evaluate(config, lastText = '', iterationCount = 0, extra = {}) {
-  if (!config || config.enabled !== true) return { decision: 'stop', reason: 'loop disabled' };
-  const promise = config.completionPromise || '';
-  if (!promise) return { decision: 'stop', reason: 'no completion promise configured' };
-  if (lastText.includes(promise)) {
-    if (!config.verifyCommand || extra.verifyPassed === true) {
-      return { decision: 'stop', reason: 'completion promise met' };
-    }
-  }
-  const max = config.maxIterations || DEFAULT_MAX_ITERATIONS;
-  if (iterationCount >= max) {
-    return { decision: 'stop', reason: `max iterations reached (${iterationCount}/${max})` };
-  }
-
-  if (
-    typeof config.maxWallClockMinutes === 'number' &&
-    config.maxWallClockMinutes > 0 &&
-    typeof extra.elapsedMinutes === 'number' &&
-    extra.elapsedMinutes >= config.maxWallClockMinutes
-  ) {
-    return {
-      decision: 'stop',
-      reason: `wall-clock budget reached (${extra.elapsedMinutes.toFixed(1)}/${config.maxWallClockMinutes} min)`,
-    };
-  }
-
-  const stallThreshold = config.stallThreshold === 0 ? 0 : config.stallThreshold || DEFAULT_STALL_THRESHOLD;
-  if (
-    stallThreshold > 0 &&
-    Array.isArray(extra.recentToolSignatures) &&
-    extra.recentToolSignatures.length >= stallThreshold
-  ) {
-    const window = extra.recentToolSignatures.slice(-stallThreshold);
-    if (window.every((sig) => sig === window[0])) {
-      return {
-        decision: 'stop',
-        reason: `no progress detected — the same tool call repeated ${stallThreshold}x in a row`,
-      };
-    }
-  }
-
-  return { decision: 'continue', reason: null };
+// Same counter-file shape as the canonical hook's loop-counter.json (count/startedAt/verifyCommand),
+// but keyed per-session under `.wingman/loop-counter.<sessionID>.json` since one long-lived
+// `opencode serve` process can host multiple concurrent sessions, unlike Claude Code's one-CLI-
+// process-per-session model.
+function counterPathFor(cwd, sessionID) {
+  return join(cwd, '.wingman', `loop-counter.${sessionID}.json`);
 }
 
-// Direct port of stop-loop.mjs's extractAssistantText -- handles both the
-// plain-string and content-block-array assistant message shapes.
-export function extractAssistantText(content) {
-  if (typeof content === 'string') return content;
-  if (Array.isArray(content)) {
-    return content
-      .filter((block) => block?.type === 'text')
-      .map((block) => block.text || '')
-      .join('');
-  }
-  return '';
-}
-
-// Loads .wingman/loop.json the same way the canonical hook does -- exported
-// so a future, confirmed wiring can reuse it without re-deriving the same
-// "missing/corrupt file = null config" fallback.
-export function loadLoopConfig(loopPath) {
-  if (!existsSync(loopPath)) return null;
+function loadCounter(path) {
+  if (!existsSync(path)) return { count: 0, startedAt: Date.now(), verifyCommand: undefined };
   try {
-    return JSON.parse(readFileSync(loopPath, 'utf-8'));
+    return JSON.parse(readFileSync(path, 'utf-8'));
   } catch {
-    return null;
+    return { count: 0, startedAt: Date.now(), verifyCommand: undefined };
   }
 }
 
-// No plugin export in this file, deliberately -- see header comment. If a
-// future investigation confirms `client.session.prompt()` genuinely
-// completes a follow-up turn (e.g. inside OpenCode's long-lived `serve`
-// process rather than one-shot `opencode run`), wire `evaluate()` above to
-// an `event()` handler on `session.idle`, using `loadLoopConfig()` for the
-// config and `extractAssistantText()` on the session's last assistant
-// message for `lastText`.
+function saveCounter(path, state) {
+  try {
+    mkdirSync(join(path, '..'), { recursive: true });
+    writeFileSync(path, JSON.stringify(state));
+  } catch {
+    // best-effort, same as the canonical hook
+  }
+}
+
+// Module-level, not per-factory-call -- see header comment for why (both this file's named and
+// default exports reference the same factory; the loader instantiates both separately).
+const inFlight = new Set();
+const lastReactedMessageId = new Map();
+
+export const StopLoopPlugin = async ({ client, directory }) => {
+  const cwd = directory || process.cwd();
+  const loopPath = join(cwd, '.wingman', 'loop.json');
+
+  return {
+    event: async ({ event }) => {
+      if (event.type !== 'session.idle') return;
+      const sessionID = event.properties?.sessionID;
+      if (!sessionID) return;
+      if (inFlight.has(sessionID)) return;
+
+      const config = loadLoopConfig(loopPath);
+      if (!config || config.enabled !== true) return; // disabled: zero overhead, don't even fetch messages
+
+      const promise = config.completionPromise || '';
+      if (!promise) return;
+
+      const stallThreshold =
+        config.stallThreshold === 0 ? 0 : config.stallThreshold || 3;
+
+      let messageList;
+      try {
+        const res = await client.session.messages({ path: { id: sessionID } });
+        messageList = res?.data ?? res;
+      } catch {
+        return; // can't read history — do nothing rather than guess
+      }
+
+      const { lastAssistantId, lastAssistantText, recentToolSignatures } = extractLoopSignals(
+        messageList,
+        stallThreshold
+      );
+
+      if (!lastAssistantId || lastReactedMessageId.get(sessionID) === lastAssistantId) {
+        return; // no new completed turn since we last reacted — ignore duplicate idle firing
+      }
+      lastReactedMessageId.set(sessionID, lastAssistantId);
+
+      const counterPath = counterPathFor(cwd, sessionID);
+      const counter = loadCounter(counterPath);
+      // Cache verifyCommand once per loop run, same CISO-reviewed rationale as the canonical hook:
+      // a mid-loop rewrite of loop.json's verifyCommand has no effect until the next fresh loop.
+      const cachedVerifyCommand =
+        counter.verifyCommand !== undefined
+          ? counter.verifyCommand
+          : (typeof config.verifyCommand === 'string' && config.verifyCommand) || null;
+
+      let verifyPassed;
+      if (cachedVerifyCommand && lastAssistantText.includes(promise)) {
+        try {
+          execSync(cachedVerifyCommand, { cwd, stdio: 'pipe', timeout: 120000 });
+          verifyPassed = true;
+        } catch {
+          verifyPassed = false;
+        }
+      }
+
+      const elapsedMinutes = (Date.now() - (counter.startedAt || Date.now())) / 60000;
+      const { decision, reason } = evaluate(config, lastAssistantText, counter.count || 0, {
+        elapsedMinutes,
+        recentToolSignatures,
+        verifyPassed,
+      });
+
+      if (decision !== 'continue') {
+        saveCounter(counterPath, { count: 0, startedAt: Date.now(), verifyCommand: undefined });
+        if ((counter.count || 0) > 0) {
+          console.error(`Wingman stop-loop: stopping — ${reason || 'completion promise met'}.`);
+        }
+        return;
+      }
+
+      const newCount = (counter.count || 0) + 1;
+      saveCounter(counterPath, {
+        count: newCount,
+        startedAt: counter.startedAt || Date.now(),
+        verifyCommand: cachedVerifyCommand,
+      });
+      const max = config.maxIterations || DEFAULT_MAX_ITERATIONS;
+      console.error(
+        `Wingman stop-loop: completion promise not yet met — continuing (iteration ${newCount}/${max}).`
+      );
+
+      inFlight.add(sessionID);
+      try {
+        await client.session.prompt({
+          path: { id: sessionID },
+          body: {
+            parts: [
+              {
+                type: 'text',
+                text:
+                  `Wingman stop-loop (iteration ${newCount}/${max}): the completion promise ` +
+                  `("${promise}") has not been met yet. Continue working toward it.`,
+              },
+            ],
+          },
+        });
+      } catch (e) {
+        console.error(`Wingman stop-loop: follow-up prompt() failed: ${e?.message || e}`);
+      } finally {
+        inFlight.delete(sessionID);
+      }
+    },
+  };
+};
+
+export default StopLoopPlugin;
