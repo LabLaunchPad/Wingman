@@ -3,6 +3,7 @@ must be read fresh per call, not cached at import time (which would
 silently ignore an env var set after `agents.model_runner` was first
 imported -- a real bug a naming audit found in this module)."""
 
+import json
 import subprocess
 
 import pytest
@@ -55,3 +56,40 @@ def test_explicit_cli_argument_overrides_env_var(monkeypatch):
     with pytest.raises(subprocess.TimeoutExpired):
         run_claude_headless("hi", cli="explicit-cli")
     assert seen_cli["cli"] == "explicit-cli"
+
+
+def _fake_completed_process(returncode=0, stdout="", stderr=""):
+    return subprocess.CompletedProcess(args=[], returncode=returncode, stdout=stdout, stderr=stderr)
+
+
+def test_successful_response_is_parsed_into_a_run_result(monkeypatch):
+    """Real coverage gap found via a coverage audit: every existing test
+    raised TimeoutExpired before reaching the actual response-parsing code
+    -- this covers the real parsing path (lines model_runner.py never
+    exercised) with a mocked subprocess.run, no live model call needed."""
+    payload = {"result": "hello", "total_cost_usd": 0.05, "session_id": "sess-1", "is_error": False}
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(stdout=json.dumps(payload))
+    )
+    result = run_claude_headless("hi")
+    assert result.text == "hello"
+    assert result.total_cost_usd == 0.05
+    assert result.session_id == "sess-1"
+    assert result.is_error is False
+
+
+def test_nonzero_returncode_raises_runtime_error(monkeypatch):
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(returncode=1, stderr="boom")
+    )
+    with pytest.raises(RuntimeError, match="exited 1"):
+        run_claude_headless("hi")
+
+
+def test_cli_reported_error_raises_runtime_error_even_with_zero_returncode(monkeypatch):
+    payload = {"result": "something went wrong internally", "total_cost_usd": 0.01, "is_error": True}
+    monkeypatch.setattr(
+        subprocess, "run", lambda *a, **k: _fake_completed_process(stdout=json.dumps(payload))
+    )
+    with pytest.raises(RuntimeError, match="reported an error"):
+        run_claude_headless("hi")

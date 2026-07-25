@@ -7,12 +7,16 @@ import sqlite3
 
 import pytest
 
+from datetime import datetime, timezone
+
 from core.state_schema import (
     BottomLine,
+    DebtLedgerEntry,
     FounderDecision,
     SeatVerdict,
     ThreatDisposition,
     ThreatRegisterEntry,
+    TraceabilityLink,
     Verdict,
 )
 from db.connection import checkpoint_wal, get_connection
@@ -21,8 +25,10 @@ from db.repository import (
     get_open_threats,
     ingest_checkpoint_raw,
     insert_checkpoint,
+    insert_debt,
     insert_memory,
     insert_threat,
+    insert_traceability,
     list_memories,
     log_schema_deviation,
 )
@@ -78,6 +84,21 @@ def test_checkpoint_wal_checkpoint_helper_runs_without_error(db_path):
     init_schema(conn)
     insert_checkpoint(conn, _sample_verdict())
     checkpoint_wal(conn, mode="PASSIVE")  # must not raise
+
+
+def test_checkpoint_wal_rejects_an_unknown_mode(db_path):
+    """Real coverage gap found via a coverage audit: only the valid-mode path
+    was ever exercised."""
+    conn = get_connection(db_path)
+    init_schema(conn)
+    with pytest.raises(ValueError, match="Unknown WAL checkpoint mode"):
+        checkpoint_wal(conn, mode="NOT_A_REAL_MODE")
+
+
+def test_get_checkpoint_returns_none_for_an_unknown_id(db_path):
+    conn = get_connection(db_path)
+    init_schema(conn)
+    assert get_checkpoint(conn, "does-not-exist") is None
 
 
 def test_do_not_ship_checkpoint_round_trips_correctly(db_path):
@@ -151,3 +172,56 @@ def test_memory_rejects_unknown_layer(db_path):
     init_schema(conn)
     with pytest.raises(ValueError):
         insert_memory(conn, "galaxy", "nonsense layer")
+
+
+def test_ingest_checkpoint_raw_succeeds_and_persists_a_valid_payload(db_path):
+    """Real coverage gap found via a coverage audit: only the failure
+    (schema-invalid) branch of ingest_checkpoint_raw was ever tested --
+    the success path (a valid payload actually gets persisted) never was."""
+    conn = get_connection(db_path)
+    init_schema(conn)
+    raw = {
+        "checkpoint_id": "cp-valid",
+        "stage": "build",
+        "scope_ref": "docs/wingman/plans/test.md",
+        "seats": [{"seat": "cto", "verdict": "GO", "summary": "looks fine"}],
+        "bottom_line": "GO",
+        "founder_decision": "ship_it",
+    }
+    result = ingest_checkpoint_raw(conn, raw)
+    assert result is not None
+    assert result.checkpoint_id == "cp-valid"
+    assert get_checkpoint(conn, "cp-valid") is not None
+
+
+def test_insert_debt_persists_a_row(db_path):
+    """Real coverage gap found via a coverage audit: insert_debt had zero
+    test coverage anywhere in the suite."""
+    conn = get_connection(db_path)
+    init_schema(conn)
+    entry = DebtLedgerEntry(
+        debt_id="DEBT-1",
+        location="agents/loop.py",
+        ceiling_condition=">500 users",
+        upgrade_path="add a real queue",
+        logged_at=datetime.now(timezone.utc),
+    )
+    insert_debt(conn, entry)
+    row = conn.execute("SELECT debt_id, status FROM debt_ledger WHERE debt_id = ?", ("DEBT-1",)).fetchone()
+    assert row is not None
+    assert row["status"] == "OPEN"
+
+
+def test_insert_traceability_persists_a_row(db_path):
+    """Real coverage gap found via a coverage audit: insert_traceability had
+    zero test coverage anywhere in the suite."""
+    conn = get_connection(db_path)
+    init_schema(conn)
+    link = TraceabilityLink(marker_id="DISC-3", prefix="DISC", source_file="commands/pipeline/discovery.md")
+    insert_traceability(conn, link)
+    row = conn.execute(
+        "SELECT marker_id, prefix, source_file FROM traceability WHERE marker_id = ?", ("DISC-3",)
+    ).fetchone()
+    assert row is not None
+    assert row["prefix"] == "DISC"
+    assert row["source_file"] == "commands/pipeline/discovery.md"

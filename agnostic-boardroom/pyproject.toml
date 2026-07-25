@@ -15,6 +15,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "pytest-cov>=7.0",
 ]
 # Added in later phases, not installed yet:
 #   fastapi, uvicorn   -- if HTTP/SSE transport is needed alongside stdio, or Agno's own AgentOS

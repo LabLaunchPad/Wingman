@@ -124,3 +124,19 @@ def test_checker_fails_closed_on_unparseable_response():
     verdict = evaluate("do the thing", "some output", call_model=call_model)
     assert verdict.accepted is False
     assert "not valid JSON" in verdict.reason
+
+
+def test_checker_fails_closed_on_a_json_like_block_with_malformed_contents():
+    """Real coverage gap found via a coverage audit: the existing
+    fails-closed test only covers a response with no {}-shaped block at all
+    -- this covers the second fail-closed path, where a {}-shaped block is
+    found but its contents don't actually parse as JSON."""
+    call_model = lambda prompt: RunResult(
+        text='{"accepted": true, "reason": unquoted_value_breaks_json}',
+        total_cost_usd=0.05,
+        session_id="s",
+        is_error=False,
+    )
+    verdict = evaluate("do the thing", "some output", call_model=call_model)
+    assert verdict.accepted is False
+    assert "unparseable JSON" in verdict.reason
