@@ -50,6 +50,25 @@ const SECRET = [
   /(?:password|passwd|secret|token|api[_-]?key)\s*[:=]\s*['"]?[A-Za-z0-9\/+_]{20,}/i,
 ];
 
+// SECRET is reachable (not just used locally) so a sibling PostToolUse-shaped plugin file
+// (output-scanners.js -- the port of secret-scanner.mjs/content-injection-scanner.mjs) can import
+// this exact list rather than keeping its own byte-identical copy that could silently drift, the
+// same reasoning plugins/wingman/hooks/secret-guard.mjs already applies for secret-scanner.mjs.
+//
+// Deliberately exported through a FUNCTION (getSecretPatterns()) rather than a bare
+// `export { SECRET }`. Real, live finding (2026-07-25): OpenCode's plugin loader auto-discovers
+// every top-level *.js file directly under .opencode/plugin/ and rejects the whole module --
+// "Plugin export is not a function" -- if it has ANY named export that isn't itself a function,
+// even when `export default` is a perfectly valid async plugin function. Confirmed by a live A/B
+// test: a module with `export default asyncFn; export const FOO = [1,2,3];` failed to load, while
+// the same shape with FOO replaced by another function loaded fine. A bare `export { SECRET }`
+// (an array of regexes) tripped exactly this bug and silently broke this file's own plugin
+// registration -- caught only by checking ~/.local/share/opencode/log/opencode.log during this
+// port, not by any error surfaced in `opencode run`'s own stdout/stderr.
+export function getSecretPatterns() {
+  return SECRET;
+}
+
 // Pure decision function, exported separately from the plugin wiring below so it can be
 // unit-tested without a live OpenCode session -- same discipline as the canonical hook's own
 // exported `decide()`.
