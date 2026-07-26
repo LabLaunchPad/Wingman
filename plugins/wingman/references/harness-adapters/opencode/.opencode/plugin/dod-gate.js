@@ -180,13 +180,14 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function listFilesRecursive(dir) {
-  let results = [];
+// Optimized using the flat accumulator pattern to avoid memory-intensive
+// recursive .concat() array copying and excessive garbage collection churn.
+function listFilesRecursive(dir, results = []) {
   let entries;
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return results; }
   for (const entry of entries) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) results = results.concat(listFilesRecursive(full));
+    if (entry.isDirectory()) listFilesRecursive(full, results);
     else results.push(full);
   }
   return results;
