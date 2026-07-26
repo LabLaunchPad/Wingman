@@ -1,6 +1,6 @@
 ---
 name: git-pr-workflow
-description: Use when opening a pull request, waiting for CI to finish, or resuming work on a branch whose earlier PR was squash-merged — teaches the git/gh-CLI procedures for draft-first PR creation, polling checks to green, and resyncing a stale branch after a squash-merge, plus the bundled scripts that implement them. Triggers whenever /wingman:ship is about to push and open a PR, or whenever a branch's `git push` is unexpectedly rejected as non-fast-forward after an earlier PR of the same name merged.
+description: Use when opening a pull request, waiting for CI to finish, resuming work on a branch whose earlier PR was squash-merged, or CI checks have gone silent (zero runs, not just slow) — teaches the git/gh-CLI procedures for draft-first PR creation, polling checks to green, resyncing a stale branch after a squash-merge (including verifying the resync boundary itself, not just trusting a commit message), and isolating whether a missing CI run is an Actions-availability problem or an event-delivery gap, plus the bundled scripts that implement them. Triggers whenever /wingman:ship is about to push and open a PR, whenever a branch's `git push` is unexpectedly rejected as non-fast-forward after an earlier PR of the same name merged, or whenever CI has stopped triggering entirely for a branch.
 ---
 
 # Git/PR Workflow
@@ -58,6 +58,8 @@ portable across coding-agent harnesses.
   is not proof of anything here; check `git merge-base --is-ancestor <base> <branch>` before trusting
   it, the same real gap a direct eval run of this skill hit (see Verification).
 - Any time a founder or another agent asks "is the PR ready yet" / "watch until CI passes."
+- Any time CI checks show as absent (not pending, not failing — zero runs) for several consecutive
+  commits on a branch, before assuming it's a billing or repo-settings problem (see step 6).
 
 ## Core Workflow
 
@@ -97,7 +99,45 @@ the exact rename + `force-with-lease` push commands to finish with — **it neve
 its own**; run this project's own validators/tests against the resynced branch first, then finish
 the steps it prints yourself.
 
-**5. If a merge attempt fails with something like `405 ... required status checks are expected.
+**Finding `<first-new-commit-sha>` correctly is the hard part, not running the script.** A branch
+reused across *multiple* squash-merge cycles (e.g. one long-lived feature branch that had PR #118
+squash-merged into `main`, then kept accumulating new commits and opened as PR #120) has several
+commits whose *message* superficially resembles the squashed PR's title — picking the first one that
+looks right is not evidence it actually is right. **Verify the candidate boundary before trusting
+it:** `git diff <candidate-commit> origin/<base> --stat` — empty output means that commit's tree is
+byte-identical to the base, confirming it's the true squash point; any output means you picked too
+early (or too late) and need to walk forward (or back) through the branch's own log to the commit
+where the diff actually goes empty. Picking a too-early boundary doesn't fail loudly — it produces a
+wave of spurious cherry-pick conflicts and empty-cherry-picks on commits that already landed via the
+squash, which looks like a series of unrelated problems rather than the one wrong input it actually
+is. Hit for real in this project's own history: an initial guess one commit too early produced an
+add/add conflict on a file where the "already on `main`" side had *more* content than the commit
+being cherry-picked (the reverse of what a naive "theirs should be newer" assumption would predict)
+— the tell that the guessed boundary was wrong, not that the file itself was broken.
+
+**6. If CI checks never appear at all — not slow, not failing, just absent minutes after a push —
+isolate the cause before assuming it's a billing/config problem.** A real GitHub-side event-delivery
+gap (`push`/`pull_request` events silently not reaching Actions for a repo, independent of anything
+in the workflow files or repo settings) is easy to mistake for a billing suspension or a disabled
+workflow, and the wrong diagnosis wastes time editing files that were never the problem. Isolate it
+in this order:
+1. If any workflow in the repo has a `workflow_dispatch:` trigger, run it manually against the same
+   branch/commit. If it queues and completes, Actions itself is healthy — the break is specifically
+   in event delivery, not billing or a disabled repo.
+2. Push a fresh, trivial commit (`git commit --allow-empty` is fine) and check whether a
+   `push`/`pull_request`-triggered run appears for it. If manual dispatch worked in step 1 but this
+   doesn't, that confirms the gap is in event delivery specifically.
+3. As one more test — **only after confirming with whoever owns the PR, since this is a visible
+   action** — closing and reopening the PR fires a `reopened` event, a different delivery path than
+   `synchronize`. If even this produces no run, the gap is outside anything fixable via git
+   operations, workflow YAML, or the repo/PR API surface available to a coding agent — report it as
+   a live GitHub-side condition (worth checking `status.github.com` or the org's Actions settings)
+   rather than continuing to try more pushes or PR-state changes hoping one works.
+Once event delivery resumes (confirmed by a `push`/`pull_request` run actually appearing), proceed
+normally — this diagnostic doesn't fix anything itself, it only tells you whether more of the same
+action will help or is wasted effort.
+
+**7. If a merge attempt fails with something like `405 ... required status checks are expected.
 []`**, this is a different situation from step 4 — it means *another* PR merged into the base
 branch while this one was pending, so the base moved out from under it (`mergeable_state` will
 read `"behind"`, not the squash-merge symptom above). This recurred repeatedly in this project's
@@ -125,6 +165,12 @@ doesn't need another update.
 - Treat a still-pending check as a pass to unblock faster.
 - Auto-resolve a cherry-pick conflict during a branch resync — leave it for the calling agent.
 - Assume a richer platform-specific tool is available without checking (`command -v gh`) first.
+- Trust a squash-merge boundary commit by message alone — verify with an empty-diff check (step 4)
+  before cherry-picking onto it.
+- Run only the project's Layer-1/"core" validators after a resync and call it verified — if CI runs
+  a broader check (e.g. a generator-freshness check alongside a drift check), run that too locally;
+  confirm the exact CI step list, don't assume it matches whatever validator list is documented
+  elsewhere if that documentation itself might be stale.
 
 ## Rationalizations
 
@@ -135,7 +181,9 @@ doesn't need another update.
 | "I'll just poll every 2 seconds so I find out the instant it's done" | Wastes API rate-limit budget for no real gain — CI runs take minutes, not seconds; a 30s interval notices "done" just as usefully. |
 | "This platform's built-in tool is probably fine, I don't need the portable script" | It might be fine *here* — but if this exact procedure needs to work for a founder's own project regardless of which coding agent operates it later, the portable script is the one guaranteed to still work. |
 | "I'll just start editing, I'll check what branch I'm on before I commit" | By the time you check, the edits already happened on whatever branch was checked out — checking *before* the first edit is the only version of this that actually prevents the mistake, not just catches it after. |
-| "The merge failed again, let me just retry immediately" | If the error is the "required status checks are expected" base-drift symptom (step 5), an immediate retry reproduces the identical failure — the base checks need to actually finish re-running first, not just be re-triggered. |
+| "The merge failed again, let me just retry immediately" | If the error is the "required status checks are expected" base-drift symptom (step 7), an immediate retry reproduces the identical failure — the base checks need to actually finish re-running first, not just be re-triggered. |
+| "I picked a commit whose message matches the squashed PR's title, that's good enough" | A branch reused across multiple squash-merge cycles has several commits that look right by message alone — verify with `git diff <candidate> origin/<base> --stat` (empty = correct) before trusting it, or a too-early guess produces a wave of spurious conflicts that looks like unrelated breakage. |
+| "CI isn't showing up, the repo's Actions must be disabled or out of budget" | Test a `workflow_dispatch`-enabled workflow manually first — if it runs, Actions is healthy and the real gap is event delivery specifically, not billing or a disabled repo. Don't edit workflow files or repo settings on a guess. |
 
 ## Red Flags — Stop and Reconsider
 
@@ -150,18 +198,47 @@ doesn't need another update.
 - A merge attempt just failed with a "required status checks are expected" error and the next
   move under consideration is an immediate retry rather than updating the branch and waiting for
   checks to re-run.
+- About to pass a commit SHA to the squash-merge sync script because its message "looks right"
+  without having run the empty-diff check against the base.
+- CI has shown zero runs for several consecutive commits and the next move under consideration is
+  another push or PR-state change "to see if it helps" rather than first isolating whether Actions
+  itself is even healthy (a `workflow_dispatch` test) before touching anything else.
+- About to declare a resynced or edited branch CI-clean based on a local validator run that hasn't
+  been checked against CI's *actual* step list for that workflow file.
 
 ## Verification
 
-- **Steps 0 and 5 were added from real, self-caught friction in this project's own session
+- **Steps 0 and 7 were added from real, self-caught friction in this project's own session
   history, not speculatively.** Step 0: a commit landed directly on local `main` mid-session
   (caught before pushing, since `main` has branch protection — recovered by branching off the
   stray commit and hard-resetting local `main` back to `origin/main`; see `docs/PROJECT.md`'s
-  decisions log). Step 5: the "required status checks are expected" base-drift race recurred
+  decisions log). Step 7: the "required status checks are expected" base-drift race recurred
   repeatedly across several PRs in this project's real merge history (one PR alone needed
   `update_pull_request_branch` re-applied 4+ separate times as other PRs kept landing ahead of
   it) before this skill documented the actual fix (update, then wait for checks to re-run, not
   retry immediately).
+- **The squash-merge boundary-finding technique (in step 4) and step 6's CI-event-delivery
+  diagnostic were both added from a single real incident on this branch (`claude/multi-domain-
+  audit-benchmarks-7u9nrw`, PR #120, 2026-07-26), not speculatively.** This branch had gone
+  through two squash-merges of PRs opened from the same branch name (#118, then later work
+  continuing on the same branch for #120); a first attempt at the resync picked a boundary commit
+  one squash-cycle too early purely because its message resembled the earlier squashed PR's title,
+  producing an empty cherry-pick and then a real add/add conflict on a file where the "already
+  merged" side had *more* content than the commit being cherry-picked — the actual tell that the
+  guessed boundary was wrong. Verifying with `git diff <candidate> origin/main --stat` (non-empty)
+  caught it; walking forward to the next candidate and re-running the same check (empty this time)
+  confirmed the correct boundary, and the resync then applied cleanly with the tree byte-identical
+  to the pre-resync branch. Separately, on the same branch: `push`/`pull_request`-triggered
+  workflow runs had stopped firing for 14+ consecutive commits with no config or billing cause
+  found; a manual `workflow_dispatch` run against the same commit queued and completed successfully
+  within a minute, proving Actions itself was healthy and isolating the gap to event delivery
+  specifically — a distinction that mattered, because "fixing" it as a billing/config problem would
+  have wasted effort on the wrong layer. A subsequent force-push (after the resync above) restored
+  normal `push`/`pull_request` triggering, and the very next CI run caught a real, independent gap:
+  a check (`generate-harness-adapters.mjs --check`) that local validation had never run, now fixed
+  in `AGENTS.md`'s own documented command list (see that file's "Project status"/"Commands"
+  sections) — direct evidence for this Verification section's own new Constraints bullet about not
+  assuming a locally-run validator set matches CI's actual step list.
 - `scripts/sync-branch-after-squash-merge.sh` was directly tested against a real simulated
   squash-merge scenario (a bare-repo clone, a feature branch, a `git merge --squash` onto main,
   then a further unmerged commit on the feature branch) — confirmed it correctly detects the

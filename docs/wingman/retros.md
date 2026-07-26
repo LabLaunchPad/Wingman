@@ -1,5 +1,72 @@
 # Retros
 
+<!-- wingman:log type=retro category=git-pr-workflow status=resolved occurrence=1 -->
+## Retro: A real CI-outage + squash-merge-resync incident on PR #120 — 2026-07-26
+
+Asked to "check why the workflows haven't triggered yet" and then "clear all backlogs" on PR #120
+(`claude/multi-domain-audit-benchmarks-7u9nrw`) — real production friction, not a scripted eval, on
+this project's own branch after 14+ consecutive commits got zero `push`/`pull_request`-triggered
+workflow runs.
+
+**What went well:**
+- Diagnosed the CI silence methodically instead of guessing: checked `list_workflows` (all
+  `state: active`, ruling out disabled workflows), then manually dispatched `install-smoke.yml` via
+  `workflow_dispatch` — it queued and completed successfully in ~18 seconds, proving Actions itself
+  was healthy and narrowing the real gap to event delivery specifically. A fresh empty-commit push
+  and a close/reopen of the PR (confirmed with the user first, since state-changing PR actions are
+  visible to others) both still produced zero runs — ruled both out as fixes, reported the finding
+  honestly as a live GitHub-side condition rather than continuing to try more of the same action.
+- Correctly refused to merge to `main` on the first ask: the PR was still a draft, `mergeable_state`
+  read `dirty` (a real conflict, not just missing checks), and the 5 required checks had never run
+  for the current HEAD — surfaced all three blockers plainly and asked before touching PR state,
+  rather than forcing a merge through unverified gates because the user's phrasing ("ensure ... and
+  merges to main") could have been read as blanket authorization.
+- Used this project's own `skills/git-pr-workflow` script (`sync-branch-after-squash-merge.sh`)
+  rather than hand-deriving the fetch/cherry-pick/force-push sequence — but the first attempt picked
+  the wrong boundary commit (one squash-cycle too early, since this branch had already been through
+  two separate squash-merges — PR #118, then continued work for PR #120), producing an empty
+  cherry-pick and then a real add/add conflict. Caught the wrong-boundary diagnosis directly: the
+  conflicting file's "already on `main`" side had *more* content than the commit being cherry-picked,
+  the opposite of what a naive assumption would predict — verified the actual correct boundary with
+  `git diff <candidate> origin/main --stat` (empty output = true squash point) before retrying, which
+  then applied cleanly (16 of 17 commits cherry-picked, the 17th an intentionally-empty diagnostic
+  commit correctly skipped) with the resulting tree confirmed byte-identical to the pre-resync branch.
+- Ran the full local validator suite on the resynced branch *before* finishing the force-push (per
+  the skill's own "verify before finishing" instruction), and again after — but the local set (the 4
+  Layer-1 validators plus the drift check) still missed a real CI failure on the very next push:
+  `generate-harness-adapters.mjs --check`, a 6th check CI's `validate.yml` runs that `AGENTS.md`
+  never named. Pulled the actual job log via `get_job_logs` rather than guessing, reproduced the
+  exact failure locally, fixed it with the generator's own `--write` flag, and confirmed all 6 CI
+  checks (not just the 4 previously treated as "the" validator set) pass locally before the next push.
+
+**What was harder than expected:**
+- The genuinely tricky part of a squash-merge resync is not running the script — it's correctly
+  identifying its `<first-new-commit>` input, which the script cannot do for itself and which
+  nothing previously documented a method for. A commit's message resembling a squashed PR's title is
+  weak evidence on a branch reused across multiple squash-merge cycles; only a direct empty-diff
+  check against the actual base is real evidence.
+- A locally-clean "all validators pass" claim is only as good as knowing CI's *actual* step list —
+  `AGENTS.md`'s documented 4-validator "must run" set had quietly drifted from the 6 checks
+  `validate.yml` really runs, and that drift was invisible until a real push hit it.
+
+**What we'd do differently next time:**
+- Before trusting any "run these N checks" documentation as sufficient, diff it against the actual
+  CI workflow YAML for the relevant job — don't assume a doc that was accurate once still is.
+- When resyncing a branch that's been through more than one squash-merge, verify the boundary commit
+  with the empty-diff check *before* starting the cherry-pick, not after hitting the first conflict.
+
+**Anything for you to know:**
+- All fixes are committed and pushed to the branch: the resync itself, the `generate-harness-
+  adapters.mjs --write` regeneration, and `AGENTS.md`'s corrected 6-check documentation. Both new
+  techniques (squash-merge boundary verification, the workflow_dispatch-first CI-outage diagnostic)
+  are now written into `skills/git-pr-workflow/SKILL.md` itself (steps 4 and 6, plus matching
+  Rationalizations/Red-Flags/Verification entries) rather than left as a one-off recovery only
+  visible in this retro — see `LEARNINGS.md`'s matching `category=tooling` entries for the
+  condensed, query-able form (`scripts/query-wingman-knowledge.mjs`).
+- The PR is not yet merged to `main` — it remains a draft with `mergeable_state` improved from
+  `dirty` to `blocked` (conflict resolved; only required-check completion remains), consistent with
+  the "don't merge on an unverified gate" call made earlier in this session.
+
 <!-- wingman:log type=retro category=fourteen-stage-pipeline status=resolved occurrence=1 -->
 ## Retro: First real dogfooding pass of the full 14-stage pipeline — 2026-07-25/26
 

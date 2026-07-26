@@ -26,6 +26,10 @@ Two zero-dependency Node scripts. Both must exit 0 (warnings are allowed, errors
 - **Command doc-drift** (warning) — every declared command is named in `CLAUDE.md` (how `launch`/`hotfix` went undocumented).
 - **Attribution coverage** (error) — every `vendor/*` repo appears in `ATTRIBUTIONS.md`.
 
+CI's `validate.yml` runs two further Layer-1 checks beyond the two scripts above, both scoped to the harness adapters — a real PR (`#120`, 2026-07-26) hit exactly the gap of this checklist not mentioning the second one, so it's documented here now instead of only in a commit message:
+- **`node plugins/wingman/scripts/check-harness-adapter-drift.mjs`** — the Codex CLI/OpenCode Boardroom-seat adapters and OpenCode's 40 ported skills haven't drifted from their canonical `agents/`/`skills/` source.
+- **`node plugins/wingman/scripts/generate-harness-adapters.mjs --check`** — a *different* check: confirms all 73 generated harness-adapter files (OpenCode command mirrors, the `shared/` skill copy, the Codex CLI commands-as-`AGENTS.md` doc) are byte-current with what `--write` would regenerate right now. Drift-checking and generator-freshness are distinct failure modes — a canonical file can change (content edit) without the drift check catching it if the generator itself was never re-run; `--write` regenerates, `--check` only verifies.
+
 ## Layer 2 — semantic (run via `/wingman:audit` on meaningful change; not mechanizable without false positives)
 
 These were deliberately *not* mechanized, because a naive keyword check on any of them false-positives often enough to train people to ignore warnings — which is worse than no check (see the `systematic-auditing` skill's own reasoning). Run these as a scoped audit pass instead:

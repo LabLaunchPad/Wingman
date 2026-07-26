@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.11] - 2026-07-26
+
+### Added
+- **`skills/git-pr-workflow` enriched with two real, evidence-backed findings from an actual CI-outage + squash-merge-resync incident on this project's own PR #120**, not written speculatively: (1) a squash-merge boundary-verification technique — `git diff <candidate-commit> origin/<base> --stat` (empty = confirmed true squash point) — added to the resync step after a first guess one squash-cycle too early produced real cascading cherry-pick conflicts; (2) a new step 6 diagnosing CI checks that go silent entirely (test `workflow_dispatch` first to isolate Actions-health from event-delivery, before assuming a billing/config problem). Matching Rationalizations, Red Flags, and Verification entries added; frontmatter `description`/"When To Use" broadened to trigger on CI going silent, not just failing.
+- **`AGENTS.md`'s documented pre-commit validator list corrected to match CI's actual 6-check `validate.yml`**, closing a real gap the same incident exposed: the doc only named 4 Layer-1 validators (plus a separately-mentioned drift check), but CI also runs `generate-harness-adapters.mjs --check` — a distinct generator-freshness check the doc never mentioned at all. A locally-clean 4-validator pass had gone green while CI failed on this exact missing check. `docs/REGRESSION-CHECKLIST.md`'s Layer 1 section updated to match.
+- New `LEARNINGS.md` entries (3, `category=tooling`) and a full retro in `docs/wingman/retros.md` recording the incident's real evidence for future querying via `scripts/query-wingman-knowledge.mjs`.
+
 ## [0.7.10] - 2026-07-26
 
 ### Added
