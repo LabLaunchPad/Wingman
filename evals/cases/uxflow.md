@@ -4,7 +4,9 @@ Tests `plugins/wingman/commands/pipeline/uxflow.md` behaviorally, distinct from 
 
 ## Fixture
 
-`evals/fixtures/setup-uxflow-fixture.sh <target-dir>` — the base waitlist app (a JSON API, no user-facing surface) with pre-seeded discovery, define (DEF-001..003), and architecture (ARCH-001..003) artifacts.
+`evals/fixtures/setup-uxflow-fixture.sh <target-dir>` — the base waitlist app (a JSON API, no user-facing surface) with pre-seeded discovery, define (DEF-001..003), and architecture (ARCH-001..003, all pure-backend) artifacts. Used alone this only re-exercises the skip-for-non-UI path (already covered by Run 1/3); for a genuine `ARCH-*`-tracing backward-compat check (Run 5), hand-add one user-facing `ARCH-004` row on top, as Run 3 and Run 5 both did.
+
+`evals/fixtures/setup-uxflow-14stage-fixture.sh <target-dir>` (added Run 5) — the real 14-stage-order shape: pre-seeded discovery, define (DEF-001..003), and information-architecture (IA-001) artifacts, with deliberately **no** `docs/wingman/architecture/` directory at all, since `architecture.md` (stage 11) genuinely hasn't run yet by the time `uxflow` (stage 7) does in the real pipeline order. Exercises the new default IA-*/DEF-* tracing path.
 
 ## Procedure
 
@@ -23,13 +25,7 @@ Tests `plugins/wingman/commands/pipeline/uxflow.md` behaviorally, distinct from 
 
 ## Trust level
 
-`provisional` (was `verified`; downgraded by Run 4, 2026-07-25/26's real ARCH-*-forward-reference
-finding — see Run 4) — the skip-for-non-UI path is confirmed by `seven-stage-pipeline-e2e.md` Run 1
-(2026-07-14, waitlist-app JSON API had no UX-* IDs minted), the produce-flow path is confirmed by
-Run 2 (2026-07-14, Tip Jar feature produced UX-* IDs with diagrams), and Run 3 (2026-07-18,
-dedicated uxflow-only dispatch) closed the one gap those two left: a genuine mixed UI/non-UI
-judgment call, rather than a clean binary. Needs one more clean run tracing to `IA-*`/`DEF-*` (the
-now-correct upstream chain in real 14-stage order) before returning to `verified`.
+`verified` (re-confirmed by Run 5, 2026-07-26, after the Run 4 downgrade) — the skip-for-non-UI path is confirmed by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14, waitlist-app JSON API had no UX-* IDs minted), the produce-flow path is confirmed by Run 2 (2026-07-14, Tip Jar feature produced UX-* IDs with diagrams), Run 3 (2026-07-18, dedicated uxflow-only dispatch) closed the mixed UI/non-UI judgment-call gap, and Run 5 closed the gap Run 4 left open: an independent run confirming the new default `IA-*`/`DEF-*` tracing path (no `ARCH-*` on disk), plus a dedicated re-check that the old `ARCH-*` tracing path still works when `ARCH-*` genuinely is the immediate upstream artifact on disk.
 
 ## Run log
 
@@ -47,22 +43,73 @@ Covered by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14) and Run 2 (2026-07-1
 
 ### Run 4 — 2026-07-25/26 (14-stage dogfood run, real gap found and fixed) — `provisional`
 
-**Setup:** first-ever real 14-stage-pipeline dogfood run (`evals/dogfood-runs/2026-07-25T19-45-00Z-14stage-complex.json`), a real "fetch-app" fixture. Found while executing the real UX Flow stage (stage 7 of 14) as one stage of the full run — not this case's own isolated dispatch.
+**Setup:** first-ever real 14-stage-pipeline dogfood run (a real "fetch-app" fixture). Found while
+executing the real UX Flow stage (stage 7 of 14) as one stage of the full run — not this case's own
+isolated dispatch.
 
 **Real gap found:** `uxflow.md`'s own body text instructed tracing to `ARCH-*` decisions — but in
 the real 14-stage order, `uxflow` is stage 7 and `architecture.md` (which mints `ARCH-*`) is stage
 11, four stages later. At the point a real pipeline run reaches UX Flow, no `ARCH-*` ID exists yet
-on disk (confirmed directly: no `docs/wingman/architecture/` file existed at that point in the run).
-This is leftover text from before the v20 stage-reorder, when Architecture ran immediately before
-UX Flow in the older 7-stage sequence — this eval case's own `setup-uxflow-fixture.sh` still
+on disk. This is leftover text from before the v20 stage-reorder, when Architecture ran immediately
+before UX Flow in the older 7-stage sequence — this eval case's own `setup-uxflow-fixture.sh` still
 pre-seeds `ARCH-*` fixture data for exactly that older ordering, which is why no prior run here
 caught the mismatch.
 
 **Fix:** `uxflow.md` now traces to `IA-*`/`DEF-*` (both genuinely available by stage 7 in the real
 order) by default, while still accepting `ARCH-*` when it's the most immediate upstream artifact
 actually on disk (so this case's own older-shaped fixture, and any other project still in the
-7-stage layout, keep working unmodified).
+7-stage layout, keep working unmodified). See `docs/wingman/retros.md`'s "First real dogfooding pass
+of the full 14-stage pipeline" entry for the full narrative.
 
-**Status:** `provisional` — fixed and reproduced against the same finding (the real 14-stage run's
-own `docs/wingman/uxflow/fetch-app.md` documents the gap and the IA-*/DEF-* workaround it forced),
-but not yet confirmed by a second, independent run tracing the new default path.
+**Status:** `provisional` — fixed, but not yet confirmed by a second, independent run tracing the
+new default path. See Run 5.
+
+### Run 5 — 2026-07-26 (independent re-verification: new default path + backward-compat re-check)
+
+**Setup 1 (new default path):** added `evals/fixtures/setup-uxflow-14stage-fixture.sh` — pre-seeds
+discovery, define (`DEF-001..003`), and information-architecture (`IA-001`), with deliberately no
+`docs/wingman/architecture/` directory at all, mirroring the real dogfood run's exact situation
+(stage 7 reached, stage 11 not yet run). Confirmed on disk before dispatch: `ls docs/wingman` showed
+only `discovery/`, `define/`, `information-architecture/` — no `architecture/`.
+
+**Dispatch 1 (fresh `general-purpose` subagent, given only `commands/pipeline/uxflow.md` + its
+referenced skills, not told the answer):** traced every `UX-*` row (`UX-001..004`) to `IA-001` and
+`DEF-001`/`DEF-002`, quoting the command's own text back verbatim: *"Trace instead to the `IA-*`/`DEF-*`
+chain, which is already available by this stage."* Confirmed no `ARCH-*` existed anywhere in the
+project before choosing this path. Produced a real Mermaid diagram plus (since a real Artifact tool
+was available in that dispatch) a Tier A wireframe. Activated `dept-design` on real evidence
+(`DEF-001`'s "confirmation page" requirement), correctly left the Management Board inactive (1
+department lead, below the 3-lead threshold), and ended with a GO gate verdict rather than stopping
+for approval.
+
+**Independently verified** (real filesystem): `cat docs/wingman/uxflow/waitlist-unsubscribe.md` in
+the fixture directory shows the exact "Satisfies" column values `IA-001, DEF-001` / `IA-001, DEF-001`
+/ `IA-001, DEF-002` / `IA-001` for the four rows — no `ARCH-*` reference anywhere in the file, and a
+real Mermaid `flowchart LR` block present.
+
+**Setup 2 (backward-compat re-check):** reused `setup-uxflow-fixture.sh`'s base fixture, then added
+one hand-authored `ARCH-004` row (a real server-rendered confirmation page) on top of the existing
+`ARCH-001..003` (all pure-backend) — since the base fixture alone has zero user-facing surface and
+would only re-exercise the already-covered skip path, not ARCH-* tracing itself.
+
+**Dispatch 2 (fresh `general-purpose` subagent, same conditions):** traced `UX-*` rows to `ARCH-*`,
+quoting the command's own fallback clause: *"use whichever of `ARCH-*`/`IA-*`/`DEF-*` is the most
+immediate real upstream artifact on disk."* Since no `information-architecture/` directory existed
+in this project, it correctly fell back to `ARCH-*`. Explicitly excluded ARCH-001/002/003 (no
+screen) and included only ARCH-004, mapping three UX-* states to it.
+
+**Independently verified** (real filesystem): `cat docs/wingman/uxflow/waitlist-unsubscribe.md` in
+that fixture directory shows a `UX-*` table whose `Satisfies` column reads `ARCH-004` (and
+`ARCH-004, DEF-002` for the idempotent row), with explicit prose excluding ARCH-001/002/003 as
+"pure backend, no screen." A Mermaid flow diagram is present.
+
+**Note on this run's own process:** this worktree's copy of `plugins/wingman/commands/pipeline/uxflow.md`
+had not actually received the Run 4 fix yet when this run started (verified: `git show HEAD:...`
+still read the pre-fix `ARCH-*`/`DEF-*`-only text) — an early read against a sibling checkout gave a
+false impression the fix was already in place here. The fix text described in Run 4 was applied to
+this worktree's file as part of this run before dispatching either subagent, and both dispatches
+above ran against the corrected file (confirmed via file content/mtime, not assumed).
+
+**No bugs found this run** — both the new default `IA-*`/`DEF-*` path and the backward-compat
+`ARCH-*` path traced correctly, exactly as the command text specifies, with explicit exclusion
+reasoning in both cases. Promoted back to `verified`.
