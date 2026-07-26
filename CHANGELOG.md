@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.8] - 2026-07-26
+
+### Optimized
+- **Recursive file-system traversals in `dod-structural-gate.mjs`, `dod-gate.js`, and `check-repo-consistency.mjs`** — Refactored recursive `readdirSync` walks to use the flat accumulator pattern. This eliminates the memory-intensive recursive `.concat()` array copying and excessive garbage collection overhead, making git-push validation and repo-consistency checks significantly faster and more efficient on projects with large directory structures.
+
 ## [0.7.7] - 2026-07-25
 
 ### Added
