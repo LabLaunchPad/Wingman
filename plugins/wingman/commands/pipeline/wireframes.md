@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific screen]"
 
 # Wingman: Wireframes
 
-The eighth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`. This stage produces low-fidelity screen layouts — where things sit and what's on each screen — deliberately before any visual polish; that's `visual-design-system.md`'s job, one stage later.
+The eighth of Wingman's 14 pipeline stages, part of **Phase 3: Lean Design & Prototyping**. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`. This stage produces low-fidelity screen layouts — where things sit and what's on each screen — deliberately before any visual polish; that's `visual-design-system.md`'s job, one stage later. A quick sketching tool (e.g. Excalidraw, or a physical napkin) is enough here — the artifact is a source of truth for later stages, not a polished deliverable.
 
 $ARGUMENTS
 

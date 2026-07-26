@@ -5,7 +5,7 @@ argument-hint: "[optional: target branch, defaults to the repo's default branch]
 
 # Wingman: Ship
 
-This is the last stop before code leaves the founder's laptop and becomes real. Nothing here should require the founder to understand git, CI, or pull requests — they get a plain-language "here's what's going out and why" summary and a single decision to make.
+The fourteenth and last of Wingman's 14 pipeline stages, and the first stage of **Phase 6: Launch & Iterate** (with `telemetry.md` for Monitor Drop-offs and `post-launch.md` for Iterate, both adaptive commands run after this one) — that phase's goal is to ship, listen, and feed real usage back into the plan. This is the last stop before code leaves the founder's laptop and becomes real. Nothing here should require the founder to understand git, CI, or pull requests — they get a plain-language "here's what's going out and why" summary and a single decision to make. Connect the repo to its deploy target for CI/CD (e.g. Vercel/Netlify) and set up a domain if this is the project's first ship.
 
 $ARGUMENTS
 

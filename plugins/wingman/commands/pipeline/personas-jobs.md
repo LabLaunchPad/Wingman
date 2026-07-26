@@ -5,7 +5,7 @@ argument-hint: "[optional: path to the Research Synthesis output, defaults to th
 
 # Wingman: Personas & Jobs
 
-The third of Wingman's 14 pipeline stages. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template.
+The third of Wingman's 14 pipeline stages, and the last stage of **Phase 1: Problem Definition & Market Validation**. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template. Distill each job-to-be-done to a single sentence: "My user needs to do X, but currently struggles with Y, so this product will provide Z."
 
 $ARGUMENTS
 

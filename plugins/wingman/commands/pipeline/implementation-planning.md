@@ -5,7 +5,7 @@ argument-hint: "[optional: anything to focus the plan on]"
 
 # Wingman: Implementation Planning
 
-The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build`. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
 
 $ARGUMENTS
 

@@ -5,7 +5,7 @@ argument-hint: "[path to plan file, or leave blank to use the most recent approv
 
 # Wingman: Build
 
-Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implementation-planning`). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint.
+The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implementation-planning`). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint. Sequence work the way an agentic IDE session should: hand the agent the plan/AI PRD, have it build the data layer first, then build individual feature modules one at a time — never everything at once.
 
 $ARGUMENTS
 
@@ -50,7 +50,15 @@ Run the full verification suite for the project (tests, typecheck, lint — what
 
 ## Build.5: Definition-of-Done gate
 
-This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
+This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This is also where **Phase 5: Testing, Security & QA** lives — not a separate 15th stage, but three explicit, named sub-checks inside this same gate. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
+
+**The three Phase 5 sub-checks.** Each must resolve PASS before the gate clears, alongside the threat register below:
+
+1. **Golden Dataset Regression** — PASS requires a maintained checklist of concrete user scenarios (see `skills/definition-of-done`'s Golden Dataset technique) re-run against this change, with no scenario newly broken.
+2. **Security & Guardrails** — PASS requires the threat register below to have `threats_open == 0` (see `skills/security-checklist`), specifically covering input sanitization and that no user can reach another user's data.
+3. **Cost & Performance Control** — PASS requires new usage-scaling surfaces (a new endpoint, a new expensive query, a new external API call) to have a stated usage/cost bound — a rate limit, a quota, or a documented reason none is needed yet (see `skills/definition-of-done`'s Cost & Performance Control technique).
+
+Record all three as PASS/FAIL lines directly in the Boardroom checkpoint output alongside the gate checklist (Build.6) — a founder should see these three names, not just "security reviewed."
 
 **Build a threat picture.** Look at what changed since the last checkpoint and build a short list of concrete risks — not a generic checklist recitation, but specific to what was actually built:
 

@@ -5,7 +5,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Research Synthesis
 
-The second of Wingman's 14 pipeline stages. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve.
+The second of Wingman's 14 pipeline stages, part of **Phase 1: Problem Definition & Market Validation**. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve. Frame this as the "Old Way vs. New Way" comparison: document concretely why the solutions the target user already has access to fail them.
 
 $ARGUMENTS
 

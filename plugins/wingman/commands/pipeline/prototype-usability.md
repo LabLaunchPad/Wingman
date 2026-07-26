@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific flow to prototype]"
 
 # Wingman: Prototype & Usability
 
-The tenth of Wingman's 14 pipeline stages, and the last of the design stages before `/wingman:architecture`. Skipped entirely for projects with no user-facing surface, same as the other design-tier stages. This stage deliberately folds accessibility and content review into itself rather than existing as a separate 15th stage — the maintainer's explicit call: an accessibility pass makes the most sense reviewed alongside the same testable prototype a usability check runs against, not as a disconnected downstream audit.
+The tenth of Wingman's 14 pipeline stages, and the last of the design stages before `/wingman:architecture` — also the first stage of **Phase 4: AI-Assisted Architecture & Build** (with `architecture.md`, `implementation-planning.md`, `build.md`), whose goal is acting as the manager of the AI coding agent rather than as the coder. Skipped entirely for projects with no user-facing surface, same as the other design-tier stages. This stage deliberately folds accessibility and content review into itself rather than existing as a separate 15th stage — the maintainer's explicit call: an accessibility pass makes the most sense reviewed alongside the same testable prototype a usability check runs against, not as a disconnected downstream audit. Before any code gets written, run a "Wizard of Oz" test: simulate the product's outcome manually (even by hand) to confirm a real user gets genuine value from it, cheaper than discovering that gap after the build stage.
 
 $ARGUMENTS
 
