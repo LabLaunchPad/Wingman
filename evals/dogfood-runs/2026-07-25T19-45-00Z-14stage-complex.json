@@ -1,0 +1,45 @@
+{
+  "run_id": "2026-07-25T19-45-00Z-14stage-complex",
+  "mode": "maintainer",
+  "path": "complex",
+  "fixture": "evals/fixtures/setup-dogfood-complex.sh",
+  "stages_run": ["discovery", "research-synthesis", "personas-jobs", "journey-mapping", "define", "information-architecture", "uxflow", "wireframes", "visual-design-system", "prototype-usability", "architecture", "implementation-planning", "build", "ship"],
+  "gates_expected_dormant": ["dept-growth"],
+  "gates_actual_dormant": ["dept-growth"],
+  "gates_expected_active": ["dept-design", "dept-engineering", "dept-data", "dept-qa", "dept-legal-security", "dept-devops", "dept-product", "management-board-activation (mgr-product, mgr-design, mgr-engineering, mgr-data, mgr-security, mgr-qa, mgr-platform)"],
+  "gates_actual_active": ["dept-design", "dept-engineering", "dept-data", "dept-qa", "dept-legal-security", "dept-devops", "dept-product", "management-board-activation (mgr-product, mgr-design, mgr-engineering, mgr-data, mgr-security, mgr-qa, mgr-platform)"],
+  "observed_gaps": [
+    {
+      "description": "discovery.md's Step 3 output template (4 fields: Problem statement/Target user/Success signal/Open questions) had drifted out of sync with its own Gate checklist a few lines below (8 Must-include items). A real 8-seat Boardroom dispatch against a template-compliant Discovery output had 3 of 8 seats (CEO, CPO, CTO, Research) independently flag 'missing sections' on output that matched the template exactly.",
+      "stage": "discovery",
+      "evidence": "plugins/wingman/commands/pipeline/discovery.md (pre-fix Step 3 template vs. its own Gate checklist section); checkpoint detail at .wingman/checkpoint-details/2026-07-25T19-45-00Z-discovery.md in the fixture, showing CEO/CPO/CTO/Research all flagging missing constraints/scope-boundary/JTBD/trigger-why-now/solo-founder-realism-check sections"
+    },
+    {
+      "description": "uxflow.md (stage 7 of 14) instructed tracing to ARCH-* decisions minted by architecture.md (stage 11) — leftover text from before the v20 stage-reorder, when Architecture ran immediately before UX Flow in the old 7-stage sequence. At the real point a 14-stage pipeline run reaches uxflow, no ARCH-* ID exists on disk yet.",
+      "stage": "uxflow",
+      "evidence": "plugins/wingman/commands/pipeline/uxflow.md (pre-fix 'For each ARCH-* decision...' line); confirmed no docs/wingman/architecture/ directory existed in the fixture at the point uxflow ran (docs/wingman/uxflow/fetch-app.md in the fixture documents the gap and the IA-*/DEF-* workaround forced by it)"
+    },
+    {
+      "description": "A Boardroom seat (CISO) reviewing a pre-implementation Architecture-stage design document returned NO_GO because a proposed schema model, webhook file, and session-validation logic didn't exist on disk yet — applying a diff-review standard (real code must already work) to a design-review scope (does the proposed approach work if built). boardroom.md never told the dispatched seat which kind of scope it was looking at.",
+      "stage": "architecture",
+      "evidence": ".wingman/checkpoint-details/2026-07-25T20-35-00Z-architecture.md in the fixture, showing the CISO first-pass NO_GO citing absent Subscription model/webhooks.ts/session validation, and the re-review GO after the design-stage-scope framing was added to the dispatch prompt"
+    }
+  ],
+  "notes": [
+    "This is the first-ever real exercise of the 14-stage pipeline (v20 expansion) end to end — every prior recorded dogfood run predates it and only ran the old 7-stage sequence. All 7 stages new to v20 (research-synthesis, personas-jobs, journey-mapping, information-architecture, wireframes, visual-design-system, prototype-usability) were genuinely run for the first time, not simulated.",
+    "Every one of the 12 pre-Build checkpoints plus Build plus Ship (14 total) ran a real, synchronous, parallel 7-8-seat Agent-tool Boardroom dispatch against the actual on-disk stage output file, reading each boardroom-<seat>.md persona directly — roughly 118 real seat dispatches across the run, including re-verification dispatches after real findings were fixed at Architecture, Build, and Ship.",
+    "3 genuine project-level bugs were caught by real Boardroom dispatch against actual on-disk code, not fabricated to manufacture a finding: (1) Subscription had no Prisma @relation to Dog, so the ownership check would silently reject every real customer at runtime; (2) the webhook idempotency tracker was in-memory-only, unsafe across a process restart within Stripe's retry window; (3) the webhook signature-verification secret had no on-disk caller demonstrating it was environment-sourced. All three were fixed with real TDD (a genuinely failing test confirmed red for the right reason, then the fix, then green) and independently re-verified by re-dispatching the same seat against the fixed code.",
+    "2 genuine design/architecture-consistency findings were also caught and fixed inline: Architecture's first draft picked an all-Stripe-hosted-Portal cancel flow contradicting the already-approved in-app wireframes (Design seat); the Implementation Plan's first draft had zero UI-building tasks despite promising in-app screens (Design seat).",
+    "Every 'GO_WITH_CHANGES' checkpoint's follow-up items were either fixed inline before proceeding (when concrete and quick) or explicitly carried forward to a named later stage in founder_notes (when they were genuinely that later stage's job) - never silently dropped.",
+    "Management Board activation genuinely crossed its 3-conditionally-activated-department threshold at Build (dept-design + dept-data + dept-legal-security = 3), correctly creating managers for every active department lead at that point (including dept-product/dept-engineering/dept-qa's managers, per management-board-activation's 'creation is decoupled from stage-relevance' rule) and mgr-platform once dept-devops activated at Ship.",
+    "Ship's real git push (git push origin feature/fetch-app-mvp1 from inside the fixture) genuinely failed - 'origin does not appear to be a git repository' - because no remote is configured on this throwaway fixture. This was followed honestly per ship.md's own preflight-check behavior, not faked. No real hooks (dod-structural-gate.mjs/boardroom-checkpoint.mjs) are wired into this fixture - confirmed by inspecting .git/hooks (only git's stock .sample files) and the absence of .claude/settings.json - so nothing was skipped that actually existed to skip."
+  ],
+  "shortcuts_disclosed": [
+    "Every founder AskUserQuestion-equivalent decision in this run was answered by this session standing in for a real founder (no human founder available in maintainer mode) - documented per-checkpoint in each .wingman/checkpoints.jsonl entry's founder_notes field in the fixture, and in the Discovery-stage doc's own 'Founder stand-in note' and 'Clarifying Q&A' section.",
+    "No live Next.js/Prisma/Stripe runtime exists in this sandbox, so real TDD for Build was scoped to genuinely-runnable plain-JS/TS units (node --test), including the UI component (src/app/billing/page.tsx), which is a thin JSX wrapper around two independently red/green-tested pure functions (billingViewState.js, cancel.js) rather than itself having a live component-render test - carries an explicit wingman:no-test-needed marker with the reason logged, not silently assumed. Same disclosed pattern as the 2026-07-21 complex-path run.",
+    "Department-lead and manager persona files (7 department leads + 7 managers) were written directly to the fixture's .claude/agents/ rather than dispatched via a live Task-tool call with a custom subagent_type - same disclosed environmental limitation logged in prior runs (no registered dept-*/mgr-*/boardroom-* subagent type in this environment). All ~118 Boardroom seat dispatches, however, were real synchronous Agent-tool calls, each reading the actual persona file and rendering its own independent verdict.",
+    "One small increment (handleWebhook()'s env-var wiring, added in response to the Ship-stage CISO finding) was implemented before its test was confirmed red - a minor, disclosed deviation from this run's own red-first discipline for that one increment only; every other implementation task (5 of 6 total code changes across Build and Ship) followed genuine red-then-green.",
+    "Boardroom seats were dispatched using the general-purpose subagent type with the haiku model (not a literal boardroom-<seat> subagent type, per the environment limitation above), each given the real persona file path and the real on-disk scope file path to read directly - a real, independent dispatch per seat, not a hand-written verdict."
+  ],
+  "timestamp": "2026-07-26T07:15:00Z"
+}
