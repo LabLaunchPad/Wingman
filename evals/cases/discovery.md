@@ -24,7 +24,13 @@ Tests `plugins/wingman/commands/pipeline/discovery.md` behaviorally, distinct fr
 
 ## Trust level
 
-`verified` — the discovery-stage behavior is exercised within `seven-stage-pipeline-e2e.md`'s two runs (Run 1 discovered the defect in build-stage code, Run 2 confirmed clean end-to-end with independent discovery questions), and Run 3 (2026-07-18) closed the isolation gap: a dedicated, standalone dispatch with the exact vague ask from this case's own Procedure and no downstream-stage context.
+`provisional` (was `verified`; downgraded by Run 5, 2026-07-25/26's real template/gate-checklist
+mismatch finding — see Run 5) — the discovery-stage behavior is exercised within
+`seven-stage-pipeline-e2e.md`'s two runs (Run 1 discovered the defect in build-stage code, Run 2
+confirmed clean end-to-end with independent discovery questions), and Run 3 (2026-07-18) closed the
+isolation gap: a dedicated, standalone dispatch with the exact vague ask from this case's own
+Procedure and no downstream-stage context. Needs one more clean run against the now-8-field
+template before returning to `verified`.
 
 ## Run log
 
@@ -51,3 +57,24 @@ Covered by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14) and Run 2 (2026-07-1
 **One process note, not a Wingman defect:** the subagent was instructed (by this eval's own setup, not by `discovery.md`) not to read any Wingman file beyond `discovery.md` itself, so it correctly declined to also execute Step 2's `department-lead-activation`/`management-board-activation` delegation — it flagged this gap explicitly in its own report rather than silently skipping it. This is a testing-scenario artifact, not evidence of a real gap in `discovery.md`.
 
 **No bugs found this run** — the new project-type-consult line produces real, differentiated, playbook-specific output, not a superficial mention.
+
+### Run 5 — 2026-07-25/26 (14-stage dogfood run, real gap found and fixed) — `provisional`
+
+**Setup:** first-ever real 14-stage-pipeline dogfood run (`evals/dogfood-runs/2026-07-25T19-45-00Z-14stage-complex.json`), a real "fetch-app" fixture (dog meal-plan subscriptions). Not this case's own isolated dispatch — found while executing the real Discovery stage as one stage of the full run.
+
+**Real gap found:** this stage's own Step 3 output template (4 fields: Problem statement / Target
+user / Success signal / Open questions) and its Gate checklist a few lines below (8 Must-include
+items) had drifted out of sync — the template never grew the other 4 fields
+(jobs-to-be-done/trigger-why-now/constraints/scope-boundary/solo-founder-realism-check) that the
+gate demands. A real 8-seat Boardroom dispatch against a template-compliant Discovery output
+independently caught this: 3 of 8 seats (CEO, CPO, CTO, Research) flagged "missing sections" on
+output that matched the template exactly.
+
+**Fix:** the Step 3 template now includes all 8 fields, with a note explaining why (this exact
+finding), so the template and gate stay in sync going forward.
+
+**Status:** `provisional` — fixed and reproduced against the same finding, but not yet confirmed by
+a second, independent run. This existing eval case's own Runs 1-4 only ever checked the original
+4-field template, so they don't regress against the new 8-field version (still present, just
+extended) — re-run this case's Procedure once more to confirm the expanded template doesn't
+introduce a new failure mode before promoting back to `verified`.

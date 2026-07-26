@@ -5,6 +5,7 @@ api-hallucination	(none: fixtures are small scratch npm projects with a stubbed 
 architecture	evals/fixtures/setup-architecture-fixture.sh	plugins/wingman/commands/pipeline/architecture.md; seven-stage-pipeline-e2e.md
 bloat-audit	evals/fixtures/setup-bloat-audit-fixture.sh	plugins/wingman/commands/adaptive/bloat-audit.md
 boardroom-7-seat	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md
+boardroom-design-stage-scope	evals/fixtures/setup-dogfood-complex.sh	plugins/wingman/commands/adaptive/boardroom.md
 boardroom-expand	evals/fixtures/setup-boardroom-gate-fixture.sh	commands/adaptive/boardroom.md
 boardroom-gate-rule	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md
 build	evals/fixtures/setup-build-tdd-fixture.sh	plugins/wingman/commands/pipeline/build.md; full-pipeline-e2e.md

@@ -17,7 +17,22 @@ Immediately after (only if `dept-design` is active), use the `management-board-a
 
 ## Design the flow
 
-For each `ARCH-*` decision that touches a user-facing surface, sketch the screens/states/transitions a user actually moves through — not visual polish (that's `design-taste`'s job at build time), just the shape of the experience: what a user sees, in what order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing back to the `ARCH-*`/`DEF-*` chain it satisfies.
+**Trace to whichever upstream IDs actually exist yet.** In the 14-stage pipeline, `uxflow` is
+stage 7 — `architecture.md` (stage 11, mints `ARCH-*`) hasn't run yet at this point, so `ARCH-*`
+IDs will not exist in a real end-to-end run reaching this stage in order (confirmed directly by a
+real maintainer-mode dogfood run, `docs/wingman/retros.md` 2026-07-25/26 — this text still referred
+to `ARCH-*` from before the v20 stage-reorder, when Architecture ran immediately before UX Flow).
+Trace instead to the `IA-*`/`DEF-*` chain, which is already available by this stage. If this command
+is ever invoked standalone against a fixture/project that already has `ARCH-*` decisions on file
+(e.g. an older 7-stage-shaped project, or a targeted eval), tracing to those is still correct too —
+use whichever of `ARCH-*`/`IA-*`/`DEF-*` is the most immediate real upstream artifact on disk, never
+a stage that hasn't produced output yet.
+
+For each in-scope upstream decision/requirement that touches a user-facing surface, sketch the
+screens/states/transitions a user actually moves through — not visual polish (that's
+`design-taste`'s job at build time), just the shape of the experience: what a user sees, in what
+order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing
+back to the upstream ID(s) it satisfies.
 
 Append this section to a scratch UX-flow doc (`docs/wingman/uxflow/<short-slug>.md` in the
 founder's project, creating the directory if needed — same slug as the earlier stages' files,
@@ -28,7 +43,7 @@ same convention):
 
 | ID | Screen/state | User can... | Satisfies |
 |---|---|---|---|
-| UX-001 | <screen or state name> | <the actions available here> | ARCH-001 |
+| UX-001 | <screen or state name> | <the actions available here> | IA-001 |
 ```
 
 ## Show the flow, not just the table

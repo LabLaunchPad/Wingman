@@ -34,7 +34,19 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 **Target user:** <who actually uses this and in what situation>
 **Success signal:** <how we'll know this actually solved the problem, in observable terms>
 **Open questions:** <anything genuinely unresolved that the founder should weigh in on later, if anything>
+**Jobs-to-be-done notes:** <the trigger that makes the target user look for a solution, and what "better" looks like to them>
+**Trigger/why-now:** <what makes this worth doing now, not later — ideally evidence-backed, not just a vibe>
+**Constraints:** <team size/solo-founder reality, existing stack that's already a given, anything not up for debate>
+**Scope boundary:** <what this pass explicitly does NOT cover, so a later stage doesn't quietly scope-creep>
+**Solo-founder realism check:** <is this actually buildable by one founder in a reasonable timeframe, or does it need to be cut down first>
 ```
+
+**Why all 8 fields, not 4:** this stage's own Gate checklist below lists these same 8 items as
+Must-include — a real maintainer-mode dogfood run (see `docs/wingman/retros.md`, 2026-07-25/26)
+found that an earlier 4-field version of this template caused 3 of 8 real Boardroom seats (CEO,
+CPO, CTO, Research) to independently flag "missing sections" on output that matched the template
+exactly, because the template and the Gate checklist a few lines below it had drifted out of sync.
+Keep both in sync if either changes.
 
 ## Where you are
 

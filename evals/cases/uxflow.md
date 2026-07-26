@@ -23,7 +23,13 @@ Tests `plugins/wingman/commands/pipeline/uxflow.md` behaviorally, distinct from 
 
 ## Trust level
 
-`verified` — the skip-for-non-UI path is confirmed by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14, waitlist-app JSON API had no UX-* IDs minted), the produce-flow path is confirmed by Run 2 (2026-07-14, Tip Jar feature produced UX-* IDs with diagrams), and Run 3 (2026-07-18, dedicated uxflow-only dispatch) closed the one gap those two left: a genuine mixed UI/non-UI judgment call, rather than a clean binary.
+`provisional` (was `verified`; downgraded by Run 4, 2026-07-25/26's real ARCH-*-forward-reference
+finding — see Run 4) — the skip-for-non-UI path is confirmed by `seven-stage-pipeline-e2e.md` Run 1
+(2026-07-14, waitlist-app JSON API had no UX-* IDs minted), the produce-flow path is confirmed by
+Run 2 (2026-07-14, Tip Jar feature produced UX-* IDs with diagrams), and Run 3 (2026-07-18,
+dedicated uxflow-only dispatch) closed the one gap those two left: a genuine mixed UI/non-UI
+judgment call, rather than a clean binary. Needs one more clean run tracing to `IA-*`/`DEF-*` (the
+now-correct upstream chain in real 14-stage order) before returning to `verified`.
 
 ## Run log
 
@@ -38,3 +44,25 @@ Covered by `seven-stage-pipeline-e2e.md` Run 1 (2026-07-14) and Run 2 (2026-07-1
 **Independently verified** (real filesystem, not the subagent's self-report): `cat docs/wingman/uxflow/waitlist-unsubscribe.md` — one `UX-001` row, correctly mapped to `ARCH-004` only, table prose correctly explains the ARCH-001/002/003 exclusion; `.claude/agents/dept-design.md` exists (Design department lead activated on real evidence); `.wingman/state.json` created fresh with `active_department_leads: ["dept-design"]`. **Fetched the live Artifact URL directly** (`https://claude.ai/code/artifact/0ea25f17-c37b-4efe-8a8a-fdc9f63aaa15`) — confirmed a real rendered wireframe (not a 404/error), matching the claimed content exactly (a bordered confirmation box reading "You've been removed from the waitlist," annotated with `UX-001 — reached via the unsubscribe link... (ARCH-004)`).
 
 **No bugs found this run** — the mixed-input judgment call, the diagram/wireframe production, and the correct non-gating handoff all behaved exactly as `uxflow.md` specifies on first try. Promoted to `verified`.
+
+### Run 4 — 2026-07-25/26 (14-stage dogfood run, real gap found and fixed) — `provisional`
+
+**Setup:** first-ever real 14-stage-pipeline dogfood run (`evals/dogfood-runs/2026-07-25T19-45-00Z-14stage-complex.json`), a real "fetch-app" fixture. Found while executing the real UX Flow stage (stage 7 of 14) as one stage of the full run — not this case's own isolated dispatch.
+
+**Real gap found:** `uxflow.md`'s own body text instructed tracing to `ARCH-*` decisions — but in
+the real 14-stage order, `uxflow` is stage 7 and `architecture.md` (which mints `ARCH-*`) is stage
+11, four stages later. At the point a real pipeline run reaches UX Flow, no `ARCH-*` ID exists yet
+on disk (confirmed directly: no `docs/wingman/architecture/` file existed at that point in the run).
+This is leftover text from before the v20 stage-reorder, when Architecture ran immediately before
+UX Flow in the older 7-stage sequence — this eval case's own `setup-uxflow-fixture.sh` still
+pre-seeds `ARCH-*` fixture data for exactly that older ordering, which is why no prior run here
+caught the mismatch.
+
+**Fix:** `uxflow.md` now traces to `IA-*`/`DEF-*` (both genuinely available by stage 7 in the real
+order) by default, while still accepting `ARCH-*` when it's the most immediate upstream artifact
+actually on disk (so this case's own older-shaped fixture, and any other project still in the
+7-stage layout, keep working unmodified).
+
+**Status:** `provisional` — fixed and reproduced against the same finding (the real 14-stage run's
+own `docs/wingman/uxflow/fetch-app.md` documents the gap and the IA-*/DEF-* workaround it forced),
+but not yet confirmed by a second, independent run tracing the new default path.
