@@ -9,13 +9,13 @@ The eighth of Wingman's 14 pipeline stages. Skipped entirely for projects with n
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Wireframes.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Sketch the wireframes
+## Wireframes.2: Sketch the wireframes
 
 For each `UX-*` screen/state in scope, sketch its low-fidelity layout: what regions exist on the screen (header/nav, primary content, primary action, secondary actions), what's in each region, and how they're arranged — structure and hierarchy, never colors, fonts, or spacing values (that's `visual-design-system.md`). Tag each with the `WF-` traceability prefix, pointing back to the `UX-*`/`IA-*` chain it satisfies.
 
@@ -31,7 +31,7 @@ convention):
 | WF-001 | <screen name, matches a UX-* state> | <header/nav, primary content, primary action, ...> | UX-001 |
 ```
 
-## Show the layout, not just the table
+## Wireframes.3: Show the layout, not just the table
 
 Immediately after the table, use `skills/visual-founder-output` to render each row as an actual
 low-fidelity layout — Tier A (Artifact-capable): a bordered-box HTML sketch per screen, no color
@@ -40,12 +40,12 @@ diagram of the same regions, inline in the same `docs/wingman/wireframes/<short-
 table stays exactly as written above — the diagram is generated from the same rows, added alongside
 it, never instead of it.
 
-## Where you are
+## Wireframes.4: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table/diagram above.
 
-## Gate checklist
+## Wireframes.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -54,7 +54,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the layout structure, and the screen order.
 - **Gate passes only if** the layout is clear and usable.
 
-## Wireframes checkpoint
+## Wireframes.6: Wireframes checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own wireframes above. The checkpoint checks
 the gate checklist above, not just the wireframes in general: it confirms every Must-include item is

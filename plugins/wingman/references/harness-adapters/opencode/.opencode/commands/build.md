@@ -9,7 +9,7 @@ Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implem
 
 $ARGUMENTS
 
-## Before starting
+## Build.1: Before starting
 
 Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
@@ -29,7 +29,7 @@ Use the `department-lead-activation` skill to check the Legal & Security activat
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to show the pipeline-status tree — Planning Milestone done, Build now the current stage.
 
-## Execution discipline
+## Build.2: Execution discipline
 
 Work through the plan task-by-task, not all at once:
 
@@ -40,15 +40,15 @@ Work through the plan task-by-task, not all at once:
 5. Keep commits small and scoped to one task each, with clear messages.
 6. Apply `engineering-minimalism` and, for any user-facing work, `design-taste` — both are bundled skills, not department-lead-specific, so they apply whether or not a department lead exists yet for this piece of work.
 
-## Reuse over reinvention
+## Build.3: Reuse over reinvention
 
 Before writing new code for any task, check whether something in the codebase already does this or something close to it. Extend and reuse before adding a parallel implementation.
 
-## When the plan is fully executed
+## Build.4: When the plan is fully executed
 
 Run the full verification suite for the project (tests, typecheck, lint — whatever this project actually has). Only once everything passes with fresh evidence, move to the Definition-of-Done gate.
 
-## Definition-of-Done gate
+## Build.5: Definition-of-Done gate
 
 This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
 
@@ -84,7 +84,7 @@ The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**.
 
 The `dod-structural-gate.mjs` hook mechanically re-checks the threat-register/traceability/test-presence conditions above before `git push` can run in `/wingman:ship` — this section is what makes that check pass, not a separate step to remember later.
 
-## Gate checklist
+## Build.6: Gate checklist
 
 Alongside the Definition-of-Done gate above, run the adaptive gap-finding loop and the 8-part output
 format from `references/pipeline-gate-checklist.md`, then confirm this stage's own gate (this is the
@@ -98,7 +98,7 @@ Definition-of-Done gate already covers it here, so no separate QA stage exists):
 - **Gate passes only if** verification passes — tests, typecheck, lint, the threat register, and
   traceability/test-presence checks above all clear.
 
-## Boardroom checkpoint
+## Build.7: Boardroom checkpoint
 
 Run `/wingman:boardroom diff` against the accumulated changes, once the Definition-of-Done gate above has cleared. This is the founder's chance to hear, in plain language, whether what got built matches what was promised and whether it's technically sound — the dedicated security pass already happened above, as part of this same stage's gate, not as a separate stage still to come.
 

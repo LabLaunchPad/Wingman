@@ -9,13 +9,13 @@ The eleventh of Wingman's 14 pipeline stages. This is where technical decisions 
 
 $ARGUMENTS
 
-## Confirm the Engineering department is active
+## Architecture.1: Confirm the Engineering department is active
 
 Use the `department-lead-activation` skill to ensure `dept-engineering` exists for this project (its activation signal is always true) — create it if it doesn't exist yet, then delegate the technical-design portion of this step to it.
 
 Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-engineering`.
 
-## Design the technical shape
+## Architecture.2: Design the technical shape
 
 Before proposing anything new, look at the existing codebase for related functionality, existing utilities, and established patterns — a small addition to something that exists beats a parallel new system. This is the same reuse-over-reinvention discipline `build.md` applies at implementation time, applied one stage earlier, at design time, so the plan itself doesn't propose something that duplicates existing code.
 
@@ -33,7 +33,7 @@ same convention):
 | ARCH-001 | <the technical decision, concretely> | DEF-001 | <what existing code this extends, or why nothing existing fits> |
 ```
 
-## Show the requirement-to-decision mapping
+## Architecture.3: Show the requirement-to-decision mapping
 
 Immediately after the table, use `skills/visual-founder-output` to render the same `ARCH-*` rows as
 a DEF→ARCH traceability graph (per `references/visual-output-templates.md` §4, appended to the same
@@ -44,11 +44,11 @@ several or several satisfy one) is genuinely graph-shaped in a way `discovery.md
 statement or `define.md`'s independent requirement rows are not — that's why only this planning
 stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
-## Where you are
+## Architecture.4: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree.
 
-## Gate checklist
+## Architecture.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -58,7 +58,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the boring default stack, and the complexity being deliberately rejected.
 - **Gate passes only if** the architecture is simple and fit for the requirements it satisfies.
 
-## Architecture checkpoint
+## Architecture.6: Architecture checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Architecture decisions above (and the
 DEF→ARCH graph). The checkpoint checks the gate checklist above, not just the decisions in general:

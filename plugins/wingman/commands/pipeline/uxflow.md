@@ -9,13 +9,13 @@ The seventh of Wingman's 14 pipeline stages. Named `uxflow`, not `design`, to st
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## UX Flow.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the flow-design portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Design the flow
+## UX Flow.2: Design the flow
 
 **Trace to whichever upstream IDs actually exist yet.** In the 14-stage pipeline, `uxflow` is
 stage 7 — `architecture.md` (stage 11, mints `ARCH-*`) hasn't run yet at this point, so `ARCH-*`
@@ -46,7 +46,7 @@ same convention):
 | UX-001 | <screen or state name> | <the actions available here> | IA-001 |
 ```
 
-## Show the flow, not just the table
+## UX Flow.3: Show the flow, not just the table
 
 Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
 actual flow diagram — detect the session's rendering tier first, then follow
@@ -56,7 +56,7 @@ screen, published as an Artifact). The table stays exactly as written above — 
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
-## Gate checklist
+## UX Flow.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -65,7 +65,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the core flow, and how exceptions get handled.
 - **Gate passes only if** the main flow and its key exceptions both exist.
 
-## UX Flow checkpoint
+## UX Flow.5: UX Flow checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own UX flow table and diagram above (skip
 this step, same as the rest of this stage, if there is no user-facing surface). The checkpoint checks

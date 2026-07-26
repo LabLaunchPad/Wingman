@@ -9,11 +9,11 @@ The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:b
 
 $ARGUMENTS
 
-## Gather: confirm slug consistency first
+## Implementation Planning.1: Gather: confirm slug consistency first
 
 Before reading any stage output, list the files actually present in each of `docs/wingman/discovery/`, `docs/wingman/research-synthesis/`, `docs/wingman/personas-jobs/`, `docs/wingman/journey-mapping/`, `docs/wingman/define/`, `docs/wingman/information-architecture/`, `docs/wingman/uxflow/`, `docs/wingman/wireframes/`, `docs/wingman/visual-design-system/`, `docs/wingman/prototype-usability/`, and `docs/wingman/architecture/` (skip `uxflow`/`wireframes`/`visual-design-system`/`prototype-usability` only if the project genuinely has no user-facing surface, per `uxflow.md`). Read each filename's `<short-slug>` and confirm all of them resolve to the exact same slug — the same-slug-filename convention each earlier stage documents is never verified mechanically, so this stage is where a silent mismatch would otherwise first bite. If any stage's directory has more than one slug present, or a stage's file is missing entirely while the others exist, do not guess which one is "the" project — stop and ask the founder explicitly (the equivalent of `AskUserQuestion` for this markdown-instructed step) which slug/project to gather from before proceeding. Only once the slugs agree (or the founder has picked one) move on to writing the plan.
 
-## Write the plan
+## Implementation Planning.2: Write the plan
 
 Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req RS-001 PJ-001 JM-001 IA-001 WF-001 VS-001 PT-001 ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
 
@@ -28,7 +28,7 @@ Enter plan mode (if not already in it). The plan file must include the sections 
 **Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
 ```
 
-## Show task dependencies
+## Implementation Planning.3: Show task dependencies
 
 The plan document itself is never shown to the founder directly — its reader is whoever executes it
 (a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
@@ -39,14 +39,14 @@ nothing for this document's actual reader. This is additive to the checkbox task
 replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
 themselves.
 
-## Where you are
+## Implementation Planning.4: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
 the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
-## Gate checklist
+## Implementation Planning.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -56,7 +56,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the build order, and what gets explicitly deferred.
 - **Gate passes only if** the plan is realistic for a solo founder to actually execute.
 
-## Implementation Planning checkpoint
+## Implementation Planning.6: Implementation Planning checkpoint
 
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 

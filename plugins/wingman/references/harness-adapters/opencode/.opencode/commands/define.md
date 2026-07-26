@@ -9,7 +9,7 @@ The fifth of Wingman's 14 pipeline stages. Discovery established *why* — this 
 
 $ARGUMENTS
 
-## Turn the problem into requirements
+## Define.1: Turn the problem into requirements
 
 Read the Discovery output (from `/wingman:discovery`, or the path given in `$ARGUMENTS`). Break the problem down into a short list of concrete requirements — not an exhaustive spec, just enough that "what are we actually building" is unambiguous. Each requirement gets its own row and its own ID, minted via the `traceability-linking` skill (prefix `DEF-`, e.g. `DEF-001`) so later stages, tasks, and code changes can point back to exactly which requirement they satisfy.
 
@@ -29,11 +29,11 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
-## Where you are
+## Define.2: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Requirements table above.
 
-## Gate checklist
+## Define.3: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -43,7 +43,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the locked MVP scope, and what is explicitly excluded.
 - **Gate passes only if** the scope is clear and realistic for a solo founder to build.
 
-## Define checkpoint
+## Define.4: Define checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The checkpoint
 checks the gate checklist above, not just the table in general: it confirms every Must-include item

@@ -9,7 +9,7 @@ The first of Wingman's 14 pipeline stages. Before anything gets scoped into requ
 
 $ARGUMENTS
 
-## Step 1: Understand the ask
+## Discovery.1: Understand the ask
 
 If the request is vague or could mean several different things, ask a small number of plain-language clarifying questions — focus on business outcomes ("who uses this and what do they do with it", "what happens today without this", "what would make this a failure") rather than technical specifics.
 
@@ -17,13 +17,13 @@ Do not ask the founder to make technical decisions (frameworks, data models, fil
 
 If the project's shape clearly matches one of `references/org-template/project-types/catalog.md`'s 7 types, consult that type's short playbook for what typically changes in later stages — never force a fit; most projects are close to one type but not exact, and this conversation always takes precedence over a category label.
 
-## Step 2: Confirm the Product department is active
+## Discovery.2: Confirm the Product department is active
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
 
 Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
 
-## Step 3: Write the Discovery output
+## Discovery.3: Write the Discovery output
 
 Produce a short artifact. Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
 
@@ -48,11 +48,11 @@ CPO, CTO, Research) to independently flag "missing sections" on output that matc
 exactly, because the template and the Gate checklist a few lines below it had drifted out of sync.
 Keep both in sync if either changes.
 
-## Where you are
+## Discovery.4: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Discovery output above — detect the session's rendering tier first, never assume.
 
-## Gate checklist
+## Discovery.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -64,7 +64,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
   large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
 
-## Discovery checkpoint
+## Discovery.6: Discovery checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
 not a preview of later stages. The checkpoint checks the gate checklist above, not just the output

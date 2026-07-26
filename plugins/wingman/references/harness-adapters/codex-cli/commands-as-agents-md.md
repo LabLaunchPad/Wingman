@@ -64,13 +64,13 @@ The eleventh of Wingman's 14 pipeline stages. This is where technical decisions 
 
 $ARGUMENTS
 
-## Confirm the Engineering department is active
+## Architecture.1: Confirm the Engineering department is active
 
 Use the `department-lead-activation` skill to ensure `dept-engineering` exists for this project (its activation signal is always true) — create it if it doesn't exist yet, then delegate the technical-design portion of this step to it.
 
 Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-engineering`.
 
-## Design the technical shape
+## Architecture.2: Design the technical shape
 
 Before proposing anything new, look at the existing codebase for related functionality, existing utilities, and established patterns — a small addition to something that exists beats a parallel new system. This is the same reuse-over-reinvention discipline `build.md` applies at implementation time, applied one stage earlier, at design time, so the plan itself doesn't propose something that duplicates existing code.
 
@@ -88,7 +88,7 @@ same convention):
 | ARCH-001 | <the technical decision, concretely> | DEF-001 | <what existing code this extends, or why nothing existing fits> |
 ```
 
-## Show the requirement-to-decision mapping
+## Architecture.3: Show the requirement-to-decision mapping
 
 Immediately after the table, use `skills/visual-founder-output` to render the same `ARCH-*` rows as
 a DEF→ARCH traceability graph (per `references/visual-output-templates.md` §4, appended to the same
@@ -99,11 +99,11 @@ several or several satisfy one) is genuinely graph-shaped in a way `discovery.md
 statement or `define.md`'s independent requirement rows are not — that's why only this planning
 stage gets a dedicated diagram beyond the generic pipeline-status tree below.
 
-## Where you are
+## Architecture.4: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree.
 
-## Gate checklist
+## Architecture.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -113,7 +113,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the boring default stack, and the complexity being deliberately rejected.
 - **Gate passes only if** the architecture is simple and fit for the requirements it satisfies.
 
-## Architecture checkpoint
+## Architecture.6: Architecture checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Architecture decisions above (and the
 DEF→ARCH graph). The checkpoint checks the gate checklist above, not just the decisions in general:
@@ -289,6 +289,19 @@ Figure out what's in scope, in this order of preference:
 2. Otherwise, if a plan file exists (e.g. from `ExitPlanMode` or a `docs/**/plans/*.md` file just written), review that plan.
 3. Otherwise, if there are uncommitted changes, review `git diff` (and `git diff --staged`).
 4. Otherwise, ask the user what they want reviewed.
+
+**A design-stage checkpoint reviews a plan, not already-built code.** Any of the 8 pre-Build
+pipeline checkpoints (Discovery through Architecture/Implementation-Planning) reviews a *decision
+about what Build will create* — the files/models/relations it names do not exist on disk yet, by
+design, and that absence is not itself a finding. A real maintainer-mode dogfood run (see
+`docs/wingman/retros.md`, 2026-07-25/26) hit this directly: a Boardroom seat reviewing an
+Architecture-stage document returned `NO_GO` because a schema model and a webhook file the document
+proposed didn't exist yet — the seat was correctly skeptical in general, but applied a diff-review
+standard (real code must already work) to a design-review scope (does this design, if built, close
+the risk). Before dispatching a checkpoint, tell each seat plainly which kind of scope this is —
+"this is a design document, judge whether the proposed approach is sound" vs. "this is a diff,
+judge whether the actual code closes the risk" — so a seat doesn't fail a pre-implementation stage
+for not yet containing implementation.
 
 **A cleared checkpoint is not a permanent guarantee against a later one.** A real dogfooding pass
 (see `docs/wingman/retros.md`) found this directly: a Build-stage diff cleared 8/8 `GO`, and a
@@ -470,7 +483,7 @@ Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implem
 
 $ARGUMENTS
 
-## Before starting
+## Build.1: Before starting
 
 Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
@@ -490,7 +503,7 @@ Use the `department-lead-activation` skill to check the Legal & Security activat
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to show the pipeline-status tree — Planning Milestone done, Build now the current stage.
 
-## Execution discipline
+## Build.2: Execution discipline
 
 Work through the plan task-by-task, not all at once:
 
@@ -501,15 +514,15 @@ Work through the plan task-by-task, not all at once:
 5. Keep commits small and scoped to one task each, with clear messages.
 6. Apply `engineering-minimalism` and, for any user-facing work, `design-taste` — both are bundled skills, not department-lead-specific, so they apply whether or not a department lead exists yet for this piece of work.
 
-## Reuse over reinvention
+## Build.3: Reuse over reinvention
 
 Before writing new code for any task, check whether something in the codebase already does this or something close to it. Extend and reuse before adding a parallel implementation.
 
-## When the plan is fully executed
+## Build.4: When the plan is fully executed
 
 Run the full verification suite for the project (tests, typecheck, lint — whatever this project actually has). Only once everything passes with fresh evidence, move to the Definition-of-Done gate.
 
-## Definition-of-Done gate
+## Build.5: Definition-of-Done gate
 
 This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
 
@@ -545,7 +558,7 @@ The threat register tracks **all risks** with explicit **CLOSED/OPEN statuses**.
 
 The `dod-structural-gate.mjs` hook mechanically re-checks the threat-register/traceability/test-presence conditions above before `git push` can run in `/wingman:ship` — this section is what makes that check pass, not a separate step to remember later.
 
-## Gate checklist
+## Build.6: Gate checklist
 
 Alongside the Definition-of-Done gate above, run the adaptive gap-finding loop and the 8-part output
 format from `references/pipeline-gate-checklist.md`, then confirm this stage's own gate (this is the
@@ -559,7 +572,7 @@ Definition-of-Done gate already covers it here, so no separate QA stage exists):
 - **Gate passes only if** verification passes — tests, typecheck, lint, the threat register, and
   traceability/test-presence checks above all clear.
 
-## Boardroom checkpoint
+## Build.7: Boardroom checkpoint
 
 Run `/wingman:boardroom diff` against the accumulated changes, once the Definition-of-Done gate above has cleared. This is the founder's chance to hear, in plain language, whether what got built matches what was promised and whether it's technically sound — the dedicated security pass already happened above, as part of this same stage's gate, not as a separate stage still to come.
 
@@ -688,7 +701,7 @@ The fifth of Wingman's 14 pipeline stages. Discovery established *why* — this 
 
 $ARGUMENTS
 
-## Turn the problem into requirements
+## Define.1: Turn the problem into requirements
 
 Read the Discovery output (from `/wingman:discovery`, or the path given in `$ARGUMENTS`). Break the problem down into a short list of concrete requirements — not an exhaustive spec, just enough that "what are we actually building" is unambiguous. Each requirement gets its own row and its own ID, minted via the `traceability-linking` skill (prefix `DEF-`, e.g. `DEF-001`) so later stages, tasks, and code changes can point back to exactly which requirement they satisfy.
 
@@ -708,11 +721,11 @@ Do not over-scope: a requirement that isn't traceable to Discovery's stated prob
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
-## Where you are
+## Define.2: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Requirements table above.
 
-## Gate checklist
+## Define.3: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -722,7 +735,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the locked MVP scope, and what is explicitly excluded.
 - **Gate passes only if** the scope is clear and realistic for a solo founder to build.
 
-## Define checkpoint
+## Define.4: Define checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Requirements table above. The checkpoint
 checks the gate checklist above, not just the table in general: it confirms every Must-include item
@@ -759,7 +772,7 @@ The first of Wingman's 14 pipeline stages. Before anything gets scoped into requ
 
 $ARGUMENTS
 
-## Step 1: Understand the ask
+## Discovery.1: Understand the ask
 
 If the request is vague or could mean several different things, ask a small number of plain-language clarifying questions — focus on business outcomes ("who uses this and what do they do with it", "what happens today without this", "what would make this a failure") rather than technical specifics.
 
@@ -767,13 +780,13 @@ Do not ask the founder to make technical decisions (frameworks, data models, fil
 
 If the project's shape clearly matches one of `references/org-template/project-types/catalog.md`'s 7 types, consult that type's short playbook for what typically changes in later stages — never force a fit; most projects are close to one type but not exact, and this conversation always takes precedence over a category label.
 
-## Step 2: Confirm the Product department is active
+## Discovery.2: Confirm the Product department is active
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.
 
 Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-product` (and `mgr-research`, which activates alongside Product) may need creating.
 
-## Step 3: Write the Discovery output
+## Discovery.3: Write the Discovery output
 
 Produce a short artifact. Append this section to a scratch discovery doc (`docs/wingman/discovery/<short-slug>.md` in the founder's project, creating the directory if needed):
 
@@ -784,13 +797,25 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 **Target user:** <who actually uses this and in what situation>
 **Success signal:** <how we'll know this actually solved the problem, in observable terms>
 **Open questions:** <anything genuinely unresolved that the founder should weigh in on later, if anything>
+**Jobs-to-be-done notes:** <the trigger that makes the target user look for a solution, and what "better" looks like to them>
+**Trigger/why-now:** <what makes this worth doing now, not later — ideally evidence-backed, not just a vibe>
+**Constraints:** <team size/solo-founder reality, existing stack that's already a given, anything not up for debate>
+**Scope boundary:** <what this pass explicitly does NOT cover, so a later stage doesn't quietly scope-creep>
+**Solo-founder realism check:** <is this actually buildable by one founder in a reasonable timeframe, or does it need to be cut down first>
 ```
 
-## Where you are
+**Why all 8 fields, not 4:** this stage's own Gate checklist below lists these same 8 items as
+Must-include — a real maintainer-mode dogfood run (see `docs/wingman/retros.md`, 2026-07-25/26)
+found that an earlier 4-field version of this template caused 3 of 8 real Boardroom seats (CEO,
+CPO, CTO, Research) to independently flag "missing sections" on output that matched the template
+exactly, because the template and the Gate checklist a few lines below it had drifted out of sync.
+Keep both in sync if either changes.
+
+## Discovery.4: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree after the Discovery output above — detect the session's rendering tier first, never assume.
 
-## Gate checklist
+## Discovery.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -802,7 +827,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
   large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
 
-## Discovery checkpoint
+## Discovery.6: Discovery checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own Discovery output above — not a bundle,
 not a preview of later stages. The checkpoint checks the gate checklist above, not just the output
@@ -832,19 +857,23 @@ you hand off to `/wingman:research-synthesis`.
 ## `/wingman:dogfood`
 
 ---
-description: Run the real 7-stage pipeline end to end against a throwaway or real small project to find genuine pipeline bugs and friction — no shortcuts, no simulation.
+description: Run the real 14-stage pipeline end to end against a throwaway or real small project to find genuine pipeline bugs and friction — no shortcuts, no simulation.
 argument-hint: "[optional: simple|complex|both (maintainer mode) or a feature idea in your own words (founder mode)]"
 ---
 
 # Wingman: Dogfood
 
 This command exists because a structural review of Wingman's own files can't catch everything —
-some bugs only surface when the actual 7-stage pipeline runs for real, with a real founder-in-the-
-loop decision, real Boardroom dispatch, real test-driven implementation, and a real `git push`
-through the actual installed hooks. Two real runs of this kind (documented in
-`docs/wingman/retros.md`) each found and fixed a genuine bug that no amount of reading the plugin's
-own files would have caught. This command formalizes that process instead of leaving it to happen
-only when a session happens to do it by hand.
+some bugs only surface when the actual 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d — the
+v20 expansion from the original 7-stage sequence to 12 individual pre-build Boardroom checkpoints
+plus Build plus Ship) runs for real, with a real founder-in-the-loop decision at every checkpoint,
+real Boardroom dispatch, real test-driven implementation, and a real `git push` through the actual
+installed hooks. Two real runs of this kind (documented in `docs/wingman/retros.md`) each found and
+fixed a genuine bug that no amount of reading the plugin's own files would have caught — both of
+those runs predate the v20 expansion, so no run has yet exercised the 7 newer stages
+(`research-synthesis`, `personas-jobs`, `journey-mapping`, `information-architecture`, `wireframes`,
+`visual-design-system`, `prototype-usability`) at all. This command formalizes that process instead
+of leaving it to happen only when a session happens to do it by hand.
 
 $ARGUMENTS
 
@@ -880,7 +909,11 @@ never ships to a founder's installed copy of the plugin.
   dispatch produces real, substantive findings on a real plan.
 
 **Run the real pipeline, no shortcuts**, against whichever fixture(s) were generated:
-1. `/wingman:discovery` through `/wingman:ship`, in order, for real — this session stands in as the
+1. `/wingman:discovery` through `/wingman:ship`, in order, for real — all 14 stages
+   (`discovery`, `research-synthesis`, `personas-jobs`, `journey-mapping`, `define`,
+   `information-architecture`, `uxflow`, `wireframes`, `visual-design-system`,
+   `prototype-usability`, `architecture`, `implementation-planning`, `build`, `ship`), never
+   skipping the 7 newer ones just because they're less familiar — this session stands in as the
    founder for every `AskUserQuestion` the pipeline calls for. Answer as a real founder would,
    don't assume or pre-script an answer.
 2. Real `Agent`-tool dispatch for every Boardroom seat, department lead, and Management Board
@@ -915,7 +948,7 @@ execution, real `AskUserQuestion` decisions, the TDD red-then-green sequence, th
   "mode": "maintainer",
   "path": "simple",
   "fixture": "evals/fixtures/setup-dogfood-simple.sh",
-  "stages_run": ["discovery", "define", "architecture", "uxflow", "implementation-planning", "build", "ship"],
+  "stages_run": ["discovery", "research-synthesis", "personas-jobs", "journey-mapping", "define", "information-architecture", "uxflow", "wireframes", "visual-design-system", "prototype-usability", "architecture", "implementation-planning", "build", "ship"],
   "gates_expected_dormant": ["management-board-activation", "dod-structural-gate.mjs threat-register"],
   "gates_expected_active": [],
   "gates_actual_dormant": ["management-board-activation"],
@@ -944,7 +977,7 @@ If `$ARGUMENTS` names a feature idea, use it. If not, propose a tiny, genuinely 
 single small addition with no real business risk) so the founder can safely see the pipeline work
 end to end before trusting it with something that matters.
 
-Run the real 7-stage pipeline against the founder's own actual project — not a synthetic fixture —
+Run the real 14-stage pipeline against the founder's own actual project — not a synthetic fixture —
 exactly like a normal `/wingman:discovery` through `/wingman:ship` sequence, real `AskUserQuestion`
 decisions, real Boardroom dispatch, real TDD, a real `git push` on a feature branch. This is
 functionally identical to using the pipeline commands directly; the only difference is this command
@@ -1135,13 +1168,13 @@ The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:b
 
 $ARGUMENTS
 
-## Gather: confirm slug consistency first
+## Implementation Planning.1: Gather: confirm slug consistency first
 
-Before reading any stage output, list the files actually present in each of `docs/wingman/discovery/`, `docs/wingman/define/`, `docs/wingman/architecture/`, and `docs/wingman/uxflow/` (skip `uxflow` only if the project genuinely has no user-facing surface, per `uxflow.md`). Read each filename's `<short-slug>` and confirm all four (or three) resolve to the exact same slug — the same-slug-filename convention each earlier stage documents is never verified mechanically, so this stage is where a silent mismatch would otherwise first bite. If any stage's directory has more than one slug present, or a stage's file is missing entirely while the others exist, do not guess which one is "the" project — stop and ask the founder explicitly (the equivalent of `AskUserQuestion` for this markdown-instructed step) which slug/project to gather from before proceeding. Only once the slugs agree (or the founder has picked one) move on to writing the plan.
+Before reading any stage output, list the files actually present in each of `docs/wingman/discovery/`, `docs/wingman/research-synthesis/`, `docs/wingman/personas-jobs/`, `docs/wingman/journey-mapping/`, `docs/wingman/define/`, `docs/wingman/information-architecture/`, `docs/wingman/uxflow/`, `docs/wingman/wireframes/`, `docs/wingman/visual-design-system/`, `docs/wingman/prototype-usability/`, and `docs/wingman/architecture/` (skip `uxflow`/`wireframes`/`visual-design-system`/`prototype-usability` only if the project genuinely has no user-facing surface, per `uxflow.md`). Read each filename's `<short-slug>` and confirm all of them resolve to the exact same slug — the same-slug-filename convention each earlier stage documents is never verified mechanically, so this stage is where a silent mismatch would otherwise first bite. If any stage's directory has more than one slug present, or a stage's file is missing entirely while the others exist, do not guess which one is "the" project — stop and ask the founder explicitly (the equivalent of `AskUserQuestion` for this markdown-instructed step) which slug/project to gather from before proceeding. Only once the slugs agree (or the founder has picked one) move on to writing the plan.
 
-## Write the plan
+## Implementation Planning.2: Write the plan
 
-Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
+Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req RS-001 PJ-001 JM-001 IA-001 WF-001 VS-001 PT-001 ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
 
 Enter plan mode (if not already in it). The plan file must include the sections `references/plan-review-checklist.md` requires (Executive Summary, Current State, Problem Statement, Solution Approach, Success Criteria, Timeline, Risks) — Discovery's problem statement and success signal map directly onto `## Problem Statement` and `## Success Criteria`; Architecture's decisions map onto `## Current State`/`## Solution Approach`. It must also end with a **Plain-Language Summary** section, written for the founder:
 
@@ -1154,7 +1187,7 @@ Enter plan mode (if not already in it). The plan file must include the sections 
 **Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
 ```
 
-## Show task dependencies
+## Implementation Planning.3: Show task dependencies
 
 The plan document itself is never shown to the founder directly — its reader is whoever executes it
 (a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
@@ -1165,14 +1198,14 @@ nothing for this document's actual reader. This is additive to the checkbox task
 replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
 themselves.
 
-## Where you are
+## Implementation Planning.4: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
 the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
-## Gate checklist
+## Implementation Planning.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -1182,7 +1215,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the build order, and what gets explicitly deferred.
 - **Gate passes only if** the plan is realistic for a solo founder to actually execute.
 
-## Implementation Planning checkpoint
+## Implementation Planning.6: Implementation Planning checkpoint
 
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 
@@ -1265,13 +1298,13 @@ The sixth of Wingman's 14 pipeline stages. This is where the product's shape get
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Information Architecture.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's later decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the IA portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Organize the information architecture
+## Information Architecture.2: Organize the information architecture
 
 For each `DEF-*` requirement that implies a distinct section or navigable area, decide where it lives in the product's overall structure: what section it belongs to, what it's nested under (if anything), and what a user would call it — task-based naming ("Send Money"), not system-based naming ("TransactionController"). Tag each with the `IA-` traceability prefix, pointing back to the `DEF-*`/`JM-*` chain it satisfies.
 
@@ -1285,12 +1318,12 @@ Append this section to a scratch information-architecture doc (`docs/wingman/inf
 | IA-001 | <section or nav item, task-named> | <parent section, or "top-level"> | <the user task this section exists for> | DEF-001 |
 ```
 
-## Where you are
+## Information Architecture.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Information Architecture.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -1299,7 +1332,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the section structure, and the navigation logic.
 - **Gate passes only if** the structure is understandable to a first-time user.
 
-## Information Architecture checkpoint
+## Information Architecture.5: Information Architecture checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own IA table above. The checkpoint checks the
 gate checklist above, not just the table in general: it confirms every Must-include item is present
@@ -1335,13 +1368,13 @@ The fourth of Wingman's 14 pipeline stages. Personas & Jobs defined *who* and *w
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Journey Mapping.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per later stages' decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the journey-mapping portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence — a journey worth mapping still exists for most projects (even a CLI or API has a first-use and a success moment), so only skip if the project genuinely has no journey a user walks at all.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Map the journey
+## Journey Mapping.2: Map the journey
 
 For each `PJ-*` persona/job in scope, walk the full journey from first thought to success: the stages they pass through, the friction points and emotions at each stage, the decision points where they could go a different direction, and the drop-off risks where they might abandon the journey entirely. Tag each with the `JM-` traceability prefix, pointing back to the `PJ-*` persona/job it maps.
 
@@ -1355,7 +1388,7 @@ Append this section to a scratch journey-mapping doc (`docs/wingman/journey-mapp
 | JM-001 | <journey stage, e.g. "first search"> | <what's hard, how they feel> | <where they could branch> | <what makes them abandon here, if anything> | PJ-001 |
 ```
 
-## Show the journey, not just the table
+## Journey Mapping.3: Show the journey, not just the table
 
 Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
 actual journey diagram — detect the session's rendering tier first (Tier B: a Mermaid flowchart
@@ -1364,12 +1397,12 @@ horizontal journey-map Artifact). The table stays exactly as written above — i
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
-## Where you are
+## Journey Mapping.4: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table/diagram above.
 
-## Gate checklist
+## Journey Mapping.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -1379,7 +1412,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** where to reduce friction first.
 - **Gate passes only if** the full journey is mapped, end to end.
 
-## Journey Mapping checkpoint
+## Journey Mapping.6: Journey Mapping checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own journey map above. The checkpoint checks
 the gate checklist above, not just the map in general: it confirms every Must-include item is
@@ -1624,11 +1657,11 @@ The third of Wingman's 14 pipeline stages. A persona document that nobody built 
 
 $ARGUMENTS
 
-## Confirm the Product department is active
+## Personas & Jobs.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
-## Define personas and jobs
+## Personas & Jobs.2: Define personas and jobs
 
 Read the Research Synthesis output (from `/wingman:research-synthesis`, or the path given in `$ARGUMENTS`). For each theme with enough evidence behind it, define:
 
@@ -1649,12 +1682,12 @@ Append this section to a scratch personas-jobs doc (`docs/wingman/personas-jobs/
 | PJ-001 | <persona name/role> | <what makes them look for a solution> | <the actual pain, not a symptom> | <what they do today instead> | <what "better" looks like to them> | RS-001 |
 ```
 
-## Where you are
+## Personas & Jobs.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Personas & Jobs.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -1665,7 +1698,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
   supports first.
 - **Gate passes only if** the target user and the job to be done are both clear.
 
-## Personas & Jobs checkpoint
+## Personas & Jobs.5: Personas & Jobs checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own personas/jobs table above. The checkpoint
 checks the gate checklist above, not just the table in general: it confirms every Must-include item
@@ -1754,13 +1787,13 @@ The tenth of Wingman's 14 pipeline stages, and the last of the design stages bef
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Prototype & Usability.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from the earlier design-tier stages if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Prototype, validate usability, and review accessibility/content
+## Prototype & Usability.2: Prototype, validate usability, and review accessibility/content
 
 For each key flow spanning the `WF-*` wireframes and `VS-*` design system, turn it into a testable prototype description (the concrete sequence of screens/states/interactions a real usability check would walk through — this stays a description Wingman produces, not a claim that a live clickable prototype tool was actually run). Then validate it against three lenses in the same pass:
 
@@ -1780,12 +1813,12 @@ Append this section to a scratch prototype-usability doc (`docs/wingman/prototyp
 | PT-001 | <flow or element under test> | <usability / accessibility / content> | <what was found, and the fix if not already applied> | WF-001 |
 ```
 
-## Where you are
+## Prototype & Usability.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Prototype & Usability.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -1798,7 +1831,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Gate passes only if** the prototype was actually tested **and** accessibility/clarity are
   acceptable — both conditions, not either alone.
 
-## Prototype & Usability checkpoint
+## Prototype & Usability.5: Prototype & Usability checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own findings table above (`boardroom-design`
 has direct material input here, on top of its usual N/A fast-path for non-visual scopes). The
@@ -1873,11 +1906,11 @@ The second of Wingman's 14 pipeline stages. Discovery captured the raw problem s
 
 $ARGUMENTS
 
-## Confirm the Product department is active
+## Research Synthesis.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
-## Synthesize the research
+## Research Synthesis.2: Synthesize the research
 
 Read the Discovery output (from `/wingman:discovery`, or the path given in `$ARGUMENTS`). Do not just restate it — actively separate the signal from the noise:
 
@@ -1898,12 +1931,12 @@ Append this section to a scratch research-synthesis doc (`docs/wingman/research-
 | RS-001 | <one concrete theme, risk, opportunity, or open question> | <known / unknown / assumed> | DISC-001 |
 ```
 
-## Where you are
+## Research Synthesis.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Research Synthesis.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -1914,7 +1947,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Gate passes only if** the findings are grounded — every theme is tagged known/unknown/assumed,
   and no assumption is presented as a known fact.
 
-## Research Synthesis checkpoint
+## Research Synthesis.5: Research Synthesis checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own synthesis table above. The checkpoint
 checks the gate checklist above, not just the table in general: it confirms every Must-include item
@@ -1996,7 +2029,7 @@ This is the last stop before code leaves the founder's laptop and becomes real. 
 
 $ARGUMENTS
 
-## Preflight checks
+## Ship.1: Preflight checks
 
 Use the `department-lead-activation` skill to check the DevOps activation signal: if this project has CI config, a Dockerfile, or has shipped once already (check `.wingman/checkpoints.jsonl` for a prior `ship` stage entry), create `dept-devops` (if it doesn't exist yet) and delegate the deployment-mechanics portion of this stage to it.
 
@@ -2011,7 +2044,7 @@ Before shipping, confirm all of the following, and stop with a plain-language ex
 3. **On a feature branch** — not committing straight to the default branch. `build.md`'s "Before starting" step checks this out before any commit lands, so this should already be satisfied; if it isn't (e.g. a manual commit landed outside the pipeline), stop and offer to create one now rather than shipping straight from the default branch.
 4. **Remote + auth available** — a git remote is configured and, if opening a PR, the `gh` CLI (or the GitHub MCP tools available in this session) can actually create it.
 
-## Push and open the change for review
+## Ship.2: Push and open the change for review
 
 Use the `git-pr-workflow` skill for the mechanics below — it's written to work with plain `git`
 and the `gh` CLI, so it holds up regardless of which coding agent is actually driving this session.
@@ -2023,7 +2056,7 @@ and the `gh` CLI, so it holds up regardless of which coding agent is actually dr
 3. Open the PR as a draft (per `git-pr-workflow`'s draft-first default), then poll until checks are
    green before marking it ready for review — never mark it ready while checks are still pending.
 
-## Report in plain language
+## Ship.3: Report in plain language
 
 Tell the founder:
 
@@ -2037,7 +2070,7 @@ Tell the founder:
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — Planning Milestone and Build done, Ship now the current stage.
 
-## Gate checklist
+## Ship.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -2047,7 +2080,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** whether the release is safe to ship now.
 - **Gate passes only if** deploy verification passed and a rollback plan is ready.
 
-## Boardroom checkpoint
+## Ship.5: Boardroom checkpoint
 
 Run `/wingman:boardroom diff` one last time before merging, so the founder gets a final plain-language go/no-go rather than being asked to interpret CI output themselves — every pipeline stage ends in a checkpoint, `ship` included, not just the "meaningful" ones (that judgment call is exactly the kind of code-review-substitute decision the Boardroom exists so the founder never has to make alone).
 
@@ -2056,7 +2089,7 @@ Must-include item is present and every Must-decide question is answered. If the 
 the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
 "needs work."
 
-## After shipping
+## Ship.6: After shipping
 
 Suggest the adaptive stages that make sense next, without forcing them:
 - `/wingman:launch` if this is worth telling users/customers about publicly (a changelog entry, docs, or an announcement).
@@ -2121,15 +2154,30 @@ The seventh of Wingman's 14 pipeline stages. Named `uxflow`, not `design`, to st
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## UX Flow.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the flow-design portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Design the flow
+## UX Flow.2: Design the flow
 
-For each `ARCH-*` decision that touches a user-facing surface, sketch the screens/states/transitions a user actually moves through — not visual polish (that's `design-taste`'s job at build time), just the shape of the experience: what a user sees, in what order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing back to the `ARCH-*`/`DEF-*` chain it satisfies.
+**Trace to whichever upstream IDs actually exist yet.** In the 14-stage pipeline, `uxflow` is
+stage 7 — `architecture.md` (stage 11, mints `ARCH-*`) hasn't run yet at this point, so `ARCH-*`
+IDs will not exist in a real end-to-end run reaching this stage in order (confirmed directly by a
+real maintainer-mode dogfood run, `docs/wingman/retros.md` 2026-07-25/26 — this text still referred
+to `ARCH-*` from before the v20 stage-reorder, when Architecture ran immediately before UX Flow).
+Trace instead to the `IA-*`/`DEF-*` chain, which is already available by this stage. If this command
+is ever invoked standalone against a fixture/project that already has `ARCH-*` decisions on file
+(e.g. an older 7-stage-shaped project, or a targeted eval), tracing to those is still correct too —
+use whichever of `ARCH-*`/`IA-*`/`DEF-*` is the most immediate real upstream artifact on disk, never
+a stage that hasn't produced output yet.
+
+For each in-scope upstream decision/requirement that touches a user-facing surface, sketch the
+screens/states/transitions a user actually moves through — not visual polish (that's
+`design-taste`'s job at build time), just the shape of the experience: what a user sees, in what
+order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing
+back to the upstream ID(s) it satisfies.
 
 Append this section to a scratch UX-flow doc (`docs/wingman/uxflow/<short-slug>.md` in the
 founder's project, creating the directory if needed — same slug as the earlier stages' files,
@@ -2140,10 +2188,10 @@ same convention):
 
 | ID | Screen/state | User can... | Satisfies |
 |---|---|---|---|
-| UX-001 | <screen or state name> | <the actions available here> | ARCH-001 |
+| UX-001 | <screen or state name> | <the actions available here> | IA-001 |
 ```
 
-## Show the flow, not just the table
+## UX Flow.3: Show the flow, not just the table
 
 Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
 actual flow diagram — detect the session's rendering tier first, then follow
@@ -2153,7 +2201,7 @@ screen, published as an Artifact). The table stays exactly as written above — 
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
-## Gate checklist
+## UX Flow.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -2162,7 +2210,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the core flow, and how exceptions get handled.
 - **Gate passes only if** the main flow and its key exceptions both exist.
 
-## UX Flow checkpoint
+## UX Flow.5: UX Flow checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own UX flow table and diagram above (skip
 this step, same as the rest of this stage, if there is no user-facing surface). The checkpoint checks
@@ -2201,13 +2249,13 @@ The ninth of Wingman's 14 pipeline stages. Skipped entirely for projects with no
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Visual Design System.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow`/`/wingman:wireframes` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Write the design system spec
+## Visual Design System.2: Write the design system spec
 
 For each `WF-*` wireframe in scope, derive the concrete design tokens and component states it needs: typography (a small type scale, not a font-per-screen), spacing (a scale, not arbitrary pixel values), color (a limited palette with defined roles — primary/secondary/error/success/neutral — not an unbounded set), the reusable component inventory this project actually needs (buttons, inputs, cards, etc. — only what's used, never a speculative full library), and each interactive component's states (default/hover/focus/disabled/error, at minimum). Tag each row with the `VS-` traceability prefix, pointing back to the `WF-*` wireframe(s) it specs for.
 
@@ -2221,12 +2269,12 @@ Append this section to a scratch visual-design-system doc (`docs/wingman/visual-
 | VS-001 | <e.g. "Primary button"> | <e.g. default/hover/focus/disabled color+spacing values> | WF-001 |
 ```
 
-## Where you are
+## Visual Design System.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Visual Design System.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -2235,7 +2283,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the design direction, and the source of truth for it.
 - **Gate passes only if** the system is consistent and reusable across screens.
 
-## Visual Design System checkpoint
+## Visual Design System.5: Visual Design System checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own spec table above. The checkpoint checks
 the gate checklist above, not just the spec in general: it confirms every Must-include item is
@@ -2272,13 +2320,13 @@ The eighth of Wingman's 14 pipeline stages. Skipped entirely for projects with n
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Wireframes.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Sketch the wireframes
+## Wireframes.2: Sketch the wireframes
 
 For each `UX-*` screen/state in scope, sketch its low-fidelity layout: what regions exist on the screen (header/nav, primary content, primary action, secondary actions), what's in each region, and how they're arranged — structure and hierarchy, never colors, fonts, or spacing values (that's `visual-design-system.md`). Tag each with the `WF-` traceability prefix, pointing back to the `UX-*`/`IA-*` chain it satisfies.
 
@@ -2294,7 +2342,7 @@ convention):
 | WF-001 | <screen name, matches a UX-* state> | <header/nav, primary content, primary action, ...> | UX-001 |
 ```
 
-## Show the layout, not just the table
+## Wireframes.3: Show the layout, not just the table
 
 Immediately after the table, use `skills/visual-founder-output` to render each row as an actual
 low-fidelity layout — Tier A (Artifact-capable): a bordered-box HTML sketch per screen, no color
@@ -2303,12 +2351,12 @@ diagram of the same regions, inline in the same `docs/wingman/wireframes/<short-
 table stays exactly as written above — the diagram is generated from the same rows, added alongside
 it, never instead of it.
 
-## Where you are
+## Wireframes.4: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table/diagram above.
 
-## Gate checklist
+## Wireframes.5: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -2317,7 +2365,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the layout structure, and the screen order.
 - **Gate passes only if** the layout is clear and usable.
 
-## Wireframes checkpoint
+## Wireframes.6: Wireframes checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own wireframes above. The checkpoint checks
 the gate checklist above, not just the wireframes in general: it confirms every Must-include item is

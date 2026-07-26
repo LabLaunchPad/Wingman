@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.9] - 2026-07-26
+
+### Added
+- **Numbered sub-phases across all 14 pipeline commands.** Every real workflow section (`##` heading, excluding `References`) in each of the 14 `commands/pipeline/*.md` files now carries a globally-unique dotted ID — `Discovery.1: Understand the ask` through `Discovery.6: Discovery checkpoint`, `Build.1` through `Build.7`, etc. — for cross-referencing in retros, dogfood run records, and traceability. Previously only `discovery.md` had partial "Step 1/2/3" numbering (and even that stopped short of its own Gate/checkpoint sections); the other 13 files used plain, unnumbered descriptive headers. No new Boardroom checkpoints were added — purely a naming/tracking convention, zero functional change.
+- Regenerated all 73 harness-adapter files (`generate-harness-adapters.mjs --write`) to pick up the new sub-phase headers plus the earlier `dogfood.md`/`implementation-planning.md` fixes.
+
 ## [0.7.8] - 2026-07-25
 
 ### Added
