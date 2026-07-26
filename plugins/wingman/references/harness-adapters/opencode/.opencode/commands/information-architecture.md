@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific section]"
 
 # Wingman: Information Architecture
 
-The sixth of Wingman's 14 pipeline stages. This is where the product's shape gets organized around what a user is trying to *do*, not around how the underlying system happens to be built — a task-based hierarchy, not a database-table-shaped one.
+The sixth of Wingman's 14 pipeline stages, and the first stage of **Phase 3: Lean Design & Prototyping** (with `uxflow.md`, `wireframes.md`, `visual-design-system.md`) — that phase's goal is generating the UI visual layer quickly enough to get to the real build. This is where the product's shape gets organized around what a user is trying to *do*, not around how the underlying system happens to be built — a task-based hierarchy, not a database-table-shaped one. Produce a simple text list of screen layouts (e.g. "Dashboard: header, sidebar, data grid, CTA button") mapping logic to specific UI screens.
 
 $ARGUMENTS
 

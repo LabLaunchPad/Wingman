@@ -5,7 +5,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Define
 
-The fifth of Wingman's 14 pipeline stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
+The fifth of Wingman's 14 pipeline stages, and the last stage of **Phase 2: Logic & Functional Mapping**. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements. Separate Must-Haves from Nice-to-Haves explicitly, and be brutal about it: cut anything that isn't core to the first 60 seconds of value a user gets from the product.
 
 $ARGUMENTS
 

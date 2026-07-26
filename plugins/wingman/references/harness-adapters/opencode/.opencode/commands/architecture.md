@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific requirement ID to design 
 
 # Wingman: Architecture
 
-The eleventh of Wingman's 14 pipeline stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
+The eleventh of Wingman's 14 pipeline stages, part of **Phase 4: AI-Assisted Architecture & Build**. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff. When handing architecture decisions to an AI coding agent (e.g. Cursor, Windsurf) for scaffolding, give it a concrete stack and project type rather than an open-ended prompt (e.g. "Set up a robust architecture for a [project type] using [stack, e.g. Next.js/Supabase/Vercel]").
 
 $ARGUMENTS
 

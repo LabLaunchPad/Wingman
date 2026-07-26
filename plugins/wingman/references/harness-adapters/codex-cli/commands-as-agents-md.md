@@ -60,7 +60,7 @@ argument-hint: "[optional: focus area, e.g. a specific requirement ID to design 
 
 # Wingman: Architecture
 
-The eleventh of Wingman's 14 pipeline stages. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff.
+The eleventh of Wingman's 14 pipeline stages, part of **Phase 4: AI-Assisted Architecture & Build**. This is where technical decisions get made *for* the founder, not asked of them — frameworks, data models, and file layout are Wingman's job, never a founder decision, unless a choice is genuinely a business tradeoff. When handing architecture decisions to an AI coding agent (e.g. Cursor, Windsurf) for scaffolding, give it a concrete stack and project type rather than an open-ended prompt (e.g. "Set up a robust architecture for a [project type] using [stack, e.g. Next.js/Supabase/Vercel]").
 
 $ARGUMENTS
 
@@ -479,7 +479,7 @@ argument-hint: "[path to plan file, or leave blank to use the most recent approv
 
 # Wingman: Build
 
-Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implementation-planning`). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint.
+The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implementation-planning`). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint. Sequence work the way an agentic IDE session should: hand the agent the plan/AI PRD, have it build the data layer first, then build individual feature modules one at a time — never everything at once.
 
 $ARGUMENTS
 
@@ -524,7 +524,15 @@ Run the full verification suite for the project (tests, typecheck, lint — what
 
 ## Build.5: Definition-of-Done gate
 
-This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
+This is where `secure.md`'s dedicated threat picture now lives — folded into Build's own gate rather than kept as a separate ship-blocking stage, so the discipline isn't diluted, only relocated. This is also where **Phase 5: Testing, Security & QA** lives — not a separate 15th stage, but three explicit, named sub-checks inside this same gate. This stage exists so a founder never has to personally judge whether something is "secure enough" or "done enough" — that call gets made by a dedicated, evidence-based review, and the founder only sees the outcome.
+
+**The three Phase 5 sub-checks.** Each must resolve PASS before the gate clears, alongside the threat register below:
+
+1. **Golden Dataset Regression** — PASS requires a maintained checklist of concrete user scenarios (see `skills/definition-of-done`'s Golden Dataset technique) re-run against this change, with no scenario newly broken.
+2. **Security & Guardrails** — PASS requires the threat register below to have `threats_open == 0` (see `skills/security-checklist`), specifically covering input sanitization and that no user can reach another user's data.
+3. **Cost & Performance Control** — PASS requires new usage-scaling surfaces (a new endpoint, a new expensive query, a new external API call) to have a stated usage/cost bound — a rate limit, a quota, or a documented reason none is needed yet (see `skills/definition-of-done`'s Cost & Performance Control technique).
+
+Record all three as PASS/FAIL lines directly in the Boardroom checkpoint output alongside the gate checklist (Build.6) — a founder should see these three names, not just "security reviewed."
 
 **Build a threat picture.** Look at what changed since the last checkpoint and build a short list of concrete risks — not a generic checklist recitation, but specific to what was actually built:
 
@@ -697,7 +705,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Define
 
-The fifth of Wingman's 14 pipeline stages. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements.
+The fifth of Wingman's 14 pipeline stages, and the last stage of **Phase 2: Logic & Functional Mapping**. Discovery established *why* — this stage scopes *what*, as a small set of concrete, individually-traceable requirements. Separate Must-Haves from Nice-to-Haves explicitly, and be brutal about it: cut anything that isn't core to the first 60 seconds of value a user gets from the product.
 
 $ARGUMENTS
 
@@ -768,7 +776,7 @@ argument-hint: "<what you want built, in your own words>"
 
 # Wingman: Discovery
 
-The first of Wingman's 14 pipeline stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
+The first of Wingman's 14 pipeline stages, and the first stage of **Phase 1: Problem Definition & Market Validation** (with `research-synthesis.md` and `personas-jobs.md`) — that phase's goal is making sure a founder is building something people actually want before spending any time managing an AI coding agent. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build. Include a feasibility check as part of this: search for existing competitors or prior attempts; if nobody else is solving this, ask plainly whether that's because it isn't a real problem, or because it's genuinely hard.
 
 $ARGUMENTS
 
@@ -1164,7 +1172,7 @@ argument-hint: "[optional: anything to focus the plan on]"
 
 # Wingman: Implementation Planning
 
-The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build`. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
 
 $ARGUMENTS
 
@@ -1294,7 +1302,7 @@ argument-hint: "[optional: focus area, e.g. a specific section]"
 
 # Wingman: Information Architecture
 
-The sixth of Wingman's 14 pipeline stages. This is where the product's shape gets organized around what a user is trying to *do*, not around how the underlying system happens to be built — a task-based hierarchy, not a database-table-shaped one.
+The sixth of Wingman's 14 pipeline stages, and the first stage of **Phase 3: Lean Design & Prototyping** (with `uxflow.md`, `wireframes.md`, `visual-design-system.md`) — that phase's goal is generating the UI visual layer quickly enough to get to the real build. This is where the product's shape gets organized around what a user is trying to *do*, not around how the underlying system happens to be built — a task-based hierarchy, not a database-table-shaped one. Produce a simple text list of screen layouts (e.g. "Dashboard: header, sidebar, data grid, CTA button") mapping logic to specific UI screens.
 
 $ARGUMENTS
 
@@ -1364,7 +1372,7 @@ argument-hint: "[optional: which persona/job to map first]"
 
 # Wingman: Journey Mapping
 
-The fourth of Wingman's 14 pipeline stages. Personas & Jobs defined *who* and *why* — this stage maps the actual path they walk, end to end, from the moment they first realize they have the problem through to genuinely succeeding at their desired progress.
+The fourth of Wingman's 14 pipeline stages, and the first stage of **Phase 2: Logic & Functional Mapping** (with `define.md`) — that phase's goal is translating the idea into a blueprint an AI coding agent can actually build from. Personas & Jobs defined *who* and *why* — this stage maps the actual path they walk, end to end, from the moment they first realize they have the problem through to genuinely succeeding at their desired progress. Include the shortest path from first entry to core value as an explicit input->process->display step list.
 
 $ARGUMENTS
 
@@ -1653,7 +1661,7 @@ argument-hint: "[optional: path to the Research Synthesis output, defaults to th
 
 # Wingman: Personas & Jobs
 
-The third of Wingman's 14 pipeline stages. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template.
+The third of Wingman's 14 pipeline stages, and the last stage of **Phase 1: Problem Definition & Market Validation**. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template. Distill each job-to-be-done to a single sentence: "My user needs to do X, but currently struggles with Y, so this product will provide Z."
 
 $ARGUMENTS
 
@@ -1730,7 +1738,7 @@ argument-hint: "[optional: what to focus the review on, e.g. a specific feature 
 
 # Wingman: Post-Launch
 
-An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review.
+An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review. Corresponds to "Iterate" in **Phase 6: Launch & Iterate** (see `ship.md`): when a real bug or gap surfaces, the fix is a plan/AI-PRD update handed back to the build stage, not a hand-patch applied outside the pipeline.
 
 $ARGUMENTS
 
@@ -1783,7 +1791,7 @@ argument-hint: "[optional: focus area, e.g. a specific flow to prototype]"
 
 # Wingman: Prototype & Usability
 
-The tenth of Wingman's 14 pipeline stages, and the last of the design stages before `/wingman:architecture`. Skipped entirely for projects with no user-facing surface, same as the other design-tier stages. This stage deliberately folds accessibility and content review into itself rather than existing as a separate 15th stage — the maintainer's explicit call: an accessibility pass makes the most sense reviewed alongside the same testable prototype a usability check runs against, not as a disconnected downstream audit.
+The tenth of Wingman's 14 pipeline stages, and the last of the design stages before `/wingman:architecture` — also the first stage of **Phase 4: AI-Assisted Architecture & Build** (with `architecture.md`, `implementation-planning.md`, `build.md`), whose goal is acting as the manager of the AI coding agent rather than as the coder. Skipped entirely for projects with no user-facing surface, same as the other design-tier stages. This stage deliberately folds accessibility and content review into itself rather than existing as a separate 15th stage — the maintainer's explicit call: an accessibility pass makes the most sense reviewed alongside the same testable prototype a usability check runs against, not as a disconnected downstream audit. Before any code gets written, run a "Wizard of Oz" test: simulate the product's outcome manually (even by hand) to confirm a real user gets genuine value from it, cheaper than discovering that gap after the build stage.
 
 $ARGUMENTS
 
@@ -1902,7 +1910,7 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Research Synthesis
 
-The second of Wingman's 14 pipeline stages. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve.
+The second of Wingman's 14 pipeline stages, part of **Phase 1: Problem Definition & Market Validation**. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve. Frame this as the "Old Way vs. New Way" comparison: document concretely why the solutions the target user already has access to fail them.
 
 $ARGUMENTS
 
@@ -2025,7 +2033,7 @@ argument-hint: "[optional: target branch, defaults to the repo's default branch]
 
 # Wingman: Ship
 
-This is the last stop before code leaves the founder's laptop and becomes real. Nothing here should require the founder to understand git, CI, or pull requests — they get a plain-language "here's what's going out and why" summary and a single decision to make.
+The fourteenth and last of Wingman's 14 pipeline stages, and the first stage of **Phase 6: Launch & Iterate** (with `telemetry.md` for Monitor Drop-offs and `post-launch.md` for Iterate, both adaptive commands run after this one) — that phase's goal is to ship, listen, and feed real usage back into the plan. This is the last stop before code leaves the founder's laptop and becomes real. Nothing here should require the founder to understand git, CI, or pull requests — they get a plain-language "here's what's going out and why" summary and a single decision to make. Connect the repo to its deploy target for CI/CD (e.g. Vercel/Netlify) and set up a domain if this is the project's first ship.
 
 $ARGUMENTS
 
@@ -2116,7 +2124,7 @@ argument-hint: "[optional: feature or area to check]"
 
 # Wingman: Telemetry
 
-Shipping isn't the finish line — a founder needs to know afterward whether the thing that shipped is actually working, without asking an engineer to go dig through logs. This command is a light touch, not a bespoke analytics platform: use whatever this project already has (error tracking, an analytics package, structured logs) before proposing something new.
+Shipping isn't the finish line — a founder needs to know afterward whether the thing that shipped is actually working, without asking an engineer to go dig through logs. This command is a light touch, not a bespoke analytics platform: use whatever this project already has (error tracking, an analytics package, e.g. Sentry- or PostHog-style tooling, structured logs) before proposing something new. Corresponds to "Monitor Drop-offs" in **Phase 6: Launch & Iterate** (see `ship.md`): the goal is surfacing where users actually drop off a flow, so that step's logic can be revisited in the plan — not just uptime/error monitoring in the abstract.
 
 $ARGUMENTS
 
@@ -2150,7 +2158,7 @@ argument-hint: "[optional: focus area, e.g. a specific screen or flow]"
 
 # Wingman: UX Flow
 
-The seventh of Wingman's 14 pipeline stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:wireframes` rather than manufacturing screens that don't need to exist.
+The seventh of Wingman's 14 pipeline stages, part of **Phase 3: Lean Design & Prototyping**. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:wireframes` rather than manufacturing screens that don't need to exist. Apply the "60-second rule": a first-time user must be able to land on the product and reach its core value in under a minute — no unnecessary signup barriers before that point.
 
 $ARGUMENTS
 
@@ -2245,7 +2253,7 @@ argument-hint: "[optional: focus area, e.g. a specific component]"
 
 # Wingman: Visual Design System
 
-The ninth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later.
+The ninth of Wingman's 14 pipeline stages, and the last stage of **Phase 3: Lean Design & Prototyping**. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later. When an AI code-generation tool (e.g. v0.dev, Bolt) is used to scaffold the frontend from this spec, keep the prompt scoped to the tokens document itself (e.g. "build a minimalist, professional dashboard using Tailwind CSS and React, per this token spec") rather than improvising a new visual language.
 
 $ARGUMENTS
 
@@ -2316,7 +2324,7 @@ argument-hint: "[optional: focus area, e.g. a specific screen]"
 
 # Wingman: Wireframes
 
-The eighth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`. This stage produces low-fidelity screen layouts — where things sit and what's on each screen — deliberately before any visual polish; that's `visual-design-system.md`'s job, one stage later.
+The eighth of Wingman's 14 pipeline stages, part of **Phase 3: Lean Design & Prototyping**. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`. This stage produces low-fidelity screen layouts — where things sit and what's on each screen — deliberately before any visual polish; that's `visual-design-system.md`'s job, one stage later. A quick sketching tool (e.g. Excalidraw, or a physical napkin) is enough here — the artifact is a source of truth for later stages, not a polished deliverable.
 
 $ARGUMENTS
 

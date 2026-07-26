@@ -5,7 +5,7 @@ argument-hint: "<what you want built, in your own words>"
 
 # Wingman: Discovery
 
-The first of Wingman's 14 pipeline stages. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build.
+The first of Wingman's 14 pipeline stages, and the first stage of **Phase 1: Problem Definition & Market Validation** (with `research-synthesis.md` and `personas-jobs.md`) — that phase's goal is making sure a founder is building something people actually want before spending any time managing an AI coding agent. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build. Include a feasibility check as part of this: search for existing competitors or prior attempts; if nobody else is solving this, ask plainly whether that's because it isn't a real problem, or because it's genuinely hard.
 
 $ARGUMENTS
 

@@ -5,7 +5,7 @@ argument-hint: "[optional: which persona/job to map first]"
 
 # Wingman: Journey Mapping
 
-The fourth of Wingman's 14 pipeline stages. Personas & Jobs defined *who* and *why* — this stage maps the actual path they walk, end to end, from the moment they first realize they have the problem through to genuinely succeeding at their desired progress.
+The fourth of Wingman's 14 pipeline stages, and the first stage of **Phase 2: Logic & Functional Mapping** (with `define.md`) — that phase's goal is translating the idea into a blueprint an AI coding agent can actually build from. Personas & Jobs defined *who* and *why* — this stage maps the actual path they walk, end to end, from the moment they first realize they have the problem through to genuinely succeeding at their desired progress. Include the shortest path from first entry to core value as an explicit input->process->display step list.
 
 $ARGUMENTS
 

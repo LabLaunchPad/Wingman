@@ -5,7 +5,7 @@ argument-hint: "[optional: focus area, e.g. a specific component]"
 
 # Wingman: Visual Design System
 
-The ninth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later.
+The ninth of Wingman's 14 pipeline stages, and the last stage of **Phase 3: Lean Design & Prototyping**. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later. When an AI code-generation tool (e.g. v0.dev, Bolt) is used to scaffold the frontend from this spec, keep the prompt scoped to the tokens document itself (e.g. "build a minimalist, professional dashboard using Tailwind CSS and React, per this token spec") rather than improvising a new visual language.
 
 $ARGUMENTS
 

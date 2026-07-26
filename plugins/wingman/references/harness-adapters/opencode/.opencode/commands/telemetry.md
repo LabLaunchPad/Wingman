@@ -5,7 +5,7 @@ argument-hint: "[optional: feature or area to check]"
 
 # Wingman: Telemetry
 
-Shipping isn't the finish line — a founder needs to know afterward whether the thing that shipped is actually working, without asking an engineer to go dig through logs. This command is a light touch, not a bespoke analytics platform: use whatever this project already has (error tracking, an analytics package, structured logs) before proposing something new.
+Shipping isn't the finish line — a founder needs to know afterward whether the thing that shipped is actually working, without asking an engineer to go dig through logs. This command is a light touch, not a bespoke analytics platform: use whatever this project already has (error tracking, an analytics package, e.g. Sentry- or PostHog-style tooling, structured logs) before proposing something new. Corresponds to "Monitor Drop-offs" in **Phase 6: Launch & Iterate** (see `ship.md`): the goal is surfacing where users actually drop off a flow, so that step's logic can be revisited in the plan — not just uptime/error monitoring in the abstract.
 
 $ARGUMENTS
 
