@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.10] - 2026-07-26
+
+### Added
+- **6 named Phase groupings over the existing 14-stage pipeline**, adopted from a founder-supplied reference workflow ("The Lean AI-Assisted SDLC for Solo Founders"). Checked against the existing stage order first — it already matched the reference doc's sequence 1:1, so no stages were reordered; only naming and cross-referencing were added. Each phase's name and goal is now stated inline in the lead paragraph of every one of the 14 `commands/pipeline/*.md` files (and cross-referenced from `telemetry.md`/`post-launch.md` for Phase 6), plus a stress-tested summary table at `docs/ARCHITECTURE.md` §4e. No new persisted state, no new `checkpoints.jsonl` field — purely a founder-facing orientation layer.
+- **`build.md`'s Definition-of-Done gate gained three explicitly named sub-checks** — Golden Dataset Regression, Security & Guardrails, Cost & Performance Control — surfacing Phase 5 (Testing, Security & QA) as founder-visible PASS/FAIL lines rather than a generic "security reviewed." The first and third are backed by a new "Techniques" section in `skills/definition-of-done`; the second by the existing `skills/security-checklist`.
+- **`skills/visual-founder-output`'s pipeline-status tree** (`references/visual-output-templates.md` §2) now nests all 14 stage rows under their Phase group, with Build's row noting Phase 5 runs inside its own gate rather than as a separate row.
+- Re-copied the updated `definition-of-done` skill to its OpenCode adapter (`references/harness-adapters/opencode/.opencode/skills/`) to keep `check-harness-adapter-drift.mjs` clean.
+
 ## [0.7.9] - 2026-07-26
 
 ### Added
