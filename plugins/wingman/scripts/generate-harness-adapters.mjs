@@ -146,7 +146,7 @@ async function buildTargets() {
       const frontmatter = fmMatch ? fmMatch[1] : '';
       const body = fmMatch ? fmMatch[2] : raw;
       const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
-      const description = (descMatch ? descMatch[1].trim() : name).replace(/"/g, '\\"');
+      const description = (descMatch ? descMatch[1].trim() : name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
       const primitives = detectPrimitives(raw);
       const note = harnessNoteBlock(primitives, target);
       const mdcFrontmatter = target.skills.mdcFrontmatter(description);
