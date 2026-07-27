@@ -1,0 +1,40 @@
+description = "On-demand code review without convening the full Boardroom — a plain-language verdict on correctness, security, simplicity, and test coverage."
+prompt = '''
+
+# Wingman: Review
+
+A thin command over the `code-review` skill, for when a founder wants "is this
+code good?" answered without paying the ceremony of a full 7-8-seat Boardroom
+checkpoint. `code-review` renders a review verdict only — it never writes or
+edits code itself.
+
+## When to use this instead of `/wingman:boardroom`
+
+- A quick gut-check mid-build, before a formal stage checkpoint is due.
+- A PR is open and needs a readable verdict, not just a green CI check.
+- The founder explicitly asks for a review without wanting the full business/
+  technical/finance/research consolidation a Boardroom checkpoint produces.
+
+If the change is genuinely high-risk (touches auth, payments, data, or a
+deploy — Level 3+ per `references/permission-model.md`), say so plainly and
+recommend `/wingman:boardroom` instead — this command is a lighter-weight
+tool, not a substitute for the real gate on things that need it.
+
+## What to do
+
+1. Follow `code-review`'s own method exactly: scope to what changed, review
+   across the four lenses (correctness, security, simplicity, tests), rate
+   each finding (Blocker / Should-fix / Nit), lead with the one-sentence
+   bottom line.
+2. If a focus note or file list was given as an argument, scope the review to
+   that; otherwise scope to the most recent uncommitted or unpushed changes.
+3. Report using `code-review`'s own output shape — this command adds no new
+   format of its own.
+
+## References
+
+- `skills/code-review` — the actual review method and output contract.
+- `references/permission-model.md` — the Level 3+ threshold for "this should
+  go to the Boardroom instead."
+
+'''
