@@ -643,6 +643,85 @@ context injection on the common path; the one point needing external confirmatio
 clean. Manufacturing a fix here would repeat the exact false-positive pattern this session's own
 `bloat-audit`/`over-engineering-review` eval promotions just tested against.
 
+## 8f. Founder-directed override: native support across 6 non-Claude-Code harnesses (2026-07-27, in progress)
+
+**This is a deliberate, disclosed reversal of §8a/§8c's own "no blanket portability work absent real,
+evidenced demand" stance — not a claim that the evidence gate organically cleared itself.** The
+founder asked directly for "full agent-agnostic support... fully native, systematic engineering."
+Before any implementation, the full history was surfaced back to the founder — three prior declines
+of this exact ask (2026-07-18, re-confirmed 2026-07-22 and 2026-07-25), each on the grounds that
+`AskUserQuestion`, `ExitPlanMode` + its gating hooks, and parallel `Task`/`Agent` dispatch are
+genuinely coupled to Claude Code, and that real per-harness demand had always been answered with a
+narrow, targeted adapter rather than a full rewrite. The founder confirmed this ask is a deliberate
+override, and chose, via `AskUserQuestion`: (1) re-verify current harness capabilities first, done
+below; (2) expand scope from the 2 harnesses §8b already covers to 6 total — Codex CLI, OpenCode,
+Gemini CLI, Cursor, Cline, OpenHands; (3) for every genuine capability gap, build the best available
+behavioral equivalent and disclose the substitution as a tradeoff, never claim silent parity; (4)
+founder checkpoints stay in scope for interactive sessions only — headless/single-shot invocations
+are explicitly out of scope.
+
+**Fresh capability-matrix research (2026-07-27)**, replacing stale prior findings where they differ
+— see `plugins/wingman/references/harness-capability-profile.md` for the live, generated version of
+this table (emitted straight from each harness's own `harness-targets/<id>.mjs` descriptor, so it
+can never drift from what the adapters actually declare):
+
+| Harness | Hooks | Plan-gate | Parallel dispatch | Question tool |
+|---|---|---|---|---|
+| Claude Code (native) | ✅ | ✅ | ✅ | ✅ |
+| Codex CLI | ✅ opt-in `codex_hooks`, v0.114+ | ❌ no plan-mode primitive at all | ✅ confirmed genuine (`spawn_agent`/`send_message`/`wait_agent`/`close_agent`) — corrects §8b's earlier "unconfirmed at scale" note | ❌ none |
+| OpenCode | ✅ built already | ⚠️ undocumented experimental flag | ❌ confirmed still sequential (`anomalyco/opencode#29638`) | ❌ confirmed broken/hangs non-interactively |
+| Gemini CLI | ✅ confirmed real event taxonomy (`BeforeTool`/`AfterTool`/etc. — corrected from an earlier, wrong `PreToolUse`/`PostToolUse` assumption) | ⚠️ real Plan mode, but exit auto-escalates to YOLO, no discrete transition event | ✅ confirmed genuine (isolated-context subagents) | ✅ real `ask_user` tool — closest match to `AskUserQuestion` found in any harness |
+| OpenHands | ✅ confirmed near-1:1 event-name parity with Claude Code (capability-matrix level; exact config schema not yet field-verified) | ❌ only a blanket confirmation-mode toggle | ✅ confirmed genuine (`DelegateTool`) | ❌ genuinely undocumented |
+| Cursor | ⚠️ only 3 narrow lifecycle points, no generic PreToolUse | ⚠️ real Plan Mode, but the transition is UI-click-only, no hook fires | ✅ confirmed genuine (up to 8 parallel worktree-isolated agents) | ❌ none |
+| Cline | ✅ new (v3.36), tool-call-scoped only, macOS/Linux only | ❌ Plan/Act toggle is manual-only | ❌ confirmed none | ✅ real `ask_followup_question`, single-select |
+
+No harness has full parity with Claude Code. **The plan-gate is the universal weak point** — every
+harness gets its own disclosed substitute (a per-harness hook where one exists, e.g. Gemini CLI's
+`hooks/plan-gate.mjs`; otherwise `plugins/wingman/scripts/dod-pre-push-check.mjs`'s existing
+harness-agnostic git-push gate, per §8a) rather than a fabricated equivalent.
+
+**What actually shipped so far** (descriptor-driven, built in phases, each phase's own commit):
+
+1. **Generator/drift-checker refactor** (`0.7.12`) — `generate-harness-adapters.mjs` and
+   `check-harness-adapter-drift.mjs` moved from 2 hardcoded harness branches to a descriptor-driven
+   model: one `plugins/wingman/scripts/harness-targets/<id>.mjs` file per harness (output paths,
+   per-primitive "Harness note" prose, `capabilities` block), loaded generically via
+   `harness-targets/index.mjs`. Adding a harness is now "add a descriptor file," not "add more
+   hardcoded branches." Proved behavior-preserving via a zero-diff `--check` gate before any new
+   harness rode on the refactor.
+2. **Gemini CLI adapter** (`0.7.13`) — the strongest capability match of the 6. Real Markdown+YAML
+   subagent schema (not TOML/JSON), a new `'toml'` commands mode in the generator
+   (`commands/wingman/*.toml`, `$ARGUMENTS` → `{{args}}`), 8 translated Boardroom personas,
+   `gemini-extension.json`, `GEMINI.md` (real `@file.md` imports), and `hooks/plan-gate.mjs` — the
+   one genuinely new piece of hook logic in this whole build, a disclosed coarser per-turn proxy for
+   the missing plan-gate transition event.
+3. **OpenHands adapter** (`0.7.14`) — deliberately narrower scope, since its capability findings
+   come from the general matrix pass above, not a dedicated schema-verification pass the way Gemini
+   CLI got. Ships the `'folded'`-mode `microagents/repo.md` (OpenHands' own confirmed-real,
+   auto-loaded repo-instructions file) and a shared-skills contribution; explicitly does **not**
+   invent a Boardroom-persona file format or hooks-config schema — both logged as open gaps in
+   `openhands/README.md` and `docs/HUMAN-TODOS.md` rather than guessed at.
+4. **Capability-profile branching in canonical files** (`0.7.15`) — `generate-harness-adapters.mjs`
+   gained `buildCapabilityProfile()`, emitting `references/harness-capability-profile.md` from the
+   same descriptors. `boardroom.md` (dispatch mode), `evolve.md`/`evolve-promotion`/
+   `dogfood-gap-classification` (question-tool fallback), and `implementation-planning.md`
+   (plan-gate fallback) each gained one branch reading that table. Because these are canonical,
+   generator-copied files, this single edit propagated automatically into every harness's own
+   generated copy on the next `--write` (confirmed directly in OpenCode's, Gemini CLI's, and
+   OpenHands' output) — closing the "OpenCode's disclosed sequential-dispatch degradation should be
+   a generated instruction, not just README prose" gap with zero OpenCode-specific work.
+   `evals/cases/harness-capability-profile-branching.md` confirmed, via a real fresh-subagent
+   dispatch (not self-report), that a session told `hasParallelDispatch: false` actually finds and
+   follows the new branch — sequential dispatch, plain disclosure, all 8 seats still returning
+   independent verdicts.
+
+**Not yet built** (tracked as open follow-on work in `docs/PROJECT.md`, not silently dropped):
+Cline and Cursor adapters (sequenced last per the plan — weakest capability match); a hooks-config
+schema and Boardroom-persona format for OpenHands (needs a real account/install to verify, per
+`docs/HUMAN-TODOS.md`); live model-inference verification for any of the 3 newest harnesses (no
+credential exists in this sandbox for Gemini CLI, OpenHands, Cursor, or Cline — the same class of
+gap §8b already discloses for Codex CLI).
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 17 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.

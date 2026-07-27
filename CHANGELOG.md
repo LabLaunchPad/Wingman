@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.16] - 2026-07-27
+
+### Added
+- **Documentation pass closing out the founder-directed 6-harness build's docs debt.** New `docs/ARCHITECTURE.md` §8f: the full override framing, the fresh 2026-07-27 capability matrix (7 harnesses), and a phase-by-phase summary of what's shipped (`0.7.12`-`0.7.15`) vs. what's tracked as open follow-on work (Cline/Cursor adapters, OpenHands' unconfirmed hooks/persona schema, live model-inference verification for any of the 3 newest harnesses). `docs/AGENT-ROSTER.md`'s "AI-agent-agnostic transformation" deferred-idea row gained a terminal "superseded again, 2026-07-27" update line, explicit that this is a founder override, not organic evidence, and that the row's own specific `dist/`/`renames-map.json` proposal remains declined on its own merits. `plugins/wingman/references/harness-adapters/README.md` rewritten for all 7 harnesses (5 built + 2 sequenced next) with a live capability matrix pointing at the generated `harness-capability-profile.md`. `plugins/wingman/AGENTS.md`'s nested cross-harness-adapters pointer updated to name all 4 built adapters plus the 2 sequenced next.
+
 ## [0.7.15] - 2026-07-27
 
 ### Added

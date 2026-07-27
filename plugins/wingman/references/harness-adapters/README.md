@@ -3,17 +3,38 @@
 Wingman is built as a Claude Code plugin (see `CLAUDE.md`), and `docs/ARCHITECTURE.md` §8a gives an
 honest account of what's harness-agnostic vs. Claude-Code-coupled — most of the plugin's *execution*
 mechanism (`AskUserQuestion`, `ExitPlanMode` + its gating hooks, parallel `Task`/`Agent` subagent
-dispatch) is genuinely coupled to Claude Code's own tool surface, and no blanket "make it all
-portable" work is planned absent real, evidenced demand for a specific target harness (§8a's own
-stated bar, and the reason an earlier external "flatten everything" proposal was declined on
-2026-07-18 — see `docs/PROJECT.md`'s decisions log).
+dispatch) is genuinely coupled to Claude Code's own tool surface.
 
-This directory names all 3 harnesses Wingman is evaluated against, symmetrically: **Claude Code**
-(`claude-code/` — the native target; no translation exists because none is needed, see that
-directory's own README), **Codex CLI** (`codex-cli/`), and **OpenCode** (`opencode/`). It is not a
-claim that Wingman runs identically everywhere — each directory states plainly what's genuinely
-ported, what's structurally verified vs. authored-but-unverified, and what has no equivalent at all
-in that harness.
+**2026-07-27 update — founder-directed override, expanding to 6 harnesses.** §8a's "no blanket
+portability work absent real demand" bar had held since 2026-07-18 (declining a full rewrite 3
+times). The founder then asked directly for full agent-agnostic support and, after being shown that
+full history, explicitly confirmed this as a deliberate override — not new organic evidence that the
+gate cleared itself. See `docs/ARCHITECTURE.md` §8f for the full framing, the fresh capability-matrix
+research, and what's shipped so far (phased, each phase its own commit). This directory now covers 7
+harnesses total, symmetrically: **Claude Code** (`claude-code/` — the native target; no translation
+exists because none is needed), **Codex CLI** (`codex-cli/`), **OpenCode** (`opencode/`), **Gemini
+CLI** (`gemini-cli/`), and **OpenHands** (`openhands/`) — with **Cursor** and **Cline** sequenced
+next (weakest capability match, built last on purpose). It is not a claim that Wingman runs
+identically everywhere — each directory states plainly what's genuinely ported, what's structurally
+verified vs. authored-but-unverified, and what has no equivalent at all in that harness.
+
+## Capability matrix
+
+The live, generated version of this table is `plugins/wingman/references/harness-capability-profile.md`
+(emitted straight from each harness's own `harness-targets/<id>.mjs` descriptor — never hand-edited).
+Consumed directly by capability-aware branching in `boardroom.md` and other canonical command/skill
+files (§8f) — a session running under any of these harnesses reads this table to pick the real
+primitive vs. the disclosed substitute.
+
+| Harness | Hooks | Plan-gate | Parallel dispatch | Question tool |
+|---|---|---|---|---|
+| Claude Code (native) | ✅ | ✅ | ✅ | ✅ |
+| Codex CLI | ✅ | ❌ | ✅ | ❌ |
+| OpenCode | ✅ | ⚠️ weak | ❌ | ❌ |
+| Gemini CLI | ✅ | ⚠️ weak | ✅ | ✅ |
+| OpenHands | ⚠️ weak (schema unconfirmed) | ❌ | ✅ | ❌ |
+| Cursor *(not yet built)* | ⚠️ weak | ⚠️ weak | ✅ | ❌ |
+| Cline *(not yet built)* | ✅ | ❌ | ❌ | ✅ |
 
 **2026-07-23 update — full command/skill parity, not just Boardroom + git-push gate.** The founder
 named "agent-agnostic across Claude Code, OpenCode, and Codex CLI" as an explicit MVP goal — the
@@ -65,6 +86,21 @@ a `verified` status with no real evidence):
   OpenCode Zen API key produced a genuine, persona-correct verdict; see `opencode/README.md`'s "Live
   model inference — confirmed" section for the full finding (including a real caveat about
   `--agent`'s fallback-to-default-then-auto-delegate behavior).
+- `gemini-cli/` — the strongest capability match of the 6 new harnesses. Boardroom seat personas (8,
+  **authored, unverified** — real Markdown+YAML subagent schema confirmed via a dedicated
+  2026-07-27 schema-verification pass, no live Gemini CLI account exists to confirm runtime
+  discovery) + `commands/wingman/*.toml` (24, **built + tested** — generated, `--check`-verified in
+  this sandbox) + `gemini-extension.json`/`GEMINI.md` (real `@file.md` imports) +
+  `hooks/hooks.json` + a self-contained `secret-guard.mjs` port + `hooks/plan-gate.mjs` (the one
+  genuinely new piece of hook logic across this whole 6-harness build — smoke-tested directly
+  against 5 constructed fixture shapes, all matching documented behavior exactly). See
+  `gemini-cli/README.md` for the full capability-profile breakdown.
+- `openhands/` — deliberately narrower scope than Gemini CLI's, since its capability findings come
+  from the general 6-harness matrix pass, not a dedicated schema-verification pass.
+  `microagents/repo.md` (**built + tested**, generated via the existing `'folded'` commands mode —
+  the same shape Codex CLI's `AGENTS.md` fallback uses) + a shared-skills contribution. No
+  Boardroom-persona adapter or hooks-config file shipped here — both honestly logged as open gaps
+  (no confirmed schema for either in this pass) rather than guessed at. See `openhands/README.md`.
 - The single **built + tested** artifact from this investment isn't harness-specific at all:
   `plugins/wingman/scripts/install-git-hooks.mjs`, which wires the existing
   `dod-pre-push-check.mjs` up as a real `.git/hooks/pre-push` hook. That fires under any coding
