@@ -132,6 +132,28 @@ async function buildTargets() {
     }
   }
 
+  // Real per-harness skill-format translation (distinct from the shared/.agents/skills/ verbatim
+  // contribution above): a harness whose native skill-adjacent file format has a genuinely
+  // different frontmatter shape than SKILL.md's (name/description) declares `skills.mdcOutDir` +
+  // `skills.mdcFrontmatter(description)` and gets a real translated copy, not just the raw
+  // SKILL.md offered for manual reference. Cursor's `.cursor/rules/*.mdc` is the first case of this
+  // (description/globs/alwaysApply, per real, documented Cursor Project Rules schema).
+  for (const target of harnessTargets) {
+    if (!target.skills?.mdcOutDir) continue;
+    for (const { name, path } of listSkills()) {
+      const raw = readFileSync(path, 'utf-8');
+      const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+      const frontmatter = fmMatch ? fmMatch[1] : '';
+      const body = fmMatch ? fmMatch[2] : raw;
+      const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+      const description = (descMatch ? descMatch[1].trim() : name).replace(/"/g, '\\"');
+      const primitives = detectPrimitives(raw);
+      const note = harnessNoteBlock(primitives, target);
+      const mdcFrontmatter = target.skills.mdcFrontmatter(description);
+      targets.set(join(...target.skills.mdcOutDir.split('/'), `${name}.mdc`), mdcFrontmatter + body + note);
+    }
+  }
+
   const commandEntries = listCommands();
 
   for (const target of harnessTargets) {
@@ -224,6 +246,7 @@ function outputDirsToClean(harnessTargets) {
   for (const d of sharedOutDirs) dirs.add(d);
   for (const t of harnessTargets) {
     if (t.commands?.mode === 'perFile' || t.commands?.mode === 'toml') dirs.add(t.commands.outDir);
+    if (t.skills?.mdcOutDir) dirs.add(t.skills.mdcOutDir);
   }
   return [...dirs];
 }

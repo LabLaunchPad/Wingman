@@ -2,7 +2,17 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
-<<<<<<< HEAD
+## [0.7.19] - 2026-07-27
+
+### Added
+- **Completeness follow-up to the 6-harness build, closing 2 real gaps for OpenCode/Codex CLI/Cursor/OpenHands/Gemini CLI specifically (an explicit founder ask).** OpenCode and Codex CLI were already near-complete from prior sessions (full command/skill/hook parity within each harness's own real limits); OpenHands' hooks-config schema and persona format remain genuinely unconfirmed (no live account exists to verify — not fabricated). Two closeable gaps were real and got closed:
+  - **Cursor `.cursor/rules/*.mdc` skill translation** (40 files) — previously left out of scope since `.mdc`'s frontmatter (`description`/`globs`/`alwaysApply`) genuinely differs from `SKILL.md`'s (`name`/`description`). `generate-harness-adapters.mjs` gained a new `skills.mdcOutDir`/`mdcFrontmatter` mechanism; each skill is now a real translation (`alwaysApply: false`, empty `globs` — Cursor's own "Agent Requested" mode, the closest real analog to Claude Code's description-triggered skill invocation), not just the raw `SKILL.md` offered for manual reference.
+  - **Cursor `hooks.json` + `secret-guard.mjs`** — wires the 2 blockable lifecycle events (`beforeShellExecution`, `afterFileEdit`) to a self-contained port of the canonical hook's `decide()` logic, per Cursor's public Hooks schema. Fails open on unrecognized stdin shapes (no live install to confirm exact field names).
+  - **Gemini CLI `prompt-guard.mjs`** — a second hook ported (beyond the existing `secret-guard.mjs`/`plan-gate.mjs`), wired to `BeforeModel` as the closest confirmed analog to Claude Code's `UserPromptSubmit`.
+  - New `evals/cases/harness-completeness-pass-2026-07-27.md` — all shapes run for real against the actual generated/authored files, not asserted.
+- **Fixed a real, previously-merged bug**: a stray `<<<<<<< HEAD` conflict-marker line had been left in `CHANGELOG.md` by an earlier merge-conflict resolution in this same build (PR #122) and had already reached `main` — found and fixed in this pass, not a new regression introduced here.
+- **`scripts/check-repo-consistency.mjs` gained a 6th check**: scans every git-tracked file (excluding `vendor/`) for leftover `<<<<<<< `/`=======`/`>>>>>>> ` conflict-marker lines — the exact gap that let the bug above through undetected, since none of the 6 standard validators previously checked for this. Verified against a real injected conflict (caught, exit 1) and the clean repo (passes).
+
 ## [0.7.18] - 2026-07-27
 
 ### Added
