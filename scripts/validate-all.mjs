@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Runs the same 6 checks CI's `validate.yml` runs, in one command, instead of requiring whoever's
+// Runs the same 7 checks CI's `validate.yml` runs, in one command, instead of requiring whoever's
 // working in this repo to remember and type all 6 separately every time. This is dev-repo-only
 // tooling (root `scripts/`, never ships with the plugin) -- see AGENTS.md's "shipped vs. dev-only
 // scripts" boundary.
@@ -7,19 +7,37 @@
 // Real incident this addresses: PR #122 pushed a stray `<<<<<<< HEAD` conflict-marker line to
 // `main` because the person merging (an AI agent, across many sessions) ran some of the 6 checks
 // by hand but not all of them, and nothing forced the full set before the push. A single command
-// that runs everything removes the "did I remember all 6" question entirely.
+// that runs everything removes the "did I remember all 7" question entirely.
 //
 // Usage:
-//   node scripts/validate-all.mjs         -- all 6 checks (same set CI runs)
+//   node scripts/validate-all.mjs         -- all 7 checks (same set CI runs)
 //   node scripts/validate-all.mjs --fast  -- skips check-fixtures.mjs (the slowest -- it spins up
 //                                            67 real git projects) for a quick pre-commit gate;
 //                                            still run the full set before actually pushing.
 
 import { spawnSync } from 'node:child_process';
+import { readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+
+// Enumerate tests/<dir>/*.test.mjs explicitly rather than handing `node --test` a glob or a
+// directory. Two reasons: spawnSync runs without a shell, so no glob expansion happens for free;
+// and Node 20 (what CI pins) and Node 22 disagree on how they interpret glob/directory arguments
+// to --test. An explicit file list behaves identically on both. Scoped to tests/ deliberately --
+// a bare `node --test` also recurses into vendor/'s own tests, which aren't this repo's concern.
+function testFiles() {
+  const testsRoot = join(repoRoot, 'tests');
+  const files = [];
+  for (const entry of readdirSync(testsRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    for (const f of readdirSync(join(testsRoot, entry.name))) {
+      if (f.endsWith('.test.mjs')) files.push(`tests/${entry.name}/${f}`);
+    }
+  }
+  return files.sort();
+}
 
 const CHECKS = [
   { name: 'validate-structure', cmd: ['node', 'plugins/wingman/scripts/validate-structure.mjs'] },
@@ -28,6 +46,9 @@ const CHECKS = [
   { name: 'check-traceability', cmd: ['node', 'plugins/wingman/scripts/check-traceability.mjs'] },
   { name: 'check-harness-adapter-drift', cmd: ['node', 'plugins/wingman/scripts/check-harness-adapter-drift.mjs'] },
   { name: 'generate-harness-adapters --check', cmd: ['node', 'plugins/wingman/scripts/generate-harness-adapters.mjs', '--check'] },
+  // Kept in --fast: the suite runs in ~2.5s, cheap enough that a pre-commit hook still catches a
+  // broken test before the commit exists, which is the whole point of the hook.
+  { name: 'node --test', cmd: ['node', '--test', ...testFiles()] },
 ];
 
 function main() {

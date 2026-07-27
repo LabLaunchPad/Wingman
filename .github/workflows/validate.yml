@@ -29,3 +29,8 @@ jobs:
       - run: node plugins/wingman/scripts/check-traceability.mjs
       - run: node plugins/wingman/scripts/check-harness-adapter-drift.mjs
       - run: node plugins/wingman/scripts/generate-harness-adapters.mjs --check
+      # Scoped to tests/ deliberately: a bare `node --test` also recurses into vendor/'s own
+      # test files, which are pinned upstream reference repos and not this repo's concern.
+      # The glob is left unquoted so the shell expands it to explicit paths -- Node 20 (pinned
+      # above) and Node 22 disagree on how they handle glob/directory arguments themselves.
+      - run: node --test tests/*/*.test.mjs
