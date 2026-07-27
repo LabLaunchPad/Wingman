@@ -15,6 +15,14 @@ A phased verification system that runs after code changes to ensure quality.
 - When quality gates need to pass
 - During `wingman:build`'s Definition-of-Done security pass
 
+## Inputs
+
+The just-completed feature/change and which phases actually apply to it — not every phase fits every project (e.g. no type checker in a plain-JS project skips Phase 2, not a failure).
+
+## Escalation
+
+If Phase 8's debt-ceiling check finds a category over 50%, recommend a harvest pass before continuing rather than proceeding past a known-over-budget category — surface this in the report's "Issues to Fix," not silently.
+
 ## Verification Phases
 
 ### Phase 1: Build Verification

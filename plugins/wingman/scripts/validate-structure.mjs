@@ -168,20 +168,27 @@ for (const relPath of plugin.skills || []) {
   if (fm?.description && !/use when|use for|use proactively|triggers/i.test(fm.description)) {
     warnings.push(`skill ${relPath}: description doesn't contain an explicit "Use when..." trigger clause`);
   }
-  // Skill-anatomy: the self-detection triad this project requires of every
-  // skill (Rationalizations, Red Flags, Verification) is what makes a skill's
-  // own failure modes catchable. Missing sections is a warning, not an error,
-  // because a skill may legitimately use equivalent headings (e.g.
-  // systematic-debugging's "Iron Law" / "Common Rationalizations") -- but the
-  // concepts should all be present. Matched on concept, not exact heading.
+  // Skill-anatomy: as of 2026-07-27, extended from a 3-concept triad to the full 6-field
+  // contract adopted from a founder-supplied blueprint review (Trigger / Inputs / Procedure /
+  // Output schema / Stop condition / Escalation). Trigger is already separately checked above
+  // (the frontmatter description's "Use when..." clause) and Procedure is already the house
+  // "Core Workflow" heading every skill already has -- neither needed a new check. The 3
+  // genuinely new concepts checked here (Inputs, Output, Escalation) plus the pre-existing
+  // Rationalizations/Red Flags/Verification triad give 6 total. Missing sections is a warning,
+  // not an error, since a skill may legitimately use an equivalent heading (e.g.
+  // systematic-debugging's "Iron Law" / "Common Rationalizations") -- concepts should all be
+  // present, matched on concept, not exact heading.
   const body = skillText;
   for (const [concept, re] of [
     ['Rationalizations', /rationaliz/i],
     ['Red Flags', /red flag/i],
     ['Verification', /\bverif/i],
+    ['Inputs', /##\s*inputs/i],
+    ['Output', /##\s*output/i],
+    ['Escalation', /##\s*escalat/i],
   ]) {
     if (!re.test(body)) {
-      warnings.push(`skill ${relPath}: no "${concept}" content found — the self-detection triad (Rationalizations/Red Flags/Verification) is what makes a skill's own failure modes catchable; confirm an equivalent exists`);
+      warnings.push(`skill ${relPath}: no "${concept}" content found — the 6-field skill contract (Trigger/Inputs/Procedure/Output/Stop/Escalation) is what makes a skill's own scope, contract, and failure modes catchable; confirm an equivalent exists`);
     }
   }
   if (fm?.name) {

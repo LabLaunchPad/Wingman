@@ -83,6 +83,14 @@ Non-trivial logic (a branch, a loop, a parser, a money/security path) leaves ONE
 
 This rule bridges minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works.
 
+## Inputs
+
+The task/bug description and the current intensity level (lite/full/ultra) — the ladder's stopping point depends on which level is active.
+
+## Escalation
+
+When Step 2's ambiguity is genuinely consequential (more than one reasonable interpretation, and picking wrong is expensive to undo), ask the founder rather than silently choosing one — this is the one point in the workflow where minimalism doesn't mean "decide fast," it means "confirm cheaply before building."
+
 ## Rationalizations
 
 | Excuse | Reality |

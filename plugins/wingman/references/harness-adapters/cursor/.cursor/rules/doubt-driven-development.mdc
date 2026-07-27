@@ -94,6 +94,18 @@ Doubt should shape *what* you test, not just *that* you test. Before writing a t
 
 If you can't name what a test is protecting against, the test is theater. Rewrite it with a clear purpose.
 
+## Inputs
+
+The specific claim you're about to make ("this is correct," "tests are sufficient," "this is safe to ship") and the evidence you currently have for it, if any.
+
+## Output
+
+No artifact — a documented resolution: the named doubt, the evidence gathered, and the decision it produced (proceed, or fix the gap). Consumed by `verification-before-completion` as the evidence layer beneath a completion claim.
+
+## Escalation
+
+If Step 3 (gather evidence) genuinely can't be completed — the target environment isn't reachable, the tooling to check doesn't exist — say so plainly and flag it as a known, unresolved gap rather than silently treating the doubt as resolved.
+
 ## Anti-Rationalization Defense
 
 The greatest threat to doubt-driven development is your own ability to explain away doubts. Watch for these patterns:

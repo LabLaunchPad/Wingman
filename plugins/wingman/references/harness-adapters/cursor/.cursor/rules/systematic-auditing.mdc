@@ -29,6 +29,14 @@ Whenever thoroughness is explicitly signaled — "audit this," "evidence-driven,
 
 **5. Record durable lessons — including *why* this pass caught what a single pass didn't.** Append to this project's existing durable-learning location (`LEARNINGS.md`, a decisions log, `docs/wingman/retros.md` — whichever this project already uses). The mechanism-level lesson (what kind of check this was, why it needed a separate pass) is often more valuable long-term than the specific bug found.
 
+## Inputs
+
+The thing to audit (a codebase, a PR, a feature) and, if given, the specific concern that triggered thoroughness — a vague "make sure this is good" still needs Step 1's scoping before dispatch.
+
+## Escalation
+
+A finding that's genuinely large or ambiguous (a business tradeoff, an architecturally significant change) gets logged as a durable follow-up and routed to the founder via `plain-language-checkpoint` — never fixed hastily just to close the audit, and never silently dropped either.
+
 ## Constraints
 
 **MUST:**
