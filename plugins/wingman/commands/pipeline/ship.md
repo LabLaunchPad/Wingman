@@ -5,11 +5,11 @@ argument-hint: "[optional: target branch, defaults to the repo's default branch]
 
 # Wingman: Ship
 
-This is the last stop before code leaves the founder's laptop and becomes real. Nothing here should require the founder to understand git, CI, or pull requests — they get a plain-language "here's what's going out and why" summary and a single decision to make.
+The fourteenth and last of Wingman's 14 pipeline stages, and the first stage of **Phase 6: Launch & Iterate** (with `telemetry.md` for Monitor Drop-offs and `post-launch.md` for Iterate, both adaptive commands run after this one) — that phase's goal is to ship, listen, and feed real usage back into the plan. This is the last stop before code leaves the founder's laptop and becomes real. Nothing here should require the founder to understand git, CI, or pull requests — they get a plain-language "here's what's going out and why" summary and a single decision to make. Connect the repo to its deploy target for CI/CD (e.g. Vercel/Netlify) and set up a domain if this is the project's first ship.
 
 $ARGUMENTS
 
-## Preflight checks
+## Ship.1: Preflight checks
 
 Use the `department-lead-activation` skill to check the DevOps activation signal: if this project has CI config, a Dockerfile, or has shipped once already (check `.wingman/checkpoints.jsonl` for a prior `ship` stage entry), create `dept-devops` (if it doesn't exist yet) and delegate the deployment-mechanics portion of this stage to it.
 
@@ -24,7 +24,7 @@ Before shipping, confirm all of the following, and stop with a plain-language ex
 3. **On a feature branch** — not committing straight to the default branch. `build.md`'s "Before starting" step checks this out before any commit lands, so this should already be satisfied; if it isn't (e.g. a manual commit landed outside the pipeline), stop and offer to create one now rather than shipping straight from the default branch.
 4. **Remote + auth available** — a git remote is configured and, if opening a PR, the `gh` CLI (or the GitHub MCP tools available in this session) can actually create it.
 
-## Push and open the change for review
+## Ship.2: Push and open the change for review
 
 Use the `git-pr-workflow` skill for the mechanics below — it's written to work with plain `git`
 and the `gh` CLI, so it holds up regardless of which coding agent is actually driving this session.
@@ -36,7 +36,7 @@ and the `gh` CLI, so it holds up regardless of which coding agent is actually dr
 3. Open the PR as a draft (per `git-pr-workflow`'s draft-first default), then poll until checks are
    green before marking it ready for review — never mark it ready while checks are still pending.
 
-## Report in plain language
+## Ship.3: Report in plain language
 
 Tell the founder:
 
@@ -50,7 +50,7 @@ Tell the founder:
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — Planning Milestone and Build done, Ship now the current stage.
 
-## Gate checklist
+## Ship.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -60,7 +60,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** whether the release is safe to ship now.
 - **Gate passes only if** deploy verification passed and a rollback plan is ready.
 
-## Boardroom checkpoint
+## Ship.5: Boardroom checkpoint
 
 Run `/wingman:boardroom diff` one last time before merging, so the founder gets a final plain-language go/no-go rather than being asked to interpret CI output themselves — every pipeline stage ends in a checkpoint, `ship` included, not just the "meaningful" ones (that judgment call is exactly the kind of code-review-substitute decision the Boardroom exists so the founder never has to make alone).
 
@@ -69,7 +69,7 @@ Must-include item is present and every Must-decide question is answered. If the 
 the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
 "needs work."
 
-## After shipping
+## Ship.6: After shipping
 
 Suggest the adaptive stages that make sense next, without forcing them:
 - `/wingman:launch` if this is worth telling users/customers about publicly (a changelog entry, docs, or an announcement).

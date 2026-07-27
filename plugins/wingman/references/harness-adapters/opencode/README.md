@@ -138,14 +138,98 @@ top-level `.js` file under `.opencode/plugin/` and silently fails the *whole mod
 named export isn't itself a function — a bare `export { SECRET }` (a regex array) broke
 `secret-guard.js`'s own registration. Fixed by exposing it via a `getSecretPatterns()` accessor.
 
-**No confirmed analog**: `stop-loop.js` — `session.idle` fires and `client.session.prompt()` is a
-real, callable method, but two live tests showed `opencode run`'s one-shot process exits before a
-plugin-triggered follow-up turn actually completes. Only the pure logic (`evaluate`,
-`extractAssistantText`, `loadLoopConfig`) is ported, with no plugin wiring — see
-`SESSION-LIFECYCLE-FINDINGS.md` for the full investigation.
+**No confirmed analog at the time**: `stop-loop.js` — `session.idle` fires and
+`client.session.prompt()` is a real, callable method, but two live tests showed `opencode run`'s
+one-shot process exits before a plugin-triggered follow-up turn actually completes. Only the pure
+logic (`evaluate`, `extractAssistantText`, `loadLoopConfig`) was ported, with no plugin wiring at
+the time — see `SESSION-LIFECYCLE-FINDINGS.md` for the full investigation, and the section below for
+what changed.
 
 90 new `node:test` cases across 6 files under `../../../../../tests/opencode-gate/` cover every
 ported pure function, independent of the live-wiring question.
+
+## Closing three real gaps: `opencode serve`, warning visibility, and a new custom tool (2026-07-25)
+
+Follow-on work to the hook-porting pass above, targeting three specific, previously-disclosed gaps.
+Same testing discipline as everything above: real `opencode run`/`opencode serve` processes against
+`opencode/deepseek-v4-flash-free` (zero cost, zero API key), never `opencode debug agent --tool`
+(confirmed elsewhere in this adapter to bypass the whole plugin/hook pipeline).
+
+**1. `stop-loop.js` is now a real, WIRED plugin — CONFIRMED WORKING for one automatic continuation
+per externally-driven turn.** The earlier "no confirmed analog" verdict tested only `opencode run`'s
+one-shot CLI mode. This pass tested `opencode serve` (a real long-lived HTTP server, started with
+`opencode serve --port <N>`) instead, driven directly over its HTTP API:
+
+```
+curl -s -X POST http://127.0.0.1:<port>/session -d '{}'
+curl -s -X POST http://127.0.0.1:<port>/session/<id>/message \
+  -d '{"model":{"providerID":"opencode","modelID":"deepseek-v4-flash-free"},
+       "parts":[{"type":"text","text":"For every message... reply WORKING_STILL..."}]}'
+```
+
+`stop-loop.js`'s `event()` handler reacted to `session.idle`, found the configured
+`completionPromise` missing, and called `client.session.prompt(...)` with a real follow-up. `GET
+/session/<id>/message` afterward showed a genuine second completed turn. A live SSE listener on
+`/event` additionally found an important, honest caveat: `session.idle` does NOT re-fire after a
+turn the plugin itself triggered — so this confirms one automatic "keep going" nudge per external
+turn, not a self-sustaining N-iteration autonomous loop. See `stop-loop.js`'s own header comment and
+`SESSION-LIFECYCLE-FINDINGS.md` section 3 for the full write-up, including a costly, non-obvious
+loader bug this pass found and fixed along the way (a pure function returning `null` when
+misinvoked as a plugin factory crashed the entire server — fixed by moving pure logic to the new
+`.opencode/plugin/lib/stop-loop-logic.js`, a path OpenCode's plugin auto-discovery does not scan).
+
+**2. Warnings now reach the model's own context — CONFIRMED WORKING via `experimental.chat.system.
+transform`.** `output-scanners.js` and `session-monitor.js` both previously disclosed that their
+warnings never reached the model, only stderr/a log file. This pass found
+`experimental.chat.system.transform` (a documented experimental hook, `output.system: string[]`) can
+inject text into the system prompt for the *next* real turn. Both files now ALSO push onto a shared
+`.wingman/pending-warnings.json` queue (`.opencode/plugin/lib/pending-warnings.js`); a new
+`.opencode/plugin/warning-relay.js` drains it into `output.system` once per turn. Confirmed
+end-to-end, live: a real bash call surfaced a fake secret, `output-scanners.js` queued a warning, and
+the very next turn's model response said:
+
+```
+Yes, there is a pending-warning system note visible in this conversation's system prompt. It states:
+> Wingman: 1 pending warning(s) from earlier tool activity this session, not yet surfaced to you:
+> 1. Wingman secret-scanner: a secret was surfaced in a bash response (matched 1 pattern(s))...
+```
+
+A real, costly bug was found and fixed along the way: `experimental.chat.system.transform` fires
+TWICE per turn — once for OpenCode's own internal title-generation call, once for the real agent
+call — and the title call fires FIRST. A naive first version drained the queue into the throwaway
+title generator's system prompt, silently losing every warning before the real agent ever saw it.
+The fix: skip the drain entirely when `output.system` looks like the title generator's own prompt (a
+stable content check — confirmed live, since neither `input` nor `output` expose a documented
+"is this the title call" field). See `warning-relay.js`'s own header comment for the full A/B.
+
+**3. A genuinely new capability: `wingman_boardroom_verdict`, a real custom tool — CONFIRMED
+WORKING.** `tool.definition` turned out to be the wrong primitive (it only modifies an *existing*
+tool's description/parameters). The real mechanism is a plugin's returned hooks object having a
+`tool` key, built with `@opencode-ai/plugin`'s own `tool()` helper (OpenCode auto-manages this as a
+real dependency in a target project's `.opencode/node_modules` — confirmed live, no manual install
+step needed). `.opencode/plugin/boardroom-verdict-tool.js` reads `.wingman/checkpoints.jsonl`
+directly and returns the latest Boardroom verdict, formatted in plain language, with no Bash
+roundtrip. Live-tested against a fixture checkpoint (`bottom_line: "DO NOT SHIP"`, one NO_GO seat):
+
+```
+> Use the wingman_boardroom_verdict tool to check whether this project is cleared to ship.
+⚙ wingman_boardroom_verdict  Boardroom verdict: DO NOT SHIP
+Bottom line: DO NOT SHIP. Reason: The CISO issued a NO_GO verdict during the build stage.
+The CTO approved, but the CISO's block is enough to hold the release.
+```
+
+**A genuine negative finding, logged honestly rather than dropped**: `permission.ask` was
+investigated as a candidate `AskUserQuestion`-style risk-acceptance gate, and confirmed NOT to fire
+at all in `opencode run`'s non-interactive mode — for an allowed in-project command, a denied
+out-of-project command, and a command another hook already blocked. OpenCode's own permission engine
+appears to auto-allow/auto-reject in this mode without ever consulting the plugin hook layer, the
+same category of finding already recorded for `plan_exit` in `wingman-gate.js`. See
+`SESSION-LIFECYCLE-FINDINGS.md` section 4 for the exact scenarios tested.
+
+27 new `node:test` cases across 3 new files (`opencode-warning-relay.test.mjs`,
+`opencode-boardroom-verdict-tool.test.mjs`, plus additions to `opencode-session-lifecycle.test.mjs`
+for the new `extractLoopSignals` helper) cover every new pure function; all 116 tests in
+`tests/opencode-gate/` pass.
 
 ## Install
 

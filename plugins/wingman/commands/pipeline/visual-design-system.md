@@ -5,17 +5,17 @@ argument-hint: "[optional: focus area, e.g. a specific component]"
 
 # Wingman: Visual Design System
 
-The ninth of Wingman's 14 pipeline stages. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later.
+The ninth of Wingman's 14 pipeline stages, and the last stage of **Phase 3: Lean Design & Prototyping**. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`/`wireframes.md`. This stage produces the actual spec/tokens document — typography scale, spacing scale, color palette, component inventory, and interaction states (default/hover/focus/disabled/error) — that Wingman's bundled `design-taste` skill then enforces as the quality bar at `/wingman:build` time. This stage writes the bar; `design-taste` holds the line against it later. When an AI code-generation tool (e.g. v0.dev, Bolt) is used to scaffold the frontend from this spec, keep the prompt scoped to the tokens document itself (e.g. "build a minimalist, professional dashboard using Tailwind CSS and React, per this token spec") rather than improvising a new visual language.
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## Visual Design System.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow`/`/wingman:wireframes` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check whether this project has crossed the 3+ conditionally-activated-department-lead complexity threshold (Design/Data/Legal-Security/DevOps/Growth only — never counting the always-active Product/Engineering/QA) — if so, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Write the design system spec
+## Visual Design System.2: Write the design system spec
 
 For each `WF-*` wireframe in scope, derive the concrete design tokens and component states it needs: typography (a small type scale, not a font-per-screen), spacing (a scale, not arbitrary pixel values), color (a limited palette with defined roles — primary/secondary/error/success/neutral — not an unbounded set), the reusable component inventory this project actually needs (buttons, inputs, cards, etc. — only what's used, never a speculative full library), and each interactive component's states (default/hover/focus/disabled/error, at minimum). Tag each row with the `VS-` traceability prefix, pointing back to the `WF-*` wireframe(s) it specs for.
 
@@ -29,12 +29,12 @@ Append this section to a scratch visual-design-system doc (`docs/wingman/visual-
 | VS-001 | <e.g. "Primary button"> | <e.g. default/hover/focus/disabled color+spacing values> | WF-001 |
 ```
 
-## Where you are
+## Visual Design System.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Visual Design System.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -43,7 +43,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the design direction, and the source of truth for it.
 - **Gate passes only if** the system is consistent and reusable across screens.
 
-## Visual Design System checkpoint
+## Visual Design System.5: Visual Design System checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own spec table above. The checkpoint checks
 the gate checklist above, not just the spec in general: it confirms every Must-include item is

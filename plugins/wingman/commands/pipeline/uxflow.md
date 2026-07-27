@@ -5,19 +5,34 @@ argument-hint: "[optional: focus area, e.g. a specific screen or flow]"
 
 # Wingman: UX Flow
 
-The seventh of Wingman's 14 pipeline stages. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:wireframes` rather than manufacturing screens that don't need to exist.
+The seventh of Wingman's 14 pipeline stages, part of **Phase 3: Lean Design & Prototyping**. Named `uxflow`, not `design`, to stay distinct from the bundled `design-taste` skill's own scope (which applies at build time to whatever gets built here). This stage is skipped entirely for projects with no user-facing surface (e.g. a pure backend service or CLI) — say so plainly and hand off to `/wingman:wireframes` rather than manufacturing screens that don't need to exist. Apply the "60-second rule": a first-time user must be able to land on the product and reach its core value in under a minute — no unnecessary signup barriers before that point.
 
 $ARGUMENTS
 
-## Confirm the Design department is active
+## UX Flow.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the flow-design portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
 
 Immediately after (only if `dept-design` is active), use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, check every currently-missing manager whose department lead is active, not just `mgr-design`.
 
-## Design the flow
+## UX Flow.2: Design the flow
 
-For each `ARCH-*` decision that touches a user-facing surface, sketch the screens/states/transitions a user actually moves through — not visual polish (that's `design-taste`'s job at build time), just the shape of the experience: what a user sees, in what order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing back to the `ARCH-*`/`DEF-*` chain it satisfies.
+**Trace to whichever upstream IDs actually exist yet.** In the 14-stage pipeline, `uxflow` is
+stage 7 — `architecture.md` (stage 11, mints `ARCH-*`) hasn't run yet at this point, so `ARCH-*`
+IDs will not exist in a real end-to-end run reaching this stage in order (confirmed directly by a
+real maintainer-mode dogfood run, `docs/wingman/retros.md` 2026-07-25/26 — this text still referred
+to `ARCH-*` from before the v20 stage-reorder, when Architecture ran immediately before UX Flow).
+Trace instead to the `IA-*`/`DEF-*` chain, which is already available by this stage. If this command
+is ever invoked standalone against a fixture/project that already has `ARCH-*` decisions on file
+(e.g. an older 7-stage-shaped project, or a targeted eval), tracing to those is still correct too —
+use whichever of `ARCH-*`/`IA-*`/`DEF-*` is the most immediate real upstream artifact on disk, never
+a stage that hasn't produced output yet.
+
+For each in-scope upstream decision/requirement that touches a user-facing surface, sketch the
+screens/states/transitions a user actually moves through — not visual polish (that's
+`design-taste`'s job at build time), just the shape of the experience: what a user sees, in what
+order, and what each state lets them do next. Tag each with the `UX-` traceability prefix, pointing
+back to the upstream ID(s) it satisfies.
 
 Append this section to a scratch UX-flow doc (`docs/wingman/uxflow/<short-slug>.md` in the
 founder's project, creating the directory if needed — same slug as the earlier stages' files,
@@ -28,10 +43,10 @@ same convention):
 
 | ID | Screen/state | User can... | Satisfies |
 |---|---|---|---|
-| UX-001 | <screen or state name> | <the actions available here> | ARCH-001 |
+| UX-001 | <screen or state name> | <the actions available here> | IA-001 |
 ```
 
-## Show the flow, not just the table
+## UX Flow.3: Show the flow, not just the table
 
 Immediately after the table, use `skills/visual-founder-output` to render the same rows as an
 actual flow diagram — detect the session's rendering tier first, then follow
@@ -41,7 +56,7 @@ screen, published as an Artifact). The table stays exactly as written above — 
 `check-traceability.mjs` parses — the diagram is generated from the same rows, added alongside it,
 never instead of it.
 
-## Gate checklist
+## UX Flow.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -50,7 +65,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Must decide:** the core flow, and how exceptions get handled.
 - **Gate passes only if** the main flow and its key exceptions both exist.
 
-## UX Flow checkpoint
+## UX Flow.5: UX Flow checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own UX flow table and diagram above (skip
 this step, same as the rest of this stage, if there is no user-facing surface). The checkpoint checks

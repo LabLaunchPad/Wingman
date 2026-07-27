@@ -60,26 +60,33 @@ Rendered fresh each time from `.wingman/state.json` (`current_stage`) and `.wing
 
 ```
 Wingman pipeline
-├─ 1. Discovery                    ✔ done — cleared 2026-07-15
-├─ 2. Research Synthesis           ✔ done — cleared 2026-07-15
-├─ 3. Personas & Jobs              ✔ done — cleared 2026-07-15
-├─ 4. Journey Mapping              ✔ done — cleared 2026-07-15
-├─ 5. Define                       ✔ done — cleared 2026-07-16
-├─ 6. Information Architecture     ▶ you are here
-├─ 7. UX Flow                      ○ not started
-├─ 8. Wireframes                   ○ not started
-├─ 9. Visual Design System         ○ not started
-├─ 10. Prototype & Usability       ○ not started
-├─ 11. Architecture                ○ not started
-├─ 12. Implementation Planning     ○ not started
-├─ Build                           ○ not started
-└─ Ship                            ○ not started
+├─ Phase 1: Problem Definition & Market Validation
+│  ├─ 1. Discovery                 ✔ done — cleared 2026-07-15
+│  ├─ 2. Research Synthesis        ✔ done — cleared 2026-07-15
+│  └─ 3. Personas & Jobs           ✔ done — cleared 2026-07-15
+├─ Phase 2: Logic & Functional Mapping
+│  ├─ 4. Journey Mapping           ✔ done — cleared 2026-07-15
+│  └─ 5. Define                    ✔ done — cleared 2026-07-16
+├─ Phase 3: Lean Design & Prototyping
+│  ├─ 6. Information Architecture  ▶ you are here
+│  ├─ 7. UX Flow                   ○ not started
+│  ├─ 8. Wireframes                ○ not started
+│  └─ 9. Visual Design System      ○ not started
+├─ Phase 4: AI-Assisted Architecture & Build
+│  ├─ 10. Prototype & Usability    ○ not started
+│  ├─ 11. Architecture             ○ not started
+│  ├─ 12. Implementation Planning  ○ not started
+│  └─ Build                        ○ not started   (Phase 5: Testing, Security & QA runs inside Build's own DoD gate — no separate row)
+└─ Phase 6: Launch & Iterate
+   └─ Ship                         ○ not started
 ```
 
-- One row per pipeline stage (all 14, per `docs/ARCHITECTURE.md` §4d), each with its own checkpoint
-  status — no bundled row and no bracketed sub-stage list; every stage 1–12 records its own solo
-  checkpoint (`schema_version: 5`, see `docs/DATABASE.md`), so every row's status is read directly
-  from its own `checkpoints.jsonl` entry.
+- One row per pipeline stage (all 14, per `docs/ARCHITECTURE.md` §4d), nested one level under its
+  **Phase** group (the 6 phases from §4e) for orientation — the phase grouping is purely a visual
+  nesting layer, not a new state field; each stage row's status is still read directly from its own
+  `checkpoints.jsonl` entry, exactly as before. Phase 5 has no stage row of its own — annotate it as
+  a parenthetical note on the Build row, matching how `build.md` itself folds those three sub-checks
+  into its Definition-of-Done gate rather than a separate stage.
 - Marker legend: `✔ done` (checkpoint recorded, `GO` or founder chose "ship it" after `GO WITH
   CHANGES`), `▶ you are here` (current stage per `state.json`), `○ not started`.
 - If the current/most recent checkpoint's `bottom_line` was `DO NOT SHIP`, replace `▶ you are here`
@@ -89,10 +96,10 @@ Wingman pipeline
   user-facing surface)` rather than `○ not started`, so the tree doesn't read as if those stages are
   still pending.
 
-**Tier A (Artifact, rendered status strip):** the same 14-row structure as a small vertical step
-indicator (each stage its own labeled row, current row highlighted, done rows checked, skipped rows
-dimmed) — no extra chrome, no separate app shell; this is one element inside the boardroom report's
-Artifact, not a standalone dashboard.
+**Tier A (Artifact, rendered status strip):** the same 14-row structure, grouped under its 6 Phase
+headers as a small vertical step indicator (each stage its own labeled row, current row highlighted,
+done rows checked, skipped rows dimmed) — no extra chrome, no separate app shell; this is one element
+inside the boardroom report's Artifact, not a standalone dashboard.
 
 ---
 

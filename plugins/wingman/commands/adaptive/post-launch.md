@@ -5,7 +5,7 @@ argument-hint: "[optional: what to focus the review on, e.g. a specific feature 
 
 # Wingman: Post-Launch
 
-An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review.
+An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review. Corresponds to "Iterate" in **Phase 6: Launch & Iterate** (see `ship.md`): when a real bug or gap surfaces, the fix is a plan/AI-PRD update handed back to the build stage, not a hand-patch applied outside the pipeline.
 
 $ARGUMENTS
 

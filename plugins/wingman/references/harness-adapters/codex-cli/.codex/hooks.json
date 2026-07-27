@@ -35,6 +35,98 @@
           }
         ]
       }
-    ]
+    ],
+    "_PostToolUse_comment": "Added in a follow-up 2026-07-25 pass, same research session as the hooks above. A direct fetch of learn.chatgpt.com/docs/hooks confirmed PostToolUse's payload field for a tool's output is `tool_response` -- the same field name Claude Code uses, so secret-scanner.mjs/content-injection-scanner.mjs/session-health.mjs/context-monitor.mjs all port over with no field-name translation for that half. No matcher is set below (fires on every tool call), matching each canonical hook's own 'all tools' registration. Still schema-confirmed only, not live-tested -- same discipline as the PreToolUse hooks above.",
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/secret-scanner.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/secret-scanner.mjs -- warn-only (never blocks): flags a secret that surfaced in a tool's OUTPUT (e.g. an echoed token), complementing secret-guard.mjs's input-side block above.",
+            "timeout": 10,
+            "statusMessage": "Wingman: scanning tool output for secret patterns"
+          },
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/content-injection-scanner.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/content-injection-scanner.mjs -- warn-only: flags prompt-injection phrasing surfacing in fetched/read content (a web page, a file, a PR comment), not just the founder's own prompt (see prompt-guard below).",
+            "timeout": 10,
+            "statusMessage": "Wingman: scanning tool output for prompt-injection phrasing"
+          },
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/session-health.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/session-health.mjs -- tracks a per-project tool-call count, warns YELLOW at 40 and RED at 60, writes .wingman/session-health.json.",
+            "timeout": 10,
+            "statusMessage": "Wingman: tracking session health"
+          },
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/context-monitor.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/context-monitor.mjs -- estimates context-window usage from payload size and tracks scope creep (files edited outside the project root). The scope-creep half is a genuine ADAPTATION, not a direct port: it parses apply_patch's own V4A patch-header lines ('*** Update File: ...') out of tool_input.command to recover a file path, since Codex's apply_patch has no separate file_path field the way Claude Code's Edit/Write do -- see the script's own header comment for the full disclosure of what's confirmed vs. inferred here.",
+            "timeout": 10,
+            "statusMessage": "Wingman: monitoring context usage and scope"
+          }
+        ]
+      }
+    ],
+    "_UserPromptSubmit_comment": "Added in the same 2026-07-25 pass: UserPromptSubmit is CONFIRMED to exist (fires 'before model processes user input', per the docs) with the prompt text in a field literally named `prompt` -- the exact same field name Claude Code uses. This was a genuinely open question earlier passes of this adapter left unresolved ('no confirmed UserPromptSubmit analog'); it's real. No matcher is supported for this event (matcher values are documented as ignored if configured), matching the registration below.",
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/prompt-guard.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/prompt-guard.mjs -- scans the founder's own prompt for classic injection phrasing (instruction override, role hijack, system-prompt reveal, exfiltration) before the model sees it.",
+            "timeout": 10,
+            "statusMessage": "Wingman: scanning prompt for injection phrasing"
+          }
+        ]
+      }
+    ],
+    "_SessionStart_comment": "Added in the same 2026-07-25 pass: SessionStart is CONFIRMED to exist, with matcher values startup/resume/clear/compact (a strict superset of Claude Code's own startup/resume/clear -- Codex additionally re-fires SessionStart after a compaction). No matcher set below, so it fires on all four, matching the canonical hook's own 'run on every session start' behavior.",
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/session-start.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/session-start.mjs -- initializes .wingman/state.json on first run and surfaces a summary of the previous session (tool-call count, warnings) via systemMessage.",
+            "timeout": 10,
+            "statusMessage": "Wingman: loading session state"
+          }
+        ]
+      }
+    ],
+    "_PreCompact_comment": "Added in the same 2026-07-25 pass: PreCompact is CONFIRMED to exist, matcher values manual/auto (same pair Claude Code uses). Genuine disclosed gap: PreCompact's documented input fields (trigger, turn_id, session_id) do NOT include cwd, unlike SessionStart/PreToolUse/PostToolUse -- the script below falls back to process.cwd() when cwd is absent from the payload, same defensive fallback the canonical hook already used.",
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/pre-compact-guard.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/pre-compact-guard.mjs -- warn-only: reminds the agent to commit/checkpoint real uncommitted work before its reasoning gets compacted away.",
+            "timeout": 15,
+            "statusMessage": "Wingman: checking for uncommitted work before compaction"
+          }
+        ]
+      }
+    ],
+    "_Stop_comment": "Added in the same 2026-07-25 pass: Stop is CONFIRMED to exist (no matcher supported). TWO genuine, disclosed gaps versus Claude Code's own Stop: (1) documented input is turn_id/stop_hook_active/last_assistant_message -- no transcript_path, so the ported evaluate()'s stall-detection check (repeated identical tool calls) has no real data to run against here and is wired as a permanent no-op (always passed an empty array) until a real tool-call-history field is confirmed for this event; (2) no cwd field documented either -- the script falls back to process.cwd() unconditionally. The completion-promise and wall-clock-budget checks are unaffected by either gap and port over cleanly.",
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"<PATH-TO-YOUR-INSTALLED-WINGMAN-PLUGIN>/plugins/wingman/references/harness-adapters/codex-cli/.codex/hooks/stop-loop.mjs\"",
+            "_command_comment": "Ported from plugins/wingman/hooks/stop-loop.mjs -- opt-in autonomous loop, disabled unless .wingman/loop.json sets enabled: true. See the script's own header for the disclosed stall-detection gap.",
+            "timeout": 15,
+            "statusMessage": "Wingman: checking whether the loop's completion promise has been met"
+          }
+        ]
+      }
+    ],
+    "_dod_structural_gate_decision": "DELIBERATELY NOT PORTED as a Codex-native hook, despite PreToolUse's Bash matcher + tool_input.command now being fully confirmed (same schema secret-guard.mjs above already uses). plugins/wingman/scripts/dod-pre-push-check.mjs already reuses dod-structural-gate.mjs's exact pure functions (checkBoardroomVerdictClean, checkVerdictTranscriptionMatchesDetails, checkTestPresence, detectTestCommand, runTestSuite, checkThreatRegisterCleanAcrossArtifacts) as a real git pre-push hook, which fires at the git level under ANY harness -- including this one -- with zero Codex-specific wiring, exactly the same way the PreToolUse Bash matcher above already recommends for this exact gate (see its own _command_comment). Building a second, Codex-hooks.json-specific PreToolUse wrapper around the same pure functions would be pure duplication with no behavioral gain: both paths fire on the same `git push` command, gate on the same checkpoint data, and the git-level path additionally works for a human typing `git push` directly, which a Codex-hooks.json entry never would. No new file was added for this."
   }
 }

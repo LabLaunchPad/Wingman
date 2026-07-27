@@ -170,6 +170,33 @@ after `/wingman:ship` — it reviews usage/support signals and feeds findings ba
 checkpoint bundle) — it records an ordinary ad-hoc `"stage": "post-launch"` checkpoint entry like any
 other `/wingman:boardroom`-reviewed content that isn't part of the fixed 14-stage sequence.
 
+## 4e. Phase groupings (6 phases over the 14 stages) — presentation layer, not new state
+
+A founder-supplied reference workflow ("The Lean AI-Assisted SDLC for Solo Founders") groups an
+AI-assisted build process into 6 named phases. Checked against Wingman's own 14-stage order in §4d
+above: the sequence already matches, stage for stage — no reordering was needed, only naming the
+groups that were already implicit in the stage order. Each phase name and its high-level goal is
+recorded inline in the lead paragraph of every stage's own command file (not duplicated here or in a
+separate standalone doc) — this table is the cross-reference, stress-tested against those inline
+headers so the two never silently drift apart:
+
+| Phase | Goal | Stages (# in §4d) |
+|---|---|---|
+| **1. Problem Definition & Market Validation** | Make sure a founder is building something people actually want before spending any time managing an AI coding agent. | 1 Discovery, 2 Research Synthesis, 3 Personas & Jobs |
+| **2. Logic & Functional Mapping** | Translate the idea into a blueprint precise enough for an AI coding agent to build from. | 4 Journey Mapping, 5 Define |
+| **3. Lean Design & Prototyping** | Generate the UI visual layer quickly enough to get to the real build. | 6 Information Architecture, 7 UX Flow, 8 Wireframes, 9 Visual Design System |
+| **4. AI-Assisted Architecture & Build** | Act as the manager of the AI coding agent, not the coder. | 10 Prototype & Usability, 11 Architecture, 12 Implementation Planning, 13 Build |
+| **5. Testing, Security & QA** | Make sure the code an AI coding agent wrote is stable and secure. | No stage of its own — folded into Build's Definition-of-Done gate (§4d, stage 13) as three explicitly named sub-checks: Golden Dataset Regression, Security & Guardrails, Cost & Performance Control (see `skills/definition-of-done` and `skills/security-checklist`). |
+| **6. Launch & Iterate** | Ship, listen, and feed real usage back into the plan. | 14 Ship, plus two adaptive commands run afterward: `telemetry.md` (Monitor Drop-offs) and `post-launch.md` (Iterate) — neither is a pipeline stage in its own right (see §4d's note on `post-launch.md`). |
+
+**Exactly 6 phases, no more.** Phase 5 deliberately has no dedicated pipeline command or checkpoint
+of its own — adding a 15th stage for it would contradict `build.md`'s existing, founder-approved
+decision to fold `secure.md`'s dedicated threat picture into Build's own gate (§4d). The phase
+grouping is a founder-facing orientation label surfaced in `skills/visual-founder-output`'s
+pipeline-status tree (`references/visual-output-templates.md` §2) and each command's own lead
+paragraph — it introduces no new persisted state, no new `checkpoints.jsonl` field, and no change to
+which stage runs when.
+
 ## 5. Department leads (grow 0 → 8, per project)
 
 One lead subagent per corporate department. Each lead covers its department's *entire* remit through its own skills/checklists — it is not itself split into the 56+ sub-roles; those are specialist promotions (§6).

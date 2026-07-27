@@ -5,15 +5,15 @@ argument-hint: "[optional: path to the Research Synthesis output, defaults to th
 
 # Wingman: Personas & Jobs
 
-The third of Wingman's 14 pipeline stages. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template.
+The third of Wingman's 14 pipeline stages, and the last stage of **Phase 1: Problem Definition & Market Validation**. A persona document that nobody built anything from is decoration, not design input — every persona and job-to-be-done here must trace back to real evidence from Research Synthesis, never invented to fill out a template. Distill each job-to-be-done to a single sentence: "My user needs to do X, but currently struggles with Y, so this product will provide Z."
 
 $ARGUMENTS
 
-## Confirm the Product department is active
+## Personas & Jobs.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
-## Define personas and jobs
+## Personas & Jobs.2: Define personas and jobs
 
 Read the Research Synthesis output (from `/wingman:research-synthesis`, or the path given in `$ARGUMENTS`). For each theme with enough evidence behind it, define:
 
@@ -34,12 +34,12 @@ Append this section to a scratch personas-jobs doc (`docs/wingman/personas-jobs/
 | PJ-001 | <persona name/role> | <what makes them look for a solution> | <the actual pain, not a symptom> | <what they do today instead> | <what "better" looks like to them> | RS-001 |
 ```
 
-## Where you are
+## Personas & Jobs.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Personas & Jobs.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -50,7 +50,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
   supports first.
 - **Gate passes only if** the target user and the job to be done are both clear.
 
-## Personas & Jobs checkpoint
+## Personas & Jobs.5: Personas & Jobs checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own personas/jobs table above. The checkpoint
 checks the gate checklist above, not just the table in general: it confirms every Must-include item

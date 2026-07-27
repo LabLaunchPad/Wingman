@@ -5,15 +5,15 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 
 # Wingman: Research Synthesis
 
-The second of Wingman's 14 pipeline stages. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve.
+The second of Wingman's 14 pipeline stages, part of **Phase 1: Problem Definition & Market Validation**. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve. Frame this as the "Old Way vs. New Way" comparison: document concretely why the solutions the target user already has access to fail them.
 
 $ARGUMENTS
 
-## Confirm the Product department is active
+## Research Synthesis.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
-## Synthesize the research
+## Research Synthesis.2: Synthesize the research
 
 Read the Discovery output (from `/wingman:discovery`, or the path given in `$ARGUMENTS`). Do not just restate it — actively separate the signal from the noise:
 
@@ -34,12 +34,12 @@ Append this section to a scratch research-synthesis doc (`docs/wingman/research-
 | RS-001 | <one concrete theme, risk, opportunity, or open question> | <known / unknown / assumed> | DISC-001 |
 ```
 
-## Where you are
+## Research Synthesis.3: Where you are
 
 Use `skills/visual-founder-output` to add the pipeline-status tree (per
 `references/visual-output-templates.md` §2) after the table above.
 
-## Gate checklist
+## Research Synthesis.4: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
@@ -50,7 +50,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 - **Gate passes only if** the findings are grounded — every theme is tagged known/unknown/assumed,
   and no assumption is presented as a known fact.
 
-## Research Synthesis checkpoint
+## Research Synthesis.5: Research Synthesis checkpoint
 
 Run `/wingman:boardroom` with scope set to this stage's own synthesis table above. The checkpoint
 checks the gate checklist above, not just the table in general: it confirms every Must-include item

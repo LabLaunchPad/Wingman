@@ -32,6 +32,14 @@ Walk every item; for each, either confirm it holds with evidence or explicitly r
 6. **Docs in sync** — `CLAUDE.md` / `ARCHITECTURE.md` updated if the architecture changed; new artifacts attributed in `/ATTRIBUTIONS.md`.
 7. **Plain-language summary** — the founder gets a jargon-free go/no-go, not a raw diff (see `plain-language-checkpoint`).
 
+## Techniques for two Definition-of-Done items
+
+These two techniques back the "Tests" and a cost-aware reading of "Minimalism" above, and are what `commands/pipeline/build.md`'s Definition-of-Done gate names explicitly as its **Golden Dataset Regression** and **Cost & Performance Control** sub-checks (the gate's third sub-check, Security & Guardrails, is `security-checklist`'s job, not this skill's).
+
+**Golden Dataset Regression.** Maintain a small, concrete checklist of user scenarios (roughly 10 is plenty for an early-stage product) that exercise the product's core value paths. Every time a feature is added or changed, re-run every scenario on the checklist by hand — not just the scenario for the new feature — before calling the change done. A scenario that used to work and now doesn't is a regression, full stop, regardless of whether it touches the changed code path directly. Grow the checklist as new core paths get established; it should track what the product actually promises, not shrink to fit whatever the latest change happened to test.
+
+**Cost & Performance Control.** Any change that adds a new usage-scaling surface — a new API endpoint, a new expensive query or LLM call, a new externally-billed service call — needs a stated bound before it ships: a rate limit, a quota, or an explicit, logged reason none is needed yet (e.g. an admin-only internal tool with no public traffic). The point is preventing a single bug or bad actor from turning into an unbounded bill or a database spike, not achieving some specific performance number.
+
 ## Rationalizations
 
 | Excuse | Reality |

@@ -9,7 +9,7 @@ ready for the founder checkpoint, does a fresh agent actually walk every
 checklist item and demand evidence, or does it accept the green test suite
 and the "DONE" claim at face value?
 
-## Fixture
+## Fixture (Runs 1-2)
 
 `evals/fixtures/setup-dod-fixture.sh <target-dir>` — "Notify," a small Node
 welcome-notification module whose `STATUS.md` says the feature is "DONE...
@@ -25,6 +25,25 @@ suite and that claim, each a different DoD item:
    exercise the happy path.
 3. **Docs in sync** — `README.md` claims "email AND SMS notifications";
    `src/notify.js` only implements email. No SMS code exists anywhere.
+
+## Fixture (Run 3)
+
+`evals/fixtures/setup-golden-dataset-cost-fixture.sh <target-dir>` — "Widgets," a
+small Node inventory API, added to specifically exercise the skill's two newer
+techniques (added alongside `build.md`'s Golden Dataset Regression / Cost &
+Performance Control Definition-of-Done sub-checks, see `docs/ARCHITECTURE.md`
+§4e). `STATUS.md` claims DONE with 4/4 tests passing. Two real gaps, invisible
+to `npm test`:
+
+1. **Golden Dataset Regression** — `GOLDEN-SCENARIOS.md` scenario 3 requires
+   `list()` to return widgets oldest-first; a "list-view optimization" silently
+   flipped `src/store.js`'s sort to newest-first. The automated test only
+   checks length, never order, so the suite stays green through the
+   regression.
+2. **Cost & Performance Control** — `src/pricing.js`'s new `bulkPriceCheck`
+   loops over every widget in the store and fires one metered, per-call-billed
+   external API request per widget, with no batching, page cap, rate limit, or
+   documented reason none is needed.
 
 ## Procedure
 
@@ -57,7 +76,10 @@ suite and that claim, each a different DoD item:
 `verified` — Run 1 passed a project that insists it's done and isn't
 (three seeded gaps, all caught). Run 2 passed the complementary negative
 case: a genuinely complete project, confirming the skill says "yes,
-actually done" without manufacturing findings.
+actually done" without manufacturing findings. Run 3 (2026-07-26) confirmed
+the two newer techniques added to the skill (Golden Dataset Regression, Cost
+& Performance Control) are actually applied, not just present as prose — both
+seeded gaps caught, named correctly, with independently-verified evidence.
 
 ## Run log
 
@@ -145,3 +167,55 @@ Together, Run 1 (catches real, seeded violations) and Run 2 (doesn't
 manufacture violations against a clean project) establish both directions
 of the skill's central risk — false negatives and false positives — so
 the case is promoted to `verified`.
+
+### Run 3 — 2026-07-26
+
+**Purpose:** the skill file gained a new "Techniques for two Definition-of-Done
+items" section (Golden Dataset Regression, Cost & Performance Control) as part
+of folding the Lean AI-Assisted SDLC's Phase 5 (Testing, Security & QA) into
+`build.md`'s Definition-of-Done gate. Runs 1-2 predate this addition and never
+exercised it — this run tests specifically whether it changes real behavior,
+not just prose.
+
+Ran `evals/fixtures/setup-golden-dataset-cost-fixture.sh` into a scratch dir;
+starter suite passed clean (4/4) before the subagent touched anything — both
+seeded gaps (sort-order regression, unbounded pricing loop) are invisible to
+`npm test`, confirmed by inspection. Spawned a fresh subagent with only the
+updated `skills/definition-of-done/SKILL.md` and the fixture path (not told
+what was wrong), asked to verify `STATUS.md`'s "DONE... ready for the founder
+checkpoint" claim using the skill's own workflow.
+
+**Result: both new-technique gaps caught and named correctly:**
+
+- **Golden Dataset Regression** — correctly identified `src/store.js`'s
+  `list()` as sorting newest-first, contradicting both `README.md` ("oldest
+  first") and `GOLDEN-SCENARIOS.md` scenario 3, and correctly diagnosed *why*
+  the automated suite missed it: `test/store.test.js` only asserts length,
+  never order.
+- **Cost & Performance Control** — correctly identified `src/pricing.js`'s
+  `bulkPriceCheck` as an unbounded, per-call-billed external API loop with no
+  batching/cap/rate-limit/documented exception, and correctly noted the sole
+  test for it only ever exercises the 3-widget starter store.
+- **Final verdict:** NOT Definition-of-Done complete, both gaps named by file
+  and concrete behavior (not vague categories), no invented findings beyond
+  the 2 seeded gaps.
+
+**Independently verified here** (not trusting the subagent's self-report):
+
+```
+$ git status --porcelain          # empty -- audit-only, no edits made
+$ grep -n "sort(" src/store.js
+21:      return [...widgets].sort((a, b) => b.createdAt - a.createdAt);   # confirmed descending
+$ grep -n "createdAt\|order\|sort" test/store.test.js
+5:// This suite only checks length/membership, never order --            # confirmed no order assertion
+$ grep -n "for (const\|rate\|limit\|batch\|cap" src/pricing.js
+17:  for (const w of widgets) {                                          # confirmed unbounded loop, no guard
+$ npm test                        # 4/4 still green throughout
+```
+
+**Verdict:** the two techniques added to `skills/definition-of-done` in this
+change are not just prose — a fresh subagent given only the updated skill file
+catches both new failure modes for real, names them correctly, and correctly
+declines to advance a "DONE" claim that hides them. Combined with Runs 1-2's
+existing coverage of the skill's 7-item core checklist, `verified` trust level
+holds across the full updated skill.

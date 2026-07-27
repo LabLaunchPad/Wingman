@@ -26,6 +26,19 @@ Figure out what's in scope, in this order of preference:
 3. Otherwise, if there are uncommitted changes, review `git diff` (and `git diff --staged`).
 4. Otherwise, ask the user what they want reviewed.
 
+**A design-stage checkpoint reviews a plan, not already-built code.** Any of the 8 pre-Build
+pipeline checkpoints (Discovery through Architecture/Implementation-Planning) reviews a *decision
+about what Build will create* — the files/models/relations it names do not exist on disk yet, by
+design, and that absence is not itself a finding. A real maintainer-mode dogfood run (see
+`docs/wingman/retros.md`, 2026-07-25/26) hit this directly: a Boardroom seat reviewing an
+Architecture-stage document returned `NO_GO` because a schema model and a webhook file the document
+proposed didn't exist yet — the seat was correctly skeptical in general, but applied a diff-review
+standard (real code must already work) to a design-review scope (does this design, if built, close
+the risk). Before dispatching a checkpoint, tell each seat plainly which kind of scope this is —
+"this is a design document, judge whether the proposed approach is sound" vs. "this is a diff,
+judge whether the actual code closes the risk" — so a seat doesn't fail a pre-implementation stage
+for not yet containing implementation.
+
 **A cleared checkpoint is not a permanent guarantee against a later one.** A real dogfooding pass
 (see `docs/wingman/retros.md`) found this directly: a Build-stage diff cleared 8/8 `GO`, and a
 later Ship-stage checkpoint over nearly the same diff caught two real, valid findings the earlier

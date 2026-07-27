@@ -2,6 +2,40 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.11] - 2026-07-26
+
+### Added
+- **`skills/git-pr-workflow` enriched with two real, evidence-backed findings from an actual CI-outage + squash-merge-resync incident on this project's own PR #120**, not written speculatively: (1) a squash-merge boundary-verification technique — `git diff <candidate-commit> origin/<base> --stat` (empty = confirmed true squash point) — added to the resync step after a first guess one squash-cycle too early produced real cascading cherry-pick conflicts; (2) a new step 6 diagnosing CI checks that go silent entirely (test `workflow_dispatch` first to isolate Actions-health from event-delivery, before assuming a billing/config problem). Matching Rationalizations, Red Flags, and Verification entries added; frontmatter `description`/"When To Use" broadened to trigger on CI going silent, not just failing.
+- **`AGENTS.md`'s documented pre-commit validator list corrected to match CI's actual 6-check `validate.yml`**, closing a real gap the same incident exposed: the doc only named 4 Layer-1 validators (plus a separately-mentioned drift check), but CI also runs `generate-harness-adapters.mjs --check` — a distinct generator-freshness check the doc never mentioned at all. A locally-clean 4-validator pass had gone green while CI failed on this exact missing check. `docs/REGRESSION-CHECKLIST.md`'s Layer 1 section updated to match.
+- New `LEARNINGS.md` entries (3, `category=tooling`) and a full retro in `docs/wingman/retros.md` recording the incident's real evidence for future querying via `scripts/query-wingman-knowledge.mjs`.
+
+## [0.7.10] - 2026-07-26
+
+### Added
+- **6 named Phase groupings over the existing 14-stage pipeline**, adopted from a founder-supplied reference workflow ("The Lean AI-Assisted SDLC for Solo Founders"). Checked against the existing stage order first — it already matched the reference doc's sequence 1:1, so no stages were reordered; only naming and cross-referencing were added. Each phase's name and goal is now stated inline in the lead paragraph of every one of the 14 `commands/pipeline/*.md` files (and cross-referenced from `telemetry.md`/`post-launch.md` for Phase 6), plus a stress-tested summary table at `docs/ARCHITECTURE.md` §4e. No new persisted state, no new `checkpoints.jsonl` field — purely a founder-facing orientation layer.
+- **`build.md`'s Definition-of-Done gate gained three explicitly named sub-checks** — Golden Dataset Regression, Security & Guardrails, Cost & Performance Control — surfacing Phase 5 (Testing, Security & QA) as founder-visible PASS/FAIL lines rather than a generic "security reviewed." The first and third are backed by a new "Techniques" section in `skills/definition-of-done`; the second by the existing `skills/security-checklist`.
+- **`skills/visual-founder-output`'s pipeline-status tree** (`references/visual-output-templates.md` §2) now nests all 14 stage rows under their Phase group, with Build's row noting Phase 5 runs inside its own gate rather than as a separate row.
+- Re-copied the updated `definition-of-done` skill to its OpenCode adapter (`references/harness-adapters/opencode/.opencode/skills/`) to keep `check-harness-adapter-drift.mjs` clean.
+
+## [0.7.9] - 2026-07-26
+
+### Added
+- **Numbered sub-phases across all 14 pipeline commands.** Every real workflow section (`##` heading, excluding `References`) in each of the 14 `commands/pipeline/*.md` files now carries a globally-unique dotted ID — `Discovery.1: Understand the ask` through `Discovery.6: Discovery checkpoint`, `Build.1` through `Build.7`, etc. — for cross-referencing in retros, dogfood run records, and traceability. Previously only `discovery.md` had partial "Step 1/2/3" numbering (and even that stopped short of its own Gate/checkpoint sections); the other 13 files used plain, unnumbered descriptive headers. No new Boardroom checkpoints were added — purely a naming/tracking convention, zero functional change.
+- Regenerated all 73 harness-adapter files (`generate-harness-adapters.mjs --write`) to pick up the new sub-phase headers plus the earlier `dogfood.md`/`implementation-planning.md` fixes.
+
+## [0.7.8] - 2026-07-25
+
+### Added
+- **Codex CLI adapter: 8 more of the 9 shipped hooks ported, schema-confirmed against OpenAI's official Codex hooks docs** (no live Codex CLI install exists in this dev sandbox, so nothing here is claimed live-tested — only schema-confirmed): `prompt-guard.mjs` → `UserPromptSubmit`, `secret-scanner.mjs`/`content-injection-scanner.mjs` → `PostToolUse` (`tool_response` field), `context-monitor.mjs`/`session-health.mjs` → `PostToolUse`, `session-start.mjs` → `SessionStart`, `pre-compact-guard.mjs` → `PreCompact`, `stop-loop.mjs` → `Stop`. `dod-structural-gate.mjs`'s git-push half deliberately left unported as a new Codex-specific hook — `dod-pre-push-check.mjs` already covers it as a real git pre-push hook under any harness. 55 new tests.
+- **OpenCode adapter: closed 2 of the 3 remaining real gaps found during the hook-porting pass, plus a new native tool.**
+  - `stop-loop.js` (the ralph-loop) now CONFIRMED WORKING under a real `opencode serve` process (not the one-shot `opencode run`) — `session.idle` + `client.session.prompt()` genuinely completes one real automatic continuation per externally-driven turn (does not yet self-sustain a multi-iteration loop without an external trigger; disclosed plainly, not oversold).
+  - Output-scanner and session-monitor warnings now genuinely reach the model's own context via `experimental.chat.system.transform` (`warning-relay.js`, backed by a shared `.wingman/pending-warnings.json` queue) — previously these warnings only reached stderr/a log file.
+  - New `wingman_boardroom_verdict` custom tool (via the `tool()` helper from `@opencode-ai/plugin`) lets the model read the latest Boardroom checkpoint verdict directly, without a `Bash` roundtrip through `.wingman/checkpoints.jsonl`.
+  - `permission.ask` investigated and confirmed NOT reachable in `opencode run`'s non-interactive mode — logged honestly rather than forced in.
+  - Found and fixed a costly OpenCode loader bug along the way: it auto-invokes every named export as a plugin factory, and a pure function returning `null` crashed the entire server — fixed by moving pure logic outside auto-discovery (`.opencode/plugin/lib/`).
+  - 27 new tests (171 total across the OpenCode+Codex CLI adapters).
+- Fixed `plugins/wingman/commands/adaptive/dogfood.md`'s stale references to the old 7-stage pipeline — never updated when the pipeline expanded to 14 stages in v20 (0.7.0).
+
 ## [0.7.7] - 2026-07-25
 
 ### Added
