@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.17] - 2026-07-27
+
+### Added
+- **Cline harness adapter** (`plugins/wingman/references/harness-adapters/cline/`), Phase 4 of the founder-directed 6-harness build. Like OpenHands, capability findings come from the general capability-matrix pass, not a dedicated schema-verification pass — no hooks-config wiring file or Boardroom-persona adapter shipped (Cline has no subagent concept at all).
+- `plugins/wingman/scripts/harness-targets/cline.mjs` — new descriptor, using the existing `'perFile'` commands mode for Cline's real, documented `.clinerules/workflows/*.md` slash-command convention (24 files, `--check`-verified), plus a shared-skills contribution (offered for manual copying only — Cline's `.clinerules/*.md` files are always-active context, not on-demand skill invocation).
+- Capability profile: confirmed no parallel dispatch (`/newtask` is sequential context-reset, not concurrency) and no plan-gate (Plan/Act toggle is manual-only, no interception point) — both fall back to existing harness-agnostic mechanisms (`dod-pre-push-check.mjs`, sequential dispatch disclosure). Real `ask_followup_question` question tool confirmed (single-select).
+
 ## [0.7.16] - 2026-07-27
 
 ### Added
