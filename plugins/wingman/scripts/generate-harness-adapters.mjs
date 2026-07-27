@@ -144,6 +144,28 @@ async function buildTargets() {
         const content = body + harnessNoteBlock(primitives, target);
         targets.set(join(...target.commands.outDir.split('/'), `${name}.md`), content);
       }
+    } else if (target.commands.mode === 'toml') {
+      // This harness reads one TOML file per command (Gemini CLI: `commands/<name>.toml`, no `name`
+      // field -- the command's invocation name derives from its path, per real, confirmed schema).
+      // `prompt` carries the full canonical body (frontmatter stripped, $ARGUMENTS -> {{args}} per
+      // Gemini's real placeholder syntax) as a TOML literal multi-line string (`'''...'''`) so no
+      // escaping of quotes/backslashes in the body is needed; `description` comes from the
+      // canonical file's own frontmatter `description:` field, as a basic TOML string.
+      for (const { name, path } of commandEntries) {
+        const raw = readFileSync(path, 'utf-8');
+        const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+        const frontmatter = fmMatch ? fmMatch[1] : '';
+        const body = (fmMatch ? fmMatch[2] : raw).replace(/\$ARGUMENTS/g, '{{args}}');
+        const primitives = detectPrimitives(raw);
+        const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+        const description = (descMatch ? descMatch[1].trim() : name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        const note = harnessNoteBlock(primitives, target);
+        const promptBody = (body + note).replace(/'''/g, "'' '"); // guard against breaking the literal-string delimiter
+        const toml =
+          `description = "${description}"\n` +
+          `prompt = '''\n${promptBody}\n'''\n`;
+        targets.set(join(...target.commands.outDir.split('/'), `${name}.toml`), toml);
+      }
     } else if (target.commands.mode === 'folded') {
       // This harness has no per-file command primitive -- fold all commands into one
       // appendable reference file, each as its own section.
@@ -171,7 +193,7 @@ function outputDirsToClean(harnessTargets) {
   const sharedOutDirs = new Set(harnessTargets.filter((t) => t.skills?.sharedOutDir).map((t) => t.skills.sharedOutDir));
   for (const d of sharedOutDirs) dirs.add(d);
   for (const t of harnessTargets) {
-    if (t.commands?.mode === 'perFile') dirs.add(t.commands.outDir);
+    if (t.commands?.mode === 'perFile' || t.commands?.mode === 'toml') dirs.add(t.commands.outDir);
   }
   return [...dirs];
 }

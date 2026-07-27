@@ -47,6 +47,7 @@ over-engineering-review	evals/fixtures/setup-over-engineering-review-fixture.sh	
 package-manager-selection	evals/fixtures/setup-new-node-project.sh	plugins/wingman/skills/package-manager-selection/SKILL.md
 personas-jobs	evals/fixtures/setup-personas-jobs-fixture.sh	plugins/wingman/commands/pipeline/personas-jobs.md
 plain-language-checkpoint	(none: fixture is an inline raw-technical-finding scenario, not a setup-*.sh script)	plugins/wingman/skills/plain-language-checkpoint/SKILL.md
+plan-gate-mode-switch-intercept	(none: constructed inline, mirrors dod-pre-push-check.md's own convention for tiny fixtures)	plugins/wingman/references/harness-adapters/gemini-cli/hooks/plan-gate.mjs
 plan	(retired)	(retired)
 platform-native-reference	evals/fixtures/setup-platform-native-reference-fixture.sh	plugins/wingman/skills/platform-native-reference/SKILL.md
 ponytail-debt-harvesting	evals/fixtures/setup-ponytail-debt-harvesting-fixture.sh	plugins/wingman/skills/ponytail-debt-harvesting/SKILL.md

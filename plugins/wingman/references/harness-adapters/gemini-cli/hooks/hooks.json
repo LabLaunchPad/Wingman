@@ -1,0 +1,32 @@
+{
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "run_shell_command|write_file|replace",
+        "sequential": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/secret-guard.mjs",
+            "name": "wingman-secret-guard",
+            "description": "Blocks destructive commands and detected secrets before a tool call runs -- ported from plugins/wingman/hooks/secret-guard.mjs."
+          }
+        ]
+      }
+    ],
+    "BeforeAgent": [
+      {
+        "matcher": "*",
+        "sequential": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/plan-gate.mjs",
+            "name": "wingman-plan-gate",
+            "description": "Disclosed substitute for ExitPlanMode's boardroom-checkpoint.mjs gate -- see hooks/plan-gate.mjs's own header for why this is a weaker gate, not an equivalent one."
+          }
+        ]
+      }
+    ]
+  }
+}

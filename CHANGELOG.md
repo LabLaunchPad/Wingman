@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.13] - 2026-07-27
+
+### Added
+- **Gemini CLI harness adapter** (`plugins/wingman/references/harness-adapters/gemini-cli/`), Phase 2 of the founder-directed 6-harness build (Phase 1: descriptor-driven generator refactor, 0.7.12). Fresh 2026-07-27 schema-verification research corrected an earlier, less-precise general pass: Gemini CLI's real hook event names are `BeforeTool`/`AfterTool`/`BeforeAgent`/`AfterAgent`/`BeforeModel`/`AfterModel`/`BeforeToolSelection`/`SessionStart`/`SessionEnd`/`Notification`/`PreCompress` — **not** `PreToolUse`/`PostToolUse` as first assumed — and subagents are real Markdown + YAML frontmatter files under `agents/`, not TOML/JSON. Of the 6 harnesses in scope, Gemini CLI is the strongest capability match found: confirmed real parallel subagent dispatch, a confirmed real structured question tool (`ask_user`), and hooks that can genuinely block a tool call — only the plan-gate is a genuine, disclosed gap (exiting Plan mode auto-escalates to YOLO mode with no discrete interceptable transition event).
+- `plugins/wingman/scripts/harness-targets/gemini-cli.mjs` — new descriptor; `generate-harness-adapters.mjs` gained a new `commands.mode === 'toml'` formatter (`prompt`/`description` TOML fields, `$ARGUMENTS` → `{{args}}`, no `name` field since Gemini derives the command name from its file path) to emit the 24 `commands/wingman/*.toml` files.
+- 8 hand-translated Boardroom seat personas (`gemini-cli/agents/boardroom-*.md`), `gemini-extension.json`, `GEMINI.md` (using Gemini's real `@file.md` import syntax), `hooks/hooks.json` + a self-contained `secret-guard.mjs` port, and `hooks/plan-gate.mjs` — the one genuinely new piece of hook logic in this adapter, a disclosed coarser substitute for the missing plan-gate, backstopped by the existing `dod-pre-push-check.mjs` git-push gate. New `evals/cases/plan-gate-mode-switch-intercept.md`, all 5 shapes run for real against a constructed fixture.
+
 ## [0.7.12] - 2026-07-27
 
 ### Changed
