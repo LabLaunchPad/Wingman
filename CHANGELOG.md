@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.12] - 2026-07-27
+
+### Changed
+- **Founder-directed override of the 3x-declined "full agent-agnostic rewrite" stance** (docs/ARCHITECTURE.md §8a/§8c, 2026-07-18/07-22/07-25): after being shown that history plus fresh capability-matrix research across 6 non-Claude-Code harnesses (Codex CLI, OpenCode, Gemini CLI, Cursor, Cline, OpenHands — none has full parity; the plan-gate is the universal weak point), the founder directed a scoped, disclosed-substitute build. Phase 1 of that build lands here: `generate-harness-adapters.mjs` and `check-harness-adapter-drift.mjs` are refactored from two hardcoded harness branches into a **descriptor-driven model** (`plugins/wingman/scripts/harness-targets/{codex-cli,opencode}.mjs`, loaded generically via `harness-targets/index.mjs`), so each further harness is a new descriptor file, not new hardcoded logic. Verified behavior-preserving: `--check` produces the same 73 generated files, with only two intentional content corrections riding along (see below). `tests/hooks-integration/hooks-integration.test.mjs`'s drift-check suite updated to the new `checkDrift(agentsDir, harnessAgentTargets[])` signature.
+- **Codex CLI's `ParallelDispatch` harness note corrected**: fresh 2026-07-27 research confirmed genuine concurrent dispatch (`spawn_agent`/`send_message`/`wait_agent`/`close_agent`), superseding the prior "unconfirmed at scale, cap at 4" note.
+- **OpenCode's `ParallelDispatch` harness note corrected**: confirmed still sequential (open bug `anomalyco/opencode#29638`), now stated plainly as a disclosed degradation rather than an aspirational "dispatch as Task calls" note.
+
 ## [0.7.11] - 2026-07-26
 
 ### Added

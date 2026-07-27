@@ -124,7 +124,7 @@ No fixed template beyond the `AskUserQuestion` proposal shape described in step 
 
 This file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real OpenCode equivalent:
 
-- **AskUserQuestion**: OpenCode has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.
+- **AskUserQuestion**: OpenCode has no structured multi-choice question UI reachable in non-interactive mode (`permission.ask` confirmed to hang indefinitely in `opencode run`/`opencode serve`). Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.
 
 
 ---

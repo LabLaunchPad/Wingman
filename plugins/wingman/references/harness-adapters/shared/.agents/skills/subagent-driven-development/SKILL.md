@@ -380,7 +380,7 @@ Done!
 
 This file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real OpenCode equivalent:
 
-- **ParallelDispatch**: OpenCode has a real Task tool and a parallel general-purpose agent (confirmed: opencode.ai/docs/agents). Dispatch each seat/subagent as a Task call the same way this file describes; if a single-message N-way fan-out isn't available, dispatch sequentially and consolidate the same way.
+- **ParallelDispatch**: OpenCode confirmed **still sequential**, not genuinely concurrent (open bug anomalyco/opencode#29638, root-caused to `tasks.pop()` + blocking `handleSubtask` in `src/session/prompt.ts`; an experimental `background` param exists but is hidden from the model). Dispatch Boardroom seats one at a time and consolidate the same way this file describes -- disclose this plainly in the founder-facing summary rather than silently pretending parallel review happened.
 
 
 ---
@@ -389,4 +389,4 @@ This file is a generated copy of the canonical Claude Code source. It references
 
 This file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real Codex CLI equivalent:
 
-- **ParallelDispatch**: Codex CLI has real parallel multi-agent dispatch (confirmed this session via a live install: `spawn_agent` to create a sub-agent, `followup_task`/`send_message` to direct it, `wait_agent` to collect its result -- up to 4 concurrent agent slots, a lower ceiling than Claude Code's Task-tool fan-out, so batch beyond 4 rather than assuming unlimited concurrency).
+- **ParallelDispatch**: Codex CLI has real, confirmed parallel multi-agent dispatch (confirmed 2026-07-27, correcting an earlier "unconfirmed at scale" note): `spawn_agent` creates a sub-agent, `send_message`/`followup_task` directs it, `wait_agent` collects its result, `close_agent` tears it down -- genuinely concurrent, not sequential. Dispatch Boardroom seats the same way this file describes; batch per `max_concurrent_threads_per_session` if this project ever needs more concurrent seats than that session cap allows.
