@@ -88,6 +88,9 @@ of relying on a remembered impression of this project's own history.
 was observed, which bucket it falls into and why, and what the resulting change would be. This
 approver is a Wingman maintainer/contributor working in this dev repo, not a founder approving
 their own project's roster — a categorically different kind of approval than `evolve-promotion`'s.
+**Harness-aware fallback**: outside Claude Code, check `references/harness-capability-profile.md`'s
+`hasQuestionTool` column — use the harness's own native question tool if `true` (naming which one),
+else present the options in prose and treat the next message as the answer.
 
 **5. Once approved, drive the fix to completion — do not stop at "classified and proposed":**
 - Implement the change in the appropriate `plugins/wingman/` location (`commands/`, `skills/`, or

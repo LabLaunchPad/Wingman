@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.15] - 2026-07-27
+
+### Added
+- **Capability-profile branching wired into canonical command/skill files** (`docs/ARCHITECTURE.md` §8f), closing the remaining founder-directed 6-harness build items that touch shipped content: `boardroom.md` (dispatch mode — parallel vs. disclosed sequential fallback), `evolve.md`/`evolve-promotion`/`dogfood-gap-classification` (question-tool fallback), and `implementation-planning.md` (plan-gate fallback). Each branch reads the new generated `plugins/wingman/references/harness-capability-profile.md` (emitted by `generate-harness-adapters.mjs` straight from the same `harness-targets/<id>.mjs` descriptors every other adapter artifact reads, so it can never drift). Because these are canonical files, the branching text propagates automatically to every harness's generated copy on the next `--write` — this is also what closes the "OpenCode's disclosed sequential-dispatch degradation should be a generated instruction, not just README prose" gap, with zero OpenCode-specific edit needed.
+- Re-copied the 2 touched skills (`evolve-promotion`, `dogfood-gap-classification`) to OpenCode's separately-ported verbatim skills copy to keep `check-harness-adapter-drift.mjs` clean.
+
 ## [0.7.14] - 2026-07-27
 
 ### Added
