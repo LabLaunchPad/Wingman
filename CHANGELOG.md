@@ -2,6 +2,7 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+<<<<<<< HEAD
 ## [0.7.18] - 2026-07-27
 
 ### Added
