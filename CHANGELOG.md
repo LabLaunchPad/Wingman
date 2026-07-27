@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.14] - 2026-07-27
+
+### Added
+- **OpenHands harness adapter** (`plugins/wingman/references/harness-adapters/openhands/`), Phase 3 of the founder-directed 6-harness build. Deliberately narrower scope than the Gemini CLI adapter: OpenHands' capability findings come from the 2026-07-27 general capability-matrix pass, not a dedicated field-level schema-verification pass, so this phase does **not** invent a Boardroom-persona file format or an exact hooks-config schema — both are honestly logged as open gaps in `openhands/README.md` and `docs/HUMAN-TODOS.md` rather than guessed at.
+- `plugins/wingman/scripts/harness-targets/openhands.mjs` — new descriptor, reusing the existing `'folded'` commands mode (all 24 commands folded into `.openhands/microagents/repo.md`, OpenHands' own confirmed-real, automatically-loaded repository-instructions file — the same shape as Codex CLI's `AGENTS.md` fallback) and contributing to the shared skills output. No `agents` block (no confirmed persona schema), so `check-harness-adapter-drift.mjs` correctly skips OpenHands for the persona-drift check.
+- Capability profile: confirmed real parallel delegation (`DelegateTool`), no plan-gate (blanket confirmation-mode toggle only, no discrete transition event — falls back to the existing `dod-pre-push-check.mjs` git-push gate), no confirmed question tool (prose fallback).
+
 ## [0.7.13] - 2026-07-27
 
 ### Added
