@@ -5,18 +5,19 @@ honest account of what's harness-agnostic vs. Claude-Code-coupled — most of th
 mechanism (`AskUserQuestion`, `ExitPlanMode` + its gating hooks, parallel `Task`/`Agent` subagent
 dispatch) is genuinely coupled to Claude Code's own tool surface.
 
-**2026-07-27 update — founder-directed override, expanding to 6 harnesses.** §8a's "no blanket
-portability work absent real demand" bar had held since 2026-07-18 (declining a full rewrite 3
-times). The founder then asked directly for full agent-agnostic support and, after being shown that
-full history, explicitly confirmed this as a deliberate override — not new organic evidence that the
-gate cleared itself. See `docs/ARCHITECTURE.md` §8f for the full framing, the fresh capability-matrix
-research, and what's shipped so far (phased, each phase its own commit). This directory now covers 7
-harnesses total, symmetrically: **Claude Code** (`claude-code/` — the native target; no translation
-exists because none is needed), **Codex CLI** (`codex-cli/`), **OpenCode** (`opencode/`), **Gemini
-CLI** (`gemini-cli/`), and **OpenHands** (`openhands/`) — with **Cursor** and **Cline** sequenced
-next (weakest capability match, built last on purpose). It is not a claim that Wingman runs
-identically everywhere — each directory states plainly what's genuinely ported, what's structurally
-verified vs. authored-but-unverified, and what has no equivalent at all in that harness.
+**2026-07-27 update — founder-directed override, expanding to 6 harnesses (all 6 now built).** §8a's
+"no blanket portability work absent real demand" bar had held since 2026-07-18 (declining a full
+rewrite 3 times). The founder then asked directly for full agent-agnostic support and, after being
+shown that full history, explicitly confirmed this as a deliberate override — not new organic
+evidence that the gate cleared itself. See `docs/ARCHITECTURE.md` §8f for the full framing, the
+fresh capability-matrix research, and the phase-by-phase build (each phase its own commit). This
+directory now covers all 7 harnesses Wingman is evaluated against, symmetrically: **Claude Code**
+(`claude-code/` — the native target; no translation exists because none is needed), **Codex CLI**
+(`codex-cli/`), **OpenCode** (`opencode/`), **Gemini CLI** (`gemini-cli/`), **OpenHands**
+(`openhands/`), **Cline** (`cline/`), and **Cursor** (`cursor/`, sequenced last on purpose — weakest
+capability match). It is not a claim that Wingman runs identically everywhere — each directory
+states plainly what's genuinely ported, what's structurally verified vs. authored-but-unverified,
+and what has no equivalent at all in that harness.
 
 ## Capability matrix
 
@@ -33,8 +34,8 @@ primitive vs. the disclosed substitute.
 | OpenCode | ✅ | ⚠️ weak | ❌ | ❌ |
 | Gemini CLI | ✅ | ⚠️ weak | ✅ | ✅ |
 | OpenHands | ⚠️ weak (schema unconfirmed) | ❌ | ✅ | ❌ |
-| Cursor *(not yet built)* | ⚠️ weak | ⚠️ weak | ✅ | ❌ |
-| Cline *(not yet built)* | ✅ | ❌ | ❌ | ✅ |
+| Cline | ⚠️ weak (schema unconfirmed) | ❌ | ❌ | ✅ |
+| Cursor | ⚠️ weak | ⚠️ weak | ✅ | ❌ |
 
 **2026-07-23 update — full command/skill parity, not just Boardroom + git-push gate.** The founder
 named "agent-agnostic across Claude Code, OpenCode, and Codex CLI" as an explicit MVP goal — the

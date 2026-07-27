@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.18] - 2026-07-27
+
+### Added
+- **Cursor harness adapter** (`plugins/wingman/references/harness-adapters/cursor/`), Phase 5 and the **last** phase of the founder-directed 6-harness build — sequenced last on purpose, since Cursor has the weakest capability match of all 6 (only 3 narrow hook lifecycle points, a UI-click-only Plan Mode exit with no interceptable event, no question tool). `plugins/wingman/scripts/harness-targets/cursor.mjs` reuses the existing `'perFile'` commands mode for Cursor's real, documented `.cursor/commands/*.md` slash-command convention, plus a shared-skills contribution (Cursor's real `.cursor/rules/*.mdc` mechanism has a genuinely different frontmatter shape than `SKILL.md`, so a full translation is left explicitly out of scope rather than half-done). Confirmed real parallel dispatch (up to 8 worktree-isolated background agents — an 8-seat Boardroom fits one batch exactly); no hooks-config wiring file or Boardroom-persona adapter, both honestly logged as open gaps.
+- **All 6 harnesses in the founder-directed build now have an adapter.** `docs/ARCHITECTURE.md` §8f, `harness-adapters/README.md`, and `plugins/wingman/AGENTS.md` updated to reflect the completed build; remaining open items (hooks-config schemas + persona formats for OpenHands/Cline/Cursor, the Cursor `.mdc` skill translation, live model-inference verification for the 4 newest harnesses) tracked in `docs/PROJECT.md`, not silently dropped.
+
 ## [0.7.17] - 2026-07-27
 
 ### Added

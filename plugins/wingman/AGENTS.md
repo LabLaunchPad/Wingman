@@ -52,9 +52,9 @@ needs the *content* of a `docs/` file, inline that content instead of pointing a
 
 ## Cross-harness adapters
 
-`references/harness-adapters/` holds Codex CLI, OpenCode, Gemini CLI, and OpenHands translations of
-the Boardroom seats and the git-push safety gate (Cursor and Cline sequenced next), honestly labeled
-by verification status (most are `authored, unverified` — no live install of any of these harnesses
+`references/harness-adapters/` holds translations for all 6 non-Claude-Code harnesses Wingman
+targets — Codex CLI, OpenCode, Gemini CLI, OpenHands, Cline, and Cursor — honestly labeled by
+verification status (most are `authored, unverified` — no live install of any of these harnesses
 exists in this dev repo). Adding a harness means adding a `plugins/wingman/scripts/harness-targets/<id>.mjs`
 descriptor, not hand-editing the generator. See that directory's own `README.md` before extending it,
 and `docs/ARCHITECTURE.md` §8a/§8b/§8f (repo root) for the full portability accounting this content

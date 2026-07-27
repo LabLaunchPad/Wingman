@@ -715,12 +715,26 @@ harness-agnostic git-push gate, per §8a) rather than a fabricated equivalent.
    follows the new branch — sequential dispatch, plain disclosure, all 8 seats still returning
    independent verdicts.
 
-**Not yet built** (tracked as open follow-on work in `docs/PROJECT.md`, not silently dropped):
-Cline and Cursor adapters (sequenced last per the plan — weakest capability match); a hooks-config
-schema and Boardroom-persona format for OpenHands (needs a real account/install to verify, per
-`docs/HUMAN-TODOS.md`); live model-inference verification for any of the 3 newest harnesses (no
-credential exists in this sandbox for Gemini CLI, OpenHands, Cursor, or Cline — the same class of
-gap §8b already discloses for Codex CLI).
+5. **Cline adapter** (`0.7.17`) — deliberately narrower scope, same posture as OpenHands: real,
+   documented `.clinerules/workflows/*.md` slash-command convention (the existing `'perFile'`
+   commands mode) and a shared-skills contribution offered for manual copying only (Cline's
+   `.clinerules/*.md` is always-active context, not on-demand skill invocation). No hooks-config
+   wiring file or Boardroom-persona adapter — Cline has no subagent concept at all, and its v3.36
+   hooks' exact config schema wasn't independently re-verified this pass.
+6. **Cursor adapter** (`0.7.18`, sequenced last on purpose — weakest capability match of all 6) —
+   real, documented `.cursor/commands/*.md` slash-command convention (the existing `'perFile'`
+   mode) and a shared-skills contribution. Cursor's real skill-adjacent mechanism
+   (`.cursor/rules/*.mdc`) has a genuinely different frontmatter shape than `SKILL.md`, so a full
+   translation was left out of scope rather than half-done; no hooks-config wiring file (only 3
+   narrow lifecycle points, exact payload schema unconfirmed) or Boardroom-persona adapter (no
+   confirmed persona-file format for Cursor's background agents).
+
+**All 6 harnesses now have an adapter.** What remains open, tracked in `docs/PROJECT.md`, not
+silently dropped: a hooks-config schema and Boardroom-persona format for OpenHands/Cline/Cursor
+(each needs a real account/install to verify at the field level, per `docs/HUMAN-TODOS.md`); a
+`.cursor/rules/*.mdc` translation of the 40 skills; live model-inference verification for any of the
+4 newest harnesses (no credential exists in this sandbox for Gemini CLI, OpenHands, Cline, or
+Cursor — the same class of gap §8b already discloses for Codex CLI).
 
 ## 9. Relationship to vendored reference repositories
 
