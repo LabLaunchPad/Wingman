@@ -99,12 +99,26 @@ export function findLatestBuildCheckpoint(cwd) {
 // docs/ARCHITECTURE.md's v7 note and evals/cases/boardroom-gate-rule.md), so check both the
 // top-level bottom_line AND every individual seat's verdict as defense-in-depth, in case
 // consolidation didn't propagate a seat-level NO_GO up into bottom_line correctly.
+// A red-team pass (2026-07-27) found two real bypasses of the exact-string comparisons this
+// function used to do: a `bottom_line` with doubled internal whitespace ("DO  NOT  SHIP") failed
+// the `=== 'DO NOT SHIP'` check, and a seat verdict with trailing text ("NO_GO (accepted with
+// conditions)") failed the `=== 'NO_GO'` check -- both are plausible real transcription variants,
+// not just adversarial constructions. Fixed by collapsing whitespace before the bottom_line
+// comparison, and matching NO_GO as a leading token (word-boundary-anchored) rather than requiring
+// the whole string to equal exactly "NO_GO" -- this still correctly does NOT match "GO",
+// "GO_WITH_CONCERNS", or a hypothetical "NO_GOOD_REASON" (the trailing \b prevents that).
+const NO_GO_PREFIX = /^NO_GO\b/;
+
+function normalizeBottomLine(value) {
+  return String(value || '').trim().replace(/\s+/g, ' ').toUpperCase();
+}
+
 export function checkBoardroomVerdictClean(checkpoint) {
   if (!checkpoint) return { ok: true };
-  if (String(checkpoint.bottom_line || '').trim().toUpperCase() === 'DO NOT SHIP') {
+  if (normalizeBottomLine(checkpoint.bottom_line) === 'DO NOT SHIP') {
     return { ok: false, reason: `its recorded bottom line was "DO NOT SHIP"` };
   }
-  const noGoSeat = (checkpoint.seats || []).find((s) => String(s.verdict || '').toUpperCase() === 'NO_GO');
+  const noGoSeat = (checkpoint.seats || []).find((s) => NO_GO_PREFIX.test(String(s.verdict || '').trim().toUpperCase()));
   if (noGoSeat) {
     return { ok: false, reason: `its "${noGoSeat.seat}" seat recorded a NO_GO verdict` };
   }

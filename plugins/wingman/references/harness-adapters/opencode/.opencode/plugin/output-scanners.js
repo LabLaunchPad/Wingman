@@ -76,7 +76,7 @@ const SECRET = getSecretPatterns();
 // header comment (1a) for the real finding on why a bare array export here would break OpenCode's
 // plugin auto-discovery for this file.
 const INJECTION = [
-  /ignore\s+(all|previous|your|the)\s+(instructions|prompt|system)/i,
+  /ignore\s+(all\s+|previous\s+|your\s+|the\s+){1,2}(instructions|prompt|system)/i, // widened 2026-07-27, see canonical hooks/prompt-guard.mjs
   /(disregard|forget)\s+(all\s+|previous\s+|your\s+|the\s+){1,2}(instructions|prompt|rules)/i,   // common paraphrase of "ignore previous instructions"
   /you\s+are\s+now\s+[a-z][a-z\s]{0,20}/i,               // role hijack
   /(act\s+as\s+if|pretend\s+(that\s+)?you\s+are|from\s+now\s+on\s+you\s+are)\s+[a-z][a-z\s]{0,20}/i, // role-hijack paraphrases

@@ -34,10 +34,12 @@
 // canonical file's patterns change; there is no generator wiring this one yet.
 
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
 const DESTRUCTIVE = [
   /rm\s+-rf\s+\//i,
-  /git\s+push\s+(--force|-f)\b/i,
+  /git\s+push\s+(\S+\s+){0,3}?(--force|-f)\b/i, // widened 2026-07-27: red-team pass found "git push origin main --force" bypassed the un-widened form -- see canonical hooks/secret-guard.mjs
   /git\s+clean\s+-[fF]\w*x/i,
   /\bmkfs\b/i,
   /\bdd\s+if=/i,
@@ -120,6 +122,14 @@ function main() {
   }
 }
 
-main();
+// A red-team pass (2026-07-27) found this call was unconditional -- unlike every sibling file in
+// this same directory (prompt-guard.mjs, content-injection-scanner.mjs), which all guard their
+// own main() behind this exact check. An unconditional call means readStdin()'s synchronous
+// readFileSync(0, ...) blocks forever the instant anything statically imports `decide` from this
+// module without stdin piped in (a test runner, a future generator, a REPL) -- a real bug, not a
+// style nit, since it makes the file unsafe to import for anything other than direct CLI execution.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main();
+}
 
 export { decide };
