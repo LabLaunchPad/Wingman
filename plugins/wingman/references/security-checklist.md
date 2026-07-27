@@ -197,6 +197,19 @@ For any system that processes LLM prompts or user-generated text that may be sen
 4. MEDIUM findings must be tracked in the risk register with a remediation timeline.
 5. This checklist is versioned. Updates require a Boardroom checkpoint with the Security seat.
 
+## Red lines
+
+Two, harvested from a founder-supplied blueprint review (2026-07-27) — not new principles Wingman
+lacked, but worth stating explicitly rather than only implicitly:
+
+- **Never disable a security control to make a task easier.** Commenting out `secret-guard.mjs`'s
+  matcher in `hooks.json`, weakening a regex to stop a false positive without understanding it, or
+  skipping the DoD gate's threat-register check is itself the finding, not a workaround for one.
+- **Never circumvent a repository protection to complete a task faster.** `--no-verify` on a commit
+  hook, `git push --force` to bypass a review, or editing a generated file directly instead of
+  regenerating it (`generate-harness-adapters.mjs --write`) all count — the protection existing at
+  all is evidence someone already decided it mattered.
+
 ## Cited by
 
 - `plugins/wingman/skills/security-checklist/SKILL.md`

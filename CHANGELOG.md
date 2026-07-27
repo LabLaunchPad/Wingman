@@ -2,6 +2,16 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.21] - 2026-07-27
+
+### Added
+- **5-tier permission model** (`plugins/wingman/references/permission-model.md`, restated for human readers in root `POLICIES.md`) — Read only / Draft and propose / Scoped write / Conditional action / Break-glass, mapping onto the existing `permissions:` frontmatter enum (`read`/`write`/`approve`/`execute`/`deploy`). Adopted from a founder-supplied blueprint review; `scripts/check-repo-consistency.mjs` gained a 7th check asserting the two files' tier names stay in sync.
+- **`deploy-approval-gate.mjs`** — a new `PreToolUse`/`Bash` hook enforcing the model's Level 3/4 boundary: blocks deploy-class commands (`kubectl apply`, `terraform apply`, `npm`/`pnpm`/`yarn publish`, a force-push to a protected ref) unless the most recent Build-stage checkpoint carries a clean Boardroom `GO`. Deliberately **not** identity-based — confirmed directly that no Claude Code hook payload exposes which agent is acting, so the gate enforces the boundary against checkpoint state instead, reusing `dod-structural-gate.mjs`'s own `checkBoardroomVerdictClean()`. New `tests/hooks-integration/deploy-approval-gate.test.mjs` (7 tests).
+- **Two new red lines in `references/security-checklist.md`**: never disable a security control to make a task easier; never circumvent a repository protection to complete a task faster.
+
+### Not built (logged, not silently dropped)
+- The blueprint's audit-log fields (`commands run`, `model/agent used`) were descoped during implementation — they don't map cleanly onto what a Boardroom checkpoint actually records (a rendered verdict, not a command trace), and forcing a `schema_version` 5→6 bump for a bad-fit field would itself be the kind of speculative addition this project's evidence-gate discipline exists to prevent. See `docs/AGENT-ROSTER.md`'s deferred-ideas table.
+
 ## [0.7.20] - 2026-07-27
 
 ### Fixed
