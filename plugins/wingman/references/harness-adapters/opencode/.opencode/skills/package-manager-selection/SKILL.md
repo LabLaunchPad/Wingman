@@ -22,6 +22,14 @@ first needs a package manager and doesn't have one yet — never for a project t
 lock file (respecting whatever already exists is a hard rule, not a preference), and never as a
 blanket "always use pnpm" mandate.
 
+## Inputs
+
+The project directory about to receive a new dependency — the choice reads from what's already there (lockfiles present), not from preference.
+
+## Escalation
+
+None by design — a genuinely new project defaults to pnpm with a silent, automatic npm fallback (step 2); the founder gets one plain-language sentence, never a decision to make or an error to react to.
+
 ## When To Use
 
 At `/wingman:build`'s "Before starting" step, only when **all** of the following are true:

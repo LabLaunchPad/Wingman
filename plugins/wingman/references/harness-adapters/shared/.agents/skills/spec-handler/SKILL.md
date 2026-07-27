@@ -20,6 +20,18 @@ Separate **what** must be done (the *spec*) from **how** it is done (the *handle
 
 Any time a pipeline command runs, a department lead or specialist is dispatched, or `/wingman:build` begins work — before producing any output.
 
+## Inputs
+
+The task about to be started — whatever request, ticket, or command invocation triggers it — before any handler code is written.
+
+## Output
+
+A one-sentence-minimum spec (inputs, invariants, observable success criteria) plus the handler built to satisfy it, and a runnable check proving the spec holds (see Verification).
+
+## Escalation
+
+The spec can't be stated in one sentence even after trying (the Red Flags list's first item) — that's a sign the task itself is underspecified; flag it back to whoever requested the work rather than inventing a spec to match whatever gets built.
+
 ## Core Workflow
 
 1. **Spec.** Name the inputs, the invariants that must hold, and the observable success criteria. One sentence is the floor, not the ceiling.

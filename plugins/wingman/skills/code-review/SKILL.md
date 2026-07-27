@@ -15,6 +15,14 @@ goes one level deeper on the actual changes.
 - After a build stage and before `/wingman:ship`.
 - A PR is open and needs a readable verdict, not just a green check.
 
+## Inputs
+
+The diff or file set the founder wants reviewed — the specific changed lines, not the whole repo (see Method step 1).
+
+## Escalation
+
+A Blocker the builder disputes, or a finding that touches an architecturally significant decision beyond this diff — escalate to the founder or the full Boardroom rather than the two sides re-litigating it in review comments.
+
 ## Method
 1. Scope the review to what changed (the diff / the files touched), not the
    whole repo.
