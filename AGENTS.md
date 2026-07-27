@@ -26,12 +26,14 @@ There's no unit-test runner to point at a single test: the closest equivalent is
 ## Commands
 
 ```
+node scripts/validate-all.mjs                           # runs all 6 checks below in one command (--fast skips check-fixtures)
 node plugins/wingman/scripts/validate-structure.mjs   # plugin-internal invariants (frontmatter, refs)
-node scripts/check-repo-consistency.mjs                # repo-root doc/attribution invariants
+node scripts/check-repo-consistency.mjs                # repo-root doc/attribution invariants (incl. leftover conflict-marker scan)
 node scripts/check-fixtures.mjs                        # every eval fixture (evals/fixtures/setup-*.sh) still runs clean
 node plugins/wingman/scripts/check-traceability.mjs     # requirement/marker cross-referencing (also shippable, runs in founder projects)
-node plugins/wingman/scripts/check-harness-adapter-drift.mjs  # checks the Codex CLI/OpenCode Boardroom adapters (and OpenCode's 40 ported skills) haven't drifted from canonical
-node plugins/wingman/scripts/generate-harness-adapters.mjs --check  # confirms all 73 generated harness-adapter files are current; --write regenerates them
+node plugins/wingman/scripts/check-harness-adapter-drift.mjs  # checks the Boardroom-persona adapters (Codex CLI/Gemini CLI) and every harness's ported skills haven't drifted from canonical
+node plugins/wingman/scripts/generate-harness-adapters.mjs --check  # confirms all generated harness-adapter files are current (run --write to see the current count); --write regenerates them
+node scripts/install-dev-git-hooks.mjs                  # dev-repo-only, opt-in: installs a local pre-commit hook running `validate-all.mjs --fast` automatically
 node scripts/wingman-health.mjs                         # read-only dev-health report: built vs. verified vs. gaps
 node scripts/query-wingman-knowledge.mjs                # dev-repo-only: query the wingman:log markers by type/category/status, or --recurring
 node scripts/wingman-metrics.mjs                        # dev-repo-only: real cost/quality/debt signals, not a service benchmark
