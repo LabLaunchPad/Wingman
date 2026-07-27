@@ -2,6 +2,19 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.20] - 2026-07-27
+
+### Fixed
+- **Red-team pass against the live `prompt-guard.mjs`/`secret-guard.mjs`/`dod-structural-gate.mjs` hooks found and fixed 3 real bypasses, plus a real structural bug in a Codex CLI port.**
+  - `prompt-guard.mjs`'s `INJECTION` regex missed the single most common textbook phrasing, "ignore all previous instructions" — it only allowed one qualifier word before instructions/prompt/system, not the common two-word "all previous." Widened to allow 1-2 words, matching the sibling disregard/forget pattern that already did.
+  - A zero-width space or newline inserted mid-phrase silently broke the same regex family. Added a `normalize()` pass (strip invisible characters, collapse whitespace) before matching, confirmed to introduce no new false positive against ordinary benign prompts using the word "ignore."
+  - `secret-guard.mjs`'s destructive-command guard missed `git push origin main --force` — the single most common real invocation shape (positional args before the flag) — catching only a bare `git push --force`. Widened to allow up to 3 positional args before the flag.
+  - `dod-structural-gate.mjs`'s `checkBoardroomVerdictClean()` had two real bypasses: doubled internal whitespace in `bottom_line`, and a seat verdict with trailing annotation text, both defeated exact-string comparison. Fixed with whitespace normalization and word-boundary-anchored prefix matching.
+  - **Codex CLI's `secret-guard.mjs` port** called its own `main()` unconditionally at module load — unlike every sibling port file — so importing `decide` from it hung forever on a synchronous, unpiped stdin read. This file had zero prior test coverage. Fixed to match the established entry-point-guard convention.
+  - The two regex fixes above were hand-synced into the Codex CLI and OpenCode ports (`references/harness-adapters/{codex-cli,opencode}/...`), since `check-harness-adapter-drift.mjs` only checks Boardroom-persona/skill drift, not these hook files — a port could otherwise silently carry a weaker pattern forever.
+  - Encoding/obfuscation evasion (base64, rot13, leetspeak, reversed text, Unicode homoglyphs) is a documented, disclosed residual risk — not fixable by pattern-matching alone — and is asserted as current behavior in the new test suite so a future accidental fix is visible.
+- New `tests/red-team/` (dev-repo-only): 25 tests across 4 files, attacking the real exported functions directly (never a reimplementation), including the same corpus re-run against the Codex CLI/OpenCode ports.
+
 ## [0.7.19] - 2026-07-27
 
 ### Added

@@ -19,7 +19,12 @@ import path from 'node:path';
 
 const DESTRUCTIVE = [
   /rm\s+-rf\s+\//i,                       // rm -rf /
-  /git\s+push\s+(--force|-f)\b/i,         // git push --force / -f
+  // A red-team pass (2026-07-27) found the single most common real invocation --
+  // `git push origin main --force` (remote/branch positional args first, flag last) --
+  // bypassed this entirely, because the old pattern required the flag immediately after
+  // "push" with nothing but whitespace between. Up to 3 positional args (a generous but
+  // bounded allowance) are now permitted before the flag.
+  /git\s+push\s+(\S+\s+){0,3}?(--force|-f)\b/i,   // git push [args] --force / -f
   /git\s+clean\s+-[fF]\w*x/i,             // git clean -fdx
   /\bmkfs\b/i,                            // mkfs
   /\bdd\s+if=/i,                          // dd if=

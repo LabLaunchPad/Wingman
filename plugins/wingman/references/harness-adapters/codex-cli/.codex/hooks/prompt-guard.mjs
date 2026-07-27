@@ -55,7 +55,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const INJECTION = [
-  /ignore\s+(all|previous|your|the)\s+(instructions|prompt|system)/i,
+  /ignore\s+(all\s+|previous\s+|your\s+|the\s+){1,2}(instructions|prompt|system)/i, // widened 2026-07-27: red-team pass found the un-widened form missed "ignore all previous instructions" itself -- see canonical hooks/prompt-guard.mjs
   /(disregard|forget)\s+(all\s+|previous\s+|your\s+|the\s+){1,2}(instructions|prompt|rules)/i,
   /you\s+are\s+now\s+[a-z][a-z\s]{0,20}/i,
   /(act\s+as\s+if|pretend\s+(that\s+)?you\s+are|from\s+now\s+on\s+you\s+are)\s+[a-z][a-z\s]{0,20}/i,

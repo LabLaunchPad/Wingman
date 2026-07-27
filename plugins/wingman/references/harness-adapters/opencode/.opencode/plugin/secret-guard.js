@@ -26,7 +26,7 @@
 
 const DESTRUCTIVE = [
   /rm\s+-rf\s+\//i,
-  /git\s+push\s+(--force|-f)\b/i,
+  /git\s+push\s+(\S+\s+){0,3}?(--force|-f)\b/i, // widened 2026-07-27: red-team pass found "git push origin main --force" bypassed the un-widened form -- see canonical hooks/secret-guard.mjs
   /git\s+clean\s+-[fF]\w*x/i,
   /\bmkfs\b/i,
   /\bdd\s+if=/i,
