@@ -195,7 +195,29 @@ for (const relPath of trackedFiles) {
   }
 }
 
-console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files), eval-manifest freshness, ${trackedFiles.length} tracked file(s) scanned for leftover conflict markers`);
+// Root POLICIES.md restates plugins/wingman/references/permission-model.md for human readers
+// (the latter is what agents actually read at runtime; POLICIES.md never ships). The one place
+// they could silently drift is the 5-tier name list -- POLICIES.md doesn't restate the model's
+// full text (nothing to keep byte-identical), but a founder-directed choice to land the model in
+// two places means paying the cost of keeping the tier NAMES consistent between them, so
+// docs/GOVERNANCE.md's "the cited document is correct" rule doesn't quietly stop being true. Each
+// permission-model.md tier is a "## Level N — <name>" heading; each name must appear, case-
+// insensitively, somewhere in POLICIES.md.
+const permissionModel = read('plugins/wingman/references/permission-model.md');
+const policies = read('POLICIES.md');
+if (permissionModel && policies) {
+  const tierNames = [...permissionModel.matchAll(/^##\s+Level\s+\d+\s+—\s+(.+)$/gm)].map((m) => m[1].trim());
+  if (tierNames.length === 0) {
+    warnings.push('policy-drift: permission-model.md has no "## Level N — <name>" headings to check POLICIES.md against — has its format changed?');
+  }
+  for (const name of tierNames) {
+    if (!policies.toLowerCase().includes(name.toLowerCase())) {
+      errors.push(`policy-drift: permission-model.md's tier "${name}" is not mentioned anywhere in POLICIES.md — the two have drifted apart`);
+    }
+  }
+}
+
+console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files), eval-manifest freshness, ${trackedFiles.length} tracked file(s) scanned for leftover conflict markers, POLICIES.md/permission-model.md tier-name consistency`);
 
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);
