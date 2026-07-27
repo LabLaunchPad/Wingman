@@ -1,34 +1,41 @@
 #!/usr/bin/env node
-// Generates the cross-harness command/skill surface for Codex CLI and OpenCode from Wingman's
-// canonical plugins/wingman/{commands,skills}/** source, so all 24 commands / 40 skills are
-// available under those harnesses too, not just the 8 Boardroom seats + git-push gate that
-// existed before this generator.
+// Generates the cross-harness command/skill surface for every harness target descriptor under
+// harness-targets/ from Wingman's canonical plugins/wingman/{commands,skills}/** source.
 //
-// Why a generator, not a one-time hand port: a hand translation of 64 files was correctly
-// declined before (harness-adapters/README.md) as "untestable at scale" and guaranteed to drift.
-// A generator that's regenerated and diff-checked in CI (--check, wired into validate.yml) can't
-// silently rot the way a one-time port would -- same principle already established this session
-// for evals/MANIFEST.tsv (scripts/generate-eval-manifest.mjs).
+// Why a generator, not a one-time hand port: a hand translation was correctly declined before
+// (harness-adapters/README.md) as "untestable at scale" and guaranteed to drift. A generator that's
+// regenerated and diff-checked in CI (--check, wired into validate.yml) can't silently rot the way a
+// one-time port would -- same principle already established for evals/MANIFEST.tsv
+// (scripts/generate-eval-manifest.mjs).
 //
-// Real, direct verification this session (not docs prose) locked the target paths:
+// Descriptor-driven (2026-07-27 refactor, docs/ARCHITECTURE.md §8f): this script used to hardcode
+// exactly 2 harnesses (Codex CLI, OpenCode) via inline HARNESS_NOTES/HARNESS_LABELS tables and two
+// branches in buildTargets(). Adding a 3rd-6th harness (Gemini CLI, Cursor, Cline, OpenHands) the
+// same way would mean repeating that hardcoding 4 more times. Instead, every harness's output paths,
+// per-primitive "Harness note" prose, and capability profile now live in one descriptor file under
+// harness-targets/<id>.mjs, loaded generically by harness-targets/index.mjs -- this file only knows
+// how to walk that list, not any specific harness's name.
+//
+// Real, direct verification (2026-07-25, unchanged by this refactor) locked the target paths:
 //   - Skills: a single shared `.agents/skills/<name>/SKILL.md` is read natively by BOTH OpenCode
 //     (confirmed via `opencode debug skill`, real install v1.18.4) and Codex CLI (confirmed via
 //     `codex debug prompt-input`, real install v0.145.0) -- same file serves both harnesses,
 //     zero per-harness translation needed for the frontmatter/body shape itself.
 //   - Commands: OpenCode reads `.opencode/commands/<name>.md` natively (confirmed via
 //     `opencode debug config`, byte-identical template content). Codex CLI has NO user-authored
-//     slash-command/prompt-template file primitive (confirmed by direct CLI inspection: no
-//     `codex commands` subcommand; `prompts/list`/`prompts/get` are MCP protocol methods, not a
-//     local file convention) -- so Codex CLI commands fold into one AGENTS.md-appendable reference
-//     file instead of being forced into a file shape that doesn't exist for that harness.
+//     slash-command/prompt-template file primitive -- so Codex CLI commands fold into one
+//     AGENTS.md-appendable reference file instead of being forced into a file shape that doesn't
+//     exist for that harness. Each new descriptor's `commands.mode` ('perFile' | 'folded') encodes
+//     which shape that harness actually supports.
 //   - Boardroom seat agents already have their own hand-built, drift-checked adapters
 //     (check-harness-adapter-drift.mjs) -- untouched by this generator.
 //
 // Primitive substitution: a command/skill that references a Claude-Code-specific primitive
 // (AskUserQuestion, ExitPlanMode, parallel Task/Agent dispatch) gets the canonical body copied
-// verbatim PLUS an appended, clearly-marked "Harness note" section explaining that harness's real
-// equivalent -- additive, never a rewrite of the original prose (rewriting nuanced instructions
-// via regex would risk silently corrupting them; appending a note is honest and mechanical).
+// verbatim PLUS an appended, clearly-marked "Harness note" section per harness explaining that
+// harness's real equivalent -- additive, never a rewrite of the original prose (rewriting nuanced
+// instructions via regex would risk silently corrupting them; appending a note is honest and
+// mechanical).
 //
 // Usage: node generate-harness-adapters.mjs [--write|--check]
 //   (no args) -- prints a summary to stdout
@@ -38,14 +45,12 @@
 import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadHarnessTargets } from './harness-targets/index.mjs';
 
 const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const skillsDir = join(pluginRoot, 'skills');
 const commandsDir = join(pluginRoot, 'commands');
 const adaptersRoot = join(pluginRoot, 'references', 'harness-adapters');
-const sharedSkillsOut = join(adaptersRoot, 'shared', '.agents', 'skills');
-const opencodeCommandsOut = join(adaptersRoot, 'opencode', '.opencode', 'commands');
-const codexCommandsRefOut = join(adaptersRoot, 'codex-cli', 'commands-as-agents-md.md');
 
 // --- Primitive detection (regex over content, not a hardcoded file list -- so a newly added
 // command/skill is classified correctly on the next --write without editing this script) ---
@@ -64,36 +69,15 @@ function detectPrimitives(body) {
   return PRIMITIVES.filter((p) => p.pattern.test(body)).map((p) => p.id);
 }
 
-const HARNESS_NOTES = {
-  AskUserQuestion: {
-    opencode: "OpenCode has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.",
-    codex: "Codex CLI has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.",
-  },
-  ExitPlanMode: {
-    opencode: "OpenCode's real analog is the `plan_exit` tool (confirmed: opencode.ai/docs). The gating logic this canonical file assumes (`boardroom-checkpoint.mjs`'s ExitPlanMode hook) is ported as a real OpenCode plugin at `references/harness-adapters/opencode/.opencode/plugin/wingman-gate.js` -- wire that plugin in rather than re-deriving the gate.",
-    codex: "Codex CLI has no plan-mode concept at all (it uses `approval_policy` for command-level escalation instead, a genuine capability gap, not a missed port). Use `plugins/wingman/scripts/install-git-hooks.mjs` (already harness-agnostic, fires under any `git push` regardless of which agent drove the session) as the real enforcement point instead of a mid-session plan gate.",
-  },
-  ParallelDispatch: {
-    opencode: "OpenCode has a real Task tool and a parallel general-purpose agent (confirmed: opencode.ai/docs/agents). Dispatch each seat/subagent as a Task call the same way this file describes; if a single-message N-way fan-out isn't available, dispatch sequentially and consolidate the same way.",
-    codex: "Codex CLI has real parallel multi-agent dispatch (confirmed this session via a live install: `spawn_agent` to create a sub-agent, `followup_task`/`send_message` to direct it, `wait_agent` to collect its result -- up to 4 concurrent agent slots, a lower ceiling than Claude Code's Task-tool fan-out, so batch beyond 4 rather than assuming unlimited concurrency).",
-  },
-};
-
-const HARNESS_LABELS = { opencode: 'OpenCode', codex: 'Codex CLI' };
-
-function harnessNoteBlock(primitiveIds, harness) {
+function harnessNoteBlock(primitiveIds, target) {
   if (primitiveIds.length === 0) return '';
-  const label = HARNESS_LABELS[harness];
-  const lines = primitiveIds.map((id) => `- **${id}**: ${HARNESS_NOTES[id][harness]}`);
-  return `\n\n---\n\n## Harness note: ${label} (auto-generated by \`generate-harness-adapters.mjs\` -- do not hand-edit)\n\nThis file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real ${label} equivalent:\n\n${lines.join('\n')}\n`;
+  const lines = primitiveIds.map((id) => `- **${id}**: ${target.notes[id]}`);
+  return `\n\n---\n\n## Harness note: ${target.label} (auto-generated by \`generate-harness-adapters.mjs\` -- do not hand-edit)\n\nThis file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real ${target.label} equivalent:\n\n${lines.join('\n')}\n`;
 }
 
 function listSkills() {
   // Flat skills/<name>/SKILL.md layout (no category subdirectory) -- matches how listCommands()
-  // already scans dynamically rather than assuming fixed depth. Skills used to live nested under
-  // skills/<category>/<name>/, but that nesting was removed repo-wide so the on-disk layout matches
-  // the flat structure precedent multi-harness repos use and lines up with Codex CLI's plugin-cache
-  // path reading this same tree directly.
+  // already scans dynamically rather than assuming fixed depth.
   const out = [];
   for (const skill of readdirSync(skillsDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
     const skillPath = join(skillsDir, skill.name, 'SKILL.md');
@@ -117,60 +101,138 @@ function listCommands() {
 }
 
 // --- Build the in-memory target file map: relative-path -> content ---
-function buildTargets() {
+async function buildTargets() {
   const targets = new Map();
+  const harnessTargets = await loadHarnessTargets();
 
-  for (const { name, path } of listSkills()) {
-    const body = readFileSync(path, 'utf-8');
-    const primitives = detectPrimitives(body);
-    // Both harnesses read the identical .agents/skills/<name>/SKILL.md file -- one generated
-    // artifact serves both, with per-harness notes appended when needed. Since a single file
-    // can't carry two different per-harness note sections cleanly, and the notes are additive
-    // documentation (not behavior), include both harnesses' notes together when any primitive
-    // is detected -- a reader using either harness sees their own relevant note.
-    // This single file is read natively by both harnesses, so both harnesses' notes are appended
-    // together when a primitive is detected -- a reader on either harness sees their own note.
-    const content = body + harnessNoteBlock(primitives, 'opencode') + harnessNoteBlock(primitives, 'codex');
-    targets.set(join('shared', '.agents', 'skills', name, 'SKILL.md'), content);
+  // Shared skills output: every harness that declares `skills.sharedOutDir` reads the same file, so
+  // write it once per distinct sharedOutDir, with each contributing harness's note appended in a
+  // fixed, explicit order (not directory-scan order, which would silently reorder existing output
+  // and fail --check for no real reason) -- OpenCode's note precedes Codex CLI's, matching the order
+  // the pre-refactor hardcoded script always produced.
+  const skillNoteOrder = ['opencode', 'codex-cli'];
+  const sharedOutDirs = new Set(harnessTargets.filter((t) => t.skills?.sharedOutDir).map((t) => t.skills.sharedOutDir));
+  const orderedSkillTargets = (dir) =>
+    harnessTargets
+      .filter((t) => t.skills?.sharedOutDir === dir)
+      .sort((a, b) => {
+        const ai = skillNoteOrder.indexOf(a.id);
+        const bi = skillNoteOrder.indexOf(b.id);
+        return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+      });
+
+  for (const sharedOutDir of sharedOutDirs) {
+    const contributingTargets = orderedSkillTargets(sharedOutDir);
+    for (const { name, path } of listSkills()) {
+      const body = readFileSync(path, 'utf-8');
+      const primitives = detectPrimitives(body);
+      const notesBlock = contributingTargets.map((t) => harnessNoteBlock(primitives, t)).join('');
+      const content = body + notesBlock;
+      targets.set(join(...sharedOutDir.split('/'), name, 'SKILL.md'), content);
+    }
   }
 
   const commandEntries = listCommands();
-  for (const { name, path } of commandEntries) {
-    const body = readFileSync(path, 'utf-8');
-    const primitives = detectPrimitives(body);
-    const content = body + harnessNoteBlock(primitives, 'opencode');
-    targets.set(join('opencode', '.opencode', 'commands', `${name}.md`), content);
-  }
 
-  // Codex CLI has no per-file command primitive -- fold all commands into one AGENTS.md-appendable
-  // reference file, each as its own section, so a Codex CLI project can paste the relevant
-  // sections into its own AGENTS.md (which Codex genuinely discovers and reads).
-  const codexSections = commandEntries.map(({ name, path }) => {
-    const body = readFileSync(path, 'utf-8');
-    const primitives = detectPrimitives(body);
-    const note = harnessNoteBlock(primitives, 'codex');
-    return `## \`/wingman:${name}\`\n\n${body}${note}`;
-  });
-  const codexHeader = `# Wingman commands, as AGENTS.md-appendable workflows\n\n` +
-    `Codex CLI has no user-authored slash-command/prompt-template file primitive (confirmed by direct\n` +
-    `CLI inspection: no \`codex commands\` subcommand; \`prompts/list\`/\`prompts/get\` are MCP protocol\n` +
-    `methods for an MCP *server* to expose, not a local file convention a plugin author can drop files\n` +
-    `into) -- a genuine capability gap in this harness, not a missed port. Codex CLI does genuinely\n` +
-    `discover and read a project's \`AGENTS.md\` for workflow instructions, so each Wingman command below\n` +
-    `is written as a section you can paste into your own project's \`AGENTS.md\` (or reference from it)\n` +
-    `to get the same workflow under Codex CLI.\n\n` +
-    `Generated by \`generate-harness-adapters.mjs\` from the canonical \`plugins/wingman/commands/**\` ` +
-    `source -- do not hand-edit; re-run the generator instead.\n\n---\n\n`;
-  targets.set('codex-cli/commands-as-agents-md.md', codexHeader + codexSections.join('\n\n---\n\n'));
+  for (const target of harnessTargets) {
+    if (!target.commands) continue;
+
+    if (target.commands.mode === 'perFile') {
+      for (const { name, path } of commandEntries) {
+        const body = readFileSync(path, 'utf-8');
+        const primitives = detectPrimitives(body);
+        const content = body + harnessNoteBlock(primitives, target);
+        targets.set(join(...target.commands.outDir.split('/'), `${name}.md`), content);
+      }
+    } else if (target.commands.mode === 'toml') {
+      // This harness reads one TOML file per command (Gemini CLI: `commands/<name>.toml`, no `name`
+      // field -- the command's invocation name derives from its path, per real, confirmed schema).
+      // `prompt` carries the full canonical body (frontmatter stripped, $ARGUMENTS -> {{args}} per
+      // Gemini's real placeholder syntax) as a TOML literal multi-line string (`'''...'''`) so no
+      // escaping of quotes/backslashes in the body is needed; `description` comes from the
+      // canonical file's own frontmatter `description:` field, as a basic TOML string.
+      for (const { name, path } of commandEntries) {
+        const raw = readFileSync(path, 'utf-8');
+        const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+        const frontmatter = fmMatch ? fmMatch[1] : '';
+        const body = (fmMatch ? fmMatch[2] : raw).replace(/\$ARGUMENTS/g, '{{args}}');
+        const primitives = detectPrimitives(raw);
+        const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
+        const description = (descMatch ? descMatch[1].trim() : name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+        const note = harnessNoteBlock(primitives, target);
+        const promptBody = (body + note).replace(/'''/g, "'' '"); // guard against breaking the literal-string delimiter
+        const toml =
+          `description = "${description}"\n` +
+          `prompt = '''\n${promptBody}\n'''\n`;
+        targets.set(join(...target.commands.outDir.split('/'), `${name}.toml`), toml);
+      }
+    } else if (target.commands.mode === 'folded') {
+      // This harness has no per-file command primitive -- fold all commands into one
+      // appendable reference file, each as its own section.
+      const sections = commandEntries.map(({ name, path }) => {
+        const body = readFileSync(path, 'utf-8');
+        const primitives = detectPrimitives(body);
+        const note = harnessNoteBlock(primitives, target);
+        return `## \`/wingman:${name}\`\n\n${body}${note}`;
+      });
+      const outFileLabel = target.commands.outFileLabel || target.label;
+      const header =
+        `# Wingman commands, as ${outFileLabel}-appendable workflows\n\n` +
+        `${target.commands.headerRationale}\n\n` +
+        `Generated by \`generate-harness-adapters.mjs\` from the canonical \`plugins/wingman/commands/**\` ` +
+        `source -- do not hand-edit; re-run the generator instead.\n\n---\n\n`;
+      targets.set(target.commands.outFile, header + sections.join('\n\n---\n\n'));
+    }
+  }
 
   return targets;
 }
 
-function writeTargets(targets) {
+// Emits the canonical capability-profile table straight from the same descriptors every other
+// output here reads, so it can never drift from what actually drives the generated adapters (§8f).
+// Written as a standalone file outside adaptersRoot (like evals/MANIFEST.tsv is standalone relative
+// to evals/cases/) rather than folded into buildTargets()'s adaptersRoot-relative map, since it's a
+// single cross-harness summary, not a per-harness generated artifact.
+function buildCapabilityProfile(harnessTargets) {
+  const flag = (v) => (v === true ? '✅' : v === false ? '❌' : '⚠️ weak');
+  // Claude Code is the native target, not a harness-targets/*.mjs descriptor (it needs no adapter),
+  // so its row is synthesized here as the full-parity baseline every other row is measured against.
+  const claudeCodeRow = '| Claude Code (native) | ✅ | ✅ | ✅ | ✅ |';
+  const rows = harnessTargets.map((t) => {
+    const c = t.capabilities || {};
+    return `| ${t.label} | ${flag(c.hasHooks)} | ${flag(c.hasPlanGate)} | ${flag(c.hasParallelDispatch)} | ${flag(c.hasQuestionTool)} |`;
+  });
+  return (
+    `# Harness capability profile\n\n` +
+    `Generated by \`generate-harness-adapters.mjs\` from each harness's own \`harness-targets/<id>.mjs\` ` +
+    `\`capabilities\` block -- do not hand-edit; re-run the generator instead. See each harness's own ` +
+    `\`references/harness-adapters/<id>/\` directory for the disclosed substitute behind every ⚠️/❌ cell. ` +
+    `Consumed by capability-aware branching in \`boardroom.md\` and other canonical command/skill files ` +
+    `(docs/ARCHITECTURE.md §8f) -- a session running under a non-Claude-Code harness reads this table to ` +
+    `decide which real primitive to use vs. which disclosed substitute to fall back to.\n\n` +
+    `| Harness | Hooks | Plan-gate | Parallel dispatch | Question tool |\n` +
+    `|---|---|---|---|---|\n` +
+    claudeCodeRow + '\n' +
+    rows.join('\n') +
+    `\n`
+  );
+}
+
+function outputDirsToClean(harnessTargets) {
+  const dirs = new Set();
+  const sharedOutDirs = new Set(harnessTargets.filter((t) => t.skills?.sharedOutDir).map((t) => t.skills.sharedOutDir));
+  for (const d of sharedOutDirs) dirs.add(d);
+  for (const t of harnessTargets) {
+    if (t.commands?.mode === 'perFile' || t.commands?.mode === 'toml') dirs.add(t.commands.outDir);
+  }
+  return [...dirs];
+}
+
+function writeTargets(targets, cleanDirs) {
   // Clean-slate the generated directories first so a removed command/skill's stale output
   // doesn't linger (the same reason evals/MANIFEST.tsv is fully rewritten, not patched).
-  for (const dir of [sharedSkillsOut, opencodeCommandsOut]) {
-    rmSync(dir, { recursive: true, force: true });
+  for (const dir of cleanDirs) {
+    rmSync(join(adaptersRoot, dir), { recursive: true, force: true });
   }
   for (const [relPath, content] of targets) {
     const fullPath = join(adaptersRoot, relPath);
@@ -188,13 +250,38 @@ function readExisting(targets) {
   return existing;
 }
 
-function main() {
+function findStale(targets, cleanDirs) {
+  const stale = [];
+  for (const dir of cleanDirs) {
+    const fullDir = join(adaptersRoot, dir);
+    if (!existsSync(fullDir)) continue;
+    const walk = (d, prefix) => {
+      for (const entry of readdirSync(d, { withFileTypes: true })) {
+        const full = join(d, entry.name);
+        if (entry.isDirectory()) walk(full, join(prefix, entry.name));
+        else {
+          const rel = join(dir, prefix, entry.name);
+          if (!targets.has(rel)) stale.push(rel);
+        }
+      }
+    };
+    walk(fullDir, '');
+  }
+  return stale;
+}
+
+async function main() {
   const mode = process.argv[2];
-  const targets = buildTargets();
+  const harnessTargets = await loadHarnessTargets();
+  const targets = await buildTargets();
+  const cleanDirs = outputDirsToClean(harnessTargets);
+  const capabilityProfilePath = join(pluginRoot, 'references', 'harness-capability-profile.md');
+  const capabilityProfileContent = buildCapabilityProfile(harnessTargets);
 
   if (mode === '--write') {
-    writeTargets(targets);
-    console.log(`Wrote ${targets.size} generated file(s) under ${adaptersRoot.replace(pluginRoot, 'plugins/wingman')}.`);
+    writeTargets(targets, cleanDirs);
+    writeFileSync(capabilityProfilePath, capabilityProfileContent);
+    console.log(`Wrote ${targets.size} generated file(s) under ${adaptersRoot.replace(pluginRoot, 'plugins/wingman')}, plus references/harness-capability-profile.md.`);
     return;
   }
 
@@ -204,25 +291,11 @@ function main() {
     for (const [relPath, content] of targets) {
       if (existing.get(relPath) !== content) mismatches.push(relPath);
     }
-    // Also check for stale files present on disk but no longer in the generated set.
-    const staleDirs = [sharedSkillsOut, opencodeCommandsOut];
-    const stale = [];
-    for (const dir of staleDirs) {
-      if (!existsSync(dir)) continue;
-      const walk = (d, prefix) => {
-        for (const entry of readdirSync(d, { withFileTypes: true })) {
-          const full = join(d, entry.name);
-          if (entry.isDirectory()) walk(full, join(prefix, entry.name));
-          else {
-            const rel = join(dir === sharedSkillsOut ? join('shared', '.agents', 'skills') : join('opencode', '.opencode', 'commands'), prefix, entry.name);
-            if (!targets.has(rel)) stale.push(rel);
-          }
-        }
-      };
-      walk(dir, '');
-    }
-    if (mismatches.length || stale.length) {
-      console.error(`Harness-adapter generator drift: ${mismatches.length} stale/missing, ${stale.length} orphaned file(s)`);
+    const stale = findStale(targets, cleanDirs);
+    const capabilityProfileStale =
+      (existsSync(capabilityProfilePath) ? readFileSync(capabilityProfilePath, 'utf-8') : null) !== capabilityProfileContent;
+    if (mismatches.length || stale.length || capabilityProfileStale) {
+      console.error(`Harness-adapter generator drift: ${mismatches.length} stale/missing, ${stale.length} orphaned file(s)${capabilityProfileStale ? ', harness-capability-profile.md stale' : ''}`);
       for (const m of mismatches) console.error(`  - stale/missing: ${m}`);
       for (const s of stale) console.error(`  - orphaned (no longer generated): ${s}`);
       console.error('\nRun: node plugins/wingman/scripts/generate-harness-adapters.mjs --write\n\nFAIL');
@@ -237,4 +310,4 @@ function main() {
 
 if (process.argv[1] && process.argv[1] === fileURLToPath(import.meta.url)) main();
 
-export { buildTargets, detectPrimitives, listSkills, listCommands };
+export { buildTargets, detectPrimitives, listSkills, listCommands, buildCapabilityProfile };

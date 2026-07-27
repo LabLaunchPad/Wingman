@@ -1,0 +1,91 @@
+description = "Turn all 11 prior pipeline stages' combined output into a concrete, task-by-task implementation plan, then run this stage's own Boardroom checkpoint before any code is written."
+prompt = '''
+
+# Wingman: Implementation Planning
+
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
+
+{{args}}
+
+## Implementation Planning.1: Gather: confirm slug consistency first
+
+Before reading any stage output, list the files actually present in each of `docs/wingman/discovery/`, `docs/wingman/research-synthesis/`, `docs/wingman/personas-jobs/`, `docs/wingman/journey-mapping/`, `docs/wingman/define/`, `docs/wingman/information-architecture/`, `docs/wingman/uxflow/`, `docs/wingman/wireframes/`, `docs/wingman/visual-design-system/`, `docs/wingman/prototype-usability/`, and `docs/wingman/architecture/` (skip `uxflow`/`wireframes`/`visual-design-system`/`prototype-usability` only if the project genuinely has no user-facing surface, per `uxflow.md`). Read each filename's `<short-slug>` and confirm all of them resolve to the exact same slug — the same-slug-filename convention each earlier stage documents is never verified mechanically, so this stage is where a silent mismatch would otherwise first bite. If any stage's directory has more than one slug present, or a stage's file is missing entirely while the others exist, do not guess which one is "the" project — stop and ask the founder explicitly (the equivalent of `AskUserQuestion` for this markdown-instructed step) which slug/project to gather from before proceeding. Only once the slugs agree (or the founder has picked one) move on to writing the plan.
+
+## Implementation Planning.2: Write the plan
+
+Gather all 11 prior stage outputs — Discovery, Research Synthesis (`RS-*`), Personas & Jobs (`PJ-*`), Journey Mapping (`JM-*`), the `DEF-*` requirements, Information Architecture (`IA-*`), the `UX-*` flow (if this project has one), Wireframes (`WF-*`), the Visual Design System (`VS-*`), Prototype & Usability findings (`PT-*`), and the `ARCH-*` decisions — into a single concrete implementation plan, reading each by the same short-slug convention (same slug across every `docs/wingman/<stage>/<slug>.md` file in the founder's project). <!-- wingman:req RS-001 PJ-001 JM-001 IA-001 WF-001 VS-001 PT-001 ARCH-001 UX-001 --> Use Wingman's bundled `writing-plans` skill as the bar for quality: exact files, bite-sized tasks, no placeholders, a verification step for every task. Every task must carry at least one `wingman:req` marker (via the `traceability-linking` skill) pointing back to the ID(s) it implements — this is what `dod-structural-gate.mjs` checks for before `/wingman:build`'s checkpoint can clear later, so a task with no traceability marker at this stage will surface as a gap then, not silently.
+
+Enter plan mode (if not already in it) — or, outside Claude Code, whichever real plan/draft mode this harness has (check `references/harness-capability-profile.md`'s `hasPlanGate` column); if the harness has none at all, just write the plan file directly and rely on the checkpoint step below plus `dod-pre-push-check.mjs`'s git-push backstop. The plan file must include the sections `references/plan-review-checklist.md` requires (Executive Summary, Current State, Problem Statement, Solution Approach, Success Criteria, Timeline, Risks) — Discovery's problem statement and success signal map directly onto `## Problem Statement` and `## Success Criteria`; Architecture's decisions map onto `## Current State`/`## Solution Approach`. It must also end with a **Plain-Language Summary** section, written for the founder:
+
+```markdown
+## Plain-Language Summary
+
+**What this builds:** <1-2 sentences, no jargon>
+**What changes for your users/business:** <1-2 sentences>
+**What could go wrong:** <the single biggest risk, in plain terms>
+**Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
+```
+
+## Implementation Planning.3: Show task dependencies
+
+The plan document itself is never shown to the founder directly — its reader is whoever executes it
+(a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
+Plain-Language Summary), use `skills/visual-founder-output` to append a `## Task Dependencies`
+section per `references/visual-output-templates.md` §5, generated from the plan's own task list —
+this defaults to Tier B (Mermaid) regardless of session capability, since a rendered Artifact adds
+nothing for this document's actual reader. This is additive to the checkbox task list, not a
+replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
+themselves.
+
+## Implementation Planning.4: Where you are
+
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
+the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
+records — that's expected, not wasted effort: this view is "the plan just finished," the
+checkpoint's is "this stage's checkpoint is now recorded," one step later.
+
+## Implementation Planning.5: Gate checklist
+
+Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
+`references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
+
+- **Must include:** task breakdown, effort buckets, dependencies, milestones, risk list, sequencing
+  logic.
+- **Must decide:** the build order, and what gets explicitly deferred.
+- **Gate passes only if** the plan is realistic for a solo founder to actually execute.
+
+## Implementation Planning.6: Implementation Planning checkpoint
+
+Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
+
+**Harness-aware fallback**: `ExitPlanMode` + `boardroom-checkpoint.mjs`'s hook gate is Claude Code's own mechanism for making sure a "ship it" decision was actually recorded before code-writing resumes. Outside Claude Code, check `references/harness-capability-profile.md`'s `hasPlanGate` column: a `true`/`⚠️ weak` entry (e.g. Gemini CLI) has its own per-harness substitute hook already wired in that harness's own adapter (see `references/harness-adapters/<id>/`); a `false` entry (most harnesses today) has no interceptable transition at all, so `plugins/wingman/scripts/dod-pre-push-check.mjs` (wired via `install-git-hooks.mjs`) is the real backstop — it still blocks an unapproved plan from actually reaching `git push`, just later in the flow than Claude Code's own gate.
+
+The checkpoint checks the gate checklist above, not just the plan in general: it confirms every
+Must-include item is present and every Must-decide question is answered. If the gate does not pass,
+the checkpoint blocks here and names the specific missing item(s) to the founder — never a generic
+"needs work." Only once the boardroom checkpoint returns a "ship it" decision should you proceed to
+`/wingman:build`.
+
+## References
+
+- `skills/writing-plans` — the plan-quality bar.
+- `references/plan-review-checklist.md` — the 7 required sections the `boardroom-checkpoint` hook enforces before `ExitPlanMode`.
+- `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
+  questions, gap register, and 8-part output format every stage runs before its own checkpoint.
+- `skills/visual-founder-output` + `references/visual-output-templates.md` §5 — the task-dependency
+  diagram appended to the plan; §2 — the pipeline-status tree above.
+- `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
+
+<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+
+
+---
+
+## Harness note: Gemini CLI (auto-generated by `generate-harness-adapters.mjs` -- do not hand-edit)
+
+This file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real Gemini CLI equivalent:
+
+- **AskUserQuestion**: Gemini CLI has a real, confirmed structured question tool: `ask_user` (1-4 choices, blocking). Use it directly in place of `AskUserQuestion` -- this is the closest match to Claude Code's own tool found in any evaluated harness, not a prose fallback.
+- **ExitPlanMode**: Gemini CLI has a real Plan mode, but exiting it auto-escalates to YOLO mode, which bypasses further tool-approval gating entirely -- there is no discrete, interceptable "plan approved" event to hook the way `ExitPlanMode` + `boardroom-checkpoint.mjs` do. The disclosed substitute is a `BeforeAgent`/`Notification` hook watching for the mode-switch signal (see `gemini-cli/hooks/plan-gate.mjs`) plus `dod-pre-push-check.mjs`'s existing git-push fallback as a second, independent backstop -- treat this as a weaker gate than Claude Code's, not an equivalent one.
+
+'''

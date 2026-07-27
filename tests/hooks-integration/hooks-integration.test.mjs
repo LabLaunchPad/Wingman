@@ -1368,6 +1368,15 @@ describe('Harness Adapter Drift Check', () => {
     );
   }
 
+  // Descriptor-driven (2026-07-27 refactor): checkDrift now takes the canonical agents dir plus an
+  // array of harness-target-shaped objects ({ id, label, agents: { ext, modelFieldPattern? |
+  // modelFieldName? }, agentsDirAbs }), mirroring harness-targets/*.mjs's real shape rather than
+  // two hardcoded positional directory args.
+  const harnessAgentTargets = () => [
+    { id: 'codex-cli', label: 'Codex CLI', agentsDirAbs: codexDir, agents: { ext: '.toml', modelFieldPattern: /^model = .*$/m } },
+    { id: 'opencode', label: 'OpenCode', agentsDirAbs: opencodeDir, agents: { ext: '.md', modelFieldName: 'model' } },
+  ];
+
   beforeEach(() => {
     if (fs.existsSync(tempDir4)) fs.rmSync(tempDir4, { recursive: true, force: true });
     fs.mkdirSync(agentsDir, { recursive: true });
@@ -1384,7 +1393,7 @@ describe('Harness Adapter Drift Check', () => {
     writeCanonical('cto', 'opus');
     writeCodex('cto', { opusNote: true });
     writeOpencode('cto', { model: 'anthropic/claude-opus-4-8' });
-    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    const errors = checkDrift(agentsDir, harnessAgentTargets());
     assert.deepStrictEqual(errors, []);
   });
 
@@ -1392,7 +1401,7 @@ describe('Harness Adapter Drift Check', () => {
     const { checkDrift } = await import(pathToFileURL(driftCheckPath).href);
     writeCanonical('cto', 'opus');
     writeOpencode('cto', { model: 'anthropic/claude-opus-4-8' });
-    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    const errors = checkDrift(agentsDir, harnessAgentTargets());
     assert.ok(errors.some((e) => /missing boardroom-cto\.toml/.test(e)));
   });
 
@@ -1401,7 +1410,7 @@ describe('Harness Adapter Drift Check', () => {
     writeCanonical('cto', 'opus');
     writeCodex('cto', { opusNote: true });
     writeOpencode('cto', { model: 'anthropic/claude-sonnet-5' }); // drifted: should be opus tier
-    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    const errors = checkDrift(agentsDir, harnessAgentTargets());
     assert.ok(errors.some((e) => /canonical seat pins model: opus/.test(e) && /opencode/.test(e)));
   });
 
@@ -1410,7 +1419,7 @@ describe('Harness Adapter Drift Check', () => {
     writeCanonical('cmo', 'inherit');
     writeCodex('cmo', { verdict: false });
     writeOpencode('cmo');
-    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    const errors = checkDrift(agentsDir, harnessAgentTargets());
     assert.ok(errors.some((e) => /does not contain the expected/.test(e) && /codex-cli/.test(e)));
   });
 
@@ -1421,7 +1430,7 @@ describe('Harness Adapter Drift Check', () => {
     writeOpencode('cto', { model: 'anthropic/claude-opus-4-8' });
     // A leftover adapter for a seat that no longer exists in canonical:
     writeCodex('retired-seat', {});
-    const errors = checkDrift(agentsDir, codexDir, opencodeDir);
+    const errors = checkDrift(agentsDir, harnessAgentTargets());
     assert.ok(errors.some((e) => /stale adapter for a removed\/renamed seat/.test(e)));
   });
 

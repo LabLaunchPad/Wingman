@@ -199,6 +199,13 @@ not just re-reading this table's own prose.
 - **"AI-agent-agnostic transformation"**: genuinely met, but by a different mechanism — see the
   row's own updated cell above. The real Codex CLI/OpenCode harness-adapter work (§8b/§8c) answers
   the underlying need without adopting this row's specific `dist/`/`renames-map.json` proposal.
+  **Superseded again, 2026-07-27**: the founder came back and asked directly for full
+  agent-agnostic support across 6 harnesses (Codex CLI, OpenCode, Gemini CLI, Cursor, Cline,
+  OpenHands) — a deliberate, disclosed override of this row's and §8a/§8c's own "no blanket work
+  absent real demand" stance, not new organic evidence. See `docs/ARCHITECTURE.md` §8f for the full
+  framing and what's shipped so far. This row's *specific* `dist/`/`renames-map.json`/flattened-
+  repo-root proposal still stays declined on its own (lower-leverage) merits — the actual build is a
+  descriptor-driven generator extension (`harness-targets/<id>.mjs`), not that shape.
 - **`cosmtrek/mindwalk` (session-footprint)**: still zero organic mentions of "can't tell what an
   agent touched" as real friction anywhere in the logs.
 - **Context Compressor**: the one "context budget" mention found in `docs/PROJECT.md` is about a

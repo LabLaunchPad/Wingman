@@ -15,7 +15,7 @@ Use the `evolve-promotion` skill now. It will:
 1. Gather signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`.
 2. Cluster genuine repeated friction (2+ occurrences required — a single occurrence is never enough).
 3. Classify each qualifying cluster as a candidate command, skill, or specialist agent.
-4. Present the proposals to you in plain language and get explicit approval via `AskUserQuestion` before creating anything.
+4. Present the proposals to you in plain language and get explicit approval via `AskUserQuestion` before creating anything. **Harness-aware fallback**: if this session isn't running under Claude Code, check `references/harness-capability-profile.md`'s `hasQuestionTool` column — if `true` (e.g. Gemini CLI's `ask_user`, Cline's `ask_followup_question`), use that harness's native question tool instead, naming which one; if `false`, present the options in plain prose and treat the next message as the answer.
 5. Write the approved artifact into **your own project** under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate) — never into Wingman's own plugin files, regardless of artifact type (see `docs/ARCHITECTURE.md` §6 for why).
 6. Record any promoted specialist in `.wingman/state.json`'s `active_specialists` array.
 
@@ -36,4 +36,4 @@ This is meant to run occasionally (after a handful of shipped features), not eve
 
 This file is a generated copy of the canonical Claude Code source. It references the following Claude-Code-specific mechanism(s); here is the real OpenCode equivalent:
 
-- **AskUserQuestion**: OpenCode has no structured multi-choice question UI. Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.
+- **AskUserQuestion**: OpenCode has no structured multi-choice question UI reachable in non-interactive mode (`permission.ask` confirmed to hang indefinitely in `opencode run`/`opencode serve`). Ask the same question as plain conversational text, listing the options in prose, and take the reply as free-form text.

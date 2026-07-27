@@ -2,6 +2,52 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+<<<<<<< HEAD
+## [0.7.18] - 2026-07-27
+
+### Added
+- **Cursor harness adapter** (`plugins/wingman/references/harness-adapters/cursor/`), Phase 5 and the **last** phase of the founder-directed 6-harness build — sequenced last on purpose, since Cursor has the weakest capability match of all 6 (only 3 narrow hook lifecycle points, a UI-click-only Plan Mode exit with no interceptable event, no question tool). `plugins/wingman/scripts/harness-targets/cursor.mjs` reuses the existing `'perFile'` commands mode for Cursor's real, documented `.cursor/commands/*.md` slash-command convention, plus a shared-skills contribution (Cursor's real `.cursor/rules/*.mdc` mechanism has a genuinely different frontmatter shape than `SKILL.md`, so a full translation is left explicitly out of scope rather than half-done). Confirmed real parallel dispatch (up to 8 worktree-isolated background agents — an 8-seat Boardroom fits one batch exactly); no hooks-config wiring file or Boardroom-persona adapter, both honestly logged as open gaps.
+- **All 6 harnesses in the founder-directed build now have an adapter.** `docs/ARCHITECTURE.md` §8f, `harness-adapters/README.md`, and `plugins/wingman/AGENTS.md` updated to reflect the completed build; remaining open items (hooks-config schemas + persona formats for OpenHands/Cline/Cursor, the Cursor `.mdc` skill translation, live model-inference verification for the 4 newest harnesses) tracked in `docs/PROJECT.md`, not silently dropped.
+
+## [0.7.17] - 2026-07-27
+
+### Added
+- **Cline harness adapter** (`plugins/wingman/references/harness-adapters/cline/`), Phase 4 of the founder-directed 6-harness build. Like OpenHands, capability findings come from the general capability-matrix pass, not a dedicated schema-verification pass — no hooks-config wiring file or Boardroom-persona adapter shipped (Cline has no subagent concept at all).
+- `plugins/wingman/scripts/harness-targets/cline.mjs` — new descriptor, using the existing `'perFile'` commands mode for Cline's real, documented `.clinerules/workflows/*.md` slash-command convention (24 files, `--check`-verified), plus a shared-skills contribution (offered for manual copying only — Cline's `.clinerules/*.md` files are always-active context, not on-demand skill invocation).
+- Capability profile: confirmed no parallel dispatch (`/newtask` is sequential context-reset, not concurrency) and no plan-gate (Plan/Act toggle is manual-only, no interception point) — both fall back to existing harness-agnostic mechanisms (`dod-pre-push-check.mjs`, sequential dispatch disclosure). Real `ask_followup_question` question tool confirmed (single-select).
+
+## [0.7.16] - 2026-07-27
+
+### Added
+- **Documentation pass closing out the founder-directed 6-harness build's docs debt.** New `docs/ARCHITECTURE.md` §8f: the full override framing, the fresh 2026-07-27 capability matrix (7 harnesses), and a phase-by-phase summary of what's shipped (`0.7.12`-`0.7.15`) vs. what's tracked as open follow-on work (Cline/Cursor adapters, OpenHands' unconfirmed hooks/persona schema, live model-inference verification for any of the 3 newest harnesses). `docs/AGENT-ROSTER.md`'s "AI-agent-agnostic transformation" deferred-idea row gained a terminal "superseded again, 2026-07-27" update line, explicit that this is a founder override, not organic evidence, and that the row's own specific `dist/`/`renames-map.json` proposal remains declined on its own merits. `plugins/wingman/references/harness-adapters/README.md` rewritten for all 7 harnesses (5 built + 2 sequenced next) with a live capability matrix pointing at the generated `harness-capability-profile.md`. `plugins/wingman/AGENTS.md`'s nested cross-harness-adapters pointer updated to name all 4 built adapters plus the 2 sequenced next.
+
+## [0.7.15] - 2026-07-27
+
+### Added
+- **Capability-profile branching wired into canonical command/skill files** (`docs/ARCHITECTURE.md` §8f), closing the remaining founder-directed 6-harness build items that touch shipped content: `boardroom.md` (dispatch mode — parallel vs. disclosed sequential fallback), `evolve.md`/`evolve-promotion`/`dogfood-gap-classification` (question-tool fallback), and `implementation-planning.md` (plan-gate fallback). Each branch reads the new generated `plugins/wingman/references/harness-capability-profile.md` (emitted by `generate-harness-adapters.mjs` straight from the same `harness-targets/<id>.mjs` descriptors every other adapter artifact reads, so it can never drift). Because these are canonical files, the branching text propagates automatically to every harness's generated copy on the next `--write` — this is also what closes the "OpenCode's disclosed sequential-dispatch degradation should be a generated instruction, not just README prose" gap, with zero OpenCode-specific edit needed.
+- Re-copied the 2 touched skills (`evolve-promotion`, `dogfood-gap-classification`) to OpenCode's separately-ported verbatim skills copy to keep `check-harness-adapter-drift.mjs` clean.
+
+## [0.7.14] - 2026-07-27
+
+### Added
+- **OpenHands harness adapter** (`plugins/wingman/references/harness-adapters/openhands/`), Phase 3 of the founder-directed 6-harness build. Deliberately narrower scope than the Gemini CLI adapter: OpenHands' capability findings come from the 2026-07-27 general capability-matrix pass, not a dedicated field-level schema-verification pass, so this phase does **not** invent a Boardroom-persona file format or an exact hooks-config schema — both are honestly logged as open gaps in `openhands/README.md` and `docs/HUMAN-TODOS.md` rather than guessed at.
+- `plugins/wingman/scripts/harness-targets/openhands.mjs` — new descriptor, reusing the existing `'folded'` commands mode (all 24 commands folded into `.openhands/microagents/repo.md`, OpenHands' own confirmed-real, automatically-loaded repository-instructions file — the same shape as Codex CLI's `AGENTS.md` fallback) and contributing to the shared skills output. No `agents` block (no confirmed persona schema), so `check-harness-adapter-drift.mjs` correctly skips OpenHands for the persona-drift check.
+- Capability profile: confirmed real parallel delegation (`DelegateTool`), no plan-gate (blanket confirmation-mode toggle only, no discrete transition event — falls back to the existing `dod-pre-push-check.mjs` git-push gate), no confirmed question tool (prose fallback).
+
+## [0.7.13] - 2026-07-27
+
+### Added
+- **Gemini CLI harness adapter** (`plugins/wingman/references/harness-adapters/gemini-cli/`), Phase 2 of the founder-directed 6-harness build (Phase 1: descriptor-driven generator refactor, 0.7.12). Fresh 2026-07-27 schema-verification research corrected an earlier, less-precise general pass: Gemini CLI's real hook event names are `BeforeTool`/`AfterTool`/`BeforeAgent`/`AfterAgent`/`BeforeModel`/`AfterModel`/`BeforeToolSelection`/`SessionStart`/`SessionEnd`/`Notification`/`PreCompress` — **not** `PreToolUse`/`PostToolUse` as first assumed — and subagents are real Markdown + YAML frontmatter files under `agents/`, not TOML/JSON. Of the 6 harnesses in scope, Gemini CLI is the strongest capability match found: confirmed real parallel subagent dispatch, a confirmed real structured question tool (`ask_user`), and hooks that can genuinely block a tool call — only the plan-gate is a genuine, disclosed gap (exiting Plan mode auto-escalates to YOLO mode with no discrete interceptable transition event).
+- `plugins/wingman/scripts/harness-targets/gemini-cli.mjs` — new descriptor; `generate-harness-adapters.mjs` gained a new `commands.mode === 'toml'` formatter (`prompt`/`description` TOML fields, `$ARGUMENTS` → `{{args}}`, no `name` field since Gemini derives the command name from its file path) to emit the 24 `commands/wingman/*.toml` files.
+- 8 hand-translated Boardroom seat personas (`gemini-cli/agents/boardroom-*.md`), `gemini-extension.json`, `GEMINI.md` (using Gemini's real `@file.md` import syntax), `hooks/hooks.json` + a self-contained `secret-guard.mjs` port, and `hooks/plan-gate.mjs` — the one genuinely new piece of hook logic in this adapter, a disclosed coarser substitute for the missing plan-gate, backstopped by the existing `dod-pre-push-check.mjs` git-push gate. New `evals/cases/plan-gate-mode-switch-intercept.md`, all 5 shapes run for real against a constructed fixture.
+
+## [0.7.12] - 2026-07-27
+
+### Changed
+- **Founder-directed override of the 3x-declined "full agent-agnostic rewrite" stance** (docs/ARCHITECTURE.md §8a/§8c, 2026-07-18/07-22/07-25): after being shown that history plus fresh capability-matrix research across 6 non-Claude-Code harnesses (Codex CLI, OpenCode, Gemini CLI, Cursor, Cline, OpenHands — none has full parity; the plan-gate is the universal weak point), the founder directed a scoped, disclosed-substitute build. Phase 1 of that build lands here: `generate-harness-adapters.mjs` and `check-harness-adapter-drift.mjs` are refactored from two hardcoded harness branches into a **descriptor-driven model** (`plugins/wingman/scripts/harness-targets/{codex-cli,opencode}.mjs`, loaded generically via `harness-targets/index.mjs`), so each further harness is a new descriptor file, not new hardcoded logic. Verified behavior-preserving: `--check` produces the same 73 generated files, with only two intentional content corrections riding along (see below). `tests/hooks-integration/hooks-integration.test.mjs`'s drift-check suite updated to the new `checkDrift(agentsDir, harnessAgentTargets[])` signature.
+- **Codex CLI's `ParallelDispatch` harness note corrected**: fresh 2026-07-27 research confirmed genuine concurrent dispatch (`spawn_agent`/`send_message`/`wait_agent`/`close_agent`), superseding the prior "unconfirmed at scale, cap at 4" note.
+- **OpenCode's `ParallelDispatch` harness note corrected**: confirmed still sequential (open bug `anomalyco/opencode#29638`), now stated plainly as a disclosed degradation rather than an aspirational "dispatch as Task calls" note.
+
 ## [0.7.11] - 2026-07-26
 
 ### Added
