@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.23] - 2026-07-27
+
+### Optimized
+- **Memory: Optimize file-system traversal recursively checking tests.** Refactored `listFilesRecursive` in `dod-structural-gate.mjs` (canonical) and `dod-gate.js` (OpenCode adapter) to utilize a flat accumulator pattern instead of recursively concatenating arrays, preventing garbage collection overhead and high memory usage during file scans.
+
 ## [0.7.22] - 2026-07-27
 
 ### Added
