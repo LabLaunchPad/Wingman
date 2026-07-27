@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      { "command": "node ./.cursor/hooks/secret-guard.mjs" }
+    ],
+    "afterFileEdit": [
+      { "command": "node ./.cursor/hooks/secret-guard.mjs" }
+    ],
+    "beforeMCPExecution": []
+  }
+}

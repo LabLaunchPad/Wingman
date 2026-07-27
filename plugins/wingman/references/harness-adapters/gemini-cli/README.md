@@ -49,6 +49,11 @@ Same 4-tier legend used throughout `references/harness-adapters/`:
   field names a Gemini CLI `BeforeTool` command hook receives were not pinned down at that level of
   detail, so this script reads several plausible field-name variants and fails **open** on anything
   it doesn't recognize — it can under-block, never over-block on a guess.
+- `hooks/prompt-guard.mjs` — **authored, unverified** (2026-07-27 completeness pass). Wired to
+  `BeforeModel` — the closest confirmed real event to Claude Code's `UserPromptSubmit` (Gemini CLI's
+  taxonomy has no discrete "prompt submitted" event distinct from a model call), a self-contained
+  port of `plugins/wingman/hooks/prompt-guard.mjs`'s injection-pattern scan. Same defensive,
+  fail-open posture as `secret-guard.mjs`'s port, for the same reason.
 - `hooks/plan-gate.mjs` — **authored, unverified**, the one genuinely new piece of hook logic in
   this adapter (every other primitive here is a port). Gemini CLI has a real Plan mode, but exiting
   it auto-escalates straight to YOLO mode with no discrete, interceptable "plan approved" event —

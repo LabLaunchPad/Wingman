@@ -32,6 +32,7 @@ founder-cro	(none: a verdict-rendering skill with no code to set up as a fixture
 full-pipeline-e2e	evals/fixtures/setup-waitlist-app.sh	whole Wingman SDLC pipeline — `/wingman:plan` → `/wingman:build` → `/wingman:secure` → `/wingman:ship` — run in sequence against one continuous realistic project, rather than testing any single skill or command in isolation
 git-pr-workflow	(none: evidence comes from directly-constructed real git scenarios (bare repos, simulated squash-merges) built inline per run, not a dedicated setup-*.sh script)	plugins/wingman/skills/git-pr-workflow/SKILL.md
 harness-capability-profile-branching	(none: a fresh subagent is briefed with boardroom.md's own text plus a forced capability-profile fixture, no repo scaffolding needed)	plugins/wingman/commands/adaptive/boardroom.md
+harness-completeness-pass-2026-07-27	(none: deterministic script tests run directly against the real generated/authored files, no repo scaffolding needed)	3 concrete gaps closed in the 2026-07-27 completeness follow-up to the 6-harness build
 harness	evals/fixtures/setup-harness-fake-fixture.sh	plugins/wingman/commands/adaptive/harness.md
 hotfix	evals/fixtures/setup-hotfix-fixture.sh	plugins/wingman/commands/adaptive/hotfix.md
 implementation-planning	evals/fixtures/setup-implementation-planning-fixture.sh	plugins/wingman/commands/pipeline/implementation-planning.md; seven-stage-pipeline-e2e.md

@@ -27,6 +27,20 @@
           }
         ]
       }
+    ],
+    "BeforeModel": [
+      {
+        "matcher": "*",
+        "sequential": true,
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/prompt-guard.mjs",
+            "name": "wingman-prompt-guard",
+            "description": "Prompt-injection scan on the outgoing prompt -- ported from plugins/wingman/hooks/prompt-guard.mjs. BeforeModel is the closest confirmed analog to Claude Code's UserPromptSubmit, not a confirmed 1:1 match."
+          }
+        ]
+      }
     ]
   }
 }

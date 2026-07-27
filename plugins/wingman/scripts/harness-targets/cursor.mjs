@@ -21,11 +21,14 @@ export default {
   },
   skills: {
     // Cursor's real skill-adjacent mechanism is `.cursor/rules/*.mdc` -- a DIFFERENT frontmatter
-    // shape (description/globs/alwaysApply) than Wingman's own SKILL.md (name/description), so a
-    // faithful port would mean translating all 40 files' frontmatter, not a verbatim copy. Out of
-    // scope for this pass (no evidenced need to prioritize it over the other gaps this phase
-    // closes) -- contributed to the same shared output anyway, for manual reference/translation,
-    // same honest posture as Cline/OpenHands take.
+    // shape (description/globs/alwaysApply) than Wingman's own SKILL.md (name/description). Real
+    // translation (2026-07-27 completeness pass), not just the raw SKILL.md offered for reference:
+    // `alwaysApply: false` + empty `globs` makes Cursor treat the rule as "Agent Requested" --
+    // the agent reads `description` and decides whether to pull it in, the closest real Cursor
+    // analog to Claude Code's own description-triggered skill auto-invocation.
+    mdcOutDir: 'cursor/.cursor/rules',
+    mdcFrontmatter: (description) =>
+      `---\ndescription: "${description}"\nglobs: []\nalwaysApply: false\n---\n\n`,
     sharedOutDir: 'shared/.agents/skills',
   },
 

@@ -16,6 +16,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { parseAll } from './parse-wingman-logs.mjs';
 import { buildManifest, renderManifest } from './generate-eval-manifest.mjs';
 
@@ -164,7 +165,37 @@ if (committedManifest !== null && committedManifest !== regenerated) {
   errors.push('eval-manifest-drift: evals/MANIFEST.tsv does not match a fresh regeneration — run `node scripts/generate-eval-manifest.mjs --write` and commit the result');
 }
 
-console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files), eval-manifest freshness`);
+// --- Leftover merge-conflict markers: a real regression this project hit --
+// a stray `<<<<<<< HEAD` line from an imperfect manual conflict resolution
+// reached `main` undetected (2026-07-27, PR #122) because none of the 6
+// standard validators scan for this. Checks every git-tracked text file
+// (excluding vendor/, which is pinned upstream content this repo doesn't
+// author) for the 3 literal marker lines at the start of a line -- a cheap,
+// zero-false-positive-risk check since these exact strings never occur in
+// real prose/code outside an actual unresolved conflict.
+const CONFLICT_MARKERS = [/^<<<<<<< /m, /^=======$/m, /^>>>>>>> /m];
+let trackedFiles = [];
+try {
+  trackedFiles = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf-8' })
+    .split('\n')
+    .filter((f) => f && !f.startsWith('vendor/'));
+} catch {
+  // Not a git checkout (or git unavailable) -- nothing to scan; other checks still run.
+}
+for (const relPath of trackedFiles) {
+  const fullPath = join(repoRoot, relPath);
+  let text;
+  try {
+    text = readFileSync(fullPath, 'utf-8');
+  } catch {
+    continue; // binary or unreadable -- not a text file this check cares about
+  }
+  if (CONFLICT_MARKERS.some((re) => re.test(text))) {
+    errors.push(`conflict-marker: ${relPath} contains a leftover merge-conflict marker line -- resolve it before committing`);
+  }
+}
+
+console.log(`Repo-consistency: checked ${vendorEntries.length} vendored repos for attribution coverage, command inventory vs CLAUDE.md, structural-log marker coverage (${coverage.markedHeadings}/${coverage.totalHeadings}), shipped/dev-only script boundary (${shippedMjsFiles.length} files), eval-manifest freshness, ${trackedFiles.length} tracked file(s) scanned for leftover conflict markers`);
 
 if (warnings.length) {
   console.log(`\n${warnings.length} warning(s):`);
