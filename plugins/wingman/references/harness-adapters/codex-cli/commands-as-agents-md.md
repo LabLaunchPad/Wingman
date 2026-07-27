@@ -2028,6 +2028,52 @@ If the retro surfaces a durable lesson (not a one-off), run `/wingman:learn` to 
 
 ---
 
+## `/wingman:review`
+
+---
+description: On-demand code review without convening the full Boardroom — a plain-language verdict on correctness, security, simplicity, and test coverage.
+argument-hint: "[optional: files or focus notes]"
+---
+
+# Wingman: Review
+
+A thin command over the `code-review` skill, for when a founder wants "is this
+code good?" answered without paying the ceremony of a full 7-8-seat Boardroom
+checkpoint. `code-review` renders a review verdict only — it never writes or
+edits code itself.
+
+## When to use this instead of `/wingman:boardroom`
+
+- A quick gut-check mid-build, before a formal stage checkpoint is due.
+- A PR is open and needs a readable verdict, not just a green CI check.
+- The founder explicitly asks for a review without wanting the full business/
+  technical/finance/research consolidation a Boardroom checkpoint produces.
+
+If the change is genuinely high-risk (touches auth, payments, data, or a
+deploy — Level 3+ per `references/permission-model.md`), say so plainly and
+recommend `/wingman:boardroom` instead — this command is a lighter-weight
+tool, not a substitute for the real gate on things that need it.
+
+## What to do
+
+1. Follow `code-review`'s own method exactly: scope to what changed, review
+   across the four lenses (correctness, security, simplicity, tests), rate
+   each finding (Blocker / Should-fix / Nit), lead with the one-sentence
+   bottom line.
+2. If a focus note or file list was given as an argument, scope the review to
+   that; otherwise scope to the most recent uncommitted or unpushed changes.
+3. Report using `code-review`'s own output shape — this command adds no new
+   format of its own.
+
+## References
+
+- `skills/code-review` — the actual review method and output contract.
+- `references/permission-model.md` — the Level 3+ threshold for "this should
+  go to the Boardroom instead."
+
+
+---
+
 ## `/wingman:ship`
 
 ---
@@ -2149,6 +2195,62 @@ Propose the smallest addition that closes the gap — usually a few lines using 
 ## If nothing exists yet in the project
 
 Do not silently pick a vendor for the founder. Summarize the tradeoff in plain language (a hosted error-tracking tool vs. simple log files vs. nothing yet) and ask which they'd prefer, sized by effort and cost.
+
+
+---
+
+## `/wingman:test`
+
+---
+description: Run this project's actual test suite and report a plain-language pass/fail — the detected runner's real exit code, not a guess.
+argument-hint: "[optional: a specific file or path to test]"
+---
+
+# Wingman: Test
+
+A thin command wrapping `testing-patterns` and the project's own detected test
+runner. Where `/wingman:harness` audits whether the test setup *itself* is
+trustworthy, and `build.md`'s Definition-of-Done gate runs the suite as a
+blocking pre-push check, this command exists for the in-between moment: the
+founder or an agent wants to know "do the tests pass right now?" without
+convening a Boardroom checkpoint or waiting for a git push.
+
+## What to do
+
+1. **Detect the runner, generically** — same manifest-driven detection
+   `dod-structural-gate.mjs`'s `detectTestCommand()` already does: `package.json`
+   test script, `pytest.ini`/`pyproject.toml`/`setup.py`, `go.mod`, `Cargo.toml`,
+   `Gemfile`. Don't assume Node.js — Wingman builds arbitrary founder projects.
+2. **If no recognized runner exists**, say so plainly rather than fabricating
+   a result: "no test suite detected for this project" is itself useful,
+   plain-language information, not a failure to hide.
+3. **If an argument scopes to a specific file/path**, pass it through to the
+   detected runner in whatever form that runner accepts (e.g. `npm test --
+   path/to/file`, `pytest path/to/file`); otherwise run the full suite.
+4. **Actually run it and report the real exit code** — never claim "tests
+   pass" without having just run them fresh, per `verification-before-completion`.
+5. Apply `testing-patterns`'s coverage-floor guidance (>=80% on changed paths)
+   only as a note in the report, not as a separate blocking check this command
+   performs itself — that judgment call belongs to a human/Boardroom review,
+   not a mechanical pass/fail.
+
+## Report
+
+```markdown
+## Test Run
+
+**Runner:** <detected command, or "none detected">
+**Result:** <PASS / FAIL / no suite found>
+**Detail:** <failure output, tail only if long — never the full raw log>
+**Coverage note:** <if visible from the runner's own output; omit if not>
+```
+
+## References
+
+- `skills/testing-patterns` — AAA structure, boundary mocking, the 80% floor.
+- `plugins/wingman/hooks/dod-structural-gate.mjs`'s `detectTestCommand()`/
+  `runTestSuite()` — the same detection/execution logic this command mirrors,
+  reused at `git push` time as a blocking gate rather than an on-demand check.
 
 
 ---

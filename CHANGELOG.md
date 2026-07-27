@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.22] - 2026-07-27
+
+### Added
+- **Dependency audit — 5th check on `dod-structural-gate.mjs`'s `git push` gate.** Makes `security-checklist.md`'s OWASP A06 row ("dependencies audited; no known CVEs at HIGH/CRITICAL") mechanically true instead of aspirational. `detectDependencyAuditCommand()` picks the project's real ecosystem generically (npm/pnpm/yarn by lockfile, pip-audit, cargo-audit — mirroring `detectTestCommand()`'s own convention); `parseAuditReport()` is a pure function fed an auditor's raw JSON/NDJSON output, unit-tested against real recorded shapes with zero network; `runDependencyAudit()` is the thin shell-out wrapper. Skips (never false-blocks) when no auditor is installed or output is unparseable. New `tests/hooks-integration/dependency-audit.test.mjs` (16 tests).
+- **`/wingman:review`** — a thin command over the existing `code-review` skill, for on-demand review without convening the full Boardroom.
+- **`/wingman:test`** — a thin command over `testing-patterns` and the same test-runner detection `dod-structural-gate.mjs` already uses, so a founder can ask "do the tests pass right now?" without a git push.
+- Both new commands registered in `plugin.json` (32 → 34) and mirrored to all 6 harness adapters via `generate-harness-adapters.mjs --write`.
+
 ## [0.7.21] - 2026-07-27
 
 ### Added

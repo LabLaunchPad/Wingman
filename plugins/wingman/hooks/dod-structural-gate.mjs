@@ -473,6 +473,140 @@ export function runTestSuite(cwd, testCmd) {
   }
 }
 
+// Detects which native dependency auditor applies to this project -- language-generic, mirroring
+// detectTestCommand()'s own convention exactly (same manifest-file checks, same "return null if
+// unrecognized" contract so the caller skips rather than invents a false failure). Picks among
+// npm/pnpm/yarn by lockfile, since all three share package.json but report audit results in
+// different shapes (npm audit --json is a single JSON object; yarn classic's --json is NDJSON).
+export function detectDependencyAuditCommand(cwd) {
+  if (existsSync(join(cwd, 'package.json'))) {
+    if (existsSync(join(cwd, 'pnpm-lock.yaml'))) return { ecosystem: 'pnpm', command: 'pnpm', args: ['audit', '--json'] };
+    if (existsSync(join(cwd, 'yarn.lock'))) return { ecosystem: 'yarn', command: 'yarn', args: ['audit', '--json'] };
+    return { ecosystem: 'npm', command: 'npm', args: ['audit', '--json'] };
+  }
+  if (existsSync(join(cwd, 'pyproject.toml')) || existsSync(join(cwd, 'requirements.txt')) || existsSync(join(cwd, 'setup.py'))) {
+    return { ecosystem: 'pip-audit', command: 'pip-audit', args: ['-f', 'json'] };
+  }
+  if (existsSync(join(cwd, 'Cargo.toml'))) {
+    return { ecosystem: 'cargo', command: 'cargo', args: ['audit', '--json'] };
+  }
+  return null;
+}
+
+// Pure decision function: given an auditor's raw stdout (a string) and which ecosystem produced
+// it, decide whether a HIGH/CRITICAL vulnerability was found. Deliberately separated from
+// runAudit() below (which shells out) so this can be unit-tested against real, recorded auditor
+// output -- no network, fully deterministic -- the same testability seam detectTestCommand()/
+// runTestSuite() already establish for the sibling test-execution check.
+//
+// Unparseable/empty output is treated as "skip, don't invent a false failure" -- the auditor
+// either isn't installed (a real, common case: pip-audit and cargo-audit are both opt-in installs,
+// not bundled) or produced a shape this parser doesn't recognize yet. This mirrors detectTestCommand's
+// own "return null rather than a false failure" contract, applied to the report-parsing step instead
+// of the detection step.
+export function parseAuditReport(raw, ecosystem) {
+  const text = String(raw || '').trim();
+  if (!text) return { ok: true, skipped: true };
+
+  try {
+    if (ecosystem === 'npm' || ecosystem === 'pnpm') {
+      const report = JSON.parse(text);
+      const counts = report?.metadata?.vulnerabilities;
+      if (counts && typeof counts === 'object') {
+        const blocking = (counts.high || 0) + (counts.critical || 0);
+        return blocking > 0
+          ? { ok: false, findings: [`${blocking} HIGH/CRITICAL advisor${blocking === 1 ? 'y' : 'ies'} (${ecosystem} audit)`] }
+          : { ok: true };
+      }
+      // Older npm audit shape: a flat `advisories` map, each entry carrying its own `severity`.
+      const advisories = report?.advisories;
+      if (advisories && typeof advisories === 'object') {
+        const blocking = Object.values(advisories).filter((a) => ['high', 'critical'].includes(String(a.severity).toLowerCase()));
+        return blocking.length > 0
+          ? { ok: false, findings: blocking.map((a) => `${a.severity} — ${a.module_name || a.title || 'unnamed advisory'}`) }
+          : { ok: true };
+      }
+      return { ok: true, skipped: true }; // recognized JSON, unrecognized shape -- don't invent a failure
+    }
+
+    if (ecosystem === 'yarn') {
+      // yarn classic's `--json` is NDJSON: one JSON object per line, terminated by a single
+      // `{"type":"auditSummary", "data": {"vulnerabilities": {...}}}` line.
+      const lines = text.split('\n').filter(Boolean);
+      for (let i = lines.length - 1; i >= 0; i--) {
+        let entry;
+        try { entry = JSON.parse(lines[i]); } catch { continue; }
+        if (entry.type === 'auditSummary') {
+          const counts = entry.data?.vulnerabilities || {};
+          const blocking = (counts.high || 0) + (counts.critical || 0);
+          return blocking > 0
+            ? { ok: false, findings: [`${blocking} HIGH/CRITICAL advisor${blocking === 1 ? 'y' : 'ies'} (yarn audit)`] }
+            : { ok: true };
+        }
+      }
+      return { ok: true, skipped: true };
+    }
+
+    if (ecosystem === 'cargo') {
+      const report = JSON.parse(text);
+      const list = report?.vulnerabilities?.list;
+      if (!Array.isArray(list)) return { ok: true, skipped: true };
+      // RustSec advisories don't use a numeric CVSS-style severity field by default in all cases;
+      // treat any listed vulnerability as blocking, since cargo-audit only lists advisories that
+      // actually apply to this project's resolved dependency graph (no info-only noise floor the
+      // way npm's audit does).
+      return list.length > 0
+        ? { ok: false, findings: list.map((v) => `${v.advisory?.id || 'unknown'} — ${v.advisory?.title || 'untitled advisory'}`) }
+        : { ok: true };
+    }
+
+    if (ecosystem === 'pip-audit') {
+      const report = JSON.parse(text);
+      const packages = Array.isArray(report) ? report : report?.dependencies;
+      if (!Array.isArray(packages)) return { ok: true, skipped: true };
+      // pip-audit's JSON doesn't reliably carry a severity rating the way npm/cargo do -- so
+      // unlike those two, this treats ANY finding as blocking rather than filtering to HIGH/
+      // CRITICAL only. Documented deviation, not an oversight: filtering to HIGH/CRITICAL here
+      // would require guessing at a severity field this tool doesn't consistently provide.
+      const findings = [];
+      for (const pkg of packages) {
+        for (const vuln of pkg.vulns || []) {
+          findings.push(`${pkg.name}@${pkg.version} — ${vuln.id || 'unnamed CVE'}`);
+        }
+      }
+      return findings.length > 0 ? { ok: false, findings } : { ok: true };
+    }
+  } catch {
+    return { ok: true, skipped: true }; // malformed/unexpected output -- never invent a false block
+  }
+
+  return { ok: true, skipped: true };
+}
+
+// Thin shell-out wrapper, separated from parseAuditReport() above so the parsing logic is
+// testable with zero network access and zero installed auditors. Real auditors need network
+// (querying an advisory database) and may not be installed at all in a given environment -- both
+// are treated as "skip," never a false block, matching this file's own established fail-open
+// convention for unrecognized-project-shape cases.
+export function runDependencyAudit(cwd, auditCmd) {
+  if (!auditCmd) return { ok: true, skipped: true };
+  try {
+    const output = execFileSync(auditCmd.command, auditCmd.args, {
+      cwd,
+      encoding: 'utf-8',
+      timeout: 30_000,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    return parseAuditReport(output, auditCmd.ecosystem);
+  } catch (err) {
+    // Most audit CLIs (npm/pnpm/yarn/cargo-audit) exit non-zero when they FIND a vulnerability --
+    // that's the actual, useful signal, still captured on stdout even though execFileSync throws.
+    // A missing binary, no network, or a genuine crash also lands here; parseAuditReport's own
+    // "unparseable -> skip" rule is what keeps those cases from becoming a false block.
+    return parseAuditReport(err.stdout, auditCmd.ecosystem);
+  }
+}
+
 export function getChangedFiles(cwd, baseRef) {
   // A bad or unreachable baseRef (e.g. HEAD~20 in a repo with fewer commits)
   // must not silently degrade to "no changed files" -- that would skip the
@@ -597,6 +731,20 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       deny(
         `Wingman dod-structural-gate: the threat register still has an OPEN row. ` +
         `Close it or get explicit founder acceptance (see build.md's Definition-of-Done gate) before pushing.`
+      );
+    }
+
+    // 5. Dependency audit — makes the security-checklist's OWASP A06 row ("dependencies audited;
+    // no known CVEs at HIGH/CRITICAL") mechanically true instead of aspirational. Skips (never
+    // false-blocks) when no recognized auditor/ecosystem is present, per this file's own
+    // "don't invent a failure for an unrecognized project shape" rule.
+    const auditCmd = detectDependencyAuditCommand(cwd);
+    const auditResult = runDependencyAudit(cwd, auditCmd);
+    if (!auditResult.ok) {
+      deny(
+        `Wingman dod-structural-gate: a dependency audit found HIGH/CRITICAL issue(s):\n` +
+        `${(auditResult.findings || []).join('\n')}\n` +
+        `Update the affected package(s), or get explicit founder risk acceptance recorded in the threat register, before pushing.`
       );
     }
 

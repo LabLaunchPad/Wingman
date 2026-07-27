@@ -1,0 +1,50 @@
+---
+description: Run this project's actual test suite and report a plain-language pass/fail — the detected runner's real exit code, not a guess.
+argument-hint: "[optional: a specific file or path to test]"
+---
+
+# Wingman: Test
+
+A thin command wrapping `testing-patterns` and the project's own detected test
+runner. Where `/wingman:harness` audits whether the test setup *itself* is
+trustworthy, and `build.md`'s Definition-of-Done gate runs the suite as a
+blocking pre-push check, this command exists for the in-between moment: the
+founder or an agent wants to know "do the tests pass right now?" without
+convening a Boardroom checkpoint or waiting for a git push.
+
+## What to do
+
+1. **Detect the runner, generically** — same manifest-driven detection
+   `dod-structural-gate.mjs`'s `detectTestCommand()` already does: `package.json`
+   test script, `pytest.ini`/`pyproject.toml`/`setup.py`, `go.mod`, `Cargo.toml`,
+   `Gemfile`. Don't assume Node.js — Wingman builds arbitrary founder projects.
+2. **If no recognized runner exists**, say so plainly rather than fabricating
+   a result: "no test suite detected for this project" is itself useful,
+   plain-language information, not a failure to hide.
+3. **If an argument scopes to a specific file/path**, pass it through to the
+   detected runner in whatever form that runner accepts (e.g. `npm test --
+   path/to/file`, `pytest path/to/file`); otherwise run the full suite.
+4. **Actually run it and report the real exit code** — never claim "tests
+   pass" without having just run them fresh, per `verification-before-completion`.
+5. Apply `testing-patterns`'s coverage-floor guidance (>=80% on changed paths)
+   only as a note in the report, not as a separate blocking check this command
+   performs itself — that judgment call belongs to a human/Boardroom review,
+   not a mechanical pass/fail.
+
+## Report
+
+```markdown
+## Test Run
+
+**Runner:** <detected command, or "none detected">
+**Result:** <PASS / FAIL / no suite found>
+**Detail:** <failure output, tail only if long — never the full raw log>
+**Coverage note:** <if visible from the runner's own output; omit if not>
+```
+
+## References
+
+- `skills/testing-patterns` — AAA structure, boundary mocking, the 80% floor.
+- `plugins/wingman/hooks/dod-structural-gate.mjs`'s `detectTestCommand()`/
+  `runTestSuite()` — the same detection/execution logic this command mirrors,
+  reused at `git push` time as a blocking gate rather than an on-demand check.
