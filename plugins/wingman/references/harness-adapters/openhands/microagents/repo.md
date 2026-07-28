@@ -486,6 +486,14 @@ $ARGUMENTS
 
 ## Build.1: Before starting
 
+If no prior approved plan exists for this request (see below) — an ad hoc/direct build request that
+skips the earlier pipeline stages — use the `change-triage` skill before anything else. A request
+with an approved plan was already triaged implicitly by having passed through Discovery, so skip this
+check in that case. A Level 0-1 classification routes to `/wingman:hotfix`'s lightweight loop instead
+of Build; a Level 4 classification routes to `/wingman:incident` immediately; Level 2-3 continue here,
+with a Level 3 classification meaning every downstream checkpoint for this request is mandatory full
+review.
+
 Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
 Check `.wingman/checkpoints.jsonl` for an entry with `"bundle": "planning-milestone"` for this project. If none exists, do not proceed silently — tell the founder plainly: "No prior Wingman plan found for this project — proceeding without traceability coverage from earlier pipeline stages. If you have your own spec, that's fine; if you meant to run `/wingman:discovery` through `/wingman:implementation-planning` first, stop now and do that instead." Wait for the founder's answer before continuing this stage.
@@ -780,6 +788,15 @@ argument-hint: "<what you want built, in your own words>"
 The first of Wingman's 14 pipeline stages, and the first stage of **Phase 1: Problem Definition & Market Validation** (with `research-synthesis.md` and `personas-jobs.md`) — that phase's goal is making sure a founder is building something people actually want before spending any time managing an AI coding agent. Before anything gets scoped into requirements, make sure the underlying problem is actually understood — a well-built solution to the wrong problem is still a wasted build. Include a feasibility check as part of this: search for existing competitors or prior attempts; if nobody else is solving this, ask plainly whether that's because it isn't a real problem, or because it's genuinely hard.
 
 $ARGUMENTS
+
+## Discovery.0: Triage
+
+Use the `change-triage` skill to classify this request before anything else. A Level 0-1 request
+(a small, reversible, non-trust-boundary fix) routes to `/wingman:hotfix`'s lightweight loop instead
+of continuing through Discovery — tell the founder plainly and stop here. A Level 4 request (active
+production incident) routes to `/wingman:incident` immediately. Level 2-3 requests continue to
+Discovery.1 normally; a Level 3 classification means every downstream checkpoint for this request is
+mandatory full review, never skippable later.
 
 ## Discovery.1: Understand the ask
 
@@ -1128,6 +1145,14 @@ $ARGUMENTS
 ## Step 1: Intake
 
 Normalize whatever triggered this into one clear problem statement: a founder-pasted error/stack trace, or an alert delivered through an error-tracking connector wired up via `/wingman:telemetry`. If the input is too vague to investigate (no error message, no reproduction, just "it's broken"), ask the founder one plain-language clarifying question before proceeding — don't start guessing.
+
+Use the `change-triage` skill to confirm the level this fix actually belongs at — a "hotfix" framing
+is exactly where under-classification risk is highest, since urgency pressures toward skipping
+process. If the underlying fix touches a trust boundary (auth, payments, access control, customer
+data) it's Level 3+ regardless of how urgent it feels: continue this loop, but flag the eventual
+Boardroom checkpoint in Step 6 as mandatory full review, never a rubber-stamped `diff` pass. If
+production is actively broken beyond a single, well-understood error, this may actually be Level 4 —
+consider `/wingman:incident` instead of continuing this loop alone.
 
 ## Step 2: Activate the relevant department leads
 

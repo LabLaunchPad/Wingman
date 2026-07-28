@@ -172,6 +172,23 @@ after `/wingman:ship` — it reviews usage/support signals and feeds findings ba
 checkpoint bundle) — it records an ordinary ad-hoc `"stage": "post-launch"` checkpoint entry like any
 other `/wingman:boardroom`-reviewed content that isn't part of the fixed 14-stage sequence.
 
+**`skills/change-triage` (added 2026-07-28) is a deliberate, explicitly-recorded partial reversal of
+this section's own founder-approved bundling decision — named honestly, not silently overwritten.**
+This section documents the 12 individual pre-build checkpoints as a founder-approved tradeoff of
+"more checkpoints is more founder review overhead, traded deliberately for less risk of shipping
+something structurally under-designed." Change-triage partially re-opens that tradeoff from the other
+direction: a Level 0-1 request (a small, reversible, non-trust-boundary fix) is routed to
+`/wingman:hotfix`'s lightweight loop instead of the full 14-stage sequence, on the founder's own
+explicit direction that not every request should pay the full ceremony cost. This is safe by
+construction, not a strictness dial: triage may only route work *up* (a Level 3+ classification means
+every downstream checkpoint stays mandatory full review, never skippable), never down — anything
+touching a trust boundary, secrets, auth, payments, customer data, or deploy is Level 3+ by
+definition regardless of how the request is framed. It is a skill, not a 15th pipeline stage — it
+produces a routing decision, not an artifact with its own checkpoint or traceability ID, so the 14
+stage names encoded in `checkpoints.jsonl`'s schema are untouched. See `docs/PROJECT.md`'s decisions
+log, 2026-07-28, for the full record of this as a deliberate override, not evidence the original
+bundling decision was wrong.
+
 ## 4e. Phase groupings (6 phases over the 14 stages) — presentation layer, not new state
 
 A founder-supplied reference workflow ("The Lean AI-Assisted SDLC for Solo Founders") groups an

@@ -11,6 +11,14 @@ This is the loop that runs when something already shipped breaks in production: 
 
 Normalize whatever triggered this into one clear problem statement: a founder-pasted error/stack trace, or an alert delivered through an error-tracking connector wired up via `/wingman:telemetry`. If the input is too vague to investigate (no error message, no reproduction, just "it's broken"), ask the founder one plain-language clarifying question before proceeding — don't start guessing.
 
+Use the `change-triage` skill to confirm the level this fix actually belongs at — a "hotfix" framing
+is exactly where under-classification risk is highest, since urgency pressures toward skipping
+process. If the underlying fix touches a trust boundary (auth, payments, access control, customer
+data) it's Level 3+ regardless of how urgent it feels: continue this loop, but flag the eventual
+Boardroom checkpoint in Step 6 as mandatory full review, never a rubber-stamped `diff` pass. If
+production is actively broken beyond a single, well-understood error, this may actually be Level 4 —
+consider `/wingman:incident` instead of continuing this loop alone.
+
 ## Step 2: Activate the relevant department leads
 
 Use the `department-lead-activation` skill for `dept-engineering` (always active), `dept-qa` (always active), and `dept-devops` (check for CI config, a Dockerfile, or a prior `ship` entry in `.wingman/checkpoints.jsonl` — a production incident almost always implies at least one prior ship, so this will typically already be true).
