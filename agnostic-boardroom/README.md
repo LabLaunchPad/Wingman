@@ -209,7 +209,7 @@ alone. This is real, disclosed evidence against declaring the gap closed, not fo
 
 The founder reviewed Phase 1-3's real-metrics readiness report and explicitly chose to proceed on the
 strength of the already-measured token-compression result alone, overriding the earlier
-"prove decision-quality against the shipped plugin first" bar — see `docs/PROJECT.md`'s decisions
+"prove decision-quality against the shipped plugin first" bar — see `docs/status/PROJECT.md`'s decisions
 log for the exact exchange. Two things were built as a result:
 
 1. **`agents/boardroom_engine.py`** composes `retrieve_memories` + `route_task` +
@@ -275,7 +275,7 @@ actually report a mismatch rather than rubber-stamping every result.
 scripted exchange. It does not yet compare against a live run of the shipped plugin's own
 `/wingman:boardroom` on the same task — that comparison needs two real model runs, one per system,
 on identical input, and stays the deferred next step once live spend is authorized. See
-`docs/PROJECT.md`'s decisions log for the exact exchange this phase resolves and defers.
+`docs/status/PROJECT.md`'s decisions log for the exact exchange this phase resolves and defers.
 
 ## Phase 2b: closing the "built in isolation" gaps
 
@@ -328,7 +328,7 @@ them"). **Three real, disclosed findings**:
    informative, not proof the low-confidence-routing gap is safe in general across other tasks — a
    single run is one data point, not a closed risk.
 
-See `docs/PROJECT.md`'s decisions log for the full record.
+See `docs/status/PROJECT.md`'s decisions log for the full record.
 
 This is a from-scratch Python backend rebuild of Wingman's Boardroom/pipeline concepts as a
 standalone, agent-agnostic MCP server — LangGraph-style graph orchestration (via
@@ -340,21 +340,21 @@ for checkpoints/threat-register/debt-ledger/traceability data.
 **This does not replace `plugins/wingman/` today.** The existing markdown Claude Code plugin under
 `plugins/wingman/` is Wingman's shipped, working product and keeps operating unchanged throughout
 this build-out. Nothing here is deleted, retired, or wired to override it until this backend is
-proven end-to-end. See `docs/PROJECT.md`'s decisions log for the full record of why this was built
+proven end-to-end. See `docs/status/PROJECT.md`'s decisions log for the full record of why this was built
 additively rather than as an in-place replacement.
 
 ## Why this exists
 
 A full architectural rewrite proposal (LangGraph/PydanticAI/MCP/vector-store/SQL state,
-`docs/PROJECT.md`'s decisions log has the full pasted blueprint and the evaluation) was reviewed
+`docs/status/PROJECT.md`'s decisions log has the full pasted blueprint and the evaluation) was reviewed
 against Wingman's existing, documented decisions — several of which it directly reverses (the
-flat-file state store choice in `docs/DATABASE.md`, the unconditional any-`NO_GO`-blocks Boardroom
+flat-file state store choice in `docs/status/DATABASE.md`, the unconditional any-`NO_GO`-blocks Boardroom
 gate rule, the v16 audit's evidence-based rejection of vector search / self-healing / enterprise
 governance for zero cited need). Those conflicts were surfaced and the user explicitly confirmed:
 build it anyway, as a full rewrite, evaluating Agno over LangGraph. This directory is that build,
 in progress.
 
-## Phases (see `docs/PROJECT.md` decisions log for the full execution protocol)
+## Phases (see `docs/status/PROJECT.md` decisions log for the full execution protocol)
 
 1. **Data & Schema** (done) — `core/state_schema.py`: Pydantic models for `ProjectState`,
    `BoardroomVerdict`, `ThreatRegisterEntry`, `DebtLedgerEntry`, `TraceabilityLink`. Guarantees type
@@ -443,7 +443,7 @@ would be exactly the "purposeless data" this A/B layer exists to avoid.
 `gateway/` is a plain, importable, stateless routing layer — not a persistent service. Modeled on
 LiteLLM's own `router.py` (a stateless-per-call `Router` class) as distinct from LiteLLM's `proxy/`
 (the actual always-on HTTP gateway server, only needed for cross-process auth/spend-tracking). This
-project needs the former, not the latter: `docs/ARCHITECTURE.md` §2's "no persistent runtime" rule
+project needs the former, not the latter: `docs/status/ARCHITECTURE.md` §2's "no persistent runtime" rule
 rules out an always-on daemon for the shipped Claude Code plugin, and `gateway.Router.run()` has the
 exact same lifecycle as calling a function directly — no background thread, no listening socket.
 
@@ -455,7 +455,7 @@ only partially live-verified**: 2 real completions were captured via the raw CLI
 format and a real, non-obvious mechanic — OpenCode resolves its project config via the `$PWD` env var,
 not merely a subprocess's OS-level cwd), but the OpenCode Zen workspace then hit a real billing wall
 before the class itself completed a live round-trip. `tests/test_opencode_provider.py`'s fixtures are
-the *actual* captured JSONL from those 2 real calls, not fabricated data — see `docs/PROJECT.md`'s
+the *actual* captured JSONL from those 2 real calls, not fabricated data — see `docs/status/PROJECT.md`'s
 decisions log for the full, disclosed account. Deliberately **no retry/fallback-on-failure logic yet**
 even with 2 providers registered — `Router` requires the caller to name a provider or rely on
 `default`; automatic failover on error is a real future increment, not built speculatively here.
@@ -515,6 +515,47 @@ on — needed zero logic changes, only an import-path update.
 transport wrapper exposing them as `@mcp.tool()`-decorated functions over stdio. This is the same
 registry/transport split real agent-SDK scaffolds (CrewAI's `tools/`, Mastra's `tools/`) use, just
 named for the actual transport (MCP) this project uses rather than a generic folder name.
+
+## Candidate roadmap ideas from external AI-SDLC survey (2026-07-28, not yet built)
+
+A founder-supplied survey of external "agent-agnostic AI SDLC" frameworks proposed rebuilding
+Wingman around five declarative resources: `Pipeline`, `AgentRole`, `QualityGate`,
+`AutonomyPolicy`, `AdapterBinding`. Before adding anything here, the cited sources were actually
+fetched and read, not taken on faith — worth recording plainly, since the evidentiary weight varies
+a lot per source:
+
+- **ai-sdlc.io** — early-stage/speculative project. No visible GitHub stars, forks, contributor
+  count, case studies, or company backing; polished docs describing aspirations, not demonstrated
+  deployments. Weak evidence.
+- **arXiv:2604.26275** — a real trend paper (SWE-bench Verified performance curve, productivity
+  studies, a proposed six-layer reference architecture) but it does **not** discuss declarative
+  pipelines, adapter contracts, or quality gates at all — the specific architectural claim
+  attributed to it wasn't actually in it.
+- **agentpatterns.ai** — the strongest of the four: detailed, actively-maintained operational
+  patterns, genuinely tool-agnostic in philosophy, treats quality gates (evals, observability, audit
+  trails) as pipeline prerequisites rather than afterthoughts. Worth drawing on.
+- **vibed-lab's `ai-sdlc-harness` plugin** — small (11 GitHub stars) and, notably, built
+  specifically **for Claude Code** — cited as agent-agnostic evidence but is itself single-harness,
+  which undercuts using it that way.
+
+Net: this is inspiration-grade, not proof of an industry-consensus pattern. Given that, and given
+this project already has a real, evidenced result arguing for caution on rearchitecture generally
+(Phase 5's live decision-quality A/B found this engine's judgment *worse*, in the more dangerous
+direction, than the shipped Claude Code Boardroom on one real case), these ideas are logged as
+candidates against what's already here, not queued for implementation:
+
+| External concept | Closest existing equivalent here | Gap, if any |
+|---|---|---|
+| `Pipeline` (declarative workflow definition) | `graph/pipeline_workflow.py` — the real 7-stage topology as an Agno `Workflow` of `Step`s | Already declarative in the Agno sense; not a gap. |
+| `AgentRole` | The Boardroom personas this engine's `engine/boardroom_engine.py` maps to, plus the 40-skill index `knowledge/skill_router.py` dispatches over | Roles are defined in Wingman's own prose/schema, not a separate declarative role manifest — could be worth a typed `AgentRole` schema in `core/state_schema.py` if a second consumer ever needs one; no evidenced need yet. |
+| `QualityGate` | `loop/checker.py`'s Maker/Checker pair, plus the coverage audit and the decision-quality A/B harness (`eval/decision_quality.py`, `eval/checker_severity_ab.py`) | Reasonably well covered already. |
+| `AutonomyPolicy` | Nothing here yet — Wingman's actual autonomy gating (the 5-tier permission model, `change-triage`'s routing) lives in `plugins/wingman/`, not this backend | Genuine gap *if* this backend is ever meant to run autonomy decisions itself, but no evidenced need — this backend still requires a human to invoke `ship-feature` per Phase 7's own scope note. |
+| `AdapterBinding` (multi-harness) | Not this project's job — `plugins/wingman/scripts/generate-harness-adapters.mjs` + `harness-targets/*.mjs` already do exactly this for 7 harnesses, at the `plugins/wingman/` layer | Out of scope for `agnostic-boardroom/` specifically; would only matter here if this backend itself needed to run under multiple agent runtimes, which isn't its stated goal (it's an MCP server, harness-agnostic by construction already). |
+
+Only genuine, evidence-thin gap: a typed `AutonomyPolicy` resource, and only if a future need
+actually surfaces for this backend (rather than `plugins/wingman/`) to make autonomy decisions.
+Not building it now — logged here per this project's own evidence-gated convention, same bar as
+everything else in `docs/roadmap/AGENT-ROSTER.md`.
 
 ## Running this today
 
