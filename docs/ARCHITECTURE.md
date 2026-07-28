@@ -305,7 +305,7 @@ project's dev history.
 
 | Corporate concept | Wingman mechanism |
 |---|---|
-| Boardroom meeting / phase gateway | `/wingman:boardroom` — parallel dispatch of the 5 seats, consolidated verdict, `.wingman/checkpoints.jsonl` record (§4) |
+| Boardroom meeting / phase gateway | `/wingman:boardroom` — parallel dispatch of all 8 seats (7 C-suite + Design), consolidated verdict, `.wingman/checkpoints.jsonl` record (§4) |
 | Cross-departmental PR loop (QA + Security run together; Security can block and reassign) | `/wingman:build`'s closing verification step and its own Definition-of-Done gate (§4b) — Security's dedicated pass now happens inline here rather than in a separate `/wingman:secure` stage. Read-only review passes (`dept-qa`, `boardroom-ciso`) dispatch in parallel — same one-message/multiple-Task-call pattern `/wingman:boardroom` already uses. |
 | Automated error-correction loop (prod error → root-cause → hotfix → re-verify) | `/wingman:hotfix`: founder pastes a production error (or it arrives via an error-tracking MCP connector wired up through `/wingman:telemetry`) → `systematic-debugging` skill investigates → `dept-engineering` fixes → `dept-qa` verifies → boardroom checkpoint → `/wingman:ship`. |
 

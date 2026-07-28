@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.25] - 2026-07-28
+
+### Fixed
+- **`engineering-minimalism`'s One-Check Rule vs. `test-driven-development`/`testing-patterns`.** Both fire on the same event (writing code during `/wingman:build`) but prescribed incompatible testing depth, with no disambiguation. Added an explicit precedence note: TDD's Iron Law and `testing-patterns`' 80% coverage floor win during `build.md`'s normal task loop; the One-Check Rule applies only where they aren't already governing the work (dev-tooling scripts, non-plan exploratory code). Found via a semantic audit dispatched specifically to look for cross-skill contradictions the mechanical validators can't catch.
+- Two stale "5 Boardroom seats" mentions (real count: 8, 7 C-suite + Design) — `docs/SRS.md` FR-3/FR-4, and `docs/ARCHITECTURE.md` §7's cross-departmental protocols table, which self-contradicted the same document's own §4/§8b.
+
 ## [0.7.24] - 2026-07-28
 
 ### Added
