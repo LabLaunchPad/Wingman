@@ -9,6 +9,14 @@ A calm, ordered runbook for when something is on fire. Founders rarely have an
 ops background, so the value here is sequencing under stress: stop the bleed,
 contain, diagnose, communicate, then fix — in that order, not all at once.
 
+## Inputs
+
+Whatever's known right now about the broken/degraded surface — the last change, the affected users, since-when — even if incomplete; triage (step 3) works from what's known, not a full investigation first.
+
+## Escalation
+
+A suspected or confirmed security incident (breach, leaked key, abuse) — rotate the exposed secret immediately (step 2) and treat it as exposed until proven otherwise; this is not a "monitor and see" case.
+
 ## When to use
 - A production outage, error spike, or "everything is down" message.
 - A bad deploy, rollback, or data-corruption event.

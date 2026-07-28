@@ -25,6 +25,18 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Save plans to:** `docs/wingman/plans/YYYY-MM-DD-<feature-name>.md`
 
+## Inputs
+
+A spec or requirements doc for a multi-step task — this skill assumes the spec exists; it doesn't gather requirements itself (see `spec-handler` for that).
+
+## Output
+
+A saved file at `docs/wingman/plans/YYYY-MM-DD-<feature-name>.md`, matching the Plan Document Header + per-task structure below, ending in the required Plain-Language Summary.
+
+## Escalation
+
+Per the Rationalizations table's "vague spec" row: real ambiguity in the spec gets an explicit stated decision in the plan, or gets flagged to the founder — never silently deferred as an implicit placeholder for whoever executes the plan.
+
 ## Scope Check
 
 If the spec covers multiple independent subsystems, it should be broken into separate plans — one per subsystem. Each plan should produce working, testable software on its own.

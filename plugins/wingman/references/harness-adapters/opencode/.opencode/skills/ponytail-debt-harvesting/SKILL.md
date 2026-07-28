@@ -15,6 +15,18 @@ pattern formalized here for Wingman's build-time use.
 
 Every deliberate shortcut (`// minimal:` comment) has a ceiling. When usage approaches that ceiling, the shortcut becomes the wrong abstraction. Without a ledger, shortcuts rot silently into permanent debt — nobody remembers the ceiling, the upgrade path, or even that the shortcut was deliberate.
 
+## Inputs
+
+A deliberate shortcut just taken at `engineering-minimalism`'s rungs 6-7 — this skill marks and tracks it, it doesn't decide whether the shortcut itself was warranted.
+
+## Output
+
+A `// minimal:` comment (ceiling + upgrade path) plus its matching row in `DEBT.md`'s ledger table — never one without the other.
+
+## Escalation
+
+A ceiling that's already been hit (per "Never leave" in step 3, or the audit's flag in step 5) — upgrade now, or explicitly re-justify the debt with a new ceiling and time-boxed plan; working around a hit ceiling is not an option.
+
 ## The Pattern
 
 ### 1. Mark Every Shortcut

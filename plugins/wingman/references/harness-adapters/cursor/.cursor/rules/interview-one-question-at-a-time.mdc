@@ -26,6 +26,18 @@ When exploring requirements, debugging, or negotiating design decisions, the nat
 - Scope negotiation (determining what's in/out)
 - Any conversation where multiple unknowns need resolution
 
+## Inputs
+
+The task with open ambiguity (requirements, a debugging session, a design decision) — this skill applies the moment more than one unknown needs resolving, not just at kickoff.
+
+## Output
+
+A logged decisions record (see Decisions Log) plus a final plain-language summary of the full understanding, with the founder's explicit sign-off before implementation starts.
+
+## Escalation
+
+None — a vague answer gets probed further (per Verification), never silently accepted or waved through; there's no separate approval path beyond the founder's own explicit confirmation at the end of the interview.
+
 ## Question Types
 
 ### Clarifying

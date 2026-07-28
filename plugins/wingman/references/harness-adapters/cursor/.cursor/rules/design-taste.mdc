@@ -30,6 +30,14 @@ AI-generated interfaces converge on the same "tells" regardless of which model w
 
 **Core principle:** check against a real, named category of problem (a specific "tell," a specific accessibility failure, a specific inconsistency with what's already built) — never a vague "make it better."
 
+## Inputs
+
+The UI surface being built or reviewed, plus the project's own established tokens (palette/font/spacing) if any already exist — new work is checked against those, not decided fresh each time.
+
+## Escalation
+
+Any quality/accessibility-checklist item present (step 5) blocks rather than gets noted — these are defects, not taste calls, and `boardroom-design`'s verdict should reflect that rather than waving them through as style feedback.
+
 ## When To Use
 
 Building or reviewing anything with a user-facing surface: landing pages, dashboards, forms, app shells, onboarding, empty/error states, individual components. Also used by `boardroom-design` when rendering its checkpoint verdict.

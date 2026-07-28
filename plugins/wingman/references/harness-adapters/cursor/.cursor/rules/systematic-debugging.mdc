@@ -43,6 +43,14 @@ Use for ANY technical issue: test failures, bugs, unexpected behavior, performan
 
 **Don't skip when:** the issue seems simple (simple bugs have root causes too) or you're in a hurry (rushing guarantees rework — systematic is faster than thrashing).
 
+## Inputs
+
+The bug/failure/unexpected-behavior report, including the exact error message and stack trace if one exists — Phase 1 starts by reading that, not by guessing.
+
+## Output
+
+No fixed template — the outcome is a fix backed by a failing-then-passing test (Phase 4), or, when 3+ fixes have failed, a plain-language architectural finding instead of a 4th fix attempt.
+
 ## The Four Phases
 
 You MUST complete each phase before proceeding to the next.
@@ -109,6 +117,10 @@ If you catch yourself thinking any of these, stop and return to Phase 1:
 | **2. Pattern** | Find working examples, compare | Identify differences |
 | **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
 | **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
+
+## Escalation
+
+Phase 3's "when you don't know" step and Phase 4's 3-failed-fixes threshold are the two escalation points: say "I don't understand X" and research more, or route to the founder/reviewer when it's a business-relevant tradeoff, or when the pattern indicates an architectural problem rather than one more hypothesis to test.
 
 ## When Process Reveals "No Root Cause"
 

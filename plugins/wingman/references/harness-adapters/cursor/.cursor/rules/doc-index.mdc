@@ -20,6 +20,18 @@ command/skill/agent until they were deliberately wired in. Attribution in
 
 A reference doc that nothing cites is a dead doc — it exists, it's correct, and nobody ever reads it. The doc-index discipline keeps Wingman's documentation *discoverable*: every doc or reference has an owning command/skill/agent that cites it, and the set of docs is small enough to hold in one index. This is governance, not housekeeping — an un-wired checklist is the same as no checklist.
 
+## Inputs
+
+The new or promoted `references/*.md` (or other doc) about to enter the tree, and the existing commands/skills/agents that could plausibly own it.
+
+## Output
+
+A cross-linked doc: an owning command/skill/agent's `## References` section citing it by path with a one-line "when to consult" note, plus (if vendor-derived) an `/ATTRIBUTIONS.md` entry.
+
+## Escalation
+
+A `references/*.md` with zero citations anywhere (step 4's audit) — wire it into an owner or delete it; there's no third option of leaving a dead doc in place.
+
 ## When To Use
 
 - When you create or promote a `references/*.md` (or any doc).

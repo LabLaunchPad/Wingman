@@ -19,6 +19,18 @@ canon; the enforced disposition model (CLOSED/OPEN, blocks while threats_open >
 
 A security pass is not a generic checklist recitation — it is a concrete risk hunt whose findings land in the gsd-plugin **threat register** with explicit `CLOSED`/`OPEN` dispositions. Advancement is blocked while any threat is `OPEN`.
 
+## Inputs
+
+The actual change being reviewed (diff/files touched) — STRIDE/OWASP are walked against what changed, not the whole codebase from scratch each time.
+
+## Output
+
+The gsd-plugin threat register: one row per concrete risk found, each with a `CLOSED`/`OPEN` disposition and, for `CLOSED`, a cited PR/commit + regression test.
+
+## Escalation
+
+Fix, or escalate to the founder for explicit acceptance, recorded in `docs/wingman/founder-todos.md` — an `OPEN` threat never advances the stage on its own.
+
 ## When To Use
 
 During `/wingman:build`'s Definition-of-Done gate and any time code that touches a trust boundary, data, secrets, or an LLM is changed.

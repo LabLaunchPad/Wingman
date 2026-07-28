@@ -27,6 +27,18 @@ that case's fixture never exercised the changed section in the first place. This
 narrow check for exactly that gap: not a new testing system, a cross-reference against the one
 that already exists.
 
+## Inputs
+
+The diff (or before/after) of a changed `commands/*.md`/`agents/*.md`/`skills/*/SKILL.md` file, and the eval case(s) that claim to cover it.
+
+## Output
+
+A concrete finding: either the changed section maps to a checked row in the covering case's `## Expectations` table (file:line to file:line), or an explicit statement that coverage is missing/stale.
+
+## Escalation
+
+No case exists, or the existing one demonstrably doesn't cover the changed section — extend or author a case, or explicitly accept the gap with a stated reason; never silently merge past it (step 4).
+
 ## When To Use
 
 - Before merging a diff that changes an existing `commands/*.md`, `agents/*.md`, or

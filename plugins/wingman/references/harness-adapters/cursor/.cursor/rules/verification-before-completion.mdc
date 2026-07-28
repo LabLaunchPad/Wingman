@@ -136,6 +136,18 @@ After any code change, provide at most three short lines explaining what was ski
 ❌ [code] → [5-paragraph essay defending the simplification]
 ```
 
+## Inputs
+
+The specific claim about to be made ("tests pass," "the bug is fixed," "the agent completed the task") and whatever command/output would actually prove it.
+
+## Output
+
+No artifact — a claim that is either backed by fresh, just-run evidence (stated alongside the claim) or not made at all. See the Key Patterns section above for the exact ✅/❌ shape this takes per claim type.
+
+## Escalation
+
+If the proving command genuinely can't be run in this environment (no network, missing tooling), say so plainly and state the claim as unverified rather than making it as if it were confirmed — an honestly-flagged gap, not a silent substitution of confidence for evidence.
+
 ## Why This Matters in Wingman
 
 Wingman tells a non-technical founder that a stage is done. If that claim is wrong, the founder has no independent way to catch it — they're trusting the plugin. Unverified "done" claims are the single fastest way to destroy that trust and ship broken software to real users.

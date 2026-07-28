@@ -13,6 +13,14 @@ Wingman's 14-stage pipeline produces a chain of artifacts — a requirement, a d
 
 **Core principle:** every downstream artifact names the ID(s) it satisfies; nothing gets built, designed, or coded "just because" with no traceable origin.
 
+## Inputs
+
+The requirement/decision/flow/task about to be minted or referenced, and `.wingman/traceability.json`'s current `next_id` counters — read fresh each time, never assumed.
+
+## Escalation
+
+None — this is a mechanical marker convention with a hard verifier (`check-traceability.mjs`); a broken link is an error the script catches, not a judgment call routed to the founder.
+
 ## When To Use
 
 Whenever `/wingman:research-synthesis`, `/wingman:personas-jobs`, `/wingman:journey-mapping`, `/wingman:define`, `/wingman:information-architecture`, `/wingman:uxflow`, `/wingman:wireframes`, `/wingman:visual-design-system`, `/wingman:prototype-usability`, `/wingman:architecture`, or `/wingman:implementation-planning` mints a new requirement/decision/flow/task ID, or whenever `/wingman:build` writes a task's corresponding source-code change.

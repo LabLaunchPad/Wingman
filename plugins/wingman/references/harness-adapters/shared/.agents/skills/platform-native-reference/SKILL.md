@@ -16,6 +16,18 @@ The lazy senior dev's first question: *does the platform already do this?*
 
 This reference answers that question for the most common cases. Before reaching for a package, check here. The platform ships with your app for free, doesn't break on updates, and was written by people whose job is exactly that problem.
 
+## Inputs
+
+The feature about to be reached for via a new dependency — checked against this reference before the dependency is added, not after.
+
+## Output
+
+No fixed template — the outcome is either "use the native/stdlib feature" or a stated, specific reason the native solution is genuinely insufficient (old browser support, missing edge case, ergonomics that matter at scale).
+
+## Escalation
+
+None — this is a lookup table, not a judgment call; if the native solution is insufficient, the library earns its place per the How To Use rule, no founder decision needed.
+
 ## How To Use
 
 Consult the relevant layer below when `engineering-minimalism`'s decision ladder hits rungs 3-4 (stdlib / native platform). If the platform covers it, use it. If the native solution is genuinely insufficient (old browser support, edge cases it doesn't handle, ergonomics that matter at scale), the library earns its place — install it then, not before.

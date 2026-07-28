@@ -32,6 +32,14 @@ own history: `boardroom-checkpoint.mjs` v12.1's fail-closed over-block, the
 `management-board-activation` threshold that fired on every project regardless of real complexity).
 Classify by what the gap actually needs, not by reflex toward the strongest-sounding enforcement.
 
+## Inputs
+
+A dogfood run's `observed_gaps` array (`description`/`stage`/`evidence` per entry) — this skill only ever runs against a real, already-collected run, never speculatively.
+
+## Escalation
+
+The `AskUserQuestion` proposal in step 4 to whoever is running the maintainer-mode session, and, for any hook candidate, the `pending-second-opinion` hold until a second dogfood run confirms it — both are mandatory, not optional.
+
 ## When To Use
 
 Only from inside `/wingman:dogfood`'s maintainer mode, when a run's `observed_gaps` array is

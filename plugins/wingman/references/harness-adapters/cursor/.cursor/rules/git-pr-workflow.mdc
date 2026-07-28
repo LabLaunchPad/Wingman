@@ -48,6 +48,14 @@ which coding agent (or human) is driving. See
 `plugins/wingman/references/harness-adapters/README.md` for the fuller picture of what is and isn't
 portable across coding-agent harnesses.
 
+## Inputs
+
+A completed, locally-verified change on a feature branch — this skill starts at "ready to open a PR," it doesn't decide when work is done (that's `verification-before-completion`'s job).
+
+## Escalation
+
+CI red after a real re-diagnosis attempt, a reviewer comment with genuine ambiguity, or anything touching an architecturally significant decision — surface to the founder rather than guessing and pushing another fix blind.
+
 ## When To Use
 
 - `/wingman:ship`'s "Push and open the change for review" step (see `commands/pipeline/ship.md`).

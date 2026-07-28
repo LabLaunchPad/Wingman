@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.23] - 2026-07-28
+
+### Added
+- **6-field skill contract across all 40 skills.** Extended the existing skill-anatomy check (`validate-structure.mjs`) from a 3-concept triad (Rationalizations/Red Flags/Verification) to the full 6-field contract adopted from a founder-supplied blueprint review: Trigger / Inputs / Procedure / Output schema / Stop condition / Escalation. Trigger was already covered by the frontmatter `description`'s "Use when..." clause and Procedure by the house "Core Workflow" heading — no new check needed for either. The 3 genuinely new fields (Inputs, Output, Escalation) were added to all 40 skills across 5 hand-authored waves (8 skills each), each field grounded in that specific skill's real content rather than templated. `validate-structure.mjs` now reports zero anatomy warnings repo-wide. Fifth of 6 planned PRs harvesting genuine gaps from the founder-supplied blueprint review (prior four: CI test enforcement #125, red-team suite #126, permission model + deploy-approval gate #127, dependency audit + `/wingman:review`/`/wingman:test` #128).
+
 ## [0.7.22] - 2026-07-27
 
 ### Added

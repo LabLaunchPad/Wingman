@@ -21,6 +21,18 @@ Tests are evidence that the spec's success criteria hold (see `spec-handler`, `v
 
 Whenever `/wingman:build` or a department lead/specialist writes code that should be verified, and when reviewing a change's test coverage.
 
+## Inputs
+
+The just-written or just-changed code, and which paths it actually touches — coverage is measured against the diff, not the whole file.
+
+## Output
+
+No artifact of its own — the outcome is a passing suite (new tests failing-first on the old code, passing on the new) that `verification-before-completion` reads as evidence.
+
+## Escalation
+
+A changed path that genuinely can't be tested (e.g. no seam to mock a boundary) — escalate as a design problem for `test-driven-development`'s "when stuck" guidance, not a coverage exception to wave through.
+
 ## Core Workflow
 
 1. **AAA.** Arrange inputs/state, Act on the unit, Assert the observable outcome. One behavior per test; name it for the behavior, not the method.

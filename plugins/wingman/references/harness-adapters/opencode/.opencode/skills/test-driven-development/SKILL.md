@@ -50,6 +50,18 @@ Write code before the test? Delete it. Start over.
 
 Implement fresh from tests. Period.
 
+## Inputs
+
+The feature/bugfix description and, for a bug, a reproduction of the failure — the failing test comes from this, not from guessing at what "should" happen.
+
+## Output
+
+No fixed template — the outcome is code where every production line exists because a test demanded it, verified via the Verification Checklist below.
+
+## Escalation
+
+The "Exceptions (ask the founder)" cases above — throwaway prototypes, generated code, configuration files — are the only legitimate skip path, and they require asking, not silently deciding TDD doesn't apply.
+
 ## Red-Green-Refactor
 
 ### RED - Write Failing Test

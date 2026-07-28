@@ -104,6 +104,18 @@ The rationalizations must be **domain-specific**, not generic. "This is too simp
 - During `/wingman:audit` when reviewing whether skills were followed
 - During `/wingman:retro` when analyzing what went wrong and why
 
+## Inputs
+
+The discipline skill being written/audited, and — when this fires reactively — the specific excuse an agent just caught itself generating.
+
+## Output
+
+The skill-specific `## Anti-Rationalization Defense` block shown above (Common Rationalizations table + Red Flags + Anti-Pattern Callouts), domain-specific to the skill it's added to. No other output shape.
+
+## Escalation
+
+None — a meta-skill with no founder-facing path. A discipline skill missing this section is a `/wingman:audit` finding against that skill, not something routed to the founder.
+
 ## The Bottom Line
 
 The anti-rationalization system is not about distrust — it's about the empirical observation that LLMs (like humans) will generate plausible justifications for skipping hard steps unless those justifications are explicitly named and blocked. Every discipline skill in this plugin is a wall against a specific failure mode. This meta-skill is the concrete in those walls.

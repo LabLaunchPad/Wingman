@@ -11,6 +11,18 @@ Gives Wingman durable, cross-session memory for a founder's project without
 relying on the model's implicit context window. Wingman reads and writes a small
 structured store so future sessions start where the last one ended.
 
+## Inputs
+
+The fact, decision, or prior-attempt outcome about to be lost at session end, or a task that touches context a prior session already established.
+
+## Output
+
+An appended/updated entry in the relevant store file (`MEMORY.md`/`decisions.md`/`tried.md`) — one or two lines, dated where relevant, never a secret.
+
+## Escalation
+
+Anything that looks like a secret (key, token, password) — stop and refuse to store it, per the Red Flags below; there's no founder approval path for this, it's a hard block.
+
 ## When to use
 - The founder says "remember", "note that", "don't forget", "we decided".
 - You are about to lose important context at the end of a session.

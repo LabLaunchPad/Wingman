@@ -37,6 +37,15 @@ every later reader has to decrypt it. Adapted from the simplify discipline in
    same pass, not a separate later step.
 5. Lead with the one big win, not a laundry list of nits.
 
+## Inputs
+The just-changed code (the diff from the most recent build/fix), never the whole file or repo.
+
+## Output
+A short plan (each change as "delete / extract / collapse X because Y") applied in the same pass as the diff it describes — see Method step 4. Never a plan with no matching diff, or a diff with no matching plan.
+
+## Escalation
+If tightening the code would require an actual behavior change (not just clarity/dedup), stop and flag it rather than making the change under the "simplify" banner — that's a design decision, not a tidy-up.
+
 ## Rationalizations
 - "It works, leave it." — Working and clear are different; clarity is cheaper now.
 - "I'll simplify later." — Later never comes; the code sets.

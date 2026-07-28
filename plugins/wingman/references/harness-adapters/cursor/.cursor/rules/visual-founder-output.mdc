@@ -23,6 +23,14 @@ never assume — the same "detect first, choose second, fall back silently" disc
 already uses for tool availability (`skills/package-manager-selection`, `skills/git-pr-workflow`),
 applied here to rendering medium instead of a CLI.
 
+## Inputs
+
+The founder-facing content about to be reported, and this session's actual tool surface (whether an Artifact-publishing tool is genuinely available) — the latter is checked fresh every time, never assumed from a prior session.
+
+## Escalation
+
+None beyond `plain-language-checkpoint`'s own — this skill only changes layout, never the underlying verdict; a rendering failure just falls back to Tier B, it doesn't need a founder decision.
+
 ## When To Use
 
 Whenever the content being reported is structurally a flow, a tree/hierarchy, a status-across-stages,

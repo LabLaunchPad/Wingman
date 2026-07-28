@@ -75,6 +75,18 @@ digraph process {
 }
 ```
 
+## Inputs
+
+An implementation plan (from `writing-plans`) with independent, right-sized tasks — this skill executes a plan, it doesn't write one.
+
+## Output
+
+No artifact of its own — the outcome is a merged branch of reviewed commits, with `.wingman/sdd/progress.md` as the durable record of what was dispatched, reviewed, and completed.
+
+## Escalation
+
+Per Handling Implementer Status above: a `BLOCKED` implementer that a context re-dispatch or a more capable model can't resolve, or a plan-mandated requirement a reviewer flags as a defect, both escalate to the human — never silently worked around.
+
 ## Pre-Flight Plan Review
 
 Before dispatching Task 1, scan the plan once for conflicts:
