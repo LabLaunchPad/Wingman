@@ -1,7 +1,7 @@
 // Loads every harness target descriptor in this directory. A new harness is a new descriptor file
 // here -- generate-harness-adapters.mjs and check-harness-adapter-drift.mjs both iterate whatever
 // this returns, so adding a 7th harness never requires touching either script's own logic.
-// See docs/ARCHITECTURE.md §8f.
+// See docs/status/ARCHITECTURE.md §8f.
 
 import { readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';

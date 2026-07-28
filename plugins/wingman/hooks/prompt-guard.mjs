@@ -17,7 +17,7 @@
 // while being honest that a fixed regex list is a floor, not a ceiling: no
 // amount of pattern-matching closes this class of risk completely — a
 // rewritten/obfuscated injection can still evade a fixed pattern set. This is
-// an accepted, disclosed residual risk (see docs/ARCHITECTURE.md's "Agent
+// an accepted, disclosed residual risk (see docs/status/ARCHITECTURE.md's "Agent
 // Permission Model" section for the sibling accepted-risk framing on
 // permissions enforcement), not a claim that this hook makes the class of
 // risk go away.

@@ -15,7 +15,7 @@
 //      plan text contains "## Implementation Planning checkpoint" (a heading
 //      unique to commands/pipeline/implementation-planning.md — renamed from
 //      "## Planning Milestone checkpoint" when that stage stopped bundling all
-//      5 planning stages into one checkpoint, see docs/ARCHITECTURE.md §4d),
+//      5 planning stages into one checkpoint, see docs/status/ARCHITECTURE.md §4d),
 //      so an unrelated ExitPlanMode
 //      call elsewhere (including Wingman's own dev-planning sessions, which
 //      have zero wingman:req markers by design) is never touched.
@@ -96,7 +96,7 @@ export function findLatestBuildCheckpoint(cwd) {
 
 // A checkpoint entry existing is not the same as it having actually passed — the Boardroom's own
 // consolidation rule is "any NO_GO anywhere overrides any approval elsewhere" (see
-// docs/ARCHITECTURE.md's v7 note and evals/cases/boardroom-gate-rule.md), so check both the
+// docs/status/ARCHITECTURE.md's v7 note and evals/cases/boardroom-gate-rule.md), so check both the
 // top-level bottom_line AND every individual seat's verdict as defense-in-depth, in case
 // consolidation didn't propagate a seat-level NO_GO up into bottom_line correctly.
 // A red-team pass (2026-07-27) found two real bypasses of the exact-string comparisons this

@@ -12,7 +12,7 @@ Narrow, evidence-gated addition (2026-07-20): a pasted "deep research report" pr
 before building anything. The one real, not-fully-redundant gap: nothing automatically flags when
 a changed prompt file's existing eval case doesn't actually cover the section that changed. This
 skill closes that one gap; it does not duplicate the eval harness itself. See
-docs/PROJECT.md's decisions log, 2026-07-20, for the full assessment.
+docs/status/PROJECT.md's decisions log, 2026-07-20, for the full assessment.
 -->
 
 # Prompt-Diff-Check

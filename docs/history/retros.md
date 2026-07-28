@@ -1,5 +1,64 @@
 # Retros
 
+<!-- wingman:log type=retro category=dogfooding-mechanism status=resolved occurrence=7 -->
+## Retro: Partial simple-path dogfood run — a real dispatch-failure bug and systemic post-restructure doc drift — 2026-07-28
+
+A user-requested real dogfood pass, scoped deliberately to Discovery only (not a full 14-stage run,
+disclosed as such up front) against `setup-dogfood-simple.sh`'s fixture. Found two real, evidenced
+gaps before completing even the first stage.
+
+**What went well:**
+- Correctly refused to fabricate a passing result when dispatch to a freshly-created `dept-product`
+  subagent failed. Reproduced the failure a second time before treating it as real, rather than
+  assuming a fluke, and disclosed honestly that the root cause (harness-specific vs. a genuine
+  Claude Code CLI same-turn limitation) couldn't be confirmed from this environment alone — the fix
+  was designed to work regardless of which is true, rather than waiting to resolve that question.
+- A hypothesis that `change-triage` might route this request away from the pipeline entirely (Level
+  0-1 → `/wingman:hotfix`) before Discovery even started was checked against the skill's actual
+  tier-3 rule ("an ordinary feature... is Level 2") before being reported — caught it was wrong
+  before it became a false finding.
+- The stale-path finding was caught by first noticing `dogfood.md`'s own citations looked wrong,
+  then verifying the actual scope mechanically (`grep -rl` across `plugins/wingman/`, initially 207
+  hits before separating genuine matches from unrelated founder-project-convention false positives
+  and already-correct generated harness-adapter mirrors) rather than fixing the first few files found
+  and assuming the rest were fine.
+
+**What was harder than expected — 2 real bugs found and fixed:**
+- `department-lead-activation/SKILL.md`'s Step 5 claimed, unconditionally, that a newly-created
+  `.claude/agents/dept-<name>.md` file is dispatchable "this turn... no plugin reload is needed."
+  Real dispatch failed immediately: `Agent type 'dept-product' not found`. Classified via
+  `dogfood-gap-classification` as a skill-candidate (not a hook — nothing mechanical to enforce, a
+  false assumption needing a judgment-based fallback) and fixed with a try-then-fallback branch: if
+  dispatch fails, do the delegated work directly this turn using the just-written file's own remit,
+  and tell the founder plainly that the department lead will run as its own subagent from the next
+  session onward. See `evals/cases/department-lead-activation.md` Run 4 (`provisional` pending a
+  second confirming run).
+- PR #137's docs restructure (`docs/` → `docs/status/`/`docs/roadmap/`/`docs/history/`) deliberately
+  left `plugins/wingman/` untouched on the reasoning that nothing there does a *functional* path
+  read of the moved files — true, but missed that dozens of shipped commands/skills/references cite
+  those paths in human-readable prose (a recurring `<!-- See docs/ARCHITECTURE.md for this
+  command's place... -->` footer, plus inline citations). 63 canonical files needed fixing, which
+  cascaded into regenerating 220 harness-adapter files via `generate-harness-adapters.mjs --write`
+  and manually re-copying 17 OpenCode-ported skill files (`portedSkillsDir` has no auto-regeneration
+  path — `check-harness-adapter-drift.mjs` is read-only, confirmed by running it: it correctly
+  caught all 16 skills that had drifted after the canonical fix and regeneration, proving the
+  drift-check itself works as designed even though the initial restructure's own verification didn't
+  think to check for prose citations in the first place).
+
+**What we'd do differently next time:**
+- When a restructure declares a directory "untouched," explicitly grep that directory for prose
+  citations of the moved paths too, not just functional/script reads — the earlier PR's risk-map
+  only modeled `readFileSync`/`import`-style dependencies, not markdown cross-references.
+- Get a real Claude Code CLI session (not this sandboxed harness) to attempt the same same-turn
+  dept-lead dispatch, to settle whether the Step 5 fallback is covering a general limitation or one
+  specific to this environment.
+
+**Anything for you to know:**
+- This run did not complete past Discovery — research-synthesis through ship were never attempted,
+  by design (disclosed as a deliberately scoped pass, not padded to look like a full 14-stage run).
+- Both fixes landed in the same commit as this retro, verified via the full `validate-all.mjs` suite
+  (7 checks + 345 tests) both before and after.
+
 <!-- wingman:log type=retro category=git-pr-workflow status=resolved occurrence=1 -->
 ## Retro: A real CI-outage + squash-merge-resync incident on PR #120 — 2026-07-26
 

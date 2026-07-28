@@ -81,7 +81,7 @@ Wingman pipeline
    └─ Ship                         ○ not started
 ```
 
-- One row per pipeline stage (all 14, per `docs/ARCHITECTURE.md` §4d), nested one level under its
+- One row per pipeline stage (all 14, per `docs/status/ARCHITECTURE.md` §4d), nested one level under its
   **Phase** group (the 6 phases from §4e) for orientation — the phase grouping is purely a visual
   nesting layer, not a new state field; each stage row's status is still read directly from its own
   `checkpoints.jsonl` entry, exactly as before. Phase 5 has no stage row of its own — annotate it as

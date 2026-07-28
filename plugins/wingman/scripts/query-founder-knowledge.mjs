@@ -5,13 +5,13 @@
 // scripts/, unlike its dev-repo-only cousin) because it's meant to run inside
 // a founder's own installed project, over that project's own .wingman/ state.
 //
-// Directly answers docs/DATABASE.md's named gap: "No single file or view
+// Directly answers docs/status/DATABASE.md's named gap: "No single file or view
 // here unifies checkpoints.jsonl, state.json, traceability.json, and
 // memory/*.md into one 'what has this project decided and why' surface."
 // Built per docs/wingman/architecture-audit-2026-07-15.md's Emerging finding
 // #6 (Confidence: Medium) -- explicitly a bounded prototype to be graded
 // honestly before any broader commitment (skill/command wrapper), per that
-// audit's own Migration Strategy. See docs/PROJECT.md's decisions log for
+// audit's own Migration Strategy. See docs/status/PROJECT.md's decisions log for
 // the run log.
 //
 // Read-only. No writes, no network, no dependencies beyond Node's stdlib.
@@ -126,7 +126,7 @@ export function query(projectDir, filters = {}) {
 }
 
 // The one-shot "what has this project decided and why" overview -- the direct answer to
-// docs/DATABASE.md's named gap, read in one call instead of four files in three formats.
+// docs/status/DATABASE.md's named gap, read in one call instead of four files in three formats.
 export function summary(projectDir) {
   const all = unify(projectDir);
   const checkpoints = all.filter((r) => r.source === 'checkpoints');
@@ -134,7 +134,7 @@ export function summary(projectDir) {
   const stateEntry = all.find((r) => r.source === 'state');
   const state = readJsonFile(join(projectDir, '.wingman', 'state.json'));
 
-  // Found via real multi-session dogfooding (docs/PROJECT.md decisions log, 2026-07-21): a session
+  // Found via real multi-session dogfooding (docs/status/PROJECT.md decisions log, 2026-07-21): a session
   // that forgets to update state.json after writing a checkpoint leaves current_stage silently
   // stale -- exactly the kind of drift this whole unification exists to catch, so flag it rather
   // than reporting current_stage at face value.

@@ -2,7 +2,7 @@
 
 Three pieces of static guidance content, cited from the pipeline and from the `memory` skill, for
 context a founder builds up *across* projects rather than within a single one. This is deliberately
-narrow — see `docs/PROJECT.md`'s decisions log (2026-07-22, "founder-org scaffold") for the fuller
+narrow — see `docs/status/PROJECT.md`'s decisions log (2026-07-22, "founder-org scaffold") for the fuller
 "master repo blueprint" this was scoped down from, and why the rest of it wasn't built.
 
 - `project-types/` — a catalog + 7 short playbooks for the kinds of projects a solo founder

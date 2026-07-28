@@ -9,7 +9,7 @@ alwaysApply: false
 
 ## Overview
 
-Two real dogfooding passes of Wingman's own 7-stage pipeline (see `docs/wingman/retros.md`,
+Two real dogfooding passes of Wingman's own 7-stage pipeline (see `docs/history/retros.md`,
 2026-07-14) found real bugs that no structural review of the plugin's files would have caught, and
 also surfaced something subtler: the executing agent followed several good practices during those
 runs (proper test-cleanup discipline, deliberately reproducing a bug against its own fixture before
@@ -81,7 +81,7 @@ of relying on a remembered impression of this project's own history.
    the loop — wait for a second real dogfood run to clarify the shape before classifying.
 
 **3. For a hook candidate, answer these in writing before proposing anything** (these become the
-`docs/PROJECT.md` decision-log entry if approved):
+`docs/status/PROJECT.md` decision-log entry if approved):
 - **Generalization**: does this hold across project types/languages, or is it stack-specific? If
   stack-specific, does it need a sniff-and-adapt approach (like `dod-structural-gate.mjs`'s
   `detectTestCommand()`, which checks `package.json`/`pytest.ini`/`go.mod`/`Cargo.toml`/`Gemfile`
@@ -109,16 +109,16 @@ else present the options in prose and treat the next message as the answer.
   actually closes it — not a different, easier scenario.
 - Add eval coverage: a new `evals/cases/*.md` case if none exists for this area, or a new "Run N"
   in an existing one. Mark `provisional` until independently re-verified once more, then `verified`.
-- Append a `## Retro:` entry to `docs/wingman/retros.md` describing the gap, the classification
+- Append a `## Retro:` entry to `docs/history/retros.md` describing the gap, the classification
   reasoning, and the fix.
 - **If the approved change is a hook**: it does not finalize in the same run that found it. Mark it
-  `pending-second-opinion` in the `docs/PROJECT.md` decision-log entry, and require a second,
+  `pending-second-opinion` in the `docs/status/PROJECT.md` decision-log entry, and require a second,
   separate real dogfood run (not necessarily immediate) to confirm it doesn't over-block before
   calling it `verified`. Skill and command-instruction changes skip this — lower risk, easily
   reverted.
-- Add a `docs/REGRESSION-CHECKLIST.md` Layer 0 line for the finding, and (once a hook clears
+- Add a `docs/status/REGRESSION-CHECKLIST.md` Layer 0 line for the finding, and (once a hook clears
   cooling-off) its own Layer 1 line per that doc's existing graduation rule.
-- Record the promotion in `docs/PROJECT.md`'s decisions log, including the step-3 safeguard answers
+- Record the promotion in `docs/status/PROJECT.md`'s decisions log, including the step-3 safeguard answers
   for any hook.
 
 ## Constraints
@@ -168,8 +168,8 @@ reflects whether a second differently-shaped run has happened; for hooks, confir
 ## Output
 
 The `AskUserQuestion` proposal in step 4 (what was observed, the bucket, the proposed change). Once
-approved and implemented: a `docs/PROJECT.md` decisions-log entry, a `docs/REGRESSION-CHECKLIST.md`
-Layer 0 (and, once cleared, Layer 1) line, an eval-case update, and a `docs/wingman/retros.md` entry.
+approved and implemented: a `docs/status/PROJECT.md` decisions-log entry, a `docs/status/REGRESSION-CHECKLIST.md`
+Layer 0 (and, once cleared, Layer 1) line, an eval-case update, and a `docs/history/retros.md` entry.
 
 ## Anti-Rationalization Defense
 
@@ -202,7 +202,7 @@ Layer 0 (and, once cleared, Layer 1) line, an eval-case update, and a `docs/wing
 - `commands/adaptive/dogfood.md`
 - `skills/evolve-promotion`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
 
 
 ---

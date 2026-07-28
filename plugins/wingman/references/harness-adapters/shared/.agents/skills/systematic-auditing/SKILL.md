@@ -25,7 +25,7 @@ Whenever thoroughness is explicitly signaled — "audit this," "evidence-driven,
 
 **4. Fix real, contained findings immediately.** Don't let an audit produce a list of problems nobody acts on — that's strictly worse than not auditing, since it creates the appearance of rigor without the substance. Log genuinely larger or ambiguous findings as durable follow-ups (a roadmap, a tracked backlog) rather than either fixing them hastily or letting them evaporate.
 
-**5. Record durable lessons — including *why* this pass caught what a single pass didn't.** Append to this project's existing durable-learning location (`LEARNINGS.md`, a decisions log, `docs/wingman/retros.md` — whichever this project already uses). The mechanism-level lesson (what kind of check this was, why it needed a separate pass) is often more valuable long-term than the specific bug found.
+**5. Record durable lessons — including *why* this pass caught what a single pass didn't.** Append to this project's existing durable-learning location (`LEARNINGS.md`, a decisions log, `docs/history/retros.md` — whichever this project already uses). The mechanism-level lesson (what kind of check this was, why it needed a separate pass) is often more valuable long-term than the specific bug found.
 
 ## Inputs
 
@@ -109,7 +109,7 @@ See `references/continuous-execution.md` — maintain momentum through a workflo
 
 - `commands/adaptive/audit.md`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
 
 
 ---

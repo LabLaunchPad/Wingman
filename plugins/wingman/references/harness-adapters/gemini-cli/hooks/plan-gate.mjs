@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Disclosed substitute for Claude Code's ExitPlanMode + boardroom-checkpoint.mjs gate, wired as a
 // Gemini CLI `BeforeAgent` hook command. Genuinely new logic (not a port) -- see
-// docs/ARCHITECTURE.md §8f and gemini-cli.mjs's ExitPlanMode note for why Gemini CLI has no
+// docs/status/ARCHITECTURE.md §8f and gemini-cli.mjs's ExitPlanMode note for why Gemini CLI has no
 // discrete, interceptable "plan approved" transition event the way ExitPlanMode does (exiting Plan
 // mode auto-escalates straight to YOLO mode, bypassing further tool-approval gating entirely).
 //

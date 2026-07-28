@@ -9,7 +9,7 @@ alwaysApply: false
 
 ## Overview
 
-This is a real, previously-idle proposal (see `docs/PROJECT.md`'s decisions log) reviewed by a real
+This is a real, previously-idle proposal (see `docs/status/PROJECT.md`'s decisions log) reviewed by a real
 7-seat Boardroom dispatch: pnpm's phantom-dependency prevention and disk/speed wins are genuinely
 better defaults for a founder's *new* Node/JS project than npm, but three things had to be true
 before this became more than a preference — a corepack-pinned install (not an unpinned global
@@ -145,4 +145,4 @@ No founder-facing template beyond the one-sentence notification in Core Workflow
 
 - `skills/visual-founder-output`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

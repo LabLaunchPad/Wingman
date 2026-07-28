@@ -7,7 +7,7 @@ description: Use at intake — before /wingman:discovery starts on a fresh reque
 Origin: a founder-supplied "enterprise blueprint" proposed a Stage-1 Triage step ahead of a
 multi-stage decision framework. The founder chose to build the triage idea now, as a deliberate,
 explicitly-recorded partial reversal of the 14-stage-checkpoint-bundling decision documented in
-docs/ARCHITECTURE.md §4d — see docs/PROJECT.md's decisions log, 2026-07-28, for the full record.
+docs/status/ARCHITECTURE.md §4d — see docs/status/PROJECT.md's decisions log, 2026-07-28, for the full record.
 The framework's other proposed pieces (a coarser 7-8 stage model, a separate risk scale) were not
 adopted: this skill reuses the permission model's existing 5 tiers (references/permission-model.md)
 rather than inventing a second, competing risk taxonomy.
@@ -31,7 +31,7 @@ the exact failure mode a prior "configurable Boardroom strictness" proposal was 
 
 **This is a skill, not a 15th pipeline stage.** It produces a routing decision, not an artifact with
 its own Boardroom checkpoint, and it never mints a traceability ID — adding a stage would break the
-14 stage names already encoded in the `checkpoints.jsonl` schema (`docs/DATABASE.md`).
+14 stage names already encoded in the `checkpoints.jsonl` schema (`docs/status/DATABASE.md`).
 
 ## When To Use
 
@@ -105,7 +105,7 @@ the classification right and the existing pipeline/incident machinery does the r
   redundant.
 - Skip triage because the requester called the change "tiny," "urgent," or "just a quick fix."
 - Invent a new risk scale or tier — this skill reuses `references/permission-model.md`'s 5 tiers
-  exactly; a second, competing taxonomy is exactly the kind of drift `docs/GOVERNANCE.md` exists to
+  exactly; a second, competing taxonomy is exactly the kind of drift `docs/status/GOVERNANCE.md` exists to
   prevent.
 - Re-run on a request that already has an approved plan from an earlier pipeline pass — that request
   was already triaged implicitly by having gone through Discovery.

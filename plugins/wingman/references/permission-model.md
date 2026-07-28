@@ -4,7 +4,7 @@ Origin: a founder-supplied "enterprise blueprint" proposed a 5-tier permission m
 mechanical improvement over Wingman's existing `permissions: read|write|approve|execute|deploy`
 frontmatter enum. The founder chose to adopt it, and chose to land it in two places: this
 shipped reference (the authoritative version, actually read by agents in a founder's install)
-and root `POLICIES.md` (the human-facing statement). See `docs/PROJECT.md`'s decisions log,
+and root `POLICIES.md` (the human-facing statement). See `docs/status/PROJECT.md`'s decisions log,
 2026-07-27, for the full reconciliation against the blueprint's other proposals.
 -->
 
@@ -19,12 +19,12 @@ human readers; if the two ever disagree, this file is correct (`scripts/check-re
 mechanically asserts they stay in sync — see that script's own comment for what it checks).
 
 **Status, stated plainly, not smoothed over**: like the `permissions:` field itself
-(`docs/ARCHITECTURE.md` §4), this is a documentation-and-consistency model, not a fully
+(`docs/status/ARCHITECTURE.md` §4), this is a documentation-and-consistency model, not a fully
 runtime-enforced one. `validate-structure.mjs` checks the field is used correctly at authoring time.
 `deploy-approval-gate.mjs` (see below) enforces the one boundary that actually matters most —
 Level 3/4 deploy-class actions — against real checkpoint state. Everything below that boundary still
 relies on each agent's `tools:` allowlist as the real runtime barrier, the same accepted limit
-`docs/ARCHITECTURE.md` §4 already discloses.
+`docs/status/ARCHITECTURE.md` §4 already discloses.
 
 ## Level 0 — Read only
 
@@ -90,7 +90,7 @@ stopping a production incident.
 authorization; requires its own audit entry; never used for ordinary development.
 
 **Maps onto**: `permissions: deploy` — reserved for `dept-devops`-dispatched work, and only after a
-Level-3 Boardroom approval has already happened (`docs/ARCHITECTURE.md` §4).
+Level-3 Boardroom approval has already happened (`docs/status/ARCHITECTURE.md` §4).
 
 ## Permission decision rules
 
@@ -117,14 +117,14 @@ means yes.
 checkpoint in `.wingman/checkpoints.jsonl` carries a clean Boardroom `GO` (reusing
 `dod-structural-gate.mjs`'s own `checkBoardroomVerdictClean()`). This is deliberately **not**
 identity-based — no Claude Code hook payload exposes which agent is acting (confirmed directly by
-reading every hook's actual payload fields; see `docs/ARCHITECTURE.md` §4's disclosed limit and this
+reading every hook's actual payload fields; see `docs/status/ARCHITECTURE.md` §4's disclosed limit and this
 file's own commit history for the verification). The gate enforces the boundary against checkpoint
 state instead: has *this project* cleared the review this action requires, regardless of who is
 about to run it.
 
 ## Cited by
 
-- `docs/ARCHITECTURE.md` §4 (Agent Permission Model)
+- `docs/status/ARCHITECTURE.md` §4 (Agent Permission Model)
 - `plugins/wingman/hooks/deploy-approval-gate.mjs`
 - `plugins/wingman/skills/department-lead-activation/references/template.md`
 - `plugins/wingman/skills/evolve-promotion/references/specialist-agent-template.md`

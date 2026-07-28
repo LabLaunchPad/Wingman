@@ -134,7 +134,7 @@ you hand off to `/wingman:implementation-planning`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -179,7 +179,7 @@ Translate every finding through `plain-language-checkpoint`'s bar before it reac
 - `skills/systematic-auditing` — the deeper audit discipline for when a surface needs more than the standard pass.
 - `commands/adaptive/dogfood.md` — a different, complementary operation: `/wingman:audit` reviews *existing* project state; `/wingman:dogfood` generates and runs a fixture/feature through the real pipeline end to end.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -294,7 +294,7 @@ Figure out what's in scope, in this order of preference:
 pipeline checkpoints (Discovery through Architecture/Implementation-Planning) reviews a *decision
 about what Build will create* — the files/models/relations it names do not exist on disk yet, by
 design, and that absence is not itself a finding. A real maintainer-mode dogfood run (see
-`docs/wingman/retros.md`, 2026-07-25/26) hit this directly: a Boardroom seat reviewing an
+`docs/history/retros.md`, 2026-07-25/26) hit this directly: a Boardroom seat reviewing an
 Architecture-stage document returned `NO_GO` because a schema model and a webhook file the document
 proposed didn't exist yet — the seat was correctly skeptical in general, but applied a diff-review
 standard (real code must already work) to a design-review scope (does this design, if built, close
@@ -304,7 +304,7 @@ judge whether the actual code closes the risk" — so a seat doesn't fail a pre-
 for not yet containing implementation.
 
 **A cleared checkpoint is not a permanent guarantee against a later one.** A real dogfooding pass
-(see `docs/wingman/retros.md`) found this directly: a Build-stage diff cleared 8/8 `GO`, and a
+(see `docs/history/retros.md`) found this directly: a Build-stage diff cleared 8/8 `GO`, and a
 later Ship-stage checkpoint over nearly the same diff caught two real, valid findings the earlier
 pass had missed. That's the review working as intended, not a contradiction to explain away — each
 checkpoint is a fresh, independent look, not a rubber stamp carried forward from the last one. Do
@@ -435,13 +435,13 @@ Then append one line to `.wingman/checkpoints.jsonl` at the project root with ex
 }
 ```
 
-**Schema note (14-stage individual-checkpoint pipeline, schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction bundling decision — see `docs/ARCHITECTURE.md` §4d for the full rationale. The pipeline expands from 7 stages / 1 bundled pre-build checkpoint to 14 stages / 12 individual pre-build checkpoints. Every stage — including the 4 that used to run silently unbundled (`discovery`/`define`/`architecture`/`uxflow`) — now records its own solo checkpoint immediately after itself; `implementation-planning.md` no longer reviews the combined output of 5 planning stages as one `"bundle": "planning-milestone"` entry. `stage` is always a scalar as of `schema_version: 5` (never an array); `bundle` is kept as a field, set to the same value as `stage`, rather than dropped, so every entry has a uniform field set regardless of schema version. See `docs/DATABASE.md` for the full old→new stage mapping. This is an append-only audit log, never rewritten — existing `schema_version: 3`/`4` entries keep their bundled/array shape permanently; any consumer must still check whether `stage` is an array before iterating.
+**Schema note (14-stage individual-checkpoint pipeline, schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction bundling decision — see `docs/status/ARCHITECTURE.md` §4d for the full rationale. The pipeline expands from 7 stages / 1 bundled pre-build checkpoint to 14 stages / 12 individual pre-build checkpoints. Every stage — including the 4 that used to run silently unbundled (`discovery`/`define`/`architecture`/`uxflow`) — now records its own solo checkpoint immediately after itself; `implementation-planning.md` no longer reviews the combined output of 5 planning stages as one `"bundle": "planning-milestone"` entry. `stage` is always a scalar as of `schema_version: 5` (never an array); `bundle` is kept as a field, set to the same value as `stage`, rather than dropped, so every entry has a uniform field set regardless of schema version. See `docs/status/DATABASE.md` for the full old→new stage mapping. This is an append-only audit log, never rewritten — existing `schema_version: 3`/`4` entries keep their bundled/array shape permanently; any consumer must still check whether `stage` is an array before iterating.
 
-**Schema note (reversible-compression / `expand`, schema_version 3 → 4, 2026):** adds `details_ref`, a path to the full-seat-verdict companion file the step above writes — this is what closes the gap `docs/DATABASE.md` had named ("checkpoints.jsonl — Boardroom verdicts only, no rationale beyond a one-line seat summary"): the rationale now exists, just not inline in the append-only log itself (keeping it lean). Omit `details_ref` entirely if the companion-file write failed (never write a `details_ref` pointing at a file that doesn't actually exist) — `expand` treats its absence as "no detail available for this one," not an error. Existing `schema_version: 3` and earlier entries have no `details_ref` and never will — this is an append-only audit log, never rewritten.
+**Schema note (reversible-compression / `expand`, schema_version 3 → 4, 2026):** adds `details_ref`, a path to the full-seat-verdict companion file the step above writes — this is what closes the gap `docs/status/DATABASE.md` had named ("checkpoints.jsonl — Boardroom verdicts only, no rationale beyond a one-line seat summary"): the rationale now exists, just not inline in the append-only log itself (keeping it lean). Omit `details_ref` entirely if the companion-file write failed (never write a `details_ref` pointing at a file that doesn't actually exist) — `expand` treats its absence as "no detail available for this one," not an error. Existing `schema_version: 3` and earlier entries have no `details_ref` and never will — this is an append-only audit log, never rewritten.
 
-**Schema note (7-stage pipeline migration, 2026):** `schema_version: 3` marks the 7-stage pipeline (`discovery`/`define`/`architecture`/`uxflow`/`implementation-planning`/`build`/`ship`, replacing `plan`/`build`/`secure`/`ship`) and introduces the `bundle` field: `implementation-planning.md` is the only one of the 5 planning stages that records a checkpoint, reviewing all 5 stages' combined output as one `"bundle": "planning-milestone"` entry with `stage` as an **array** of all 5 stage names — `build` and `ship` keep a scalar `stage` and `bundle` set to their own name (not `null`) for consistency, since every checkpoint now belongs to exactly one of the 3 bundles a project produces. `secure` no longer exists as a stage — its discipline is folded into `build`'s own Definition-of-Done gate (see `commands/pipeline/build.md`). Existing `schema_version: 2` entries keep a scalar `stage` and no `bundle` field at all — treat its absence on an older entry as "not applicable," never as an error. This remains an append-only audit log, never rewritten; see `docs/DATABASE.md` for the full old→new stage mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) must not assume `stage` is always a scalar — check whether it's an array before iterating.
+**Schema note (7-stage pipeline migration, 2026):** `schema_version: 3` marks the 7-stage pipeline (`discovery`/`define`/`architecture`/`uxflow`/`implementation-planning`/`build`/`ship`, replacing `plan`/`build`/`secure`/`ship`) and introduces the `bundle` field: `implementation-planning.md` is the only one of the 5 planning stages that records a checkpoint, reviewing all 5 stages' combined output as one `"bundle": "planning-milestone"` entry with `stage` as an **array** of all 5 stage names — `build` and `ship` keep a scalar `stage` and `bundle` set to their own name (not `null`) for consistency, since every checkpoint now belongs to exactly one of the 3 bundles a project produces. `secure` no longer exists as a stage — its discipline is folded into `build`'s own Definition-of-Done gate (see `commands/pipeline/build.md`). Existing `schema_version: 2` entries keep a scalar `stage` and no `bundle` field at all — treat its absence on an older entry as "not applicable," never as an error. This remains an append-only audit log, never rewritten; see `docs/status/DATABASE.md` for the full old→new stage mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) must not assume `stage` is always a scalar — check whether it's an array before iterating.
 
-**Schema note (seat-rename migration, 2026):** `schema_version: 2`+ marks the 7-seat Boardroom (`ceo`/`cpo`/`cmo`/`cto`/`ciso`/`cfo`/`research`/`design`), replacing the prior 5-seat schema (`founder`/`engineer`/`security`/`design`/`cost`, implicitly `schema_version: 1`, unmarked). Existing `checkpoints.jsonl` entries written before this change keep their old seat names — this is an append-only audit log and is never rewritten. See `docs/DATABASE.md` for the full old→new seat mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and does not assume a fixed seat count or fixed names, so old and new entries coexist safely.
+**Schema note (seat-rename migration, 2026):** `schema_version: 2`+ marks the 7-seat Boardroom (`ceo`/`cpo`/`cmo`/`cto`/`ciso`/`cfo`/`research`/`design`), replacing the prior 5-seat schema (`founder`/`engineer`/`security`/`design`/`cost`, implicitly `schema_version: 1`, unmarked). Existing `checkpoints.jsonl` entries written before this change keep their old seat names — this is an append-only audit log and is never rewritten. See `docs/status/DATABASE.md` for the full old→new seat mapping. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and does not assume a fixed seat count or fixed names, so old and new entries coexist safely.
 
 Create `.wingman/` and the file if they don't exist yet. This is a plain append (`>>`), never a rewrite — it's an audit log.
 
@@ -456,7 +456,7 @@ Then update `.wingman/state.json`. **Read the existing file first if it exists**
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the "Where you are" pipeline status and the optional seat-verdict grid; consult before formatting the consolidated summary above.
 - `skills/plain-language-checkpoint` — the reversible-compression rule behind the `details_ref` companion file and `expand` mode above.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -481,7 +481,7 @@ argument-hint: "[path to plan file, or leave blank to use the most recent approv
 
 # Wingman: Build
 
-The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the plan approved at `/wingman:implementation-planning`'s own solo checkpoint (per `docs/ARCHITECTURE.md` §4d, no separate "Planning Milestone" bundle exists — every one of the 12 prior stages already cleared its own checkpoint). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint. Sequence work the way an agentic IDE session should: hand the agent the plan/AI PRD, have it build the data layer first, then build individual feature modules one at a time — never everything at once.
+The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the plan approved at `/wingman:implementation-planning`'s own solo checkpoint (per `docs/status/ARCHITECTURE.md` §4d, no separate "Planning Milestone" bundle exists — every one of the 12 prior stages already cleared its own checkpoint). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint. Sequence work the way an agentic IDE session should: hand the agent the plan/AI PRD, have it build the data layer first, then build individual feature modules one at a time — never everything at once.
 
 $ARGUMENTS
 
@@ -505,7 +505,7 @@ Confirm the project is on a feature branch, not the default branch — check out
 
 If this is a JS/TS project about to need a package manager for the very first time (no lock file, no `package.json` `packageManager` field yet), use the `package-manager-selection` skill before running any install command. This never applies to a project that already has a lock file — that choice is respected, not revisited.
 
-Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly — **except** for a genuinely single-task plan (Implementation Planning named exactly one task): creating and dispatching a full department-lead persona for one small unit of work is overhead disproportionate to the task itself, so this command may execute that one task directly. This exception does not apply once a plan names 2+ tasks — delegate normally from there. (Found via two real maintainer-mode dogfood runs, 2026-07-18 and 2026-07-21 — see `docs/wingman/retros.md`.)
+Use the `department-lead-activation` skill to check the Design, Engineering, Data, and QA activation signals against this project and the plan. `dept-engineering` and `dept-qa` are always active; create `dept-design` if the plan touches any user-facing surface, and `dept-data` if it touches a schema/migrations. Delegate each task to the relevant department lead rather than doing all the work as this command directly — **except** for a genuinely single-task plan (Implementation Planning named exactly one task): creating and dispatching a full department-lead persona for one small unit of work is overhead disproportionate to the task itself, so this command may execute that one task directly. This exception does not apply once a plan names 2+ tasks — delegate normally from there. (Found via two real maintainer-mode dogfood runs, 2026-07-18 and 2026-07-21 — see `docs/history/retros.md`.)
 
 Immediately after, use the `management-board-activation` skill to check the Management Board activation threshold (see `references/pipeline-stage-boilerplate.md`'s Activation Checks section for the shared criteria) — if crossed, `mgr-engineering`/`mgr-design`/`mgr-data`/`mgr-qa`/`mgr-security` may need creating for whichever department leads are actually active (including `mgr-security`, once `dept-legal-security` is created just below).
 
@@ -772,7 +772,7 @@ you hand off to `/wingman:information-architecture`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -832,7 +832,7 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 ```
 
 **Why all 8 fields, not 4:** this stage's own Gate checklist below lists these same 8 items as
-Must-include — a real maintainer-mode dogfood run (see `docs/wingman/retros.md`, 2026-07-25/26)
+Must-include — a real maintainer-mode dogfood run (see `docs/history/retros.md`, 2026-07-25/26)
 found that an earlier 4-field version of this template caused 3 of 8 real Boardroom seats (CEO,
 CPO, CTO, Research) to independently flag "missing sections" on output that matched the template
 exactly, because the template and the Gate checklist a few lines below it had drifted out of sync.
@@ -876,7 +876,7 @@ you hand off to `/wingman:research-synthesis`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -891,11 +891,11 @@ argument-hint: "[optional: simple|complex|both (maintainer mode) or a feature id
 # Wingman: Dogfood
 
 This command exists because a structural review of Wingman's own files can't catch everything —
-some bugs only surface when the actual 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d — the
+some bugs only surface when the actual 14-stage pipeline (see `docs/status/ARCHITECTURE.md` §4d — the
 v20 expansion from the original 7-stage sequence to 12 individual pre-build Boardroom checkpoints
 plus Build plus Ship) runs for real, with a real founder-in-the-loop decision at every checkpoint,
 real Boardroom dispatch, real test-driven implementation, and a real `git push` through the actual
-installed hooks. Two real runs of this kind (documented in `docs/wingman/retros.md`) each found and
+installed hooks. Two real runs of this kind (documented in `docs/history/retros.md`) each found and
 fixed a genuine bug that no amount of reading the plugin's own files would have caught — both of
 those runs predate the v20 expansion, so no run has yet exercised the 7 newer stages
 (`research-synthesis`, `personas-jobs`, `journey-mapping`, `information-architecture`, `wireframes`,
@@ -915,7 +915,7 @@ never ships to a founder's installed copy of the plugin.
   `dogfood-gap-classification` skill.
 - **If it doesn't exist → founder mode.** You're running inside a founder's own project. Proceed
   to Step 2b. Nothing in this mode ever writes to `plugins/wingman/`; findings flow into the
-  founder's own `LEARNINGS.md`/`docs/wingman/retros.md`/`/wingman:evolve`, exactly like any other
+  founder's own `LEARNINGS.md`/`docs/history/retros.md`/`/wingman:evolve`, exactly like any other
   session's work.
 
 ## Step 2a: Maintainer mode
@@ -927,7 +927,7 @@ never ships to a founder's installed copy of the plugin.
   user-facing surface). Purpose: prove the gates that are supposed to stay dormant on a trivial
   project actually do — `management-board-activation`'s conditional-department threshold,
   `department-lead-activation`'s conditional signals, `dod-structural-gate.mjs`'s checks. This is
-  the path that caught the real complexity-gate miscounting bug (see `docs/wingman/retros.md`,
+  the path that caught the real complexity-gate miscounting bug (see `docs/history/retros.md`,
   2026-07-14/15) — do not skip it just because "nothing should happen" makes it feel like a no-op.
 - **Complex path**: generate a fresh fixture via `evals/fixtures/setup-dogfood-complex.sh
   <target-dir>` — seeded with deliberate conditional signals (an auth/payments touchpoint, a
@@ -995,7 +995,7 @@ finding to avoid an empty array.
 **If `observed_gaps` is non-empty**, invoke the `dogfood-gap-classification` skill against each
 entry before considering this run complete.
 
-**Always** write a `## Retro:` entry to `docs/wingman/retros.md`, in the existing format, whether
+**Always** write a `## Retro:` entry to `docs/history/retros.md`, in the existing format, whether
 or not a gap was found — a clean run is real signal too, not a no-op.
 
 ## Step 2b: Founder mode
@@ -1012,7 +1012,7 @@ frames it explicitly as a low-stakes "try it and see" pass and reminds the found
 the branch afterward with no cost if they were just kicking the tires.
 
 Any friction found here is captured the normal way: `/wingman:learn` for a durable lesson,
-`docs/wingman/retros.md` for a fuller retrospective, `/wingman:evolve` if the same friction repeats
+`docs/history/retros.md` for a fuller retrospective, `/wingman:evolve` if the same friction repeats
 2+ times. **Never** invoke `dogfood-gap-classification` in this mode, and never write to
 `plugins/wingman/` — that skill and that directory are maintainer-mode-only, by design (see Step 1).
 
@@ -1028,7 +1028,7 @@ Any friction found here is captured the normal way: `/wingman:learn` for a durab
 - `commands/adaptive/evolve.md` / `skills/evolve-promotion` — founder-project-scoped promotion (never writes
   to `plugins/wingman/`); the mirror image of `dogfood-gap-classification`'s maintainer scope.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -1058,11 +1058,11 @@ $ARGUMENTS
 ## Run the promotion mechanism
 
 Use the `evolve-promotion` skill now. It will:
-1. Gather signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`.
+1. Gather signal from `LEARNINGS.md`, `docs/history/retros.md`, and `.wingman/checkpoints.jsonl`.
 2. Cluster genuine repeated friction (2+ occurrences required — a single occurrence is never enough).
 3. Classify each qualifying cluster as a candidate command, skill, or specialist agent.
 4. Present the proposals to you in plain language and get explicit approval via `AskUserQuestion` before creating anything. **Harness-aware fallback**: if this session isn't running under Claude Code, check `references/harness-capability-profile.md`'s `hasQuestionTool` column — if `true` (e.g. Gemini CLI's `ask_user`, Cline's `ask_followup_question`), use that harness's native question tool instead, naming which one; if `false`, present the options in plain prose and treat the next message as the answer.
-5. Write the approved artifact into **your own project** under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate) — never into Wingman's own plugin files, regardless of artifact type (see `docs/ARCHITECTURE.md` §6 for why).
+5. Write the approved artifact into **your own project** under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate) — never into Wingman's own plugin files, regardless of artifact type (see `docs/status/ARCHITECTURE.md` §6 for why).
 6. Record any promoted specialist in `.wingman/state.json`'s `active_specialists` array.
 
 ## Keep it rare
@@ -1179,13 +1179,13 @@ Delegate to `dept-qa` to verify the fix doesn't break anything else, and re-chec
 
 ## Step 6: Boardroom checkpoint
 
-Run `/wingman:boardroom diff` before this ships again — a hotfix under time pressure is exactly when skipping the checkpoint feels tempting and is most likely to matter. Record the checkpoint with `stage: "hotfix"` in `.wingman/checkpoints.jsonl` (a free-text stage label is fine, per `docs/DATABASE.md`), and set `next_stage: "ship"`.
+Run `/wingman:boardroom diff` before this ships again — a hotfix under time pressure is exactly when skipping the checkpoint feels tempting and is most likely to matter. Record the checkpoint with `stage: "hotfix"` in `.wingman/checkpoints.jsonl` (a free-text stage label is fine, per `docs/status/DATABASE.md`), and set `next_stage: "ship"`.
 
 ## Step 7: Hand off
 
 Once the Boardroom clears this stage, proceed to `/wingman:ship`. Suggest `/wingman:learn` afterward if this incident revealed something durable worth remembering (a fragile pattern, a monitoring gap, a recurring root cause).
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -1199,7 +1199,7 @@ argument-hint: "[optional: anything to focus the plan on]"
 
 # Wingman: Implementation Planning
 
-The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/status/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
 
 $ARGUMENTS
 
@@ -1252,7 +1252,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 
 ## Implementation Planning.6: Implementation Planning checkpoint
 
-Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
+Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/status/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 
 **Harness-aware fallback**: `ExitPlanMode` + `boardroom-checkpoint.mjs`'s hook gate is Claude Code's own mechanism for making sure a "ship it" decision was actually recorded before code-writing resumes. Outside Claude Code, check `references/harness-capability-profile.md`'s `hasPlanGate` column: a `true`/`⚠️ weak` entry (e.g. Gemini CLI) has its own per-harness substitute hook already wired in that harness's own adapter (see `references/harness-adapters/<id>/`); a `false` entry (most harnesses today) has no interceptable transition at all, so `plugins/wingman/scripts/dod-pre-push-check.mjs` (wired via `install-git-hooks.mjs`) is the real backstop — it still blocks an unapproved plan from actually reaching `git push`, just later in the flow than Claude Code's own gate.
 
@@ -1272,7 +1272,7 @@ the checkpoint blocks here and names the specific missing item(s) to the founder
   diagram appended to the plan; §2 — the pipeline-status tree above.
 - `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -1387,7 +1387,7 @@ you hand off to `/wingman:uxflow`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -1467,7 +1467,7 @@ you hand off to `/wingman:define`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
   journey diagram above; consult before choosing a rendering tier.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -1483,7 +1483,7 @@ argument-hint: "[optional: output directory, defaults to .wingman/okf-export/]"
 
 Everything Wingman has tracked about this project's decisions lives under `.wingman/` in Wingman's own formats (JSONL checkpoints, prose memory files) — genuinely useful, but only readable by something that already knows Wingman's shapes. This command exports it into [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog), a plain directory of markdown files with light YAML frontmatter, so a founder can point Gemini, a ChatGPT connector, or any other AI tool at their own project history without a Wingman-specific integration.
 
-Opt-in only — this never runs automatically as part of the pipeline. Invoke it when a founder wants to hand their project's decision history to a different AI tool, or wants a single, human-browsable "what has this project decided and why" view (a real gap `docs/DATABASE.md` names explicitly: no file today unifies checkpoints, state, and memory into one surface).
+Opt-in only — this never runs automatically as part of the pipeline. Invoke it when a founder wants to hand their project's decision history to a different AI tool, or wants a single, human-browsable "what has this project decided and why" view (a real gap `docs/status/DATABASE.md` names explicitly: no file today unifies checkpoints, state, and memory into one surface).
 
 $ARGUMENTS
 
@@ -1512,7 +1512,7 @@ Writes a fresh bundle to `.wingman/okf-export/` (or the output directory given i
 
 If the project has no `.wingman/checkpoints.jsonl` and no populated `memory/*.md` yet, there's nothing meaningful to export — say so plainly rather than writing an empty bundle that looks like output.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -1565,7 +1565,7 @@ Only after the Boardroom returns "ship it," show the founder the final materials
 
 Suggest `/wingman:learn` if anything about drafting this launch is worth remembering for next time (a recurring changelog format quirk, a channel-specific copy constraint, etc.).
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---
@@ -1753,7 +1753,7 @@ you hand off to `/wingman:journey-mapping`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -1767,7 +1767,7 @@ argument-hint: "[optional: what to focus the review on, e.g. a specific feature 
 
 # Wingman: Post-Launch
 
-An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review. Corresponds to "Iterate" in **Phase 6: Launch & Iterate** (see `ship.md`): when a real bug or gap surfaces, the fix is a plan/AI-PRD update handed back to the build stage, not a hand-patch applied outside the pipeline.
+An adaptive command, not part of the fixed 14-stage pipeline (see `docs/status/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review. Corresponds to "Iterate" in **Phase 6: Launch & Iterate** (see `ship.md`): when a real bug or gap surfaces, the fix is a plan/AI-PRD update handed back to the build stage, not a hand-patch applied outside the pipeline.
 
 $ARGUMENTS
 
@@ -1796,7 +1796,7 @@ Append this to `docs/wingman/post-launch/<short-slug>.md` in the founder's proje
 
 ## Record the checkpoint
 
-Run `/wingman:boardroom` with scope set to this review — this is an ad-hoc `/wingman:boardroom` invocation, not one of the 14 pipeline-stage checkpoints, so it records with a free-text `"stage": "post-launch"` (and `"bundle"` set to the same value) in `.wingman/checkpoints.jsonl`, per `docs/DATABASE.md`'s schema. No new traceability prefix is minted by this command.
+Run `/wingman:boardroom` with scope set to this review — this is an ad-hoc `/wingman:boardroom` invocation, not one of the 14 pipeline-stage checkpoints, so it records with a free-text `"stage": "post-launch"` (and `"bundle"` set to the same value) in `.wingman/checkpoints.jsonl`, per `docs/status/DATABASE.md`'s schema. No new traceability prefix is minted by this command.
 
 ## Feed it forward
 
@@ -1804,8 +1804,8 @@ If the review surfaces something that should change what gets built next, hand i
 
 ## References
 
-- `docs/ARCHITECTURE.md` §4d — why this is an adaptive command, not a 15th pipeline stage.
-- `docs/DATABASE.md` — the `checkpoints.jsonl` schema this command's ad-hoc entry follows.
+- `docs/status/ARCHITECTURE.md` §4d — why this is an adaptive command, not a 15th pipeline stage.
+- `docs/status/DATABASE.md` — the `checkpoints.jsonl` schema this command's ad-hoc entry follows.
 - `commands/pipeline/discovery.md` — where this review's findings feed back into.
 
 
@@ -1889,7 +1889,7 @@ you hand off to `/wingman:architecture`.
 - `skills/plain-language-checkpoint` — the content-review bar applied above.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -2002,7 +2002,7 @@ you hand off to `/wingman:personas-jobs`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -2026,7 +2026,7 @@ Before writing anything, look at real evidence from this work: commit history, t
 
 ## Write the retro
 
-Append to `docs/wingman/retros.md` at the project root (create it with a one-line header if it doesn't exist yet — same append-only convention as `LEARNINGS.md`). Retros scattered across individual plan files can't be reliably found later, including by `/wingman:evolve`'s clustering step, so this is the one canonical location:
+Append to `docs/history/retros.md` at the project root (create it with a one-line header if it doesn't exist yet — same append-only convention as `LEARNINGS.md`). Retros scattered across individual plan files can't be reliably found later, including by `/wingman:evolve`'s clustering step, so this is the one canonical location:
 
 ```markdown
 <!-- wingman:log type=retro category=<short free-text tag matching what this retro is mainly about> status=resolved -->
@@ -2304,7 +2304,7 @@ Immediately after (only if `dept-design` is active), use the `management-board-a
 **Trace to whichever upstream IDs actually exist yet.** In the 14-stage pipeline, `uxflow` is
 stage 7 — `architecture.md` (stage 11, mints `ARCH-*`) hasn't run yet at this point, so `ARCH-*`
 IDs will not exist in a real end-to-end run reaching this stage in order (confirmed directly by a
-real maintainer-mode dogfood run, `docs/wingman/retros.md` 2026-07-25/26 — this text still referred
+real maintainer-mode dogfood run, `docs/history/retros.md` 2026-07-25/26 — this text still referred
 to `ARCH-*` from before the v20 stage-reorder, when Architecture ran immediately before UX Flow).
 Trace instead to the `IA-*`/`DEF-*` chain, which is already available by this stage. If this command
 is ever invoked standalone against a fixture/project that already has `ARCH-*` decisions on file
@@ -2370,7 +2370,7 @@ you hand off to `/wingman:wireframes`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -2441,7 +2441,7 @@ you hand off to `/wingman:prototype-usability`.
 - `skills/design-taste` — the quality bar this spec becomes, enforced later at `/wingman:build` time; this stage produces the spec, `design-taste` enforces it.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 
 ---
@@ -2522,4 +2522,4 @@ you hand off to `/wingman:visual-design-system`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
   layout sketches above; consult before choosing a rendering tier.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.

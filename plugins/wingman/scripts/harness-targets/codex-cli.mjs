@@ -2,7 +2,7 @@
 //
 // Extracted from the previously-hardcoded HARNESS_NOTES/HARNESS_LABELS tables and inline
 // buildTargets() branch in generate-harness-adapters.mjs, plus the hardcoded codexDir constant in
-// check-harness-adapter-drift.mjs -- see docs/ARCHITECTURE.md §8f for why this became a
+// check-harness-adapter-drift.mjs -- see docs/status/ARCHITECTURE.md §8f for why this became a
 // descriptor-driven model instead of two more hand-added harness branches.
 
 export default {

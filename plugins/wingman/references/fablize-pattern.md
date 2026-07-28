@@ -1,6 +1,6 @@
 # The fablize wiring/logic separation pattern
 
-Referenced by `docs/ARCHITECTURE.md` §8a. Not a vendored dependency (nothing from this source is
+Referenced by `docs/status/ARCHITECTURE.md` §8a. Not a vendored dependency (nothing from this source is
 copied or executed) — a documented design principle reverse-engineered from a real, working Claude
 Code plugin, `github.com/fivetaku/fablize`, in response to a direct request to make Wingman's own
 hook layer more agent-agnostic. See `ATTRIBUTIONS.md` for the formal attribution entry.
@@ -41,7 +41,7 @@ taxonomy too); the actual, transferable lesson is the **discipline**, not a port
 ## Where this was applied in Wingman
 
 Re-reading `plugins/wingman/hooks/dod-structural-gate.mjs` against this exact standard (see
-`docs/ARCHITECTURE.md` §8a) found it **already follows this discipline** — every exported check
+`docs/status/ARCHITECTURE.md` §8a) found it **already follows this discipline** — every exported check
 function operates on generic signals; only the file's outermost `if (toolName === ...)` dispatch is
 tool-name-specific, and that's wiring, not logic, exactly like `router.sh`'s own event dispatch.
 

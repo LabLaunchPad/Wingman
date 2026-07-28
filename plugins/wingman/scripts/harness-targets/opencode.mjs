@@ -2,7 +2,7 @@
 //
 // Extracted from the previously-hardcoded HARNESS_NOTES/HARNESS_LABELS tables and inline
 // buildTargets() branch in generate-harness-adapters.mjs, plus the hardcoded opencodeDir/
-// opencodeSkillsDir constants in check-harness-adapter-drift.mjs. See docs/ARCHITECTURE.md §8f.
+// opencodeSkillsDir constants in check-harness-adapter-drift.mjs. See docs/status/ARCHITECTURE.md §8f.
 
 export default {
   id: 'opencode',

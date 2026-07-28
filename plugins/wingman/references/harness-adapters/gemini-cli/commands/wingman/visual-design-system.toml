@@ -60,6 +60,6 @@ you hand off to `/wingman:prototype-usability`.
 - `skills/design-taste` — the quality bar this spec becomes, enforced later at `/wingman:build` time; this stage produces the spec, `design-taste` enforces it.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.
 
 '''

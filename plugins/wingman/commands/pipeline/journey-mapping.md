@@ -71,4 +71,4 @@ you hand off to `/wingman:define`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the
   journey diagram above; consult before choosing a rendering tier.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.

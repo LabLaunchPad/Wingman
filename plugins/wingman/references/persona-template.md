@@ -10,7 +10,7 @@ checkpoint` bar.
 
 Only when a founder actually needs a new lens repeatedly. Do NOT create
 personas speculatively — promote via evidenced need, same as specialists
-(see `docs/AGENT-ROSTER.md`). A new *advisor* is a skill, not an agent: it
+(see `docs/roadmap/AGENT-ROSTER.md`). A new *advisor* is a skill, not an agent: it
 renders a verdict, it never writes or edits code.
 
 ## The skill file (`skills/<name>/SKILL.md`)

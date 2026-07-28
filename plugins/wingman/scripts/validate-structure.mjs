@@ -2,7 +2,7 @@
 // Structural validator for the Wingman plugin.
 // Checks that everything plugin.json declares actually exists on disk, that
 // every command/agent/skill has the frontmatter fields Claude Code requires,
-// and that agent/skill names are globally unique (see docs/ARCHITECTURE.md
+// and that agent/skill names are globally unique (see docs/status/ARCHITECTURE.md
 // and the wshobson-agents/jeffallan-claude-skills vendor research this
 // convention was adapted from). No dependencies beyond Node's stdlib, since
 // Node ships with Claude Code itself.
@@ -15,13 +15,13 @@ const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const errors = [];
 const warnings = [];
 
-// Agents whose model tier is load-bearing, per docs/ARCHITECTURE.md §8:
+// Agents whose model tier is load-bearing, per docs/status/ARCHITECTURE.md §8:
 // the two highest-stakes reviewers (a wrong call is expensive) must run on
 // opus, not inherit. They silently drifted to `inherit` once and only an
 // audit caught it -- mechanizing keeps that from recurring.
 // Renamed from boardroom-engineer/boardroom-security to boardroom-cto/
 // boardroom-ciso in the 7-seat Boardroom expansion (schema_version 2,
-// see docs/DATABASE.md) -- update this set again if the seats are ever
+// see docs/status/DATABASE.md) -- update this set again if the seats are ever
 // renamed further, or this invariant silently stops being checked.
 const OPUS_REQUIRED_AGENTS = new Set(['boardroom-cto', 'boardroom-ciso']);
 
@@ -132,11 +132,11 @@ for (const relPath of plugin.agents || []) {
   if (fm?.name) {
     if (seenAgentNames.has(fm.name)) errors.push(`agent name collision: "${fm.name}" (${relPath})`);
     seenAgentNames.add(fm.name);
-    // Model-tier invariant (docs/ARCHITECTURE.md §8).
+    // Model-tier invariant (docs/status/ARCHITECTURE.md §8).
     if (OPUS_REQUIRED_AGENTS.has(fm.name) && fm.model !== 'opus') {
       errors.push(`agent ${relPath}: "${fm.name}" must be "model: opus" per ARCHITECTURE.md §8 (a wrong call from this seat is expensive), found "model: ${fm.model ?? 'unset'}"`);
     }
-    // Agent Permission Model (docs/ARCHITECTURE.md §4a): a documentation-and-
+    // Agent Permission Model (docs/status/ARCHITECTURE.md §4a): a documentation-and-
     // consistency check, not yet runtime-enforced. Missing is a warning
     // (soft rollout); present-but-invalid is an error; "approve" is
     // Boardroom-exclusive.
@@ -238,7 +238,7 @@ if (existsSync(hooksFullPath)) {
 // Recursive (not a flat readdirSync) since commands/ still nests one level
 // deeper into category subfolders (e.g. commands/pipeline/discovery.md).
 // skills/ is flat as of 2026-07-23 (skills/<name>/SKILL.md, no category
-// subdirectory -- see docs/ARCHITECTURE.md §8b), but the recursive walk is
+// subdirectory -- see docs/status/ARCHITECTURE.md §8b), but the recursive walk is
 // left generic rather than hardcoded to either depth: it recurses into any
 // directory that isn't itself a skill (no SKILL.md at that level), so it
 // tolerates whichever nesting a given tree actually has instead of assuming
