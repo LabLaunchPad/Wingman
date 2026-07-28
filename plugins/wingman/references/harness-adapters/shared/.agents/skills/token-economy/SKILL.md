@@ -20,6 +20,14 @@ Every internal message an agent writes costs tokens whether or not anyone benefi
 
 **Core principle:** spend words where a human needs them; don't spend them where only a machine is reading.
 
+## Inputs
+
+The message about to be sent and its actual reader — another agent/process, or a person. Everything else follows from that one determination (step 1-2).
+
+## Escalation
+
+Genuine uncertainty about whether the reader is a person — treat it as a person and use `plain-language-checkpoint` instead; this skill never applies when in doubt.
+
 ## When To Use
 
 Internal-only channels: a pipeline command's instructions to a boardroom seat or department-lead subagent, a subagent's tool-call narration to itself, working logs, delegation handoffs, intermediate scratch notes.

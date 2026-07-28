@@ -7,6 +7,18 @@ description: Use whenever presenting a plan, diff, review verdict, or completion
 
 Wingman's core promise is that a non-technical founder can run a full SDLC without reading code or diffs. That promise is only as good as the last checkpoint they saw. This skill is the writing bar every Wingman checkpoint (boardroom summaries, stage completions, error reports) must clear.
 
+## Inputs
+
+Whatever technical finding, verdict, or status is about to be sent to the founder — a diff review, a Boardroom seat's reasoning, a stage-completion status.
+
+## Output
+
+A short, jargon-free message with a leading bottom-line sentence, following the "three things" rule (what/why/what-to-do) and the Anti-patterns table below.
+
+## Escalation
+
+A genuine risk with no honest reassurance available — say so plainly (per rule 5) rather than implying confidence that isn't backed by evidence; there's no separate approval gate beyond writing the honest verdict.
+
 ## The rule
 
 **If a smart 16-year-old with no coding background couldn't act on this sentence, rewrite it.**

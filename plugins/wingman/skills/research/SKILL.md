@@ -8,6 +8,14 @@ description: Use when the founder asks to investigate, compare, gather evidence 
 Turns a vague founder question into a sourced, plain-language brief with
 citations, so decisions are made on evidence rather than guesswork.
 
+## Inputs
+
+The founder's question and however vague it currently is — decomposing it into 2-4 sub-questions (step 1) is this skill's own first move, not a precondition it needs handed to it.
+
+## Escalation
+
+A claim with no reachable source, or a single source being treated as consensus (per Red Flags) — flag the gap explicitly in the confidence note rather than presenting an unverified answer as settled.
+
 ## When to use
 - The founder wants evidence before a decision (market, tech, legal, process).
 - Comparing approaches across vendors or the literature.
