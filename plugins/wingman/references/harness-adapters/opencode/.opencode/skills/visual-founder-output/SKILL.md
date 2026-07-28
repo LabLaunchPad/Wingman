@@ -98,7 +98,7 @@ not a new source of truth.
   beautifully rendered diagram full of unexplained technical terms is still a failing checkpoint.
 - Invent new persistent state to power a visual — render fresh from `.wingman/state.json` /
   `checkpoints.jsonl`, which already exist; this project's architecture is deliberately flat-files,
-  no server (see `docs/ARCHITECTURE.md`).
+  no server (see `docs/status/ARCHITECTURE.md`).
 
 ## Rationalizations
 

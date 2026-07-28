@@ -1,7 +1,7 @@
 // Harness target descriptor: Gemini CLI.
 //
 // Schemas verified directly (2026-07-27, dedicated research pass, corrected an earlier general pass
-// that wrongly assumed PreToolUse/PostToolUse event names -- see docs/ARCHITECTURE.md §8f):
+// that wrongly assumed PreToolUse/PostToolUse event names -- see docs/status/ARCHITECTURE.md §8f):
 //   - `gemini-extension.json`: name/version/description required; commands/hooks/agents/skills live
 //     in sibling directories, not manifest fields (contextFileName defaults to GEMINI.md).
 //   - `commands/*.toml`: `prompt` (required) + `description` (optional) -- no `name` field, the

@@ -2,7 +2,7 @@
 // Exports this project's Wingman-tracked knowledge (.wingman/checkpoints.jsonl,
 // .wingman/memory/*.md) into a Google Open Knowledge Format (OKF v0.1) bundle:
 // a directory of markdown "concept" files with YAML frontmatter, plus the two
-// OKF-reserved filenames (index.md, log.md). See docs/DATABASE.md for the
+// OKF-reserved filenames (index.md, log.md). See docs/status/DATABASE.md for the
 // source schemas and the "no single unifying view" gap this answers.
 //
 // Read-only on source data — never rewrites checkpoints.jsonl or memory/*.md.
@@ -13,7 +13,7 @@
 // another AI tool.
 //
 // Runnable standalone with zero Claude Code involvement, same pattern as
-// dod-pre-push-check.mjs (see docs/ARCHITECTURE.md §8a) — but for knowledge/
+// dod-pre-push-check.mjs (see docs/status/ARCHITECTURE.md §8a) — but for knowledge/
 // output portability rather than execution portability: the exported bundle
 // itself is what's portable, not just the script that makes it.
 //
@@ -98,7 +98,7 @@ function stageLabel(checkpoint) {
 
 function timestampFromCheckpointId(checkpointId) {
   // checkpoint_id is "<ISO-8601-timestamp-with-dashes>-<stage-or-bundle-name>"
-  // per docs/DATABASE.md — the timestamp portion is the first 20 chars
+  // per docs/status/DATABASE.md — the timestamp portion is the first 20 chars
   // ("2026-07-14T14-32-00Z"), with hyphens standing in for the colons.
   const match = String(checkpointId || '').match(/^(\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}Z)/);
   if (!match) return null;

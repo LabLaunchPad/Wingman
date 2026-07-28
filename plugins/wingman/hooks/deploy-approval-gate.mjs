@@ -5,7 +5,7 @@
 // Deliberately NOT identity-based. Every Wingman hook, and an independent second plugin's hooks,
 // were checked directly during a red-team pass (2026-07-27): all read only cwd/tool_name/
 // tool_input/session_id from their payload -- no Claude Code hook exposes which agent is acting.
-// docs/ARCHITECTURE.md §4 already disclosed this as an accepted limit; this hook closes the part
+// docs/status/ARCHITECTURE.md §4 already disclosed this as an accepted limit; this hook closes the part
 // of it that's actually closable -- not "is this specific agent allowed to deploy" (unanswerable),
 // but "has this project's Boardroom actually approved a deploy-class action right now" (answerable,
 // from real state that already exists).

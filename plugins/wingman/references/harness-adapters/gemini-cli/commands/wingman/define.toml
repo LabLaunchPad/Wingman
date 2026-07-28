@@ -60,6 +60,6 @@ you hand off to `/wingman:information-architecture`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 '''

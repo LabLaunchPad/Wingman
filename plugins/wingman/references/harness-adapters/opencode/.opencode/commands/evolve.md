@@ -12,11 +12,11 @@ $ARGUMENTS
 ## Run the promotion mechanism
 
 Use the `evolve-promotion` skill now. It will:
-1. Gather signal from `LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl`.
+1. Gather signal from `LEARNINGS.md`, `docs/history/retros.md`, and `.wingman/checkpoints.jsonl`.
 2. Cluster genuine repeated friction (2+ occurrences required — a single occurrence is never enough).
 3. Classify each qualifying cluster as a candidate command, skill, or specialist agent.
 4. Present the proposals to you in plain language and get explicit approval via `AskUserQuestion` before creating anything. **Harness-aware fallback**: if this session isn't running under Claude Code, check `references/harness-capability-profile.md`'s `hasQuestionTool` column — if `true` (e.g. Gemini CLI's `ask_user`, Cline's `ask_followup_question`), use that harness's native question tool instead, naming which one; if `false`, present the options in plain prose and treat the next message as the answer.
-5. Write the approved artifact into **your own project** under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate) — never into Wingman's own plugin files, regardless of artifact type (see `docs/ARCHITECTURE.md` §6 for why).
+5. Write the approved artifact into **your own project** under `.claude/` (`agents/`, `commands/`, or `skills/` as appropriate) — never into Wingman's own plugin files, regardless of artifact type (see `docs/status/ARCHITECTURE.md` §6 for why).
 6. Record any promoted specialist in `.wingman/state.json`'s `active_specialists` array.
 
 ## Keep it rare

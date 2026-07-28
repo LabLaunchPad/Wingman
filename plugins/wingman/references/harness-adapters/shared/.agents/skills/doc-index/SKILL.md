@@ -69,4 +69,4 @@ The discipline is itself verifiable: `grep` each `references/*.md` for citations
 
 - `commands/adaptive/evolve.md`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

@@ -79,4 +79,4 @@ you hand off to `/wingman:implementation-planning`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §4 — the DEF→ARCH
   traceability graph; §2 — the pipeline-status tree.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.

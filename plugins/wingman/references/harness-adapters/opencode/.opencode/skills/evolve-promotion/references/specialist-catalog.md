@@ -2,7 +2,7 @@
 
 The named vocabulary `evolve-promotion` promotes specialist agents from, so a promoted role gets an established name/scope instead of one invented ad hoc. Every role below is a **candidate**, not a file — none of these exist until a real project's repeated friction (2+ occurrences, see `SKILL.md`) justifies promoting one.
 
-**This file must stay in sync with `docs/AGENT-ROSTER.md` in the Wingman repo** — that file is the human-facing version (with promotion-process narrative, aimed at repo browsers/contributors); this one is the runtime-facing version that actually ships inside the installed plugin (`docs/` at the Wingman repo root is not part of what `marketplace.json` installs — only `plugins/wingman/` is, which is why this copy exists here). When one changes, update the other. See `docs/PROJECT.md`'s decisions log for why this duplication exists rather than a single shared file.
+**This file must stay in sync with `docs/roadmap/AGENT-ROSTER.md` in the Wingman repo** — that file is the human-facing version (with promotion-process narrative, aimed at repo browsers/contributors); this one is the runtime-facing version that actually ships inside the installed plugin (`docs/` at the Wingman repo root is not part of what `marketplace.json` installs — only `plugins/wingman/` is, which is why this copy exists here). When one changes, update the other. See `docs/status/PROJECT.md`'s decisions log for why this duplication exists rather than a single shared file.
 
 ## 1. Product Management — lead: `dept-product`
 
@@ -39,7 +39,7 @@ The named vocabulary `evolve-promotion` promotes specialist agents from, so a pr
 | AI Integration Specialist | RAG pipelines, vector search, LLM guardrails | candidate |
 | RAG Engineer | Retrieval pipeline design specifically (chunking, embedding strategy, retrieval-quality tuning) — narrower than AI Integration Specialist's general RAG/vector-search/guardrails scope | candidate |
 | LLM Integration Engineer | Prompt/response contract design and model-call integration for LLM-backed features, distinct from RAG's retrieval concern | candidate |
-| RL Engineer | Reinforcement-learning system design (reward shaping, training-loop correctness) — only relevant to a project that's actually building an RL system, not Wingman's own operation (Wingman has no RLHF/model-training layer; see `docs/PRD.md` Non-goals) | candidate |
+| RL Engineer | Reinforcement-learning system design (reward shaping, training-loop correctness) — only relevant to a project that's actually building an RL system, not Wingman's own operation (Wingman has no RLHF/model-training layer; see `docs/status/PRD.md` Non-goals) | candidate |
 | Prompt Engineer | Prompt authoring/iteration for a project's own LLM-backed features — distinct from `Prompt Security Guard` below, which reviews prompts for injection risk, not authors them | candidate |
 | Protocol & RPC Specialist | gRPC/WebSockets/GraphQL transport layers | candidate |
 | Legacy Refactoring Specialist | Prevents new tech debt when touching old code | candidate |

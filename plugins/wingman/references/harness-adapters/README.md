@@ -1,6 +1,6 @@
 # Harness adapters — running Wingman's Boardroom under a coding agent other than Claude Code
 
-Wingman is built as a Claude Code plugin (see `CLAUDE.md`), and `docs/ARCHITECTURE.md` §8a gives an
+Wingman is built as a Claude Code plugin (see `CLAUDE.md`), and `docs/status/ARCHITECTURE.md` §8a gives an
 honest account of what's harness-agnostic vs. Claude-Code-coupled — most of the plugin's *execution*
 mechanism (`AskUserQuestion`, `ExitPlanMode` + its gating hooks, parallel `Task`/`Agent` subagent
 dispatch) is genuinely coupled to Claude Code's own tool surface.
@@ -9,7 +9,7 @@ dispatch) is genuinely coupled to Claude Code's own tool surface.
 "no blanket portability work absent real demand" bar had held since 2026-07-18 (declining a full
 rewrite 3 times). The founder then asked directly for full agent-agnostic support and, after being
 shown that full history, explicitly confirmed this as a deliberate override — not new organic
-evidence that the gate cleared itself. See `docs/ARCHITECTURE.md` §8f for the full framing, the
+evidence that the gate cleared itself. See `docs/status/ARCHITECTURE.md` §8f for the full framing, the
 fresh capability-matrix research, and the phase-by-phase build (each phase its own commit). This
 directory now covers all 7 harnesses Wingman is evaluated against, symmetrically: **Claude Code**
 (`claude-code/` — the native target; no translation exists because none is needed), **Codex CLI**

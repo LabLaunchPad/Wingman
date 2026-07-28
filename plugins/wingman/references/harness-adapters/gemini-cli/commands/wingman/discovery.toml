@@ -49,7 +49,7 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 ```
 
 **Why all 8 fields, not 4:** this stage's own Gate checklist below lists these same 8 items as
-Must-include — a real maintainer-mode dogfood run (see `docs/wingman/retros.md`, 2026-07-25/26)
+Must-include — a real maintainer-mode dogfood run (see `docs/history/retros.md`, 2026-07-25/26)
 found that an earlier 4-field version of this template caused 3 of 8 real Boardroom seats (CEO,
 CPO, CTO, Research) to independently flag "missing sections" on output that matched the template
 exactly, because the template and the Gate checklist a few lines below it had drifted out of sync.
@@ -93,6 +93,6 @@ you hand off to `/wingman:research-synthesis`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 '''

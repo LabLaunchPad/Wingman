@@ -3,7 +3,7 @@ prompt = '''
 
 # Wingman: Implementation Planning
 
-The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
+The twelfth of Wingman's 14 pipeline stages, immediately followed by `/wingman:build` — part of **Phase 4: AI-Assisted Architecture & Build**. The plan this stage produces is effectively the "AI PRD": the concrete Markdown context file (features, database schema, desired behavior) that gets handed to the coding agent at Build time, task by task rather than all at once. As of `docs/status/ARCHITECTURE.md` §4d's 14-stage pipeline, this stage records only its **own** solo Boardroom checkpoint — it no longer bundles the 5 original planning stages (Discovery/Define/Architecture/UX Flow/Implementation Planning) into one "Planning Milestone" checkpoint. Every one of the 11 prior stages already ran its own checkpoint by the time this stage starts; this stage's checkpoint reviews only the plan this stage itself produces.
 
 {{args}}
 
@@ -56,7 +56,7 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 
 ## Implementation Planning.6: Implementation Planning checkpoint
 
-Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
+Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/status/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 
 **Harness-aware fallback**: `ExitPlanMode` + `boardroom-checkpoint.mjs`'s hook gate is Claude Code's own mechanism for making sure a "ship it" decision was actually recorded before code-writing resumes. Outside Claude Code, check `references/harness-capability-profile.md`'s `hasPlanGate` column: a `true`/`⚠️ weak` entry (e.g. Gemini CLI) has its own per-harness substitute hook already wired in that harness's own adapter (see `references/harness-adapters/<id>/`); a `false` entry (most harnesses today) has no interceptable transition at all, so `plugins/wingman/scripts/dod-pre-push-check.mjs` (wired via `install-git-hooks.mjs`) is the real backstop — it still blocks an unapproved plan from actually reaching `git push`, just later in the flow than Claude Code's own gate.
 
@@ -76,7 +76,7 @@ the checkpoint blocks here and names the specific missing item(s) to the founder
   diagram appended to the plan; §2 — the pipeline-status tree above.
 - `skills/traceability-linking` — every task needs at least one marker before `/wingman:build`'s Definition-of-Done gate can clear.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
 
 
 ---

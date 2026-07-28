@@ -26,7 +26,7 @@ section are not restated here). This file is package-scoped: the conventions spe
   pinned model *version*), `permissions`. Body ends with a mandated `## <SEAT> VERDICT: <GO |
   GO_WITH_CONCERNS | NO_GO>` block — see any existing `agents/boardroom-*.md` for the exact shape.
 - **Skills** (`skills/<name>/SKILL.md` — flat, no category subdirectory as of 2026-07-23, see
-  `docs/ARCHITECTURE.md` §8b): YAML frontmatter with `name`, `description` ("Use when..." framing,
+  `docs/status/ARCHITECTURE.md` §8b): YAML frontmatter with `name`, `description` ("Use when..." framing,
   same convention as agents). Discipline-category skills (see root `AGENTS.md`'s conceptual
   category table) additionally carry a Constraints/Rationalizations/Red-Flags/Verification
   structure (e.g. `skills/engineering-minimalism/SKILL.md`) — this is the bar every skill should
@@ -34,7 +34,7 @@ section are not restated here). This file is package-scoped: the conventions spe
 
 ## Before making a structural change (new command, agent, skill, or department)
 
-Read `docs/ARCHITECTURE.md` first (repo root, does not ship — see "docs/ isn't installed" below).
+Read `docs/status/ARCHITECTURE.md` first (repo root, does not ship — see "docs/ isn't installed" below).
 Then run these four validators — all must exit 0:
 - `node scripts/validate-structure.mjs` (run from `plugins/wingman/`, or
   `node plugins/wingman/scripts/validate-structure.mjs` from repo root)
@@ -45,7 +45,7 @@ Then run these four validators — all must exit 0:
 ## The one thing to never get wrong: `docs/` does not ship
 
 Nothing under this directory (`plugins/wingman/`) may cite a `docs/` path for *operational* logic —
-a skill or agent that reads `docs/ARCHITECTURE.md` at runtime to know what to do will silently fail
+a skill or agent that reads `docs/status/ARCHITECTURE.md` at runtime to know what to do will silently fail
 in a founder's own installed project, where no such file exists. This exact bug class has recurred
 more than once (see `LEARNINGS.md`'s occurrence-tracking entries for it) — if a template or skill
 needs the *content* of a `docs/` file, inline that content instead of pointing at the path.
@@ -57,7 +57,7 @@ targets — Codex CLI, OpenCode, Gemini CLI, OpenHands, Cline, and Cursor — ho
 verification status (most are `authored, unverified` — no live install of any of these harnesses
 exists in this dev repo). Adding a harness means adding a `plugins/wingman/scripts/harness-targets/<id>.mjs`
 descriptor, not hand-editing the generator. See that directory's own `README.md` before extending it,
-and `docs/ARCHITECTURE.md` §8a/§8b/§8f (repo root) for the full portability accounting this content
+and `docs/status/ARCHITECTURE.md` §8a/§8b/§8f (repo root) for the full portability accounting this content
 is scoped against.
 
 ## Founder-org reference template
@@ -66,4 +66,4 @@ is scoped against.
 projects (a project-type catalog + 7 playbooks, plus `founder-preferences.md`/`capability-map.md`
 guidance) — cited from `commands/pipeline/discovery.md` and `skills/memory`. Deliberately
 scoped down from a much larger founder-org-scaffold proposal; see that directory's own `README.md`
-and `docs/PROJECT.md`'s decisions log (2026-07-22) for what was excluded and why.
+and `docs/status/PROJECT.md`'s decisions log (2026-07-22) for what was excluded and why.

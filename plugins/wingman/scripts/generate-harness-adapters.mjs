@@ -8,7 +8,7 @@
 // one-time port would -- same principle already established for evals/MANIFEST.tsv
 // (scripts/generate-eval-manifest.mjs).
 //
-// Descriptor-driven (2026-07-27 refactor, docs/ARCHITECTURE.md §8f): this script used to hardcode
+// Descriptor-driven (2026-07-27 refactor, docs/status/ARCHITECTURE.md §8f): this script used to hardcode
 // exactly 2 harnesses (Codex CLI, OpenCode) via inline HARNESS_NOTES/HARNESS_LABELS tables and two
 // branches in buildTargets(). Adding a 3rd-6th harness (Gemini CLI, Cursor, Cline, OpenHands) the
 // same way would mean repeating that hardcoding 4 more times. Instead, every harness's output paths,
@@ -230,7 +230,7 @@ function buildCapabilityProfile(harnessTargets) {
     `\`capabilities\` block -- do not hand-edit; re-run the generator instead. See each harness's own ` +
     `\`references/harness-adapters/<id>/\` directory for the disclosed substitute behind every ⚠️/❌ cell. ` +
     `Consumed by capability-aware branching in \`boardroom.md\` and other canonical command/skill files ` +
-    `(docs/ARCHITECTURE.md §8f) -- a session running under a non-Claude-Code harness reads this table to ` +
+    `(docs/status/ARCHITECTURE.md §8f) -- a session running under a non-Claude-Code harness reads this table to ` +
     `decide which real primitive to use vs. which disclosed substitute to fall back to.\n\n` +
     `| Harness | Hooks | Plan-gate | Parallel dispatch | Question tool |\n` +
     `|---|---|---|---|---|\n` +

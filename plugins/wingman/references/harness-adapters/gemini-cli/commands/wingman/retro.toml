@@ -13,7 +13,7 @@ Before writing anything, look at real evidence from this work: commit history, t
 
 ## Write the retro
 
-Append to `docs/wingman/retros.md` at the project root (create it with a one-line header if it doesn't exist yet — same append-only convention as `LEARNINGS.md`). Retros scattered across individual plan files can't be reliably found later, including by `/wingman:evolve`'s clustering step, so this is the one canonical location:
+Append to `docs/history/retros.md` at the project root (create it with a one-line header if it doesn't exist yet — same append-only convention as `LEARNINGS.md`). Retros scattered across individual plan files can't be reliably found later, including by `/wingman:evolve`'s clustering step, so this is the one canonical location:
 
 ```markdown
 <!-- wingman:log type=retro category=<short free-text tag matching what this retro is mainly about> status=resolved -->

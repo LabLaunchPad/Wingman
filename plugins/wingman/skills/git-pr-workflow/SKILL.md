@@ -219,7 +219,7 @@ doesn't need another update.
 - **Steps 0 and 7 were added from real, self-caught friction in this project's own session
   history, not speculatively.** Step 0: a commit landed directly on local `main` mid-session
   (caught before pushing, since `main` has branch protection — recovered by branching off the
-  stray commit and hard-resetting local `main` back to `origin/main`; see `docs/PROJECT.md`'s
+  stray commit and hard-resetting local `main` back to `origin/main`; see `docs/status/PROJECT.md`'s
   decisions log). Step 7: the "required status checks are expected" base-drift race recurred
   repeatedly across several PRs in this project's real merge history (one PR alone needed
   `update_pull_request_branch` re-applied 4+ separate times as other PRs kept landing ahead of
@@ -253,7 +253,7 @@ doesn't need another update.
   behind-state, cherry-picks only the genuinely new commit, produces the exact right final file
   content, and correctly no-ops (exit 0, "nothing to resync") when the branch is already
   up to date. This exact failure mode was hit for real twice in this project's own development
-  history (`docs/wingman/retros.md`) before this script existed.
+  history (`docs/history/retros.md`) before this script existed.
 - **A fresh, un-briefed subagent dispatch** (given only `commands/pipeline/ship.md` and this skill's own
   `SKILL.md`, not told which script to use) hit a real squash-merge situation and correctly
   diagnosed and resolved it — but the scenario played out slightly differently than this skill's
@@ -313,4 +313,4 @@ directly.
 
 - `skills/visual-founder-output`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

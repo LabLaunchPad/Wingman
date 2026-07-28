@@ -7,7 +7,7 @@ description: Use immediately after department-lead-activation at the start of /w
 
 ## Overview
 
-Wingman's Management Board (Engineering, Product, Design, Data, Security, QA, Platform, Research, Growth Managers — see `docs/ARCHITECTURE.md` §5a) sits between the 7-seat Boardroom and the department leads. It doesn't exist at install time, and it doesn't exist for most projects, ever. This skill is the shared mechanism every pipeline command uses to check whether this project has grown complex enough to actually need execution-layer coordination, and to create the relevant manager's file if it's needed and doesn't exist yet.
+Wingman's Management Board (Engineering, Product, Design, Data, Security, QA, Platform, Research, Growth Managers — see `docs/status/ARCHITECTURE.md` §5a) sits between the 7-seat Boardroom and the department leads. It doesn't exist at install time, and it doesn't exist for most projects, ever. This skill is the shared mechanism every pipeline command uses to check whether this project has grown complex enough to actually need execution-layer coordination, and to create the relevant manager's file if it's needed and doesn't exist yet.
 
 **Core principle:** a Manager exists only once its corresponding department lead exists *and* the project as a whole has crossed a real complexity threshold — never on day one, never "just in case." This mirrors `department-lead-activation`'s own lazy-growth discipline one layer up; it does not introduce a second, independent gating system.
 
@@ -64,7 +64,7 @@ A manager's own activation signal is: **its corresponding department lead is in 
 **3. If a signal is true and `.claude/agents/mgr-<name>.md` doesn't already exist in the founder's project:**
 - Read the template at `references/template.md` in this skill.
 - Fill in the manager-specific sections (remit, responsibilities, activation reason) — its activation reason should name both the corresponding department lead and the project's total department-lead count (e.g. "activated because `dept-engineering` is active and this project now has 4 department leads, past the coordination threshold").
-- Write the file to `.claude/agents/mgr-<name>.md` **in the founder's project repository** — never under Wingman's own plugin directory. Same placement rule as department leads and specialists, for the same reason (see `docs/ARCHITECTURE.md` §5).
+- Write the file to `.claude/agents/mgr-<name>.md` **in the founder's project repository** — never under Wingman's own plugin directory. Same placement rule as department leads and specialists, for the same reason (see `docs/status/ARCHITECTURE.md` §5).
 - Tell the founder, in one plain-language sentence, that a new coordination role was added and why (e.g. "Your project has grown enough that I've added an Engineering Manager to help coordinate the work — you won't need to do anything differently.").
 - Add `mgr-<name>` to `active_managers` in `.wingman/state.json` (read the existing file first and append to the array — never drop `active_department_leads` or `active_specialists`; create `state.json` fresh with all three empty arrays if it doesn't exist yet).
 
@@ -126,5 +126,5 @@ No founder-facing template beyond the one-sentence notification in step 3. The m
 
 ### Anti-Pattern Callouts
 
-- **Premature layering:** Adding the Management Board the moment any department lead exists, recreating the exact always-on-org problem `docs/ARCHITECTURE.md` §2 rejected — just one layer higher than department leads.
+- **Premature layering:** Adding the Management Board the moment any department lead exists, recreating the exact always-on-org problem `docs/status/ARCHITECTURE.md` §2 rejected — just one layer higher than department leads.
 - **Silent state desync:** Creating a manager file but forgetting to add it to `.wingman/state.json` — the manager becomes invisible to future activation checks and to `/wingman:evolve`.

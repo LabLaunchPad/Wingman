@@ -18,7 +18,7 @@ Immediately after (only if `dept-design` is active), use the `management-board-a
 **Trace to whichever upstream IDs actually exist yet.** In the 14-stage pipeline, `uxflow` is
 stage 7 — `architecture.md` (stage 11, mints `ARCH-*`) hasn't run yet at this point, so `ARCH-*`
 IDs will not exist in a real end-to-end run reaching this stage in order (confirmed directly by a
-real maintainer-mode dogfood run, `docs/wingman/retros.md` 2026-07-25/26 — this text still referred
+real maintainer-mode dogfood run, `docs/history/retros.md` 2026-07-25/26 — this text still referred
 to `ARCH-*` from before the v20 stage-reorder, when Architecture ran immediately before UX Flow).
 Trace instead to the `IA-*`/`DEF-*` chain, which is already available by this stage. If this command
 is ever invoked standalone against a fixture/project that already has `ARCH-*` decisions on file
@@ -84,6 +84,6 @@ you hand off to `/wingman:wireframes`.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` — how to render the flow
   diagram above; consult before choosing a rendering tier.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
-  `docs/ARCHITECTURE.md` §4d.
+  `docs/status/ARCHITECTURE.md` §4d.
 
 '''

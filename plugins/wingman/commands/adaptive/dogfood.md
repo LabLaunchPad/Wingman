@@ -6,11 +6,11 @@ argument-hint: "[optional: simple|complex|both (maintainer mode) or a feature id
 # Wingman: Dogfood
 
 This command exists because a structural review of Wingman's own files can't catch everything —
-some bugs only surface when the actual 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d — the
+some bugs only surface when the actual 14-stage pipeline (see `docs/status/ARCHITECTURE.md` §4d — the
 v20 expansion from the original 7-stage sequence to 12 individual pre-build Boardroom checkpoints
 plus Build plus Ship) runs for real, with a real founder-in-the-loop decision at every checkpoint,
 real Boardroom dispatch, real test-driven implementation, and a real `git push` through the actual
-installed hooks. Two real runs of this kind (documented in `docs/wingman/retros.md`) each found and
+installed hooks. Two real runs of this kind (documented in `docs/history/retros.md`) each found and
 fixed a genuine bug that no amount of reading the plugin's own files would have caught — both of
 those runs predate the v20 expansion, so no run has yet exercised the 7 newer stages
 (`research-synthesis`, `personas-jobs`, `journey-mapping`, `information-architecture`, `wireframes`,
@@ -30,7 +30,7 @@ never ships to a founder's installed copy of the plugin.
   `dogfood-gap-classification` skill.
 - **If it doesn't exist → founder mode.** You're running inside a founder's own project. Proceed
   to Step 2b. Nothing in this mode ever writes to `plugins/wingman/`; findings flow into the
-  founder's own `LEARNINGS.md`/`docs/wingman/retros.md`/`/wingman:evolve`, exactly like any other
+  founder's own `LEARNINGS.md`/`docs/history/retros.md`/`/wingman:evolve`, exactly like any other
   session's work.
 
 ## Step 2a: Maintainer mode
@@ -42,7 +42,7 @@ never ships to a founder's installed copy of the plugin.
   user-facing surface). Purpose: prove the gates that are supposed to stay dormant on a trivial
   project actually do — `management-board-activation`'s conditional-department threshold,
   `department-lead-activation`'s conditional signals, `dod-structural-gate.mjs`'s checks. This is
-  the path that caught the real complexity-gate miscounting bug (see `docs/wingman/retros.md`,
+  the path that caught the real complexity-gate miscounting bug (see `docs/history/retros.md`,
   2026-07-14/15) — do not skip it just because "nothing should happen" makes it feel like a no-op.
 - **Complex path**: generate a fresh fixture via `evals/fixtures/setup-dogfood-complex.sh
   <target-dir>` — seeded with deliberate conditional signals (an auth/payments touchpoint, a
@@ -110,7 +110,7 @@ finding to avoid an empty array.
 **If `observed_gaps` is non-empty**, invoke the `dogfood-gap-classification` skill against each
 entry before considering this run complete.
 
-**Always** write a `## Retro:` entry to `docs/wingman/retros.md`, in the existing format, whether
+**Always** write a `## Retro:` entry to `docs/history/retros.md`, in the existing format, whether
 or not a gap was found — a clean run is real signal too, not a no-op.
 
 ## Step 2b: Founder mode
@@ -127,7 +127,7 @@ frames it explicitly as a low-stakes "try it and see" pass and reminds the found
 the branch afterward with no cost if they were just kicking the tires.
 
 Any friction found here is captured the normal way: `/wingman:learn` for a durable lesson,
-`docs/wingman/retros.md` for a fuller retrospective, `/wingman:evolve` if the same friction repeats
+`docs/history/retros.md` for a fuller retrospective, `/wingman:evolve` if the same friction repeats
 2+ times. **Never** invoke `dogfood-gap-classification` in this mode, and never write to
 `plugins/wingman/` — that skill and that directory are maintainer-mode-only, by design (see Step 1).
 
@@ -143,4 +143,4 @@ Any friction found here is captured the normal way: `/wingman:learn` for a durab
 - `commands/adaptive/evolve.md` / `skills/evolve-promotion` — founder-project-scoped promotion (never writes
   to `plugins/wingman/`); the mirror image of `dogfood-gap-classification`'s maintainer scope.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

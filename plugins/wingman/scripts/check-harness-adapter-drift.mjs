@@ -12,7 +12,7 @@
 // detector; fusengine/harness's adapter-vs-policy-core separation) -- borrowed here in its most
 // proportionate form: a mechanical structural check, not a full markdown-to-TOML/md regeneration
 // engine (which would be exactly the kind of fragile, hard-to-verify-at-scale over-engineering
-// docs/ARCHITECTURE.md §8b already declined for a full 1:1 command/skill port).
+// docs/status/ARCHITECTURE.md §8b already declined for a full 1:1 command/skill port).
 //
 // Deliberately checks structure, not prose: every canonical seat has a corresponding file in every
 // harness that declares an `agents` output (coverage), the model tier (opus vs inherit) is
@@ -20,7 +20,7 @@
 // diff of hand-condensed descriptions, which would be too strict (the adapters intentionally
 // shorten prose) and too fragile to maintain as a check in its own right.
 //
-// Descriptor-driven (2026-07-27 refactor, docs/ARCHITECTURE.md §8f): this used to hardcode exactly
+// Descriptor-driven (2026-07-27 refactor, docs/status/ARCHITECTURE.md §8f): this used to hardcode exactly
 // codexDir/opencodeDir constants and two inline branches. It now iterates whatever
 // harness-targets/*.mjs declares an `agents` block, so a new harness with its own persona-adapter
 // format is covered by adding a descriptor, not by editing this file's logic.

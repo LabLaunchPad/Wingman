@@ -1,7 +1,7 @@
 # Wingman for Gemini CLI
 
 Added 2026-07-27, part of the founder-directed override of Wingman's own 3x-declined
-"full agent-agnostic rewrite" stance (see `docs/ARCHITECTURE.md` §8f and `docs/PROJECT.md`'s
+"full agent-agnostic rewrite" stance (see `docs/status/ARCHITECTURE.md` §8f and `docs/status/PROJECT.md`'s
 2026-07-27 decisions-log entry) — the founder explicitly asked to proceed, given fresh capability
 research replacing the earlier, less-precise pass. Of the 6 harnesses in scope, Gemini CLI is the
 **strongest capability match** found: real parallel subagent dispatch, a real structured

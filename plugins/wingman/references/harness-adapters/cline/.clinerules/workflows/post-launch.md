@@ -5,7 +5,7 @@ argument-hint: "[optional: what to focus the review on, e.g. a specific feature 
 
 # Wingman: Post-Launch
 
-An adaptive command, not part of the fixed 14-stage pipeline (see `docs/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review. Corresponds to "Iterate" in **Phase 6: Launch & Iterate** (see `ship.md`): when a real bug or gap surfaces, the fix is a plan/AI-PRD update handed back to the build stage, not a hand-patch applied outside the pipeline.
+An adaptive command, not part of the fixed 14-stage pipeline (see `docs/status/ARCHITECTURE.md` §4d) — run periodically, at the founder's discretion, some time after `/wingman:ship`, once there's actually real usage or support signal to look at. Running this immediately after shipping, before any real users have touched the product, produces nothing useful — wait until there's something real to review. Corresponds to "Iterate" in **Phase 6: Launch & Iterate** (see `ship.md`): when a real bug or gap surfaces, the fix is a plan/AI-PRD update handed back to the build stage, not a hand-patch applied outside the pipeline.
 
 $ARGUMENTS
 
@@ -34,7 +34,7 @@ Append this to `docs/wingman/post-launch/<short-slug>.md` in the founder's proje
 
 ## Record the checkpoint
 
-Run `/wingman:boardroom` with scope set to this review — this is an ad-hoc `/wingman:boardroom` invocation, not one of the 14 pipeline-stage checkpoints, so it records with a free-text `"stage": "post-launch"` (and `"bundle"` set to the same value) in `.wingman/checkpoints.jsonl`, per `docs/DATABASE.md`'s schema. No new traceability prefix is minted by this command.
+Run `/wingman:boardroom` with scope set to this review — this is an ad-hoc `/wingman:boardroom` invocation, not one of the 14 pipeline-stage checkpoints, so it records with a free-text `"stage": "post-launch"` (and `"bundle"` set to the same value) in `.wingman/checkpoints.jsonl`, per `docs/status/DATABASE.md`'s schema. No new traceability prefix is minted by this command.
 
 ## Feed it forward
 
@@ -42,6 +42,6 @@ If the review surfaces something that should change what gets built next, hand i
 
 ## References
 
-- `docs/ARCHITECTURE.md` §4d — why this is an adaptive command, not a 15th pipeline stage.
-- `docs/DATABASE.md` — the `checkpoints.jsonl` schema this command's ad-hoc entry follows.
+- `docs/status/ARCHITECTURE.md` §4d — why this is an adaptive command, not a 15th pipeline stage.
+- `docs/status/DATABASE.md` — the `checkpoints.jsonl` schema this command's ad-hoc entry follows.
 - `commands/pipeline/discovery.md` — where this review's findings feed back into.

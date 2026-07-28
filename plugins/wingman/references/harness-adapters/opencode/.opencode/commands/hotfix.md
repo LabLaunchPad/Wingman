@@ -45,10 +45,10 @@ Delegate to `dept-qa` to verify the fix doesn't break anything else, and re-chec
 
 ## Step 6: Boardroom checkpoint
 
-Run `/wingman:boardroom diff` before this ships again — a hotfix under time pressure is exactly when skipping the checkpoint feels tempting and is most likely to matter. Record the checkpoint with `stage: "hotfix"` in `.wingman/checkpoints.jsonl` (a free-text stage label is fine, per `docs/DATABASE.md`), and set `next_stage: "ship"`.
+Run `/wingman:boardroom diff` before this ships again — a hotfix under time pressure is exactly when skipping the checkpoint feels tempting and is most likely to matter. Record the checkpoint with `stage: "hotfix"` in `.wingman/checkpoints.jsonl` (a free-text stage label is fine, per `docs/status/DATABASE.md`), and set `next_stage: "ship"`.
 
 ## Step 7: Hand off
 
 Once the Boardroom clears this stage, proceed to `/wingman:ship`. Suggest `/wingman:learn` afterward if this incident revealed something durable worth remembering (a fragile pattern, a monitoring gap, a recurring root cause).
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

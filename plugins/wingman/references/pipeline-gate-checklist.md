@@ -142,7 +142,7 @@ restated:
 - **Treat each stage as a governed handoff** — the 8-part output format and the gate-enforcement
   rule above are what make this concrete rather than aspirational.
 - **If a better rule is missing, add it** — if a stage repeatedly hits a gap this reference doesn't
-  cover, that's a `wingman:log` entry per `docs/PROJECT.md`'s decisions log, not a silent one-off
+  cover, that's a `wingman:log` entry per `docs/status/PROJECT.md`'s decisions log, not a silent one-off
   workaround.
 
 ## Writing standard

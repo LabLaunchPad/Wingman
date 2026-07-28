@@ -4,7 +4,7 @@ Shared explanatory prose that several `commands/pipeline/*.md` stages repeat ver
 same two mechanical checks. Extracted here so each stage file states only what's specific to it
 (which department/manager roles apply) and points here for the shared "why" — the actual skill
 invocations stay inline in each command file; this doc never replaces them, only the boilerplate
-prose that used to surround them. See `docs/ARCHITECTURE.md` §5 for the department-lead/management-
+prose that used to surround them. See `docs/status/ARCHITECTURE.md` §5 for the department-lead/management-
 board model this documents the mechanics of.
 
 ## Activation Checks

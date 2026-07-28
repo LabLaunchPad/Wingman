@@ -7,7 +7,7 @@ argument-hint: "[optional: output directory, defaults to .wingman/okf-export/]"
 
 Everything Wingman has tracked about this project's decisions lives under `.wingman/` in Wingman's own formats (JSONL checkpoints, prose memory files) — genuinely useful, but only readable by something that already knows Wingman's shapes. This command exports it into [OKF v0.1](https://github.com/GoogleCloudPlatform/knowledge-catalog), a plain directory of markdown files with light YAML frontmatter, so a founder can point Gemini, a ChatGPT connector, or any other AI tool at their own project history without a Wingman-specific integration.
 
-Opt-in only — this never runs automatically as part of the pipeline. Invoke it when a founder wants to hand their project's decision history to a different AI tool, or wants a single, human-browsable "what has this project decided and why" view (a real gap `docs/DATABASE.md` names explicitly: no file today unifies checkpoints, state, and memory into one surface).
+Opt-in only — this never runs automatically as part of the pipeline. Invoke it when a founder wants to hand their project's decision history to a different AI tool, or wants a single, human-browsable "what has this project decided and why" view (a real gap `docs/status/DATABASE.md` names explicitly: no file today unifies checkpoints, state, and memory into one surface).
 
 $ARGUMENTS
 
@@ -36,4 +36,4 @@ Writes a fresh bundle to `.wingman/okf-export/` (or the output directory given i
 
 If the project has no `.wingman/checkpoints.jsonl` and no populated `memory/*.md` yet, there's nothing meaningful to export — say so plainly rather than writing an empty bundle that looks like output.
 
-<!-- See docs/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->
+<!-- See docs/status/ARCHITECTURE.md for this command's place in Wingman's overall architecture. -->

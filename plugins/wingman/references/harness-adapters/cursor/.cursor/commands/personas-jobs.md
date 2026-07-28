@@ -68,4 +68,4 @@ you hand off to `/wingman:journey-mapping`.
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
-- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/ARCHITECTURE.md` §4d.
+- `commands/adaptive/boardroom.md` — the checkpoint this stage records, per `docs/status/ARCHITECTURE.md` §4d.

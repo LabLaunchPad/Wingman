@@ -57,7 +57,7 @@ following a single `wingman:req` token on the same line:
 A separate marker line per ID (`// wingman:req ARCH-<N>` then `// wingman:req ARCH-<M>`) also
 works — both forms register every ID. **Earlier versions of the checker only captured the first ID
 in a space-separated list and silently dropped the rest, with no warning** (found during a real
-dogfooding pass, see `docs/wingman/retros.md`) — this is fixed now, but if you're ever unsure
+dogfooding pass, see `docs/history/retros.md`) — this is fixed now, but if you're ever unsure
 whether a multi-ID marker actually registered every ID, verify directly (see below) rather than
 assuming the fix still holds.
 
@@ -105,7 +105,7 @@ checker isn't transitive (a `DEF-*` covered only via an intermediate `ARCH-*` ma
 downstream still shows unlinked unless something also references it directly). This is a real,
 known design limitation of the current checker, not a sign the pipeline actually has an orphaned
 requirement — don't chase it as if it were a genuine gap. Found and logged during this project's
-own first real dogfooding pass (see `docs/wingman/retros.md`, 2026-07-14); documented here rather
+own first real dogfooding pass (see `docs/history/retros.md`, 2026-07-14); documented here rather
 than fixed, since it's a warning, not a blocking error, and making the checker transitive is a
 real but separate future improvement, not something to speculatively build now.
 
@@ -144,4 +144,4 @@ No founder-facing template — this is an internal linking convention. The found
 - `commands/pipeline/implementation-planning.md`
 - `commands/pipeline/build.md`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

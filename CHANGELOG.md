@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.28] - 2026-07-28
+
+### Fixed
+- **A real dogfood pass (scoped to Discovery) found `department-lead-activation/SKILL.md`'s Step 5 claiming a freshly-created department-lead subagent is dispatchable "this turn... no plugin reload is needed" — dispatch failed outright on first real test.** Added a try-then-fallback branch: attempt dispatch, and if it fails, do the delegated work directly using the just-written file's own remit, telling the founder the department lead will run as its own subagent starting next session. See `evals/cases/department-lead-activation.md` Run 4 (`provisional`).
+- **Systemic stale-path drift from PR #137's docs restructure, now closed.** That restructure left `plugins/wingman/` untouched on the reasoning that nothing there does a functional read of the moved `docs/` paths — true, but ~63 shipped files cited those paths in prose (a recurring footer comment plus inline citations). Fixed all 63 canonical files, regenerated 220 harness-adapter files, and re-synced 17 OpenCode-ported skill copies that have no auto-regeneration path.
+
 ## [0.7.27] - 2026-07-28
 
 ### Changed

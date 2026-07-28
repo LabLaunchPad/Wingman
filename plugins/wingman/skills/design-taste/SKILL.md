@@ -154,4 +154,4 @@ No fixed template for build-time use. For `boardroom-design`'s checkpoint verdic
 
 - `commands/pipeline/uxflow.md`
 
-See `docs/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.
