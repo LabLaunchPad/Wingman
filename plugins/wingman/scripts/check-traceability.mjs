@@ -37,7 +37,7 @@ const SKIP_DIRS = new Set(['.git', 'node_modules', 'vendor', '.wingman', 'evals'
 const ID_PATTERN = /\b(DISC|RS|PJ|JM|DEF|IA|UX|WF|VS|PT|ARCH|IP)-\d+\b/;
 const TABLE_ROW_PATTERN = /^\s*\|\s*(DISC|RS|PJ|JM|DEF|IA|UX|WF|VS|PT|ARCH|IP)-\d+\s*\|/;
 // Matches one `wingman:req` token followed by one or more space-separated IDs on the
-// same line -- found via real dogfooding (docs/wingman/retros.md, 2026-07-15): the
+// same line -- found via real dogfooding (docs/history/retros.md, 2026-07-15): the
 // original single-ID pattern silently dropped every ID after the first when a task
 // genuinely satisfied more than one requirement,
 // with no warning that anything had been missed.

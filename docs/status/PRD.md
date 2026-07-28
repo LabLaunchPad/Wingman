@@ -20,27 +20,27 @@ A solo founder with no engineering background, running Claude Code (directly or 
 - Replacing Claude Code itself, or any general-purpose coding capability — Wingman is a workflow/governance layer on top of it.
 - Building a hosted product, dashboard, or SaaS. If a future need genuinely requires one, that's a different product, not Wingman.
 - Teaching the founder to code, or to read diffs. The premise is they never need to.
-- Matching every detail of the original 56-agent/8-department blueprint literally on day one — see `docs/ARCHITECTURE.md` for why the agent population grows lazily instead.
+- Matching every detail of the original 56-agent/8-department blueprint literally on day one — see `docs/status/ARCHITECTURE.md` for why the agent population grows lazily instead.
 
 ## Key features
 
 ### The Boardroom (built)
-Seven fixed C-suite-style seats — CEO, CPO, CMO, CTO, CISO, CFO, Research — plus Design, dispatched in parallel by `/wingman:boardroom`, consolidated into one plain-language verdict (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`) under grouped Business/Technical/Finance/Research summary headers. Enforced by hooks: `ExitPlanMode` is blocked until a Boardroom verdict is recorded in the plan file (see `docs/ARCHITECTURE.md` §4 and `docs/DATABASE.md`), and `dod-structural-gate.mjs` mechanically checks artifact presence (traceability, tests, a clean threat register) before a real `git push`.
+Seven fixed C-suite-style seats — CEO, CPO, CMO, CTO, CISO, CFO, Research — plus Design, dispatched in parallel by `/wingman:boardroom`, consolidated into one plain-language verdict (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`) under grouped Business/Technical/Finance/Research summary headers. Enforced by hooks: `ExitPlanMode` is blocked until a Boardroom verdict is recorded in the plan file (see `docs/status/ARCHITECTURE.md` §4 and `docs/status/DATABASE.md`), and `dod-structural-gate.mjs` mechanically checks artifact presence (traceability, tests, a clean threat register) before a real `git push`.
 
 ### Pipeline commands (built)
-7 planning/build stages, only 3 of which produce a founder-visible Boardroom checkpoint: `/wingman:discovery` → `/wingman:define` → `/wingman:architecture` → `/wingman:uxflow` → `/wingman:implementation-planning` (bundled into one "Planning Milestone" checkpoint) → `/wingman:build` (its own checkpoint, folding in what used to be a separate `/wingman:secure` stage as a Definition-of-Done gate) → `/wingman:ship` (final checkpoint). Fewer checkpoints than the original 4-stage pipeline despite more named stages — see `docs/ARCHITECTURE.md` §4b.
+7 planning/build stages, only 3 of which produce a founder-visible Boardroom checkpoint: `/wingman:discovery` → `/wingman:define` → `/wingman:architecture` → `/wingman:uxflow` → `/wingman:implementation-planning` (bundled into one "Planning Milestone" checkpoint) → `/wingman:build` (its own checkpoint, folding in what used to be a separate `/wingman:secure` stage as a Definition-of-Done gate) → `/wingman:ship` (final checkpoint). Fewer checkpoints than the original 4-stage pipeline despite more named stages — see `docs/status/ARCHITECTURE.md` §4b.
 
 ### Adaptive commands (built)
 `/wingman:retro`, `/wingman:learn`, `/wingman:evolve`, `/wingman:harness`, `/wingman:telemetry` — invoked as needed, not part of the fixed pipeline.
 
 ### Department leads (planned, v2)
-One build-time worker subagent per corporate department (Product, Design, Engineering, Data, QA, Legal/Security, DevOps, Growth), created lazily per-project only when that department's activation signal is true. None exist at fresh install. See `docs/ARCHITECTURE.md` §5.
+One build-time worker subagent per corporate department (Product, Design, Engineering, Data, QA, Legal/Security, DevOps, Growth), created lazily per-project only when that department's activation signal is true. None exist at fresh install. See `docs/status/ARCHITECTURE.md` §5.
 
 ### Specialists (planned, evolve-gated)
-The 56-role candidate catalog in `docs/AGENT-ROSTER.md`. Only created by `/wingman:evolve` after repeated, evidenced friction on a real project. Never bulk-created.
+The 56-role candidate catalog in `docs/roadmap/AGENT-ROSTER.md`. Only created by `/wingman:evolve` after repeated, evidenced friction on a real project. Never bulk-created.
 
 ### Quality-discipline skills (built)
-`verification-before-completion`, `writing-plans`, `systematic-debugging` (adapted from `obra/superpowers`), `design-taste`, `engineering-minimalism`, `token-economy` (synthesized from vendor research — see `docs/ARCHITECTURE.md` §9), and `plain-language-checkpoint` (Wingman's own writing-quality bar for anything founder-facing).
+`verification-before-completion`, `writing-plans`, `systematic-debugging` (adapted from `obra/superpowers`), `design-taste`, `engineering-minimalism`, `token-economy` (synthesized from vendor research — see `docs/status/ARCHITECTURE.md` §9), and `plain-language-checkpoint` (Wingman's own writing-quality bar for anything founder-facing).
 
 ## Success criteria
 
@@ -53,8 +53,8 @@ Wingman succeeds if a founder can, without ever reading a diff:
 ## Out of scope for v1
 
 - Department leads and specialists (see Non-goals) — v1 pipeline commands do this work inline.
-- The bundled MCP state-store server — planned, spec'd in `docs/DATABASE.md`, not yet built as of this writing.
-- `/wingman:launch` and `/wingman:hotfix` — named in `docs/ARCHITECTURE.md`'s open items, not yet built.
+- The bundled MCP state-store server — planned, spec'd in `docs/status/DATABASE.md`, not yet built as of this writing.
+- `/wingman:launch` and `/wingman:hotfix` — named in `docs/status/ARCHITECTURE.md`'s open items, not yet built.
 
 ## Open questions
 

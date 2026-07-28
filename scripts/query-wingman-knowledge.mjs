@@ -7,7 +7,7 @@
 // that already-parsed data actually queryable, filterable, and importable by other tooling.
 //
 // Dev-repo-only, same as parse-wingman-logs.mjs: this lives under /scripts, which never ships as
-// part of the installed plugin (see docs/ARCHITECTURE.md's structured-knowledge-layer note under
+// part of the installed plugin (see docs/status/ARCHITECTURE.md's structured-knowledge-layer note under
 // §6). skills/governance/dogfood-gap-classification may depend on it (dev-repo-only itself); evolve-promotion
 // must not (it runs inside any founder's installed project).
 //

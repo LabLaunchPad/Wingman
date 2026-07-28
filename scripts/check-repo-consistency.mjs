@@ -120,7 +120,7 @@ if (coverage.markedHeadings < coverage.totalHeadings) {
 // that relative-imports or reads a file from root scripts/, docs/, evals/,
 // or tests/ would pass here (both trees exist in this dev checkout) but
 // break silently the moment a founder installs just the plugin — the exact
-// naming-collision risk this project's own audit history (docs/wingman/
+// naming-collision risk this project's own audit history (docs/history/
 // audit-reorg-2026-07-20.md, action item #8) flagged and left as a TODO.
 function walkMjs(dir) {
   let out = [];

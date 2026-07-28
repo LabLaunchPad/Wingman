@@ -1,6 +1,6 @@
 # Wingman — State Store Specification
 
-Wingman has no database in the traditional sense, and per `docs/SRS.md` NFR-1/NFR-2, it never will in the sense of a hosted service the founder has to run. This document specifies the flat-file state store that exists today, and the optional MCP server interface over it that's planned but not yet justified — see "Why no server yet" below.
+Wingman has no database in the traditional sense, and per `docs/status/SRS.md` NFR-1/NFR-2, it never will in the sense of a hosted service the founder has to run. This document specifies the flat-file state store that exists today, and the optional MCP server interface over it that's planned but not yet justified — see "Why no server yet" below.
 
 ## What actually exists (v1, flat files)
 
@@ -20,7 +20,7 @@ All Wingman state lives under `.wingman/` at the root of the founder's project (
 ```
 
 (This file tree previously omitted `traceability.json` and `memory/` — an audit,
-`docs/wingman/architecture-audit-2026-07-15.md`, found both were real files real skills already
+`docs/history/architecture-audit-2026-07-15.md`, found both were real files real skills already
 write, with no corresponding entry here. Documented below.)
 
 ### `checkpoints.jsonl`
@@ -60,14 +60,14 @@ One JSON object per line, appended by `/wingman:boardroom` every time it runs (n
 - `scope_ref`: path to the plan file reviewed, or `"diff"` if the scope was a git diff rather than a plan file.
 - `seats[].seat`: one of `ceo`, `cpo`, `cmo`, `cto`, `ciso`, `cfo`, `research`, `design` (the `design` entry is omitted when Design was N/A for the checkpoint) — see migration note below for the pre-rename names.
 - `seats[].verdict`: one of `GO`, `GO_WITH_CONCERNS`, `NO_GO` — matches each Boardroom agent's own output contract.
-- `bottom_line`: one of `GO`, `GO_WITH_CHANGES`, `DO NOT SHIP` — the consolidated result, per the gate rule in `docs/ARCHITECTURE.md` §4.
+- `bottom_line`: one of `GO`, `GO_WITH_CHANGES`, `DO NOT SHIP` — the consolidated result, per the gate rule in `docs/status/ARCHITECTURE.md` §4.
 - `founder_decision`: one of `ship_it`, `fix_concerns_first`, `still_reviewing`.
 - `founder_notes`: free-text, founder-authored context on the decision above; often empty (`""`).
-- `next_stage`: the pipeline stage `state.json`'s `current_stage` should advance to once this checkpoint is acted on — pinned to the *same* stage (not advanced) whenever `bottom_line` is `"DO NOT SHIP"`, per `commands/adaptive/boardroom.md`'s consolidation step. `plugins/wingman/scripts/query-founder-knowledge.mjs`'s `summary()` (added 2026-07-21, see `docs/PROJECT.md`'s decisions log) reads this field back and compares it against `state.json`'s real `current_stage`, surfacing a `state_stage_mismatch` diagnostic when they disagree — the mechanical drift-detector for "a session wrote a checkpoint but forgot to update `state.json` afterward." Absent on checkpoints written before that field was added; treat its absence as "no mismatch check possible for this entry," never an error.
+- `next_stage`: the pipeline stage `state.json`'s `current_stage` should advance to once this checkpoint is acted on — pinned to the *same* stage (not advanced) whenever `bottom_line` is `"DO NOT SHIP"`, per `commands/adaptive/boardroom.md`'s consolidation step. `plugins/wingman/scripts/query-founder-knowledge.mjs`'s `summary()` (added 2026-07-21, see `docs/status/PROJECT.md`'s decisions log) reads this field back and compares it against `state.json`'s real `current_stage`, surfacing a `state_stage_mismatch` diagnostic when they disagree — the mechanical drift-detector for "a session wrote a checkpoint but forgot to update `state.json` afterward." Absent on checkpoints written before that field was added; treat its absence as "no mismatch check possible for this entry," never an error.
 
-This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
+This is deliberately **not cryptographically signed** — see `docs/status/ARCHITECTURE.md` §4 for why: Wingman has one trust root (the founder), not multiple mutually-distrusting parties, so signing would add complexity without a real threat it defends against.
 
-**Migration note — 14-stage individual-checkpoint pipeline (schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction decision (see `docs/ARCHITECTURE.md` §4d) — the pipeline expands from 7 stages / 1 bundled pre-build checkpoint (`"planning-milestone"`, covering all 5 planning stages) to 14 stages / 12 individual pre-build checkpoints, matching a full enterprise UX process. Stage/checkpoint shape changed:
+**Migration note — 14-stage individual-checkpoint pipeline (schema_version 4 → 5, 2026):** a founder-approved reversal of the `schema_version: 3` ceremony-reduction decision (see `docs/status/ARCHITECTURE.md` §4d) — the pipeline expands from 7 stages / 1 bundled pre-build checkpoint (`"planning-milestone"`, covering all 5 planning stages) to 14 stages / 12 individual pre-build checkpoints, matching a full enterprise UX process. Stage/checkpoint shape changed:
 
 | Old (`schema_version: 3`–`4`) | New (`schema_version: 5`) |
 |---|---|
@@ -78,7 +78,7 @@ This is deliberately **not cryptographically signed** — see `docs/ARCHITECTURE
 
 This is an **append-only audit log, never rewritten** — existing `schema_version: 3` and `4` entries keep their old bundled/array shape permanently; do not migrate or rewrite historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) must keep checking whether `stage` is an array before iterating, since `schema_version: 3`–`4` entries with `bundle: "planning-milestone"` still exist in older logs even though no new entry will ever have that shape again.
 
-**Migration note — 7-stage pipeline (schema_version 2 → 3, 2026):** the pipeline expanded from 4 stages to 7 as part of MVP2 (see `docs/ARCHITECTURE.md` §4b/§10 v14), while *reducing* founder-visible checkpoints from 4 to 3 via bundling. Stage names changed:
+**Migration note — 7-stage pipeline (schema_version 2 → 3, 2026):** the pipeline expanded from 4 stages to 7 as part of MVP2 (see `docs/status/ARCHITECTURE.md` §4b/§10 v14), while *reducing* founder-visible checkpoints from 4 to 3 via bundling. Stage names changed:
 
 | Old (`schema_version: 2`, scalar `stage`) | New (`schema_version: 3`) |
 |---|---|
@@ -98,7 +98,7 @@ This is an **append-only audit log, never rewritten** — existing `schema_versi
 
 No existing field changed meaning or shape — this is a purely additive field on new entries. This is an **append-only audit log, never rewritten** — existing `schema_version: 3` (and earlier) entries keep having no `details_ref` field, permanently; do not backfill companion files for historical entries. Any consumer reading this file (e.g. `evolve-promotion`'s clustering logic) iterates `seats[]` generically and never assumed a `details_ref` field existed, so `schema_version: 1` through `4` entries coexist safely in the same file.
 
-**Migration note — 7-seat Boardroom rename (schema_version 1 → 2, 2026):** the Boardroom expanded from 5 seats to 7 as part of a deliberate rearchitecture (see `docs/ARCHITECTURE.md` §4/§5a). Seat names changed:
+**Migration note — 7-seat Boardroom rename (schema_version 1 → 2, 2026):** the Boardroom expanded from 5 seats to 7 as part of a deliberate rearchitecture (see `docs/status/ARCHITECTURE.md` §4/§5a). Seat names changed:
 
 | Old (`schema_version: 1`, unmarked) | New (`schema_version: 2`+) |
 |---|---|
@@ -113,7 +113,7 @@ This is an **append-only audit log, never rewritten** — existing entries keep 
 
 ### `state.json`
 
-Small, overwritten in place (not append-only). Tracks what a fresh Claude Code session needs to pick up where the last one left off, what department leads (once they exist, per `docs/ARCHITECTURE.md` §5) are active for this project, what Management Board managers (per §5a, once the project crosses the 3+ department-lead complexity threshold) are active, and what specialists (per §6) have been promoted.
+Small, overwritten in place (not append-only). Tracks what a fresh Claude Code session needs to pick up where the last one left off, what department leads (once they exist, per `docs/status/ARCHITECTURE.md` §5) are active for this project, what Management Board managers (per §5a, once the project crosses the 3+ department-lead complexity threshold) are active, and what specialists (per §6) have been promoted.
 
 ```json
 {
@@ -164,7 +164,7 @@ not yet read-loop-verified.
 **No single file or view here unifies `checkpoints.jsonl`, `state.json`, `traceability.json`, and
 `memory/*.md` into one "what has this project decided and why" surface** — reconstructing that
 today means reading all four separately, in three different formats. This is a known, named gap
-(`docs/wingman/architecture-audit-2026-07-15.md`'s central finding), not an oversight to silently
+(`docs/history/architecture-audit-2026-07-15.md`'s central finding), not an oversight to silently
 work around; any future unification work should be evidence-gated (a real dogfooding prototype),
 not spun up speculatively.
 
@@ -174,11 +174,11 @@ Any Wingman command can read or write these files directly with the `Read`/`Writ
 
 ## Why no server yet
 
-`docs/ARCHITECTURE.md` §2 and this project's own `engineering-minimalism` skill both say the same thing: don't build infrastructure a simpler mechanism already covers. Every command that needs this state already has `Read`/`Write`/`Bash` — a plain JSONL file satisfies "queryable, persistent, cross-session state" without a server, a protocol handshake, or a dependency Claude Code doesn't already guarantee.
+`docs/status/ARCHITECTURE.md` §2 and this project's own `engineering-minimalism` skill both say the same thing: don't build infrastructure a simpler mechanism already covers. Every command that needs this state already has `Read`/`Write`/`Bash` — a plain JSONL file satisfies "queryable, persistent, cross-session state" without a server, a protocol handshake, or a dependency Claude Code doesn't already guarantee.
 
 ## Planned: an MCP server, once there's real evidence it's needed
 
-If department leads (v2) end up needing structured cross-session coordination that's genuinely awkward via `grep`/`Read` on flat files — for example, several department leads needing to query "what's the current state" concurrently with validation logic beyond what a shell one-liner can express cleanly — a small local MCP server (stdio transport, Node.js, no external dependencies, following `gsd-plugin`'s proven pattern researched in `docs/ARCHITECTURE.md` §9) would expose:
+If department leads (v2) end up needing structured cross-session coordination that's genuinely awkward via `grep`/`Read` on flat files — for example, several department leads needing to query "what's the current state" concurrently with validation logic beyond what a shell one-liner can express cleanly — a small local MCP server (stdio transport, Node.js, no external dependencies, following `gsd-plugin`'s proven pattern researched in `docs/status/ARCHITECTURE.md` §9) would expose:
 
 **Resources (read-only):**
 - `wingman://checkpoints` — the full `checkpoints.jsonl` history, or a filtered slice
@@ -188,4 +188,4 @@ If department leads (v2) end up needing structured cross-session coordination th
 - `wingman_record_checkpoint` — append a validated checkpoint entry (schema-checked, rejecting malformed `verdict`/`bottom_line` values that a hand-written `Write` call could silently get wrong)
 - `wingman_update_state` — update `state.json` fields
 
-This is intentionally not built yet. Building it now, before any project has generated the friction that would justify it, is exactly the speculative-infrastructure pattern `engineering-minimalism` and `docs/ARCHITECTURE.md`'s lazy-growth philosophy both argue against. Track the decision to build it (or not) in `docs/PROJECT.md`'s decisions log when it actually comes up.
+This is intentionally not built yet. Building it now, before any project has generated the friction that would justify it, is exactly the speculative-infrastructure pattern `engineering-minimalism` and `docs/status/ARCHITECTURE.md`'s lazy-growth philosophy both argue against. Track the decision to build it (or not) in `docs/status/PROJECT.md`'s decisions log when it actually comes up.

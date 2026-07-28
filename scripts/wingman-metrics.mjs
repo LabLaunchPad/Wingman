@@ -89,7 +89,7 @@ if (debtBody) {
 const recurring = recurringCategories();
 
 // --- 5. Agent-weakness coverage benchmark ---
-// Parses docs/AGENT-WEAKNESS-BENCHMARK.md's `wingman:weakness` markers, then
+// Parses docs/status/AGENT-WEAKNESS-BENCHMARK.md's `wingman:weakness` markers, then
 // RE-DERIVES each one's real status from disk rather than trusting the marker's
 // hand-written status: does the rule= path exist, and is the eval= case actually
 // `verified`? Flags any marker whose written status disagrees, plus any broken
@@ -104,7 +104,7 @@ function evalTrustLevel(evalRel) {
 }
 
 const WEAKNESS_MARKER_RE = /<!--\s*wingman:weakness\s+(.*?)\s*-->/g;
-const weaknessBody = read('docs/AGENT-WEAKNESS-BENCHMARK.md') || '';
+const weaknessBody = read('docs/status/AGENT-WEAKNESS-BENCHMARK.md') || '';
 const weaknesses = [];
 for (const match of weaknessBody.matchAll(WEAKNESS_MARKER_RE)) {
   const attrs = {};
@@ -161,7 +161,7 @@ if (asJson) {
     ? `   ${recurring.length} categor${recurring.length === 1 ? 'y has' : 'ies have'} crossed the 2+-occurrence evolve-promotion threshold: ${recurring.map((r) => `${r.category} ×${r.count}`).join(', ')}`
     : '   No category has crossed the 2+-occurrence threshold yet.');
   line();
-  line('## 5. Agent-weakness coverage benchmark (docs/AGENT-WEAKNESS-BENCHMARK.md)');
+  line('## 5. Agent-weakness coverage benchmark (docs/status/AGENT-WEAKNESS-BENCHMARK.md)');
   if (wTotal === 0) {
     line('   No wingman:weakness markers found — catalog missing or empty.');
   } else {

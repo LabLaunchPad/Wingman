@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Structured, machine-readable view over Wingman's own prose learning/retro/decision/todo logs.
 //
-// LEARNINGS.md, docs/wingman/retros.md, docs/PROJECT.md's decisions log, and docs/HUMAN-TODOS.md
+// LEARNINGS.md, docs/history/retros.md, docs/status/PROJECT.md's decisions log, and docs/HUMAN-TODOS.md
 // are genuinely rich human narrative, but until now had zero machine-parseable fields -- every
 // consumer (wingman-health.mjs, evolve-promotion, dogfood-gap-classification) had to either
 // re-read prose by eye or write another one-off regex against headings. This script reads the
 // `<!-- wingman:log type=... category=... status=... occurrence=N -->` marker that now precedes
 // every entry in those four files (additive only -- the prose itself is untouched), plus
-// docs/wingman/GAPS.md's already-structured table, and emits one JSON view. Read-only, flat-file,
+// docs/history/GAPS.md's already-structured table, and emits one JSON view. Read-only, flat-file,
 // no network -- same philosophy as wingman-health.mjs.
 //
 // Usage: node scripts/parse-wingman-logs.mjs        (pretty JSON to stdout)
@@ -49,9 +49,9 @@ function headingFrom(line) {
 // universal pattern over-counts section dividers as if they needed a marker too.
 const ENTRY_MATCHERS = {
   'LEARNINGS.md': (l) => /^###\s/.test(l),
-  'docs/wingman/retros.md': (l) => /^##\s*Retro:/.test(l),
+  'docs/history/retros.md': (l) => /^##\s*Retro:/.test(l),
   'docs/HUMAN-TODOS.md': (l) => /^- \*\*/.test(l) || /^- ~~/.test(l) || /^\d+\.\s*\*\*/.test(l),
-  'docs/PROJECT.md': (l) => /^- \*\*/.test(l),
+  'docs/status/PROJECT.md': (l) => /^- \*\*/.test(l),
 };
 
 function parseMarkedFile(relPath) {
@@ -62,7 +62,7 @@ function parseMarkedFile(relPath) {
   const isEntryLine = ENTRY_MATCHERS[relPath] || (() => false);
   // PROJECT.md's decisions log is one section among several -- only count within its bounds.
   let scopeStart = 0, scopeEnd = lines.length;
-  if (relPath === 'docs/PROJECT.md') {
+  if (relPath === 'docs/status/PROJECT.md') {
     scopeStart = lines.findIndex((l) => l.trim() === '## Decisions log');
     const roadmapIdx = lines.findIndex((l, i) => i > scopeStart && l.trim() === '## Roadmap');
     scopeEnd = roadmapIdx === -1 ? lines.length : roadmapIdx;
@@ -95,7 +95,7 @@ function parseMarkedFile(relPath) {
 }
 
 function parseGapsTable() {
-  const text = read('docs/wingman/GAPS.md');
+  const text = read('docs/history/GAPS.md');
   if (text === null) return [];
   const lines = text.split('\n');
   const gaps = [];
@@ -116,8 +116,8 @@ function parseGapsTable() {
 
 export function parseAll() {
   const learnings = parseMarkedFile('LEARNINGS.md');
-  const retros = parseMarkedFile('docs/wingman/retros.md');
-  const decisions = parseMarkedFile('docs/PROJECT.md');
+  const retros = parseMarkedFile('docs/history/retros.md');
+  const decisions = parseMarkedFile('docs/status/PROJECT.md');
   const todos = parseMarkedFile('docs/HUMAN-TODOS.md');
   const gaps = parseGapsTable();
 

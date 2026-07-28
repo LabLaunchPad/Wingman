@@ -14,7 +14,7 @@ in sync.
 - Read-only by default; the smallest safe change that satisfies the task.
 - Verification before completion — a claim without fresh evidence is not a claim (`verification-before-completion`).
 - Human approval for risky or irreversible actions — the founder always makes the final call via
-  `AskUserQuestion`; the Boardroom informs the decision, it never makes it (`docs/ARCHITECTURE.md` §4).
+  `AskUserQuestion`; the Boardroom informs the decision, it never makes it (`docs/status/ARCHITECTURE.md` §4).
 - Plain-language summaries for every founder-facing decision (`plain-language-checkpoint`).
 
 ## Permission model
@@ -27,5 +27,5 @@ each `permissions:` frontmatter value.
 
 Nearest repo instructions override broader ones. Project-specific rules override generic Wingman
 defaults. Within this project specifically: `plugins/wingman/references/permission-model.md` over
-this file; `docs/ARCHITECTURE.md` over any prose summary of it elsewhere (`docs/GOVERNANCE.md`'s own
+this file; `docs/status/ARCHITECTURE.md` over any prose summary of it elsewhere (`docs/status/GOVERNANCE.md`'s own
 stated rule, restated here since it applies just as much to this file).
