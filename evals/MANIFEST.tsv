@@ -60,6 +60,7 @@ prototype-usability	evals/fixtures/setup-prototype-usability-fixture.sh	plugins/
 research-synthesis	evals/fixtures/setup-research-synthesis-fixture.sh	plugins/wingman/commands/pipeline/research-synthesis.md
 research	(none: evidence comes from a real query against live web search inside a shared consolidated session, not a synthetic fixture)	plugins/wingman/skills/research/SKILL.md; commands/adaptive/research.md
 retro	evals/fixtures/setup-ledger-fixture.sh	plugins/wingman/commands/adaptive/retro.md
+review	evals/fixtures/setup-fetch-app.sh	plugins/wingman/commands/adaptive/review.md
 secure	(retired)	(retired)
 security-checklist	evals/fixtures/setup-security-checklist-fixture.sh	plugins/wingman/skills/security-checklist/SKILL.md
 seven-stage-pipeline-e2e	evals/fixtures/setup-waitlist-app.sh	discovery; define; architecture; uxflow; implementation-planning; build; ship; full-pipeline-e2e.md
@@ -71,6 +72,7 @@ systematic-auditing	evals/fixtures/setup-audit-fixture.sh	plugins/wingman/skills
 systematic-debugging	evals/fixtures/setup-systematic-debugging-fixture.sh	plugins/wingman/skills/systematic-debugging/SKILL.md
 telemetry	evals/fixtures/setup-waitlist-app.sh	plugins/wingman/commands/adaptive/telemetry.md
 test-driven-development	(none: fixture is a minimal scratch TS project built inline, not a setup-*.sh script)	plugins/wingman/skills/test-driven-development/SKILL.md
+test	evals/fixtures/setup-testing-patterns-fixture.sh	plugins/wingman/commands/adaptive/test.md
 testing-patterns	evals/fixtures/setup-testing-patterns-fixture.sh	plugins/wingman/skills/testing-patterns/SKILL.md
 token-economy	(none: fixture is a scratch verbose-message file built inline, not a setup-*.sh script)	plugins/wingman/skills/token-economy/SKILL.md
 traceability-linking	(none: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script)	plugins/wingman/skills/traceability-linking/SKILL.md
