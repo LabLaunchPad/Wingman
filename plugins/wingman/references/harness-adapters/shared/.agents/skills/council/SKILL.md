@@ -13,6 +13,18 @@ Convene four advisors for ambiguous decisions:
 
 This is for **decision-making under ambiguity**, not code review, implementation planning, or architecture design. For the structured SDLC pipeline, use `wingman:boardroom` instead.
 
+## Inputs
+
+The ambiguous decision itself, reduced to one explicit question (step 1) — this skill doesn't gather requirements, it adjudicates between already-credible paths.
+
+## Output
+
+The compact verdict shape in step 6 (per-voice positions + Consensus/Strongest dissent/Premise check/Recommendation) — never a bare "go with X" with the dissent hidden.
+
+## Escalation
+
+None beyond `wingman:learn` — if the council materially changes the recommendation, persist the lesson there (per the Persistence Rule); there's no founder-approval gate on this skill itself since it's advisory, not an action.
+
 ## When to Use
 
 Use council when:
