@@ -480,7 +480,7 @@ argument-hint: "[path to plan file, or leave blank to use the most recent approv
 
 # Wingman: Build
 
-The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the plan approved at the Planning Milestone checkpoint (`/wingman:implementation-planning`). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint. Sequence work the way an agentic IDE session should: hand the agent the plan/AI PRD, have it build the data layer first, then build individual feature modules one at a time — never everything at once.
+The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the plan approved at `/wingman:implementation-planning`'s own solo checkpoint (per `docs/ARCHITECTURE.md` §4d, no separate "Planning Milestone" bundle exists — every one of the 12 prior stages already cleared its own checkpoint). This stage is where code actually gets written — the founder should not need to watch this happen, only see the result at the next checkpoint. Sequence work the way an agentic IDE session should: hand the agent the plan/AI PRD, have it build the data layer first, then build individual feature modules one at a time — never everything at once.
 
 $ARGUMENTS
 
@@ -494,7 +494,7 @@ of Build; a Level 4 classification routes to `/wingman:incident` immediately; Le
 with a Level 3 classification meaning every downstream checkpoint for this request is mandatory full
 review.
 
-Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
+Confirm there is an approved plan (from `/wingman:implementation-planning`'s own solo checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
 Check `.wingman/checkpoints.jsonl` for an entry with `"bundle": "planning-milestone"` for this project. If none exists, do not proceed silently — tell the founder plainly: "No prior Wingman plan found for this project — proceeding without traceability coverage from earlier pipeline stages. If you have your own spec, that's fine; if you meant to run `/wingman:discovery` through `/wingman:implementation-planning` first, stop now and do that instead." Wait for the founder's answer before continuing this stage.
 
@@ -510,7 +510,7 @@ Immediately after, use the `management-board-activation` skill to check the Mana
 
 Use the `department-lead-activation` skill to check the Legal & Security activation signal too: if this project touches auth, payments, or personal data, create `dept-legal-security` if it doesn't exist yet. Its work now happens inline as part of this stage's Definition-of-Done gate below, rather than as a separate `/wingman:secure` stage — folding a dedicated security pass into Build's own gate, not skipping it (see "Definition-of-Done gate" below).
 
-See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to show the pipeline-status tree — Planning Milestone done, Build now the current stage.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to show the pipeline-status tree — all 12 prior stages done, Build now the current stage.
 
 ## Build.2: Execution discipline
 
@@ -2150,7 +2150,7 @@ Tell the founder:
 **What happens next:** <e.g. "this needs your approval / a merge click" or "it will merge automatically once checks pass">
 ```
 
-See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — Planning Milestone and Build done, Ship now the current stage.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — all 13 prior stages done, Ship now the current stage.
 
 ## Ship.4: Gate checklist
 

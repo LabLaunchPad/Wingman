@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.26] - 2026-07-28
+
+### Fixed
+- **7 stale "Planning Milestone" references left over from the v20 14-stage reversal** — the bundled "Planning Milestone" checkpoint concept was retired when the pipeline expanded from 7 bundled stages to 14 individually-checkpointed ones, but several files never got updated: `build.md` (its intro line and "Before starting" step both cited a "Planning Milestone checkpoint" as if it still existed; its pipeline-status tree line said "Planning Milestone done"), `ship.md` (same stale tree line), `references/pipeline-stage-boilerplate.md` (its Where You Are section still described "the 5 planning stages," and its own "Referenced by" list was missing `build.md`/`ship.md`, both of which do cite it), `references/visual-output-templates.md` (called out a nonexistent "Planning Milestone checkpoint"), and `references/org-template/project-types/automation.md` (told an automation project to "note the UX-flow skip in the Planning Milestone checkpoint" — no such checkpoint exists; `uxflow.md` records its own). Found via a step-by-step walkthrough of all 14 pipeline stages checking for conflicts.
+
 ## [0.7.25] - 2026-07-28
 
 ### Fixed
