@@ -37,7 +37,7 @@ Then run `/wingman:discovery` to start a new project, or `/wingman:boardroom` to
 
 Wingman is built as a Claude Code plugin, and most of the Boardroom's execution mechanism (interactive
 founder questions, the plan-approval gate, parallel multi-seat dispatch) is genuinely coupled to
-Claude Code's own tool surface — see [`docs/ARCHITECTURE.md` §8a/§8b](docs/ARCHITECTURE.md) for the
+Claude Code's own tool surface — see [`docs/status/ARCHITECTURE.md` §8a/§8b](docs/status/ARCHITECTURE.md) for the
 honest account of what is and isn't portable. Two harnesses have a real, scoped starting point:
 
 - **Codex CLI** and **OpenCode** — Boardroom seat personas translated into each harness's native
@@ -80,7 +80,7 @@ flowchart LR
     P4 -.->|every one of stages 1-12 has its own solo checkpoint| CP{{Boardroom}}
 ```
 
-**14 named stages, 14 founder-visible checkpoints** — every stage 1 through 12 records its own solo Boardroom checkpoint immediately after itself (no bundling), plus `build`'s own Definition-of-Done gate (folding in the security pass) and `ship`'s. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §4d for the full stage list, traceability prefixes, and the founder-approved reversal of an earlier, more-bundled 7-stage/3-checkpoint model. A `change-triage` skill runs at intake (`discovery`, `build`, `hotfix`) to route a genuinely small, non-trust-boundary fix to a lighter path instead of the full sequence — see §4d's note on this deliberate, explicitly-recorded partial exception.
+**14 named stages, 14 founder-visible checkpoints** — every stage 1 through 12 records its own solo Boardroom checkpoint immediately after itself (no bundling), plus `build`'s own Definition-of-Done gate (folding in the security pass) and `ship`'s. See [`docs/status/ARCHITECTURE.md`](docs/status/ARCHITECTURE.md) §4d for the full stage list, traceability prefixes, and the founder-approved reversal of an earlier, more-bundled 7-stage/3-checkpoint model. A `change-triage` skill runs at intake (`discovery`, `build`, `hotfix`) to route a genuinely small, non-trust-boundary fix to a lighter path instead of the full sequence — see §4d's note on this deliberate, explicitly-recorded partial exception.
 
 The agent population is deliberately **lazy, not exhaustive**:
 
@@ -89,7 +89,7 @@ The agent population is deliberately **lazy, not exhaustive**:
 - A **Management Board** of coordinators activates only once a project crosses 3+ active conditionally-created department leads.
 - Narrow **specialists** (a 56-role candidate catalog) are promoted one at a time via `/wingman:evolve`, only after proven, repeated need — never bulk-created.
 
-See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full model and [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) for the complete specialist catalog.
+See [`docs/status/ARCHITECTURE.md`](docs/status/ARCHITECTURE.md) for the full model and [`docs/roadmap/AGENT-ROSTER.md`](docs/roadmap/AGENT-ROSTER.md) for the complete specialist catalog.
 
 ## Status
 
@@ -101,18 +101,18 @@ The pipeline is built and behaviorally tested, not just scaffolded:
 
 `evals/` holds a lightweight behavioral eval harness (not just structural validation): eval cases in a mix of `verified` (passed 2+ differently-shaped scenarios including a negative case) and `provisional` (passed one real run) — see `evals/README.md` for the trust-level bar. Covers every command and the high-value skills, including full end-to-end pipeline runs against realistic projects (one adversarial run producing a real `DO NOT SHIP`). Run `node scripts/wingman-health.mjs` for a live, read-only snapshot of these numbers straight from the repo — it's the source of truth this table is generated from, not a number to trust in prose.
 
-See [`docs/PROJECT.md`](docs/PROJECT.md) for exact build/eval status and decisions log, and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for what's built versus deliberately deferred. Most of this was verified in a sandboxed testing environment; real dogfooding passes (actual `claude` CLI install, live pipeline runs via `/wingman:dogfood`) have also happened and found real gaps, now fixed — see [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) for what real dogfooding still needs.
+See [`docs/status/PROJECT.md`](docs/status/PROJECT.md) for exact build/eval status and decisions log, and [`docs/status/ARCHITECTURE.md`](docs/status/ARCHITECTURE.md) for what's built versus deliberately deferred. Most of this was verified in a sandboxed testing environment; real dogfooding passes (actual `claude` CLI install, live pipeline runs via `/wingman:dogfood`) have also happened and found real gaps, now fixed — see [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) for what real dogfooding still needs.
 
 ## For humans and for agents
 
-This README is written to be skimmed top-to-bottom in under a minute. If you're an AI coding agent working in this repo instead of a human reading it, start with [`AGENTS.md`](AGENTS.md) — the canonical project brief, following the open [AGENTS.md standard](https://agents.md) (`CLAUDE.md` is a symlink to it, kept for tools that look for that filename specifically) — rather than re-deriving conventions from source. See `docs/ARCHITECTURE.md` §8a for the honest scope of what's portable to a non-Claude-Code harness today (two skills) versus what isn't (the rest).
+This README is written to be skimmed top-to-bottom in under a minute. If you're an AI coding agent working in this repo instead of a human reading it, start with [`AGENTS.md`](AGENTS.md) — the canonical project brief, following the open [AGENTS.md standard](https://agents.md) (`CLAUDE.md` is a symlink to it, kept for tools that look for that filename specifically) — rather than re-deriving conventions from source. See `docs/status/ARCHITECTURE.md` §8a for the honest scope of what's portable to a non-Claude-Code harness today (two skills) versus what isn't (the rest).
 
 ## Documentation
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — the hybrid Boardroom/department/specialist model and why it's shaped this way.
-- [`docs/GOVERNANCE.md`](docs/GOVERNANCE.md) — a one-page index of where org governance, policy enforcement, and benchmarks/metrics each already live in this repo.
-- [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) — the full specialist candidate catalog, organized by department.
-- [`docs/PROJECT.md`](docs/PROJECT.md) — current build/eval status, decisions log, and roadmap.
+- [`docs/status/ARCHITECTURE.md`](docs/status/ARCHITECTURE.md) — the hybrid Boardroom/department/specialist model and why it's shaped this way.
+- [`docs/status/GOVERNANCE.md`](docs/status/GOVERNANCE.md) — a one-page index of where org governance, policy enforcement, and benchmarks/metrics each already live in this repo.
+- [`docs/roadmap/AGENT-ROSTER.md`](docs/roadmap/AGENT-ROSTER.md) — the full specialist candidate catalog, organized by department.
+- [`docs/status/PROJECT.md`](docs/status/PROJECT.md) — current build/eval status, decisions log, and roadmap.
 - [`CHANGELOG.md`](CHANGELOG.md) — release history.
 - [`docs/HUMAN-TODOS.md`](docs/HUMAN-TODOS.md) — what's blocked on a human rather than more engineering (publishing, demo content — see `docs/DEMO-CHECKLIST.md`).
 - [`evals/README.md`](evals/README.md) — how the behavioral eval harness works and what's been verified.

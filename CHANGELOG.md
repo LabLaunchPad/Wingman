@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.27] - 2026-07-28
+
+### Changed
+- **Root `docs/` reorganized into `docs/status/` (verified truth), `docs/roadmap/` (provisional/deferred), and `docs/history/` (frozen narrative)** — a repo-architecture request to make the verified/provisional/deferred distinction explicit. `plugins/wingman/` itself is untouched; the only shipped-content change is a one-line comment path fix in `check-traceability.mjs` (`docs/wingman/retros.md` → `docs/history/retros.md`), which is what triggers this version bump.
+
 ## [0.7.26] - 2026-07-28
 
 ### Fixed

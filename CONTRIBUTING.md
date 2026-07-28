@@ -9,8 +9,8 @@ Participation here is governed by the [Code of Conduct](CODE_OF_CONDUCT.md).
 ## Before you start
 
 - **Structural changes** (new command, agent, skill, or department) — read
-  [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first for the activation-signal model, and
-  [`docs/AGENT-ROSTER.md`](docs/AGENT-ROSTER.md) before adding any specialist subagent. Specialists
+  [`docs/status/ARCHITECTURE.md`](docs/status/ARCHITECTURE.md) first for the activation-signal model, and
+  [`docs/roadmap/AGENT-ROSTER.md`](docs/roadmap/AGENT-ROSTER.md) before adding any specialist subagent. Specialists
   are promoted via `/wingman:evolve` on evidenced, repeated need — not created speculatively. The
   [feature request template](.github/ISSUE_TEMPLATE/feature_request.yml) reflects this bar.
 - **Bug fixes** — [the bug report template](.github/ISSUE_TEMPLATE/bug_report.yml) asks which
@@ -56,6 +56,6 @@ which is still real verification, just worth naming.
 
 ## Getting help
 
-For "how does X work" questions, check `CLAUDE.md` and `docs/ARCHITECTURE.md` first, then use
+For "how does X work" questions, check `CLAUDE.md` and `docs/status/ARCHITECTURE.md` first, then use
 [Discussions](https://github.com/LabLaunchPad/Wingman/discussions) rather than opening an issue.
 For a security vulnerability, see [`SECURITY.md`](SECURITY.md) — do not open a public issue.

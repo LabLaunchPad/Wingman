@@ -6,9 +6,9 @@ the rule actually works. It exists so the claim "Wingman encodes known agent wea
 enforced, measured rules" is checkable, not asserted.
 
 It is **not** a service-style performance benchmark. Wingman has no persistent runtime or request
-traffic (`docs/ARCHITECTURE.md` §2), so there is no p95 latency / throughput / cost-function to
+traffic (`docs/status/ARCHITECTURE.md` §2), so there is no p95 latency / throughput / cost-function to
 measure — a proposed MLOps benchmark of that shape was assessed and declined earlier (see
-`docs/PROJECT.md`'s decisions log and `docs/GOVERNANCE.md`). What *is* real and computable is
+`docs/status/PROJECT.md`'s decisions log and `docs/status/GOVERNANCE.md`). What *is* real and computable is
 **coverage**: of the known weaknesses, how many have both a rule and a passing, A/B-tested eval.
 
 ## What "A/B testing" means here
@@ -45,7 +45,7 @@ Community-verified failure-mode sources this catalog draws on (each entry cites 
   defect exists in already-correct code).
 - **Industry failure-mode writeups** — e.g. Galileo, *7 AI Agent Failure Modes* — practitioner
   catalogues of premature completion, context/verbosity degradation, and unverified self-reports.
-- **First-party evidence** — this repo's own `docs/wingman/retros.md` and the cited `evals/cases/*.md`
+- **First-party evidence** — this repo's own `docs/history/retros.md` and the cited `evals/cases/*.md`
   run logs, where the same failure modes were caught (or deliberately provoked and resisted) in real
   runs. This is the strongest evidence in the catalog: it's directly re-checkable in this repo.
 
@@ -147,7 +147,7 @@ exactly Wingman's model (the 4 mechanical validators + the Boardroom review + th
   established patterns).** A well-documented agent weakness. **No dedicated rule today:**
   `skills/engineering-minimalism` touches "reuse before adding," but there is no discrete
   read-before-edit / follow-existing-conventions discipline, and nothing measures it. Logged here as
-  an **evidence-gated candidate** (per the promotion process in `docs/AGENT-ROSTER.md`) — *not*
+  an **evidence-gated candidate** (per the promotion process in `docs/roadmap/AGENT-ROSTER.md`) — *not*
   built speculatively. Promote only if a real dogfood run or founder session shows this failure mode
   actually recurring here.
 

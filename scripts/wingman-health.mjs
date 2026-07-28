@@ -63,7 +63,7 @@ line('# Wingman Dev-Health Report');
 line();
 line(`Plugin surface:   ${commands.length} commands, ${agents.length} boardroom seats, ${skills.length} skills`);
 line(`Eval cases:       ${cases.length} total — ${verified} verified, ${provisional} provisional${cases.length - verified - provisional ? `, ${cases.length - verified - provisional} unknown` : ''}`);
-line(`Decisions logged: ${decisionCount} durable decisions in docs/PROJECT.md`);
+line(`Decisions logged: ${decisionCount} durable decisions in docs/status/PROJECT.md`);
 line();
 line('Behavioral eval coverage by trust level:');
 for (const [name, t] of Object.entries(trust).sort()) {
@@ -82,4 +82,4 @@ line();
 // Overall one-line verdict, in the plain-language spirit the project holds
 // its own outputs to.
 const pctVerified = cases.length ? Math.round((verified / cases.length) * 100) : 0;
-line(`Bottom line: ${cases.length} behaviors have a real eval; ${pctVerified}% are verified (2+ scenarios), the rest provisional (1 scenario). ${uncoveredCommands.length + uncoveredSkills.length} plugin pieces have no dedicated case yet (see docs/PROJECT.md for which are deliberately deferred vs. genuinely open).`);
+line(`Bottom line: ${cases.length} behaviors have a real eval; ${pctVerified}% are verified (2+ scenarios), the rest provisional (1 scenario). ${uncoveredCommands.length + uncoveredSkills.length} plugin pieces have no dedicated case yet (see docs/status/PROJECT.md for which are deliberately deferred vs. genuinely open).`);
