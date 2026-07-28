@@ -5,7 +5,7 @@ trigger, nobody clicks through a UI to use it.
 
 **What changes in the pipeline:**
 - UX flow: usually skippable entirely — there's no user-facing flow to diagram. Note this explicitly
-  in the Planning Milestone checkpoint rather than silently omitting the stage.
+  when `/wingman:uxflow` runs (say the stage is skipped and why) rather than silently omitting it.
 - Discovery: success signal is almost always "did the manual task go away," a concretely observable
   before/after — push for the actual current manual process, not an assumed one.
 - Testing: failure mode matters more than feature completeness — what happens when the automation's

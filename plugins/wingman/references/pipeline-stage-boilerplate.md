@@ -27,8 +27,8 @@ command file's own "Confirm the ... department is active" step for the exact sig
 ## Where You Are
 
 Most pipeline stages end (or begin, for `build.md`/`ship.md`) with the same visual step: use
-`skills/visual-founder-output` to add the pipeline-status tree (mid-planning variant during the 5
-planning stages, per `references/visual-output-templates.md` §2) showing which stages are complete
+`skills/visual-founder-output` to add the pipeline-status tree (all 14 stages, nested under their
+6 Phase groups, per `references/visual-output-templates.md` §2) showing which stages are complete
 and which is current. This is generated fresh from the project's own state each time, never
 hand-authored, and is additive to whatever else that stage produced — it never replaces a stage's
 own output (a requirements table, a plan, a diff).
@@ -40,5 +40,7 @@ own output (a requirements table, a plan, a diff).
 - `commands/pipeline/architecture.md`
 - `commands/pipeline/uxflow.md`
 - `commands/pipeline/implementation-planning.md`
+- `commands/pipeline/build.md`
+- `commands/pipeline/ship.md`
 - `commands/pipeline/build.md`
 - `commands/pipeline/ship.md`

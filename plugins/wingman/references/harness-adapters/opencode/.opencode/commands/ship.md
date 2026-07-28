@@ -48,7 +48,7 @@ Tell the founder:
 **What happens next:** <e.g. "this needs your approval / a merge click" or "it will merge automatically once checks pass">
 ```
 
-See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — Planning Milestone and Build done, Ship now the current stage.
+See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree — all 13 prior stages done, Ship now the current stage.
 
 ## Ship.4: Gate checklist
 

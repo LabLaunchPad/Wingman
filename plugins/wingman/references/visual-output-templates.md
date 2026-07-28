@@ -164,10 +164,10 @@ the right, connecting lines) — no additional detail beyond what the table alre
 
 ## 5. Task-dependency diagram (`commands/pipeline/implementation-planning.md`'s internal plan document)
 
-The plan document itself is never shown to the founder directly (`boardroom.md`'s Planning Milestone
-checkpoint is what they see) — this diagram is for whoever executes the plan (a fresh `build.md`
-subagent, or a human maintainer), so ordering and dependency between tasks is visible at a glance
-instead of only implied by task numbering.
+The plan document itself is never shown to the founder directly (`boardroom.md`'s own
+`implementation-planning` checkpoint is what they see) — this diagram is for whoever executes the
+plan (a fresh `build.md` subagent, or a human maintainer), so ordering and dependency between tasks
+is visible at a glance instead of only implied by task numbering.
 
 **Tier B (Mermaid, universal fallback):**
 
