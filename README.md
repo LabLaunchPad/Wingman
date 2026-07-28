@@ -56,16 +56,31 @@ Instead of asking a founder to read code or a diff, Wingman gates every stage of
 
 ```mermaid
 flowchart LR
-    subgraph Pipeline["7-stage pipeline"]
+    subgraph P1["1. Problem Definition"]
         direction LR
-        A[discovery] --> B[define] --> C[architecture] --> D[uxflow] --> E[implementation-planning] --> F[build] --> G[ship]
+        A1[discovery] --> A2[research-synthesis] --> A3[personas-jobs]
     end
-    E -.->|Planning Milestone checkpoint| CP1{{Boardroom}}
-    F -.->|Definition-of-Done checkpoint| CP2{{Boardroom}}
-    G -.->|Ship checkpoint| CP3{{Boardroom}}
+    subgraph P2["2. Logic & Mapping"]
+        direction LR
+        B1[journey-mapping] --> B2[define]
+    end
+    subgraph P3["3. Lean Design"]
+        direction LR
+        C1[information-architecture] --> C2[uxflow] --> C3[wireframes] --> C4[visual-design-system]
+    end
+    subgraph P4["4. Architecture & Build"]
+        direction LR
+        D1[prototype-usability] --> D2[architecture] --> D3[implementation-planning] --> D4[build]
+    end
+    subgraph P6["6. Launch & Iterate"]
+        direction LR
+        E1[ship]
+    end
+    P1 --> P2 --> P3 --> P4 --> P6
+    P4 -.->|every one of stages 1-12 has its own solo checkpoint| CP{{Boardroom}}
 ```
 
-Only **3 founder-visible checkpoints** exist across the 7 stages — the 5 planning stages bundle into one review at the end of `implementation-planning`, then `build` (which folds in the security pass) and `ship` each keep their own. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §4/§4b for the exact mapping.
+**14 named stages, 14 founder-visible checkpoints** — every stage 1 through 12 records its own solo Boardroom checkpoint immediately after itself (no bundling), plus `build`'s own Definition-of-Done gate (folding in the security pass) and `ship`'s. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) §4d for the full stage list, traceability prefixes, and the founder-approved reversal of an earlier, more-bundled 7-stage/3-checkpoint model. A `change-triage` skill runs at intake (`discovery`, `build`, `hotfix`) to route a genuinely small, non-trust-boundary fix to a lighter path instead of the full sequence — see §4d's note on this deliberate, explicitly-recorded partial exception.
 
 The agent population is deliberately **lazy, not exhaustive**:
 
@@ -80,7 +95,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full model and [`docs
 
 The pipeline is built and behaviorally tested, not just scaffolded:
 
-- **Commands** — 7 named SDLC pipeline stages (`discovery` / `define` / `architecture` / `uxflow` / `implementation-planning` / `build` / `ship`) plus adaptive commands (`audit`, `boardroom`, `launch`, `hotfix`, `harness`, `telemetry`, `retro`, `learn`, `evolve`, `over-engineering-review`, `bloat-audit`, `debt-ledger`, `research`, `advisory`, `incident`, `dogfood`, `knowledge-export`).
+- **Commands** — 14 named SDLC pipeline stages (`discovery` / `research-synthesis` / `personas-jobs` / `journey-mapping` / `define` / `information-architecture` / `uxflow` / `wireframes` / `visual-design-system` / `prototype-usability` / `architecture` / `implementation-planning` / `build` / `ship`) plus adaptive commands (`audit`, `boardroom`, `launch`, `hotfix`, `harness`, `telemetry`, `retro`, `learn`, `evolve`, `over-engineering-review`, `bloat-audit`, `debt-ledger`, `research`, `advisory`, `incident`, `dogfood`, `knowledge-export`, `post-launch`, `review`, `test`). Run `node scripts/wingman-health.mjs` for the live, exact count.
 - **Skills** covering discipline (`engineering-minimalism`, `verification-before-completion`), mechanics (`git-pr-workflow`, `security-checklist`), and adaptive output (`visual-founder-output`, `plain-language-checkpoint`).
 - **8 fixed Boardroom seats** (7 C-suite-style + Design), dispatched in parallel and never writing code.
 
