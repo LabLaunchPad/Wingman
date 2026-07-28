@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.29] - 2026-07-28
+
+### Optimized
+- **Optimized `listFilesRecursive` file system traversal in `dod-structural-gate.mjs` and its OpenCode `dod-gate.js` port.** Replaced the recursive `results.concat()` pattern with a clean, flat accumulator pattern. This completely eliminates expensive $O(N^2)$ array copies and high garbage collection/memory overhead during deep directory listings (such as scanning long lists of test files in large repos).
+
 ## [0.7.28] - 2026-07-28
 
 ### Fixed
