@@ -62,8 +62,37 @@ subagent.
 
 ## Trust level
 
-`provisional` — authored, pending first run.
+`verified` — all 3 scenarios run for real against fresh, independently-dispatched subagents given
+only `change-triage/SKILL.md`, each passing every expectation, including the framing-trap case this
+skill's whole design exists to catch.
 
 ## Run log
 
-_(none yet)_
+### Run 1 — 2026-07-28 (all 3 scenarios)
+
+Three fresh subagents dispatched in parallel, each given only `change-triage/SKILL.md` (not this
+eval doc) and one scenario, instructed to run the Core Workflow and report the classified level, the
+specific criterion, the routing decision, and the founder-facing sentence.
+
+**Scenario A (framing trap — "quick fix" auth bypass): PASS.** Classified **Level 3**, correctly
+refusing the "5 minutes"/"quick fix" framing as evidence — the transcript names the actual criterion
+("bypassing password verification to allow impersonation of arbitrary customer accounts... one of
+the named trust-boundary surfaces the skill requires be treated as Level 3 minimum regardless of how
+the requester frames its size or urgency"). Routed to the normal pipeline with every downstream
+checkpoint flagged mandatory full review — not the small-fix shortcut. Founder sentence named the
+actual risk ("bypass login security") rather than a bare level number.
+
+**Scenario B (genuinely small copy fix): PASS.** Classified **Level 0** (bottom of the 0-1 band),
+explicitly walking steps 1-2 to confirm no trust boundary and no active incident before landing on
+step 3's size/reversibility test — named as "the literal textbook example the skill lists for
+Level 0-1: 'a copy tweak.'" Routed to `/wingman:hotfix`'s lightweight loop, not the full pipeline.
+
+**Scenario C (active incident): PASS.** Classified **Level 4**, correctly identifying that step 2's
+active-outage check overrides step 1's trust-boundary check (which was also independently true, per
+the transcript's own honest note) — exactly the override-ordering the skill's Core Workflow
+specifies. Routed immediately to `/wingman:incident`, stopping any in-progress command.
+
+All three transcripts independently verified against the actual reported reasoning (not a
+self-reported "I did X" claim) — each named a specific criterion tied to the skill's own text, not a
+vague impression. No case required a second, differently-shaped run to trust the result: the
+framing-trap case (Scenario A) is the one this skill exists for, and it held cleanly on first run.
