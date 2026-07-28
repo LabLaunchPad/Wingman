@@ -26,6 +26,18 @@ A skill that has never been tested in the real world is a hypothesis, not a capa
 - Reviewing whether an existing pattern should be demoted or removed
 - Any decision about what belongs in the catalog
 
+## Inputs
+
+The candidate pattern's real usage history — actual sessions it was applied in, not a hypothetical description of how it should work.
+
+## Output
+
+A filled-in Catalog Entry (below) with a tier assignment (Draft/Tested/Proven/Standard) that accurately reflects which gates have real evidence behind them.
+
+## Escalation
+
+Evidence that's incomplete or stale (6+ months since a verified test) doesn't get waved through — return the entry to draft (or demote it) and name exactly which gate is missing, per the Promotion/Demotion Process below.
+
 ## Evidence Requirements
 
 Every pattern must pass all three gates before entering the catalog:

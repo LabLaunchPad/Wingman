@@ -13,6 +13,14 @@ Wingman's department leads (Product, Design, Engineering, Data, QA, Legal/Securi
 
 **Core principle:** create exactly the department leads a project's real signals call for — never more, never speculatively, and never inside Wingman's own plugin directory.
 
+## Inputs
+
+The calling pipeline command's name and the project's current codebase/plan state — what the activation-signal check (step 2's table) actually reads to decide.
+
+## Escalation
+
+An ambiguous activation signal (per the Rationalizations table) — look closer or ask the founder rather than defaulting to "create."
+
 ## When To Use
 
 At the start of `/wingman:discovery` (checks Product, always), `/wingman:architecture` (checks Engineering, always), `/wingman:uxflow` (checks Design), `/wingman:build` (checks Design, Engineering, Data, QA, and Legal/Security — Legal/Security's dedicated review now happens inline as part of Build's own Definition-of-Done gate, not a separate `/wingman:secure` stage), and `/wingman:ship` (checks DevOps).

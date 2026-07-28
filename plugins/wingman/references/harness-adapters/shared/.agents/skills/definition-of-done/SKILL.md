@@ -16,6 +16,18 @@ an active gate rather than letting it sit as an unread doc. Attribution in
 
 A standing, cross-skill quality gate. No pipeline stage (build, secure, ship) is "done" until every item below is satisfied and evidenced. This is the bar the Boardroom checkpoint and `verification-before-completion` both assume has been met.
 
+## Inputs
+
+The stage about to be declared complete and whatever evidence already exists for it (tests run, threat register, docs touched) — this skill audits that evidence, it doesn't generate it.
+
+## Output
+
+A per-item pass/exception audit (see Core Workflow) — either every item holds with cited evidence, or an explicit, recorded exception for why one doesn't apply.
+
+## Escalation
+
+Any item that can't point to evidence, or an `OPEN` threat-register row — per Red Flags, this blocks the stage and requires either a real fix or explicit founder acceptance, never a wave-through.
+
 ## When To Use
 
 Immediately before declaring any stage complete and before asking the founder for a checkpoint/approval. Run it as a final self-audit.

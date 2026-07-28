@@ -15,6 +15,14 @@ Wingman's pipeline should get sharper the more it's used on a given project, wit
 
 **Scope note:** this skill promotes *founder-project* friction into the founder's own `.claude/` directory and never writes to `plugins/wingman/`. For the mirror-image mechanism — promoting a genuine *pipeline-behavior* gap found via real dogfooding into Wingman's own plugin content — see `skills/dogfood-gap-classification`, which runs only from Wingman's own dev-repo checkout, never from a founder's installed copy.
 
+## Inputs
+
+`LEARNINGS.md`, `docs/wingman/retros.md`, and `.wingman/checkpoints.jsonl` — the three signal sources step 1 reads fresh, never from a remembered impression of this project's history.
+
+## Escalation
+
+Every promotion is itself an escalation to the founder via `AskUserQuestion` (step 4) — nothing is ever written without that explicit approval; there is no further escalation path beyond it.
+
 ## When To Use
 
 At the start of `/wingman:evolve`'s run, and nowhere else — this is a rare, on-demand operation, not something invoked from the regular pipeline commands.

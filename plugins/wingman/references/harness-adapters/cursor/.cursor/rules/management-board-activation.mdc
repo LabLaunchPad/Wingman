@@ -15,6 +15,14 @@ Wingman's Management Board (Engineering, Product, Design, Data, Security, QA, Pl
 
 **Critical: the threshold counts only conditionally-activated department leads** (`dept-design`, `dept-data`, `dept-legal-security`, `dept-devops`, `dept-growth`) — never `dept-product`, `dept-engineering`, or `dept-qa`, which are unconditionally active on every project regardless of complexity (see `department-lead-activation`'s table). Found via a real dogfooding pass (2026-07-14): counting all active leads meant the 3-lead threshold was met by Build time on literally every project, including the simplest possible one (a single health-check endpoint, no UI, no database, no auth) — the "complexity gate" wasn't gating on complexity at all, since those 3 departments exist unconditionally. Counting only the 5 conditional departments restores the actual intent: the Management Board activates when a project has genuinely grown complex (3+ of Design/Data/Legal-Security/DevOps/Growth active), not merely because it reached Build.
 
+## Inputs
+
+`.wingman/state.json`'s `active_department_leads` array — the sole source this skill reads to decide whether the conditional-department threshold is crossed.
+
+## Escalation
+
+None — this is a fixed mechanical count (3+ conditionally-activated leads), not a judgment call; there's nothing to hand to the founder short of the plain-language notification in step 3.
+
 ## When To Use
 
 Immediately after `department-lead-activation` runs, at the start of `/wingman:discovery`, `/wingman:architecture`, `/wingman:uxflow`, `/wingman:build`, `/wingman:ship`, `/wingman:launch`, or `/wingman:hotfix` — every command that can create a conditionally-activated department lead runs this check right after, in the same pass, since that creation is exactly what can cross the threshold. Not a separate always-checked gate on commands that never touch a conditional department lead.
