@@ -7,6 +7,15 @@ The first of Wingman's 14 pipeline stages, and the first stage of **Phase 1: Pro
 
 {{args}}
 
+## Discovery.0: Triage
+
+Use the `change-triage` skill to classify this request before anything else. A Level 0-1 request
+(a small, reversible, non-trust-boundary fix) routes to `/wingman:hotfix`'s lightweight loop instead
+of continuing through Discovery — tell the founder plainly and stop here. A Level 4 request (active
+production incident) routes to `/wingman:incident` immediately. Level 2-3 requests continue to
+Discovery.1 normally; a Level 3 classification means every downstream checkpoint for this request is
+mandatory full review, never skippable later.
+
 ## Discovery.1: Understand the ask
 
 If the request is vague or could mean several different things, ask a small number of plain-language clarifying questions — focus on business outcomes ("who uses this and what do they do with it", "what happens today without this", "what would make this a failure") rather than technical specifics.

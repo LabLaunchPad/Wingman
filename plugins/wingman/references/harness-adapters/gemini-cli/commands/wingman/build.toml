@@ -9,6 +9,14 @@ The last stage of **Phase 4: AI-Assisted Architecture & Build**. Execute the pla
 
 ## Build.1: Before starting
 
+If no prior approved plan exists for this request (see below) — an ad hoc/direct build request that
+skips the earlier pipeline stages — use the `change-triage` skill before anything else. A request
+with an approved plan was already triaged implicitly by having passed through Discovery, so skip this
+check in that case. A Level 0-1 classification routes to `/wingman:hotfix`'s lightweight loop instead
+of Build; a Level 4 classification routes to `/wingman:incident` immediately; Level 2-3 continue here,
+with a Level 3 classification meaning every downstream checkpoint for this request is mandatory full
+review.
+
 Confirm there is an approved plan (from `/wingman:implementation-planning`'s Planning Milestone checkpoint, boardroom-approved). If no plan exists, tell the founder plainly that you need a plan first and suggest running `/wingman:discovery` to start the planning sequence.
 
 Check `.wingman/checkpoints.jsonl` for an entry with `"bundle": "planning-milestone"` for this project. If none exists, do not proceed silently — tell the founder plainly: "No prior Wingman plan found for this project — proceeding without traceability coverage from earlier pipeline stages. If you have your own spec, that's fine; if you meant to run `/wingman:discovery` through `/wingman:implementation-planning` first, stop now and do that instead." Wait for the founder's answer before continuing this stage.

@@ -105,7 +105,7 @@ describe('opencode adapter install.mjs', () => {
     assert.strictEqual(config.custom, 'value');
   });
 
-  it('copies all 40 skills alongside the agents and commands', () => {
+  it('copies all 41 skills alongside the agents and commands', () => {
     run([]);
     const skillsDir = path.join(tempDir, '.opencode', 'skills');
     const sourceSkillsDir = path.join(sourceOpencodeDir, 'skills');
@@ -114,7 +114,7 @@ describe('opencode adapter install.mjs', () => {
       .readdirSync(sourceSkillsDir, { withFileTypes: true })
       .filter((e) => e.isDirectory()).length;
     assert.strictEqual(destCount, sourceCount);
-    assert.strictEqual(sourceCount, 40);
+    assert.strictEqual(sourceCount, 41);
   });
 
   it('refuses to run against a non-existent target directory', () => {

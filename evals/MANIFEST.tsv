@@ -9,6 +9,7 @@ boardroom-design-stage-scope	evals/fixtures/setup-dogfood-complex.sh	plugins/win
 boardroom-expand	evals/fixtures/setup-boardroom-gate-fixture.sh	commands/adaptive/boardroom.md
 boardroom-gate-rule	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingman/commands/adaptive/boardroom.md
 build	evals/fixtures/setup-build-tdd-fixture.sh	plugins/wingman/commands/pipeline/build.md; full-pipeline-e2e.md
+change-triage	(MISSING — no fixture and no no-fixture-needed marker)	plugins/wingman/skills/change-triage/SKILL.md
 code-review	(none: fixture is a plain inline project description shared with several other cases in the same consolidated session, not a dedicated setup-*.sh script)	plugins/wingman/skills/code-review/SKILL.md
 council	(none: fixture is a single inline decision question, not a setup-*.sh script)	plugins/wingman/skills/council/SKILL.md
 debt-ledger	evals/fixtures/setup-debt-ledger-fixture.sh	plugins/wingman/commands/adaptive/debt-ledger.md

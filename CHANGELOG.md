@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.24] - 2026-07-28
+
+### Added
+- **`skills/change-triage`** — a founder-directed, explicitly-recorded partial reversal of the 14-stage checkpoint-bundling decision (`docs/ARCHITECTURE.md` §4d). Classifies an intake request against the 5-tier permission model's own levels (no second, competing risk scale) and routes accordingly: Level 0-1 (small, reversible, non-trust-boundary) → `/wingman:hotfix`'s lightweight loop instead of the full 14-stage pipeline; Level 2 → normal pipeline flow; Level 3 → normal pipeline, but every downstream Boardroom checkpoint is flagged mandatory full review; Level 4 (active incident) → `/wingman:incident` immediately. Safe by construction — triage may route work up but never down; anything touching a trust boundary is Level 3+ regardless of how the request is framed. A skill, not a 15th pipeline stage — produces a routing decision, not an artifact with its own checkpoint or traceability ID. Wired into `discovery.md` (new Discovery.0), `build.md`'s "Before starting" step (when no prior approved plan exists), and `hotfix.md`'s Step 1. New `evals/cases/change-triage.md` with a positive (auth "quick fix" framing trap), negative (genuinely small copy fix), and Level-4 (active incident) scenario. Sixth and last of 6 planned PRs harvesting genuine gaps from a founder-supplied "enterprise blueprint" review (prior five: #125-#128, #130).
+
 ## [0.7.23] - 2026-07-28
 
 ### Added
