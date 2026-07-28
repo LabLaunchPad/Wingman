@@ -12,8 +12,8 @@ Wingman is a Claude Code plugin: a set of markdown command/agent/skill files plu
 |---|---|---|
 | FR-1 | `/wingman:plan` must produce an implementation plan ending in a Plain-Language Summary section, before any code is written. | Built |
 | FR-2 | `/wingman:plan` must not call `ExitPlanMode` directly; it must route through `/wingman:boardroom` first. | Built (enforced by hook, FR-9) |
-| FR-3 | `/wingman:boardroom` must dispatch all 5 Boardroom seats in parallel, in independent subagent contexts, so their verdicts don't bias each other. | Built |
-| FR-4 | `/wingman:boardroom` must consolidate the 5 verdicts into one summary with a single bottom line (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`), per the gate rule in `docs/ARCHITECTURE.md` §4. | Built |
+| FR-3 | `/wingman:boardroom` must dispatch all 8 Boardroom seats (7 C-suite + Design) in parallel, in independent subagent contexts, so their verdicts don't bias each other. | Built |
+| FR-4 | `/wingman:boardroom` must consolidate the 8 verdicts into one summary with a single bottom line (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`), per the gate rule in `docs/ARCHITECTURE.md` §4. | Built |
 | FR-5 | `/wingman:boardroom` must obtain an explicit founder decision via `AskUserQuestion` — silence must never be treated as approval. | Built |
 | FR-6 | No Boardroom agent (persona) may invoke another agent; only commands may orchestrate/dispatch. | Built (by convention — not yet mechanically enforced, see NFR-6) |
 | FR-7 | `/wingman:build` must not mark a task complete without fresh verification evidence (test run, build output) — see `verification-before-completion`. | Built |

@@ -81,6 +81,8 @@ Non-trivial logic (a branch, a loop, a parser, a money/security path) leaves ONE
 
 This rule bridges minimalism and verification: the minimum code that works is unfinished without the minimum check that proves it works.
 
+**Precedence during `/wingman:build`'s normal task loop: `test-driven-development` and `testing-patterns` win, not this rule.** `build.md`'s own Execution discipline already runs test-first (write the test, watch it fail, implement, watch it pass) for every plan task, and `testing-patterns` sets the coverage floor (>=80% of changed paths, including error branches) that verification checks against. This rule's "one check, no per-function suites" ceiling applies where TDD/testing-patterns genuinely aren't already governing the work — a quick dev-tooling script, a one-off fix outside the founder-project's own TDD flow, exploratory code explicitly not destined for the plan. It is never a license to write fewer tests than TDD's Iron Law or testing-patterns' floor already require for a plan task.
+
 ## Inputs
 
 The task/bug description and the current intensity level (lite/full/ultra) — the ladder's stopping point depends on which level is active.
