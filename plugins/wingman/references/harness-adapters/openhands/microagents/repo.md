@@ -729,12 +729,18 @@ convention):
 ```markdown
 ## Requirements
 
-| ID | Requirement | Rationale | Source |
+| ID | Requirement | Rationale | Satisfies |
 |---|---|---|---|
-| DEF-001 | <one concrete, testable requirement> | <why this, tied to Discovery's problem statement> | Discovery |
+| DEF-001 | <one concrete, testable requirement> | <why this, tied to Discovery's problem statement> | DISC-001 |
 ```
 
-Do not over-scope: a requirement that isn't traceable to Discovery's stated problem or success signal shouldn't be here — flag it back to the founder as a possible scope-creep item instead of quietly including it.
+The `Satisfies` column takes the **real `DISC-*` ID(s)** this requirement traces to — the same column
+name and the same machine-readable form every other stage uses, so the chain from vision to code is
+one unbroken, checkable sequence. Space-separate multiple IDs (`DISC-001 DISC-003`). A bare stage
+name like `Discovery` is not a link: `check-traceability.mjs` resolves IDs, not prose, so a named
+stage leaves this requirement's origin unverifiable.
+
+Do not over-scope: a requirement that isn't traceable to Discovery's stated problem or success signal shouldn't be here — flag it back to the founder as a possible scope-creep item instead of quietly including it. If a genuinely necessary requirement has no `DISC-*` to point at, that is a signal Discovery missed something — go back and mint the finding there rather than orphaning the requirement here.
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 
@@ -828,7 +834,26 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 **Constraints:** <team size/solo-founder reality, existing stack that's already a given, anything not up for debate>
 **Scope boundary:** <what this pass explicitly does NOT cover, so a later stage doesn't quietly scope-creep>
 **Solo-founder realism check:** <is this actually buildable by one founder in a reasonable timeframe, or does it need to be cut down first>
+
+### Discovery findings
+
+| ID | Finding | Evidence | Satisfies |
+|---|---|---|---|
+| DISC-001 | <one concrete, separable finding drawn from the fields above — a problem, a constraint, or a success signal worth tracing> | <known / unknown / assumed> | — |
 ```
+
+**Why the ID table as well as the prose:** Discovery is the **root of the traceability chain** — every
+later stage's `Satisfies` column ultimately points back here (`research-synthesis.md` writes
+`| RS-001 | … | DISC-001 |`, and `skills/traceability-linking` reserves the `DISC-` prefix for this
+stage). Mint the IDs here via the `traceability-linking` skill. Discovery's `Satisfies` column is
+always `—`: nothing precedes the vision, which is exactly what makes this the root. Without these
+rows, any downstream artifact carrying a `wingman:req DISC-001` marker is an **orphan** and
+`check-traceability.mjs` fails the project with a hard error — the prose fields alone are not
+traceable, because the checker mints IDs only from a Markdown table row's first cell.
+
+Keep the prose fields *and* the table: the prose is what the founder reads at the checkpoint, the
+table is what every later stage links to. One finding may draw on several prose fields, and not
+every prose field needs its own row — mint a row for what later stages will genuinely need to point at.
 
 **Why all 8 fields, not 4:** this stage's own Gate checklist below lists these same 8 items as
 Must-include — a real maintainer-mode dogfood run (see `docs/history/retros.md`, 2026-07-25/26)
@@ -847,11 +872,13 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
 
 - **Must include:** problem statement, user statement, jobs-to-be-done notes, trigger/why-now,
-  constraints, success criteria, scope boundary, solo-founder realism check.
+  constraints, success criteria, scope boundary, solo-founder realism check, **and at least one
+  `DISC-*` row in the Discovery findings table** (the chain root — see Discovery.3).
 - **Must decide:** what problem is being solved, who the primary user is, and whether the idea is
   too large for one solo founder to build.
-- **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
-  large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
+- **Gate passes only if** the problem, the user, and the scope are all clear, **and every finding a
+  later stage will need to reference has a `DISC-*` ID**. If the idea is too large, say so directly
+  in the Discovery output and propose a smaller cut before the gate can pass.
 
 ## Discovery.6: Discovery checkpoint
 
@@ -872,6 +899,8 @@ you hand off to `/wingman:research-synthesis`.
   draws on.
 - `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
+- `skills/traceability-linking` — the `DISC-*` prefix minted in Discovery.3, and the chain every
+  later stage's `Satisfies` column follows back to it.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per
@@ -1221,7 +1250,36 @@ Enter plan mode (if not already in it) — or, outside Claude Code, whichever re
 **Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
 ```
 
-## Implementation Planning.3: Show task dependencies
+Save the plan to **`docs/wingman/plans/YYYY-MM-DD-<feature-name>.md`** in the founder's project (the
+path `skills/writing-plans` defines). Note this is deliberately *not* the `<short-slug>.md` convention
+the 11 prior stages use — a project accumulates many plans over time but only one Discovery, one
+Define, and so on, so plans are dated and feature-named rather than slug-matched. Step 1's
+slug-consistency check applies to the 11 stage directories, not to this one.
+
+## Implementation Planning.3: Mint the task register
+
+Immediately after the task list, append a task register minting one `IP-*` ID per plan task via the
+`traceability-linking` skill:
+
+```markdown
+## Task register
+
+| ID | Task | Satisfies |
+|---|---|---|
+| IP-001 | <the plan task this ID names, matching its `### Task N:` heading> | DEF-001 ARCH-001 |
+```
+
+The `Satisfies` column carries the upstream ID(s) that task implements — space-separated for several.
+This is what makes the chain resolvable end to end: `check-traceability.mjs --chain` walks a code
+marker back through `IP-*` → `ARCH-*`/`DEF-*` → … → `DISC-*`, so "does this code trace to the vision"
+becomes a question with a mechanical answer rather than a judgment call.
+
+`IP-*` is the terminal prefix — nothing downstream is expected to reference it, so `IP-*` rows
+showing as "unlinked" is expected and non-blocking (see `skills/traceability-linking`). Minting them
+is still required: without a task register the plan's tasks have no IDs, and the chain stops one link
+short of the code.
+
+## Implementation Planning.4: Show task dependencies
 
 The plan document itself is never shown to the founder directly — its reader is whoever executes it
 (a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
@@ -1232,24 +1290,26 @@ nothing for this document's actual reader. This is additive to the checkbox task
 replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
 themselves.
 
-## Implementation Planning.4: Where you are
+## Implementation Planning.5: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
 the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
-## Implementation Planning.5: Gate checklist
+## Implementation Planning.6: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
 
 - **Must include:** task breakdown, effort buckets, dependencies, milestones, risk list, sequencing
-  logic.
+  logic, **and the `IP-*` task register** (Implementation Planning.3).
 - **Must decide:** the build order, and what gets explicitly deferred.
-- **Gate passes only if** the plan is realistic for a solo founder to actually execute.
+- **Gate passes only if** the plan is realistic for a solo founder to actually execute, **and every
+  task carries an `IP-*` ID whose `Satisfies` column resolves to a real upstream ID** — verify with
+  `node "${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs" . --orphans` rather than by eye.
 
-## Implementation Planning.6: Implementation Planning checkpoint
+## Implementation Planning.7: Implementation Planning checkpoint
 
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/status/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 

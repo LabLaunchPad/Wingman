@@ -60,6 +60,12 @@ import { execFileSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+// The 12 traceability prefixes come from the one place they are defined. This file used to
+// carry its own hand-written copy covering only DISC|DEF|ARCH|UX|IP -- 5 of 12 -- because
+// the 14-stage expansion added 7 prefixes to check-traceability.mjs and nobody updated the
+// copy here. For months this gate reported success while silently ignoring every RS-, PJ-,
+// JM-, IA-, WF-, VS- and PT- ID. Import, never re-declare.
+import { TABLE_ROW_PATTERN, MARKER_PATTERN, ID_PATTERN } from '../scripts/traceability-prefixes.mjs';
 
 const PLANNING_MILESTONE_MARKER = '## Implementation Planning checkpoint';
 const NO_TEST_NEEDED = /<!--\s*wingman:no-test-needed:.*?-->/i;
@@ -254,12 +260,22 @@ export function checkPlanningMilestoneTraceability(planText) {
   if (!planText || !planText.includes(PLANNING_MILESTONE_MARKER)) {
     return { ok: true }; // not a Wingman implementation-planning checkpoint — don't touch it
   }
+  // All 12 prefixes, via the shared module -- see the import note at the top of this file
+  // for why a local copy of this list is a drift bug, not a convenience.
   const definedIds = new Set(
-    [...planText.matchAll(/^\s*\|\s*((?:DISC|DEF|ARCH|UX|IP)-\d+)\s*\|/gm)].map((m) => m[1])
+    [...planText.matchAll(new RegExp(TABLE_ROW_PATTERN.source, 'gm'))]
+      .map((m) => m[0].match(ID_PATTERN)?.[0])
+      .filter(Boolean)
   );
-  const referencedIds = new Set(
-    [...planText.matchAll(/wingman:req\s+((?:DISC|DEF|ARCH|UX|IP)-\d+)/g)].map((m) => m[1])
-  );
+  // MARKER_PATTERN captures one or more space-separated IDs after a single wingman:req
+  // token. The previous local regex here was single-ID-only, so a task genuinely satisfying
+  // several requirements had every ID after the first silently dropped -- the exact bug
+  // check-traceability.mjs had already found and fixed, still live in this copy.
+  const referencedIds = new Set();
+  MARKER_PATTERN.lastIndex = 0;
+  for (const m of planText.matchAll(MARKER_PATTERN)) {
+    for (const id of m[1].trim().split(/\s+/)) referencedIds.add(id);
+  }
   const orphaned = [...referencedIds].filter((id) => !definedIds.has(id));
   if (orphaned.length > 0) {
     return { ok: false, reason: `references ID(s) never minted in this plan: ${orphaned.join(', ')}` };

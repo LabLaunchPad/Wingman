@@ -2,6 +2,19 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.29] - 2026-07-29
+
+### Fixed
+- **The vision→artifact chain was broken at its root: `/wingman:discovery` minted no `DISC-*` IDs at all.** Its output template was 8 free-text prose fields with no ID table, while `.wingman/traceability.json` reserved a `DISC` counter, `check-traceability.mjs` matched `DISC-\d+`, and `research-synthesis.md`'s shipped template row wrote `| RS-001 | … | DISC-001 |`. Reproduced against a real fixture: build-stage code carrying `wingman:req DISC-001` produced `orphaned marker … FAIL`, exit 1. Discovery now mints a `DISC-*` findings table alongside (not replacing) the prose fields, with the gate checklist updated in the same pass — those two drifting apart previously caused 3 of 8 Boardroom seats to false-flag a compliant output.
+- **`define.md` broke the chain a second time**, using a `Source` column whose example value was the literal word `Discovery` rather than a `DISC-*` ID. Now a `Satisfies` column carrying real IDs, matching all 11 other stages.
+- **`implementation-planning.md` minted no `IP-*` IDs**, despite `IP-` being a reserved prefix with its own counter. It now mints a task register linking each plan task to the upstream IDs it implements, and states its own plan-file path rather than leaving it implicit in `skills/writing-plans`.
+- **`dod-structural-gate.mjs`'s plan-mode traceability check knew only 5 of the 12 prefixes** (`DISC|DEF|ARCH|UX|IP`) — a hand-written copy that never got updated when the 14-stage expansion added 7 more. For months the gate reported success while enforcing nothing for `RS-`, `PJ-`, `JM-`, `IA-`, `WF-`, `VS-` and `PT-`. That same copy also matched only one ID per `wingman:req` token, silently dropping the rest — a bug `check-traceability.mjs` had already fixed. Both enforcers now import `scripts/traceability-prefixes.mjs`, so neither can drift alone again.
+
+### Added
+- **`check-traceability.mjs` is now chain-aware.** It previously never parsed the `Satisfies` column at all — the chain was dead data across all 12 stages, and "does this code trace back to the vision?" had no mechanical answer. It now builds the real graph, which removes a documented class of false "unlinked" warning (an ID covered only via an intermediate stage's row) and exempts the terminal `IP-*` prefix automatically.
+- **`--chain <ID>`** walks upward to a `DISC-*` root, reporting `TRACED` (exit 0) with every path found, or `BROKEN` (exit 1) naming where the chain stops. **`--orphans`** lists every ID with no path to a root. Both are cycle-safe.
+- 16 regression tests (`tests/hooks-integration/traceability-chain.test.mjs`) covering all 12 prefixes in both enforcers, full-depth chain resolution, a deliberately severed link, cycles, and the fail-open behavior that keeps non-Wingman projects unblocked. Suite: 393 → 409.
+
 ## [0.7.28] - 2026-07-28
 
 ### Fixed
