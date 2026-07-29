@@ -1,18 +1,21 @@
 #!/usr/bin/env node
-// PROTOTYPE (evidence-gated, not yet wired into any skill/command) -- the
-// founder-project-scoped equivalent of the dev-repo-only scripts/query-
-// wingman-knowledge.mjs. Ships with the plugin (lives under plugins/wingman/
-// scripts/, unlike its dev-repo-only cousin) because it's meant to run inside
-// a founder's own installed project, over that project's own .wingman/ state.
+// The Context Engine's core: the founder-project-scoped equivalent of the dev-repo-only
+// scripts/query-wingman-knowledge.mjs. Ships with the plugin (lives under plugins/wingman/
+// scripts/, unlike its dev-repo-only cousin) because it's meant to run inside a founder's own
+// installed project, over that project's own .wingman/ state.
+//
+// PROMOTED 2026-07-29 from a zero-test PROTOTYPE (evidence-gated, per
+// docs/history/architecture-audit-2026-07-15.md's Emerging finding #6) to the Context Engine's
+// core, per the AI Engineering Operating System build (docs/status/ARCHITECTURE.md §8g). The
+// promotion bar was real dogfood evidence, not just time passing: docs/status/PROJECT.md's
+// decisions log records a 4-session run proving a cold session reading only this file's
+// --summary output correctly halts on a real DO NOT SHIP verdict and finds the specific blocker.
+// See tests/hooks-integration/query-founder-knowledge.test.mjs for the mechanical regression
+// coverage this file had none of before that promotion.
 //
 // Directly answers docs/status/DATABASE.md's named gap: "No single file or view
 // here unifies checkpoints.jsonl, state.json, traceability.json, and
 // memory/*.md into one 'what has this project decided and why' surface."
-// Built per docs/wingman/architecture-audit-2026-07-15.md's Emerging finding
-// #6 (Confidence: Medium) -- explicitly a bounded prototype to be graded
-// honestly before any broader commitment (skill/command wrapper), per that
-// audit's own Migration Strategy. See docs/status/PROJECT.md's decisions log for
-// the run log.
 //
 // Read-only. No writes, no network, no dependencies beyond Node's stdlib.
 // Reuses okf-export.mjs's existing checkpoints.jsonl / memory-file parsers

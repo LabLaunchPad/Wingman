@@ -81,6 +81,52 @@ describe('Session Start Hook', () => {
     assert.strictEqual(state.pipelineStage, 'build'); // Should not be overwritten
     assert.deepStrictEqual(state.departmentLeads, ['dept-engineering']); // Should not be overwritten
   });
+
+  // Mechanizes skills/memory/SKILL.md's operating rule 4 ("On SessionStart, surface a one-line
+  // recall of the most relevant memory") -- previously instruction-only, per
+  // references/constitution.md rule 9's disclosed gap.
+  it('surfaces a Recall line from decisions.md when memory exists', () => {
+    const memoryDir = path.join(tempDir, '.wingman', 'memory');
+    fs.mkdirSync(memoryDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(memoryDir, 'decisions.md'),
+      '- 2026-07-28: Chose SQLite over Postgres; revisit past 50 concurrent writers.\n',
+    );
+
+    const output = execSync(`node "${hookPath}"`, { cwd: tempDir, encoding: 'utf-8' });
+    assert.match(output, /Recall: Chose SQLite over Postgres/);
+  });
+
+  it('never crashes and never emits a Recall line when no memory exists', () => {
+    const output = execSync(`node "${hookPath}"`, { cwd: tempDir, encoding: 'utf-8' });
+    assert.doesNotMatch(output, /Recall:/);
+  });
+
+  it('recalls the most recent entry, not the first, when multiple exist', () => {
+    const memoryDir = path.join(tempDir, '.wingman', 'memory');
+    fs.mkdirSync(memoryDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(memoryDir, 'decisions.md'),
+      '- 2026-07-01: an older decision\n- 2026-07-28: the newest decision\n',
+    );
+
+    const output = execSync(`node "${hookPath}"`, { cwd: tempDir, encoding: 'utf-8' });
+    assert.match(output, /Recall: the newest decision/);
+    assert.doesNotMatch(output, /Recall: an older decision/);
+  });
+
+  it('does not crash on a malformed .wingman/state.json while still recalling memory', () => {
+    fs.mkdirSync(path.join(tempDir, '.wingman'), { recursive: true });
+    fs.writeFileSync(statePath, '{ not valid json');
+    const memoryDir = path.join(tempDir, '.wingman', 'memory');
+    fs.mkdirSync(memoryDir, { recursive: true });
+    fs.writeFileSync(path.join(memoryDir, 'MEMORY.md'), '- Stack: Node + SQLite.\n');
+
+    assert.doesNotThrow(() => {
+      const output = execSync(`node "${hookPath}"`, { cwd: tempDir, encoding: 'utf-8' });
+      assert.match(output, /Recall: Stack: Node \+ SQLite\./);
+    });
+  });
 });
 
 // ============================================================================
@@ -193,9 +239,9 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 42 skills', () => {
+  it('should have 43 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 42);
+    assert.strictEqual(plugin.skills.length, 43);
   });
 
   it('should have 34 commands', () => {

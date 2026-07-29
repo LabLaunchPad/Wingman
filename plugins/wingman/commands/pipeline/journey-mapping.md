@@ -9,6 +9,8 @@ The fourth of Wingman's 14 pipeline stages, and the first stage of **Phase 2: Lo
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Journey Mapping.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per later stages' decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the journey-mapping portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence — a journey worth mapping still exists for most projects (even a CLI or API has a first-use and a success moment), so only skip if the project genuinely has no journey a user walks at all.
