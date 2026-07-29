@@ -180,13 +180,15 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function listFilesRecursive(dir) {
-  let results = [];
+// Optimized via the flat accumulator pattern. We pass `results` directly as an argument
+// to recursive calls rather than creating intermediate arrays and concatenating them via `.concat()`.
+// This avoids high memory allocation and garbage collection overhead during deep traversals.
+function listFilesRecursive(dir, results = []) {
   let entries;
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return results; }
   for (const entry of entries) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) results = results.concat(listFilesRecursive(full));
+    if (entry.isDirectory()) listFilesRecursive(full, results);
     else results.push(full);
   }
   return results;
