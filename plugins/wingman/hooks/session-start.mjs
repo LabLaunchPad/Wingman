@@ -10,6 +10,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { unify } from "../scripts/query-founder-knowledge.mjs";
 
 const WINGMAN_DIR = join(process.cwd(), ".wingman");
 const statePath = join(WINGMAN_DIR, "state.json");
@@ -107,6 +108,30 @@ try {
   console.error("Wingman: Could not write session state:", error.message);
 }
 
+// --- Memory read-back: mechanize skills/memory's operating rule 4 ---
+//
+// skills/memory/SKILL.md rule 4 says "On SessionStart, surface a one-line recall of the most
+// relevant memory" -- until now that was instruction-only, with no hook enforcing it, which
+// references/constitution.md rule 9 disclosed plainly rather than implying recall was automatic.
+// This closes the standing "write-verified, not read-loop-verified" watch item
+// (docs/status/PROJECT.md) for the one thing a hook actually can check every session: whether
+// anything is in the store at all, and what the most recent entries say.
+//
+// Reuses query-founder-knowledge.mjs's unify() rather than re-parsing .wingman/memory/*.md here
+// -- the exact duplication references/constitution.md rule 3 forbids.
+function memoryRecall(cwd) {
+  let entries;
+  try {
+    entries = unify(cwd);
+  } catch {
+    return null; // never let a malformed store block session start
+  }
+  const memoryAndDecisions = entries.filter((e) => e.source === "memory" || e.source === "decisions");
+  if (memoryAndDecisions.length === 0) return null;
+  const last = memoryAndDecisions[memoryAndDecisions.length - 1];
+  return last.text;
+}
+
 // --- Inject session summary into hook output ---
 const lines = [];
 lines.push(`Wingman session #${updatedSessionState.sessionCount} started.`);
@@ -120,6 +145,11 @@ if (previousSummary) {
       : "") +
     `, ended ${previousSummary.endedAt || "unknown"}.`
   );
+}
+
+const recall = memoryRecall(process.cwd());
+if (recall) {
+  lines.push(`Recall: ${recall}`);
 }
 
 console.log(lines.join(" "));

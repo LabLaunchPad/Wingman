@@ -9,6 +9,8 @@ The sixth of Wingman's 14 pipeline stages, and the first stage of **Phase 3: Lea
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Information Architecture.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's later decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the IA portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.

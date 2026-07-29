@@ -9,6 +9,8 @@ The second of Wingman's 14 pipeline stages, part of **Phase 1: Problem Definitio
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Research Synthesis.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.

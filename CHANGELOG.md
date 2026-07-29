@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.32] - 2026-07-29
+
+### Added
+- **The Context Engine.** `scripts/query-founder-knowledge.mjs` promoted from a zero-test PROTOTYPE (dogfood-verified but unwired) to Wingman's Context Engine core. Added the test coverage it had none of — `unify`/`query`/`summary`, the `state_stage_mismatch` drift detector, and the exact real dogfood claim being promoted (a cold session reading only `--summary` output correctly halts on a `DO NOT SHIP` verdict and finds the specific blocker).
+- **`skills/context-assembly`** — reads the unified project state before any stage-specific work starts, so nothing gets re-litigated and no blocking verdict gets missed. Wired into `references/pipeline-stage-boilerplate.md`'s new Context Assembly section, inherited by all 14 pipeline stages — 7 of which previously never cited the shared boilerplate file at all, a real gap fixed in the same pass rather than left silently half-wired.
+- **Mechanized the memory read-back loop.** `references/constitution.md` rule 9 disclosed that `skills/memory`'s operating rule 4 ("On SessionStart, surface a one-line recall") was instruction-only, with nothing enforcing it. `hooks/session-start.mjs` now surfaces the most recent memory/decision entry as a `Recall:` line on every session start, reusing `query-founder-knowledge.mjs`'s existing parsers rather than re-implementing them. Closes the "write-verified, not read-loop-verified" watch item.
+
 ## [0.7.31] - 2026-07-29
 
 ### Added

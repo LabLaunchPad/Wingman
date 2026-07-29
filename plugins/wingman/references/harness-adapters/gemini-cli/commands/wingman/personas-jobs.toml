@@ -7,6 +7,8 @@ The third of Wingman's 14 pipeline stages, and the last stage of **Phase 1: Prob
 
 {{args}}
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Personas & Jobs.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.

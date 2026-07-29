@@ -9,6 +9,8 @@ The eighth of Wingman's 14 pipeline stages, part of **Phase 3: Lean Design & Pro
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Wireframes.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.

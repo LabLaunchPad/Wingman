@@ -805,7 +805,11 @@ engine rather than introducing a second one.
 
 Shipped so far: `references/constitution.md`, `scripts/constitution-check.mjs`,
 `skills/acceptance-criteria`, and the risk-dimension ownership map in `references/permission-model.md`
-(v0.7.30). Remaining phases are tracked in the session plan; each lands validator-green before the
+(v0.7.30); `references/wkos/`'s document contract, producer map, locked template, 8 scaffolds, and
+`scripts/validate-wkos.mjs` as the 8th validator check (v0.7.31); the Context Engine — promoting
+`scripts/query-founder-knowledge.mjs` from an unwired prototype, `skills/context-assembly` wired into
+all 14 pipeline stages, and mechanizing the memory read-back loop rule 9 disclosed as instruction-only
+(v0.7.32). Remaining phases are tracked in the session plan; each lands validator-green before the
 next starts.
 
 ## 9. Relationship to vendored reference repositories

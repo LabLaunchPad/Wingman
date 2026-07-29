@@ -1394,6 +1394,8 @@ The sixth of Wingman's 14 pipeline stages, and the first stage of **Phase 3: Lea
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Information Architecture.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: if this project has (or will have, per the Architecture stage's later decisions) any user-facing surface, create `dept-design` if it doesn't exist yet, then delegate the IA portion of this step to it. If there's no user-facing surface, skip this step entirely and say so in one plain sentence.
@@ -1463,6 +1465,8 @@ argument-hint: "[optional: which persona/job to map first]"
 The fourth of Wingman's 14 pipeline stages, and the first stage of **Phase 2: Logic & Functional Mapping** (with `define.md`) — that phase's goal is translating the idea into a blueprint an AI coding agent can actually build from. Personas & Jobs defined *who* and *why* — this stage maps the actual path they walk, end to end, from the moment they first realize they have the problem through to genuinely succeeding at their desired progress. Include the shortest path from first entry to core value as an explicit input->process->display step list.
 
 $ARGUMENTS
+
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
 
 ## Journey Mapping.1: Confirm the Design department is active
 
@@ -1753,6 +1757,8 @@ The third of Wingman's 14 pipeline stages, and the last stage of **Phase 1: Prob
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Personas & Jobs.1: Confirm the Product department is active
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
@@ -1883,6 +1889,8 @@ The tenth of Wingman's 14 pipeline stages, and the last of the design stages bef
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Prototype & Usability.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from the earlier design-tier stages if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
@@ -2001,6 +2009,8 @@ argument-hint: "[optional: path to the Discovery output, defaults to the most re
 The second of Wingman's 14 pipeline stages, part of **Phase 1: Problem Definition & Market Validation**. Discovery captured the raw problem statement and any evidence gathered while doing so — this stage steps back and actually synthesizes it: what themes keep showing up, what's genuinely known versus assumed, what risks and opportunities the raw notes imply, and what's still an open question a later stage needs to resolve. Frame this as the "Old Way vs. New Way" comparison: document concretely why the solutions the target user already has access to fail them.
 
 $ARGUMENTS
+
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
 
 ## Research Synthesis.1: Confirm the Product department is active
 
@@ -2447,6 +2457,8 @@ The ninth of Wingman's 14 pipeline stages, and the last stage of **Phase 3: Lean
 
 $ARGUMENTS
 
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
+
 ## Visual Design System.1: Confirm the Design department is active
 
 Use the `department-lead-activation` skill to check the Design activation signal: `dept-design` should already be active from `/wingman:uxflow`/`/wingman:wireframes` if this project has a user-facing surface. If there's no user-facing surface, skip this step (and the rest of this stage) entirely and say so in one plain sentence.
@@ -2517,6 +2529,8 @@ argument-hint: "[optional: focus area, e.g. a specific screen]"
 The eighth of Wingman's 14 pipeline stages, part of **Phase 3: Lean Design & Prototyping**. Skipped entirely for projects with no user-facing surface, same as `uxflow.md`. This stage produces low-fidelity screen layouts — where things sit and what's on each screen — deliberately before any visual polish; that's `visual-design-system.md`'s job, one stage later. A quick sketching tool (e.g. Excalidraw, or a physical napkin) is enough here — the artifact is a source of truth for later stages, not a polished deliverable.
 
 $ARGUMENTS
+
+Use `skills/context-assembly` to read the project's unified state before anything else in this stage (see `references/pipeline-stage-boilerplate.md`'s Context Assembly section) — stop and surface a blocking verdict or a state/checkpoint mismatch to the founder before continuing.
 
 ## Wireframes.1: Confirm the Design department is active
 

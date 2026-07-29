@@ -7,6 +7,16 @@ invocations stay inline in each command file; this doc never replaces them, only
 prose that used to surround them. See `docs/status/ARCHITECTURE.md` §5 for the department-lead/management-
 board model this documents the mechanics of.
 
+## Context Assembly
+
+**Before any stage-specific step below, and before the Activation Checks that follow it**, use
+`skills/context-assembly` to read the project's unified state
+(`scripts/query-founder-knowledge.mjs --summary`). This is what makes "state-centric, not
+prompt-centric" (`references/constitution.md`) real for every one of the 14 stages, in one place,
+rather than each stage file re-stating its own version of "go check prior state first." If the
+summary surfaces a `state_stage_mismatch` or a blocking `last_checkpoint.bottom_line`, stop and
+surface it to the founder before continuing this stage's own work — never proceed past it silently.
+
 ## Activation Checks
 
 **Management Board activation.** Every pipeline stage that just activated (or confirmed active) a
@@ -35,12 +45,19 @@ own output (a requirements table, a plan, a diff).
 
 ## Referenced by
 
+All 14 pipeline stages, via the Context Assembly section above:
+
 - `commands/pipeline/discovery.md`
+- `commands/pipeline/research-synthesis.md`
+- `commands/pipeline/personas-jobs.md`
+- `commands/pipeline/journey-mapping.md`
 - `commands/pipeline/define.md`
-- `commands/pipeline/architecture.md`
+- `commands/pipeline/information-architecture.md`
 - `commands/pipeline/uxflow.md`
+- `commands/pipeline/wireframes.md`
+- `commands/pipeline/visual-design-system.md`
+- `commands/pipeline/prototype-usability.md`
+- `commands/pipeline/architecture.md`
 - `commands/pipeline/implementation-planning.md`
-- `commands/pipeline/build.md`
-- `commands/pipeline/ship.md`
 - `commands/pipeline/build.md`
 - `commands/pipeline/ship.md`
