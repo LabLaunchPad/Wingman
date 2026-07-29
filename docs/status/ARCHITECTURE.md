@@ -809,8 +809,12 @@ Shipped so far: `references/constitution.md`, `scripts/constitution-check.mjs`,
 `scripts/validate-wkos.mjs` as the 8th validator check (v0.7.31); the Context Engine — promoting
 `scripts/query-founder-knowledge.mjs` from an unwired prototype, `skills/context-assembly` wired into
 all 14 pipeline stages, and mechanizing the memory read-back loop rule 9 disclosed as instruction-only
-(v0.7.32). Remaining phases are tracked in the session plan; each lands validator-green before the
-next starts.
+(v0.7.32); the Memory Engine's remaining 6 tiers — `scripts/memory-tiers.mjs` resolving Global/Org
+(outside any repo, per §2's "no persistent runtime" rule, which permits file-backed state and
+forbids only an always-on daemon) plus Product/Project/Feature/Task/User, with a mechanical (not
+merely documented) approval gate on Global/Org writes and cross-tier contradictions surfaced rather
+than silently resolved (v0.7.33). Remaining phases are tracked in the session plan; each lands
+validator-green before the next starts.
 
 ## 9. Relationship to vendored reference repositories
 

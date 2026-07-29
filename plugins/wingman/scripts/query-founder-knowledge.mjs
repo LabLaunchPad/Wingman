@@ -29,6 +29,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { readCheckpoints, readMemoryFile } from './okf-export.mjs';
+import { readAllTiers } from './memory-tiers.mjs';
 
 const ALL_SOURCES = ['checkpoints', 'decisions', 'tried', 'memory', 'traceability', 'state'];
 
@@ -109,6 +110,46 @@ export function unify(projectDir) {
   const state = readJsonFile(join(projectDir, '.wingman', 'state.json'));
   if (state) {
     entries.push({
+      source: 'state',
+      date: state.updated_at ? String(state.updated_at).slice(0, 10) : null,
+      text: `current_stage=${state.current_stage || 'unknown'}, active_department_leads=${(state.active_department_leads || []).length}, active_managers=${(state.active_managers || []).length}, active_specialists=${(state.active_specialists || []).length}`,
+    });
+  }
+
+  return entries;
+}
+
+// The 7-tier Memory Engine view (PR 5 of the AI Engineering Operating System build). unify()
+// above stays exactly as it was -- project-tier memory only -- for backward compatibility with
+// every existing caller (skills/context-assembly, hooks/session-start.mjs's recall). This is the
+// separate, opt-in entry point for reading across tiers, so callers that don't need Global/Org/
+// Feature/Task/User scope never pay for resolving them.
+//
+// Checkpoints/traceability/state stay project-scoped only -- those concepts (a Boardroom
+// checkpoint, a traceability ID counter) have no meaning at Global/Org/Feature/Task/User scope in
+// Wingman's real architecture, so tiering them would be inventing structure with no consumer.
+//
+// @param {string} projectDir
+// @param {object} [opts] passed straight through to memory-tiers.mjs's readAllTiers -- org/
+//   feature/task/user identifiers, homeDir test seam.
+export function unifyTiers(projectDir, opts = {}) {
+  const entries = [];
+  for (const checkpoint of readCheckpoints(projectDir)) {
+    entries.push(checkpointToEntry(checkpoint));
+  }
+  entries.push(...readAllTiers(projectDir, opts));
+
+  const traceability = readJsonFile(join(projectDir, '.wingman', 'traceability.json'));
+  if (traceability?.next_id) {
+    for (const [prefix, nextId] of Object.entries(traceability.next_id)) {
+      entries.push({ tier: 'project', source: 'traceability', date: null, text: `${prefix}: next ID ${nextId} (${nextId - 1} minted)` });
+    }
+  }
+
+  const state = readJsonFile(join(projectDir, '.wingman', 'state.json'));
+  if (state) {
+    entries.push({
+      tier: 'project',
       source: 'state',
       date: state.updated_at ? String(state.updated_at).slice(0, 10) : null,
       text: `current_stage=${state.current_stage || 'unknown'}, active_department_leads=${(state.active_department_leads || []).length}, active_managers=${(state.active_managers || []).length}, active_specialists=${(state.active_specialists || []).length}`,

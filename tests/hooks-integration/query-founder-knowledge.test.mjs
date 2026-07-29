@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { unify, query, summary } from '../../plugins/wingman/scripts/query-founder-knowledge.mjs';
+import { unify, query, summary, unifyTiers } from '../../plugins/wingman/scripts/query-founder-knowledge.mjs';
+import { writeTierEntry } from '../../plugins/wingman/scripts/memory-tiers.mjs';
 
 function makeProject(files = {}) {
   const dir = mkdtempSync(join(tmpdir(), 'wingman-context-'));
@@ -168,4 +169,35 @@ test('recent_decisions in summary caps at the last 3, in order', () => {
     assert.equal(s.recent_decisions.length, 3);
     assert.deepEqual(s.recent_decisions.map((d) => d.date), ['2026-07-02', '2026-07-03', '2026-07-04']);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+// unifyTiers: the 7-tier Memory Engine view (PR 5). unify() above is untouched and still
+// project-tier only, for backward compatibility with every existing caller.
+test('unifyTiers includes checkpoints/traceability/state plus every applicable memory tier', () => {
+  const dir = makeProject({
+    '.wingman/checkpoints.jsonl': checkpointLine({ checkpoint_id: '2026-07-20-build', stage: 'build', bottom_line: 'GO' }),
+  });
+  const homeDir = makeProject({});
+  try {
+    writeTierEntry('project', dir, 'MEMORY', 'a project fact', { homeDir });
+    writeTierEntry('global', dir, 'MEMORY', 'a global fact', { homeDir, approved: true });
+    const all = unifyTiers(dir, { homeDir });
+    assert.ok(all.some((e) => e.source === 'checkpoints'));
+    assert.ok(all.some((e) => e.tier === 'project' && e.text === 'a project fact'));
+    assert.ok(all.some((e) => e.tier === 'global' && e.text === 'a global fact'));
+  } finally { rmSync(dir, { recursive: true, force: true }); rmSync(homeDir, { recursive: true, force: true }); }
+});
+
+test('unifyTiers still surfaces state_stage_mismatch-relevant fields via state entry', () => {
+  const dir = makeProject({
+    '.wingman/state.json': JSON.stringify({ current_stage: 'ship', updated_at: '2026-07-29T00:00:00Z' }),
+  });
+  const homeDir = makeProject({});
+  try {
+    const all = unifyTiers(dir, { homeDir });
+    const stateEntry = all.find((e) => e.source === 'state');
+    assert.ok(stateEntry);
+    assert.equal(stateEntry.tier, 'project');
+    assert.match(stateEntry.text, /current_stage=ship/);
+  } finally { rmSync(dir, { recursive: true, force: true }); rmSync(homeDir, { recursive: true, force: true }); }
 });

@@ -13,15 +13,39 @@ All Wingman state lives under `.wingman/` at the root of the founder's project (
 │   └── <checkpoint_id>.md
 ├── state.json            # current project-level state (small, overwritten in place)
 ├── traceability.json     # next-available-ID counter per requirement/decision/flow prefix
-└── memory/
-    ├── MEMORY.md         # evergreen facts: project name, stack, constraints, preferences
-    ├── decisions.md      # dated decision log (what was decided, why, by whom)
-    └── tried.md          # approaches already attempted and their outcome
+├── memory/                          # Project tier (= Product tier, same store) -- see below
+│   ├── MEMORY.md                    # evergreen facts: project name, stack, constraints, preferences
+│   ├── decisions.md                 # dated decision log (what was decided, why, by whom)
+│   ├── tried.md                     # approaches already attempted and their outcome
+│   ├── feature/<slug>/{MEMORY,decisions,tried}.md   # Feature tier
+│   ├── task/<id>/{MEMORY,decisions,tried}.md        # Task tier
+│   └── user/<id>/{MEMORY,decisions,tried}.md        # User tier
+├── sdd/                              # skills/subagent-driven-development's progress ledger
+│   ├── progress.md
+│   ├── task-<N>-brief.md / task-<N>-report.md / task-<N>-diff.patch
+│   └── global-constraints.md
+├── okf-export/                       # commands/adaptive/knowledge-export.md's OKF bundle output
+├── loop.json                         # hooks/stop-loop.mjs
+├── loop-counter.<sessionID>.json     # hooks/stop-loop.mjs, per-session
+├── session-state.json                # hooks/session-start.mjs
+├── session-health.json               # hooks/session-health.mjs
+├── pending-warnings.json
+└── context-monitor.json              # hooks/context-monitor.mjs
+```
+
+Outside the founder's repo entirely (the Global and Org memory tiers — see below):
+
+```
+~/.wingman/
+├── global/{MEMORY,decisions,tried}.md          # facts true across every project this founder works on
+└── org/<org-slug>/{MEMORY,decisions,tried}.md  # facts shared across one company's multiple projects
 ```
 
 (This file tree previously omitted `traceability.json` and `memory/` — an audit,
 `docs/history/architecture-audit-2026-07-15.md`, found both were real files real skills already
-write, with no corresponding entry here. Documented below.)
+write, with no corresponding entry here. It was further found, during PR 3 of the AI Engineering
+Operating System build, to have drifted again — `sdd/`, `okf-export/`, `loop.json`, and 4 more
+paths existed on disk with no entry here. Both gaps are now closed in this tree.)
 
 ### `checkpoints.jsonl`
 
@@ -142,7 +166,7 @@ different things.
 Created on first use if it doesn't exist yet; a project that hasn't run any pipeline stage with
 traceability markers has no `traceability.json` at all — that's expected, not an error.
 
-### `memory/`
+### `memory/` — now one of 7 tiers (the Memory Engine, PR 5 of the AI Engineering Operating System build)
 
 Three separate Markdown files (not JSON/JSONL, unlike everything else under `.wingman/`), written
 and read by `skills/memory` per the founder's own explicit "remember"/"note that" instructions or
@@ -152,21 +176,44 @@ when a session is about to lose important context:
 - `decisions.md` — a dated decision log (what was decided, why, by whom).
 - `tried.md` — approaches already attempted and their outcome, so they aren't retried blind.
 
+This `.wingman/memory/` directory is the **Project tier** — the default, and by far the most
+common, case. `scripts/memory-tiers.mjs` defines 7 tiers total: **Global** (`~/.wingman/global/`)
+and **Org** (`~/.wingman/org/<slug>/`) live outside any repo; **Product** is the same store as
+Project, deliberately (Wingman has no multi-product-per-project concept, so a separate tier would
+be invented structure with no consumer); **Feature** (`.wingman/memory/feature/<slug>/`), **Task**
+(`.wingman/memory/task/<id>/`), and **User** (`.wingman/memory/user/<id>/`) are narrower in-repo
+scopes. Narrower tier wins on precedence, but `readAllTiers()` returns every applicable tier's
+entries rather than merging them, so a genuine cross-tier contradiction is visible to the reading
+session rather than silently resolved. Writing to Global/Org requires explicit founder approval,
+enforced mechanically (`writeTierEntry()` throws without `{ approved: true }`), not just documented.
+
 Unlike `checkpoints.jsonl` (whose inline record is a one-line seat summary — full seat rationale is
 recoverable, but only via the `details_ref` companion file and only for Boardroom checkpoints
 specifically, see `schema_version: 4` above) and `state.json` (current-stage pointers only), this
 is the one place a project's own decision *rationale* — Boardroom-driven or not — is meant to live
-directly in prose, inline, without an extra retrieval step — though as of `evals/cases/memory.md`'s Run 1, this remains
-`provisional`: no run yet demonstrates a later session actually reading this store back and
-changing its behavior as a result, only that the write path works. Treat it as write-verified,
-not yet read-loop-verified.
+directly in prose, inline, without an extra retrieval step.
 
-**No single file or view here unifies `checkpoints.jsonl`, `state.json`, `traceability.json`, and
-`memory/*.md` into one "what has this project decided and why" surface** — reconstructing that
-today means reading all four separately, in three different formats. This is a known, named gap
-(`docs/history/architecture-audit-2026-07-15.md`'s central finding), not an oversight to silently
-work around; any future unification work should be evidence-gated (a real dogfooding prototype),
-not spun up speculatively.
+**Both gaps this section used to name are now closed, not just noted:**
+- **Unification**: `scripts/query-founder-knowledge.mjs`'s `unify()` (Project tier) and
+  `unifyTiers()` (all 7 tiers) read `checkpoints.jsonl`, `state.json`, `traceability.json`, and
+  every tier of `memory/` into one chronologically-sortable array — the direct answer to "no
+  single file or view unifies these" (`docs/history/architecture-audit-2026-07-15.md`'s central
+  finding). Promoted from an unwired, zero-test prototype to the Context Engine's core in
+  `docs/status/ARCHITECTURE.md` §8g.
+- **Read-loop verification**: `evals/cases/memory.md`'s Run 1 flagged this store as
+  write-verified-only; `docs/status/PROJECT.md`'s 4-session dogfood run (2026-07-21) closed that
+  for the write-then-read-in-the-same-format case, and `hooks/session-start.mjs` now mechanically
+  reads the store back on every session start (a `Recall:` line), closing the "instruction-only"
+  half `references/constitution.md` rule 9 disclosed.
+
+**Undocumented paths, named honestly.** This file's tree above lists 7 `.wingman/` entries, but
+`sdd/` (`skills/subagent-driven-development`), `okf-export/` (`commands/adaptive/knowledge-export.md`),
+`loop.json`/`loop-counter.<sessionID>.json` (`hooks/stop-loop.mjs`), `session-state.json`
+(`hooks/session-start.mjs`), `session-health.json` (`hooks/session-health.mjs`),
+`pending-warnings.json`, and `context-monitor.json` (`hooks/context-monitor.mjs`) all exist on disk
+and are not listed in the tree above. Each is a real, working mechanism with its own owning
+file — this is a documentation completeness gap in this file's tree diagram, not a functional one.
+Fixing the tree diagram itself is tracked as a follow-up, not done in this pass.
 
 ## Who writes/reads this
 
