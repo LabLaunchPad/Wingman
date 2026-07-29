@@ -110,6 +110,45 @@ means yes.
 | 3 — Conditional action | Boardroom seats' own tool sets | N/A (seats don't execute) | Yes — Boardroom + founder decision |
 | 4 — Break-glass | `dept-devops`'s tool set | Deploy-class only | Yes — founder authorization, post-Level-3 |
 
+## Risk dimensions: what gets assessed, and who owns each
+
+The Level 0–4 scale above is the **output** of a risk assessment — how much approval this action
+needs. It is not what you assess. These ten dimensions are what you assess to arrive at a level, and
+each already has an owning Boardroom seat, so assessment is a dispatch, not a fresh judgment call.
+
+**There is exactly one risk scale in this system.** These dimensions feed the Level 0–4 tiers above;
+they never form a second, parallel severity scale. `skills/change-triage` routes using these same
+tier names for the same reason.
+
+| Risk dimension | Owning seat | What raises the level |
+|---|---|---|
+| Business | `boardroom-ceo` | Strategy misalignment, an irreversible commitment, a one-way door |
+| User | `boardroom-cpo` | A change that makes the primary job harder, or serves nobody identified |
+| Technical | `boardroom-cto` | Architecture that fights the grain of the codebase, unbounded complexity |
+| Security | `boardroom-ciso` | Auth, secrets, injection surface, a new trust boundary |
+| Maintenance | `boardroom-cto` | Something only its author can safely change later |
+| Performance | `boardroom-cto` | A hot path, an unbounded loop, an N+1 against real data volume |
+| Cost | `boardroom-cfo` | New paid dependency, token/compute growth, hosting change |
+| Migration | `boardroom-cto` | Schema or data movement, especially anything not reversible |
+| Data | `boardroom-ciso` | Personal data, retention, cross-boundary movement, deletion |
+| Model | *(no dedicated seat — see below)* | Model choice, prompt fragility, hallucination reaching a founder-facing surface |
+
+**Two honest gaps, named rather than papered over:**
+
+- **Model risk has no owning seat.** No Boardroom seat currently assesses AI/model-specific risk —
+  model selection, prompt fragility, or a hallucination reaching founder-facing output. Today it is
+  split informally between `boardroom-cto` (is this technically sound) and `boardroom-research` (is
+  this grounded in evidence). Treat that as the interim owner pair and say so when you use it. A
+  dedicated seat is **not** created here: `docs/AGENT-ROSTER.md`'s 2+-occurrence rule governs new
+  roles, and this gap has been named once, not twice. Log the second occurrence if it recurs.
+- **Migration risk is real but implicit.** `boardroom-cto` covers it in practice with no explicit
+  prompt for it. Naming it in this table is the fix; a separate mechanism is not warranted.
+
+**How dimensions map to tiers.** Any dimension touching a trust boundary — security, data, or a
+migration that isn't reversible — is Level 3 or higher by definition, regardless of how small the
+change looks or how it was described. That rule is what stops risk assessment from becoming a dial
+that can be turned down, and it matches `skills/change-triage`'s own routing-up-never-down constraint.
+
 ## The Level 3/4 boundary is the one mechanically enforced today
 
 `plugins/wingman/hooks/deploy-approval-gate.mjs` blocks deploy-class Bash commands (`kubectl apply`,
