@@ -122,13 +122,15 @@ if (coverage.markedHeadings < coverage.totalHeadings) {
 // break silently the moment a founder installs just the plugin — the exact
 // naming-collision risk this project's own audit history (docs/history/
 // audit-reorg-2026-07-20.md, action item #8) flagged and left as a TODO.
-function walkMjs(dir) {
-  let out = [];
+// Optimized via the flat accumulator pattern. We pass `out` directly as an argument
+// to recursive calls rather than creating intermediate arrays and concatenating them via `.concat()`.
+// This avoids high memory allocation and garbage collection overhead during deep traversals.
+function walkMjs(dir, out = []) {
   let entries = [];
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return out; }
   for (const entry of entries) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) out = out.concat(walkMjs(full));
+    if (entry.isDirectory()) walkMjs(full, out);
     else if (entry.isFile() && entry.name.endsWith('.mjs')) out.push(full);
   }
   return out;

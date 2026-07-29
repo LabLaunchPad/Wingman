@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.31] - 2026-07-29
+
+### Optimized
+- **Recursive File System Traversals via Flat Accumulator Pattern** — Refactored recursive directory walkers (`listFilesRecursive` in `dod-structural-gate.mjs` and `dod-gate.js`, as well as `walkMjs` in `check-repo-consistency.mjs`) to pass a shared results accumulator array directly through recursive calls. This replaces the heavy array copy and merge overhead of recursive `.concat()` calls with O(N) pushes, eliminating high memory allocation and garbage collection pressure during deep walks.
+
 ## [0.7.30] - 2026-07-29
 
 ### Added
