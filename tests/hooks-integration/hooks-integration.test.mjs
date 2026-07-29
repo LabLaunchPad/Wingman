@@ -239,9 +239,9 @@ describe('Plugin.json Structure', () => {
     assert.doesNotThrow(() => JSON.parse(content));
   });
 
-  it('should have 43 skills', () => {
+  it('should have 44 skills', () => {
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.strictEqual(plugin.skills.length, 43);
+    assert.strictEqual(plugin.skills.length, 44);
   });
 
   it('should have 34 commands', () => {

@@ -813,8 +813,13 @@ all 14 pipeline stages, and mechanizing the memory read-back loop rule 9 disclos
 (outside any repo, per §2's "no persistent runtime" rule, which permits file-backed state and
 forbids only an always-on daemon) plus Product/Project/Feature/Task/User, with a mechanical (not
 merely documented) approval gate on Global/Org writes and cross-tier contradictions surfaced rather
-than silently resolved (v0.7.33). Remaining phases are tracked in the session plan; each lands
-validator-green before the next starts.
+than silently resolved (v0.7.33); the research-first philosophy made mechanical — the `research/`
+matrix (13 domain folders, dev-repo-only, populated only when a real capability needs it, never
+speculatively across all 13) and `skills/research-gate` enforcing "Research Complete? → Architecture
+Approved? → Requirements Complete? → Implementation Starts," with `scripts/check-research-truth-doc.mjs`
+as its mechanical consumer, catching a real field-label bug in this PR's own first two populated
+`TRUTH-*.md` documents on its very first run (v0.7.34). Remaining phases are tracked in the session
+plan; each lands validator-green before the next starts.
 
 ## 9. Relationship to vendored reference repositories
 

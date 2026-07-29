@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.34] - 2026-07-29
+
+### Added
+- **The research-first philosophy, made mechanical: `research/` matrix + `skills/research-gate`.** 13 domain folders at the repo root (dev-repo-only, never ships), each holding real `TRUTH-<capability>.md` documents following a locked 5-study framework (Pioneers, Current Best Implementations, Community Experience, Engineering Trade-offs, Our Synthesis) — populated only when a real capability needs it, never speculatively across all 13 at once. Two are populated for real, using actual `WebSearch` results, not recalled training data: `02-context-engineering/TRUTH-context-engine.md` (Tobi Lütke/Shopify coining "context engineering" June 2025; Sourcegraph/Kubiya's reliability-first framing) and `03-memory/TRUTH-memory-tiers.md` (MemGPT/Letta's Core/Recall/Archival 3-tier design; the "don't use one retrieval strategy for every tier" finding that validated Wingman's own no-merge `readAllTiers()` design). The other 11 domains ship as honest stub `README.md`s stating no `TRUTH-*.md` exists yet.
+- **`skills/research-gate`** — maintainer-only (never founder-facing, scoped identically to `skills/dogfood-gap-classification`), enforcing "Research Complete? → Architecture Approved? → Requirements Complete? → Implementation Starts" before any new Wingman capability gets built. Names the specific missing study when blocking, never a generic "needs more research." Carries the Human Approval Framework (Must ask / Should ask / Can decide automatically) and a Decision Record template.
+- **`scripts/check-research-truth-doc.mjs`** (dev-repo-only) — the research gate's mechanical consumer. Checks all 5 required section headings plus real (non-empty) content under each, all 5 "Our Synthesis" sub-fields present and non-empty, and a References section. Caught a real bug on its first run against this PR's own new docs: both `TRUTH-*.md` files used a modified `**Our Improvements over the general ... pattern:**` label instead of the template's exact `**Our Improvements:**` — fixed in the docs, not loosened in the checker. Locked in as a named regression test.
+- 7 new tests for the checker, including the exact real field-label bug it caught, plus a test that walks every real `TRUTH-*.md` under `research/` and asserts each passes.
+
 ## [0.7.33] - 2026-07-29
 
 ### Added
