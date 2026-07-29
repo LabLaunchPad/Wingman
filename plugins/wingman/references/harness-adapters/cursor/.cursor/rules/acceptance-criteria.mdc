@@ -1,0 +1,173 @@
+---
+description: "Use whenever a stage produces a deliverable that someone later has to accept or reject — a requirement, a flow, a component, a plan task, a shipped feature. Triggers at any pipeline stage's gate checklist, and inside /wingman:build before a task is called done. Turns \"looks right\" into a testable statement."
+globs: []
+alwaysApply: false
+---
+
+
+# Acceptance Criteria
+
+## Overview
+
+Every deliverable has to answer one question before anyone can accept it: **what must be true for
+this to be done?** Without a written answer, "done" collapses into "the person who built it thinks it
+looks right" — which is exactly the judgment a non-technical founder cannot make, and exactly what
+Wingman exists to replace.
+
+This is the third of the Golden Rule's three questions (`references/constitution.md`): *why does this
+exist* is business intent, *how does it connect* is traceability, and *how do we know it's correct* is
+this skill.
+
+**Core principle:** a criterion someone could argue about after the fact was not a criterion. Write
+the disagreement out of existence before the work starts, not after it's delivered.
+
+## Not the same thing as the Definition of Done
+
+These are two different gates and conflating them creates the duplicate-pattern problem
+`references/constitution.md` rule 3 forbids:
+
+| | `skills/definition-of-done` | This skill |
+|---|---|---|
+| Scope | One **build**, before it can ship | One **deliverable**, before it can be accepted |
+| Question | "Is this safe and complete enough to release?" | "Did this specific thing meet what we agreed?" |
+| Content | Fixed across every project (tests pass, threat register clean, verdict recorded) | Written fresh per deliverable |
+| Enforced | `hooks/dod-structural-gate.mjs`, mechanically | The stage's own gate checklist plus the Boardroom checkpoint |
+
+A build passes DoD *and* every task's acceptance criteria. Neither substitutes for the other.
+
+## Inputs
+
+The deliverable being defined, plus the upstream ID(s) it satisfies (`DISC-*` … `ARCH-*`) — criteria
+are grounded in the requirement that caused the work, never invented independently of it.
+
+## Escalation
+
+A criterion that cannot be made measurable without a founder decision — a quality bar, a performance
+target, an acceptable-cost ceiling — goes to the founder as a plain-language question rather than
+being guessed at. Guessing a threshold and writing it down as agreed is worse than leaving it open,
+because it looks settled.
+
+## When To Use
+
+- At any pipeline stage's gate checklist, for the artifact that stage produces.
+- In `/wingman:implementation-planning`, for each `IP-*` task.
+- In `/wingman:build`, before marking a task complete.
+- Whenever the founder asks "how will we know this worked?"
+
+## Core Workflow
+
+**1. Start from the requirement, not the implementation.** Read the upstream `DEF-*`/`ARCH-*` row this
+deliverable satisfies. Criteria describe the *outcome the requirement asked for*, not the solution
+that happens to have been built — otherwise they only ever confirm that the code does what the code
+does.
+
+**2. Write each criterion so it passes all five tests.** A criterion is only finished when it is:
+
+- **Specific** — names the actual thing, not a category. "The overdue-invoice list loads" beats
+  "the page works."
+- **Measurable** — has an observable outcome. If two people could look at the same result and disagree
+  about whether it passed, it isn't measurable yet.
+- **Testable** — someone (or something) can actually check it. Name *how*: a test, a command, a
+  founder looking at a screen.
+- **Unambiguous** — no "appropriate", "reasonable", "properly", "as needed", "etc." Each of those
+  words is a deferred argument.
+- **Grounded in a user or business outcome** — traces to why anyone wanted this. A criterion that only
+  describes internal mechanism is a design note, not an acceptance criterion.
+
+**3. Write the failure case too.** State what counts as *not* accepted, explicitly. Most disputes at
+acceptance time are about an unstated edge case, not the happy path.
+
+**4. State what's out of scope.** One line. This is what stops a reviewer rejecting a deliverable for
+something it was never meant to do — a real failure mode, since Wingman's own Boardroom seats have
+flagged "missing sections" on output that matched its template exactly.
+
+**5. Keep the founder-facing version in plain language.** Criteria are written for whoever accepts the
+work. If the founder is the acceptor, `skills/plain-language-checkpoint`'s bar applies: lead with the
+consequence, no unexplained jargon.
+
+## Constraints
+
+**MUST:**
+- Ground every criterion in the upstream ID the deliverable satisfies.
+- Make each criterion specific, measurable, testable, unambiguous, and outcome-grounded.
+- State the failure case and the out-of-scope boundary explicitly.
+- Escalate an unmeasurable threshold to the founder rather than inventing one.
+
+**MUST NOT:**
+- Restate the implementation as if it were a criterion ("the function returns the list").
+- Use "appropriate", "reasonable", "properly", "as needed", or "etc." in a criterion.
+- Duplicate the Definition of Done's fixed, per-build checks here.
+- Write criteria after the deliverable is built, to match what was built.
+
+## Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "It's obvious what done means here" | Then it costs one line to write, and it stops being obvious the moment someone else reads it — including a fresh session with none of your context. |
+| "I'll write the criteria once I see how it turns out" | Criteria written to match the result only ever pass. That is the entire failure mode this skill exists to prevent. |
+| "The Definition of Done already covers this" | DoD asks whether a *build* is shippable. It cannot tell you whether *this deliverable* met what was agreed — it doesn't know what was agreed. |
+| "'Works correctly' is clear enough" | It is the least testable phrase in engineering. Name the observable outcome instead. |
+| "The founder will know it when they see it" | Then find out what they'd be looking for, and write that down — that conversation is cheaper before the build than after it. |
+
+## Red Flags — Stop and Reconsider
+
+- A criterion containing "appropriate", "reasonable", "properly", "as needed", or "etc."
+- Criteria that describe mechanism only, with no user- or business-visible outcome.
+- No stated failure case — only the happy path.
+- Criteria written after the deliverable, matching it exactly.
+- A performance/quality/cost threshold you picked yourself without asking.
+
+## Verification
+
+Before treating criteria as agreed: re-read each one and try to argue it was met by something
+obviously wrong. If that argument is available, the criterion is not yet unambiguous — rewrite it.
+Then confirm each criterion names how it will actually be checked (a test, a command, an observation),
+not merely that it should be.
+
+## Output
+
+```markdown
+## Acceptance criteria — <deliverable name>
+
+**Satisfies:** <upstream ID(s), e.g. DEF-001>
+
+| # | Criterion | How it's checked |
+|---|---|---|
+| 1 | <specific, measurable, outcome-grounded statement> | <test / command / observation> |
+
+**Not accepted if:** <the explicit failure case>
+**Out of scope:** <what this deliverable is not responsible for>
+**Open (needs founder decision):** <any threshold that couldn't be set without them, or "none">
+```
+
+## Anti-Rationalization Defense
+
+### Common Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "Writing this slows the build down" | It moves the argument earlier, where it is cheap. The slow path is rebuilding something that was accepted and then rejected. |
+| "Nobody reads acceptance criteria" | The Boardroom checkpoint reads them, and so does the next session that has to decide whether this was finished. |
+| "I'll keep them in my head for now" | A criterion that exists only in one session's context is gone at the next context boundary — this project's own memory discipline (constitution rule 9) exists for exactly this. |
+
+### Red Flags
+
+- Reaching for a vague qualifier because the precise version would be harder to satisfy.
+- Deciding a threshold yourself because asking felt like friction.
+- Criteria that would pass for any plausible implementation, including a wrong one.
+
+### Anti-Pattern Callouts
+
+- **Retrofitted criteria:** writing them once the deliverable exists, so they describe it rather than
+  test it. They will always pass and will never catch anything.
+- **Mechanism-as-criterion:** "the endpoint returns 200" with no statement of what the user can now
+  do. It confirms the code ran, not that the requirement was met.
+- **DoD duplication:** copying the fixed per-build checks in here, which creates two places to update
+  and one that will silently fall behind — the exact drift shape constitution rule 3 warns about.
+
+## Referenced by
+
+- `references/constitution.md` — rule 8 ("evaluation before release"); this is its per-deliverable half.
+- `references/pipeline-gate-checklist.md` — the shared gate every stage runs before its checkpoint.
+
+See `docs/status/ARCHITECTURE.md` for this skill's place in Wingman's overall architecture.

@@ -1,12 +1,19 @@
 {
   "name": "wingman",
-  "version": "0.7.29",
+  "version": "0.7.30",
   "description": "An AI Boardroom of agents that plans, builds, secures, and ships production-grade software end to end, with plain-language checkpoints instead of code review.",
   "author": {
     "name": "LabLaunchPad"
   },
   "license": "MIT",
-  "keywords": ["sdlc", "founders", "boardroom", "plan-review", "security", "orchestration"],
+  "keywords": [
+    "sdlc",
+    "founders",
+    "boardroom",
+    "plan-review",
+    "security",
+    "orchestration"
+  ],
   "commands": [
     "./commands/pipeline/discovery.md",
     "./commands/pipeline/research-synthesis.md",
@@ -80,6 +87,7 @@
     "./skills/evidence-gated-catalog",
     "./skills/spec-handler",
     "./skills/definition-of-done",
+    "./skills/acceptance-criteria",
     "./skills/security-checklist",
     "./skills/testing-patterns",
     "./skills/doc-index",

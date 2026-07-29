@@ -755,6 +755,59 @@ silently dropped: a hooks-config schema and Boardroom-persona format for OpenHan
 4 newest harnesses (no credential exists in this sandbox for Gemini CLI, OpenHands, Cline, or
 Cursor — the same class of gap §8b already discloses for Codex CLI).
 
+## 8g. Founder-directed override: Wingman as an AI Engineering Operating System (2026-07-29, in progress)
+
+**This is a deliberate, disclosed override of this project's own evidence gate — not a claim that the
+gate organically cleared itself.** The founder supplied three documents (a 20-layer "Master Build
+Prompt", a research-first development philosophy, and a ~130-document "Wingman Knowledge Operating
+System") and directed, in their own words, that the full plan be adopted "no matter what… achieve
+fully."
+
+The full decline history was surfaced back to the founder before any implementation, and they
+confirmed the override anyway. What it reverses, specifically:
+
+- **`docs/status/PROJECT.md` (2026-07-22)** — a pasted ~60-file org-governance blueprint, scoped down
+  to a 10-file reference doc after an audit found "the blueprint's files have zero consumer… dead
+  weight on creation," directly violating `skills/evidence-gated-catalog`'s no-speculative-bulk-creation
+  rule. WKOS is ~130 files and is the same shape.
+- **`docs/roadmap/ROADMAP.md` item 16** — local vector search explicitly *dropped*, not deferred.
+- **`docs/history/audit-reorg-2026-07-20.md`** — "no semantic search over skills exists or should be
+  built," plus its standing rule that an embedding store requires demonstrated friction first.
+- The deferred-ideas table's repeated finding that the recurring shape of these proposals is "bigger
+  runtime, bigger schema, softer gate."
+
+**What makes this override buildable rather than a repeat of 2026-07-22.** The 2026-07-22 blueprint
+failed on one specific test: its files had no producer and no consumer. WKOS is therefore built as the
+**output contract of machinery that already exists** — the 14 pipeline stages already produce ~14 of
+its documents, and `docs/status/` already holds ~9 more. Any WKOS document with no producing stage
+ships as a `templates/` entry, never as an empty file in a founder's repo, and
+`scripts/validate-wkos.mjs` asserts that rule mechanically rather than leaving it as a promise. The
+same principle governs the constitution: `scripts/constitution-check.mjs` gives it a mechanical
+consumer on day one.
+
+**What the override does not reach.** Three constraints hold regardless, because breaking them would
+break the product rather than extend it:
+
+1. **Zero runtime dependencies.** `install-smoke.yml` asserts `node_modules` never appears, so
+   vector/semantic search stays in `agnostic-boardroom/` (where it already exists under the separate
+   2026-07-25 override) and out of the shipped plugin.
+2. **The any-`NO_GO`-blocks rule is never softened.** Declined three times as a governance regression
+   for the exact audience it protects; that stands.
+3. **Nothing bulk-created without a consumer** — the producer/consumer rule above.
+
+**Mapping.** The founder's three documents are one system: the 20-layer prompt is the *operating
+instruction* (→ `references/constitution.md` + the engine layer), the research-first philosophy is the
+*method* (→ a research gate + `research/` matrix), and WKOS is the *artifact contract* (→ the pipeline's
+output contract + templates). Their "Golden Rule" — why does this exist, how does it connect, how do we
+know it's correct — maps onto business intent, the traceability chain, and acceptance criteria; the
+middle one shipped in v0.7.29 and WKOS's `Parents/Children/References` rule reuses that same graph
+engine rather than introducing a second one.
+
+Shipped so far: `references/constitution.md`, `scripts/constitution-check.mjs`,
+`skills/acceptance-criteria`, and the risk-dimension ownership map in `references/permission-model.md`
+(v0.7.30). Remaining phases are tracked in the session plan; each lands validator-green before the
+next starts.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 17 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
