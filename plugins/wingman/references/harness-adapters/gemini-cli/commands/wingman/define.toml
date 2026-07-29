@@ -18,12 +18,18 @@ convention):
 ```markdown
 ## Requirements
 
-| ID | Requirement | Rationale | Source |
+| ID | Requirement | Rationale | Satisfies |
 |---|---|---|---|
-| DEF-001 | <one concrete, testable requirement> | <why this, tied to Discovery's problem statement> | Discovery |
+| DEF-001 | <one concrete, testable requirement> | <why this, tied to Discovery's problem statement> | DISC-001 |
 ```
 
-Do not over-scope: a requirement that isn't traceable to Discovery's stated problem or success signal shouldn't be here — flag it back to the founder as a possible scope-creep item instead of quietly including it.
+The `Satisfies` column takes the **real `DISC-*` ID(s)** this requirement traces to — the same column
+name and the same machine-readable form every other stage uses, so the chain from vision to code is
+one unbroken, checkable sequence. Space-separate multiple IDs (`DISC-001 DISC-003`). A bare stage
+name like `Discovery` is not a link: `check-traceability.mjs` resolves IDs, not prose, so a named
+stage leaves this requirement's origin unverifiable.
+
+Do not over-scope: a requirement that isn't traceable to Discovery's stated problem or success signal shouldn't be here — flag it back to the founder as a possible scope-creep item instead of quietly including it. If a genuinely necessary requirement has no `DISC-*` to point at, that is a signal Discovery missed something — go back and mint the finding there rather than orphaning the requirement here.
 
 `dept-product` is already active from `/wingman:discovery`; this stage doesn't introduce a new department signal, so no activation check is needed here.
 

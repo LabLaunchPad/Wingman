@@ -46,7 +46,26 @@ Produce a short artifact. Append this section to a scratch discovery doc (`docs/
 **Constraints:** <team size/solo-founder reality, existing stack that's already a given, anything not up for debate>
 **Scope boundary:** <what this pass explicitly does NOT cover, so a later stage doesn't quietly scope-creep>
 **Solo-founder realism check:** <is this actually buildable by one founder in a reasonable timeframe, or does it need to be cut down first>
+
+### Discovery findings
+
+| ID | Finding | Evidence | Satisfies |
+|---|---|---|---|
+| DISC-001 | <one concrete, separable finding drawn from the fields above — a problem, a constraint, or a success signal worth tracing> | <known / unknown / assumed> | — |
 ```
+
+**Why the ID table as well as the prose:** Discovery is the **root of the traceability chain** — every
+later stage's `Satisfies` column ultimately points back here (`research-synthesis.md` writes
+`| RS-001 | … | DISC-001 |`, and `skills/traceability-linking` reserves the `DISC-` prefix for this
+stage). Mint the IDs here via the `traceability-linking` skill. Discovery's `Satisfies` column is
+always `—`: nothing precedes the vision, which is exactly what makes this the root. Without these
+rows, any downstream artifact carrying a `wingman:req DISC-001` marker is an **orphan** and
+`check-traceability.mjs` fails the project with a hard error — the prose fields alone are not
+traceable, because the checker mints IDs only from a Markdown table row's first cell.
+
+Keep the prose fields *and* the table: the prose is what the founder reads at the checkpoint, the
+table is what every later stage links to. One finding may draw on several prose fields, and not
+every prose field needs its own row — mint a row for what later stages will genuinely need to point at.
 
 **Why all 8 fields, not 4:** this stage's own Gate checklist below lists these same 8 items as
 Must-include — a real maintainer-mode dogfood run (see `docs/history/retros.md`, 2026-07-25/26)
@@ -65,11 +84,13 @@ Before the checkpoint below, run the adaptive gap-finding loop and the 8-part ou
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
 
 - **Must include:** problem statement, user statement, jobs-to-be-done notes, trigger/why-now,
-  constraints, success criteria, scope boundary, solo-founder realism check.
+  constraints, success criteria, scope boundary, solo-founder realism check, **and at least one
+  `DISC-*` row in the Discovery findings table** (the chain root — see Discovery.3).
 - **Must decide:** what problem is being solved, who the primary user is, and whether the idea is
   too large for one solo founder to build.
-- **Gate passes only if** the problem, the user, and the scope are all clear. If the idea is too
-  large, say so directly in the Discovery output and propose a smaller cut before the gate can pass.
+- **Gate passes only if** the problem, the user, and the scope are all clear, **and every finding a
+  later stage will need to reference has a `DISC-*` ID**. If the idea is too large, say so directly
+  in the Discovery output and propose a smaller cut before the gate can pass.
 
 ## Discovery.6: Discovery checkpoint
 
@@ -90,6 +111,8 @@ you hand off to `/wingman:research-synthesis`.
   draws on.
 - `references/pipeline-gate-checklist.md` — the shared adaptive gap-finding loop, self-critique
   questions, gap register, and 8-part output format every stage runs before its own checkpoint.
+- `skills/traceability-linking` — the `DISC-*` prefix minted in Discovery.3, and the chain every
+  later stage's `Satisfies` column follows back to it.
 - `skills/visual-founder-output` + `references/visual-output-templates.md` §2 — the pipeline-status
   tree shown above.
 - `commands/adaptive/boardroom.md` — the checkpoint this stage now records on its own, per

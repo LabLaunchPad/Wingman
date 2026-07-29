@@ -26,7 +26,36 @@ Enter plan mode (if not already in it) — or, outside Claude Code, whichever re
 **Rough size:** <small / medium / large — and roughly how many checkpoints remain (this stage's own checkpoint below, then Build, then Ship — 3 more, regardless of project size)>
 ```
 
-## Implementation Planning.3: Show task dependencies
+Save the plan to **`docs/wingman/plans/YYYY-MM-DD-<feature-name>.md`** in the founder's project (the
+path `skills/writing-plans` defines). Note this is deliberately *not* the `<short-slug>.md` convention
+the 11 prior stages use — a project accumulates many plans over time but only one Discovery, one
+Define, and so on, so plans are dated and feature-named rather than slug-matched. Step 1's
+slug-consistency check applies to the 11 stage directories, not to this one.
+
+## Implementation Planning.3: Mint the task register
+
+Immediately after the task list, append a task register minting one `IP-*` ID per plan task via the
+`traceability-linking` skill:
+
+```markdown
+## Task register
+
+| ID | Task | Satisfies |
+|---|---|---|
+| IP-001 | <the plan task this ID names, matching its `### Task N:` heading> | DEF-001 ARCH-001 |
+```
+
+The `Satisfies` column carries the upstream ID(s) that task implements — space-separated for several.
+This is what makes the chain resolvable end to end: `check-traceability.mjs --chain` walks a code
+marker back through `IP-*` → `ARCH-*`/`DEF-*` → … → `DISC-*`, so "does this code trace to the vision"
+becomes a question with a mechanical answer rather than a judgment call.
+
+`IP-*` is the terminal prefix — nothing downstream is expected to reference it, so `IP-*` rows
+showing as "unlinked" is expected and non-blocking (see `skills/traceability-linking`). Minting them
+is still required: without a task register the plan's tasks have no IDs, and the chain stops one link
+short of the code.
+
+## Implementation Planning.4: Show task dependencies
 
 The plan document itself is never shown to the founder directly — its reader is whoever executes it
 (a fresh `build.md` subagent, or a human maintainer). Immediately after the task list (before the
@@ -37,24 +66,26 @@ nothing for this document's actual reader. This is additive to the checkbox task
 replacement — `skills/writing-plans`'s exact-file/exact-step detail still lives in the tasks
 themselves.
 
-## Implementation Planning.4: Where you are
+## Implementation Planning.5: Where you are
 
 See `references/pipeline-stage-boilerplate.md`'s Where You Are section. Use `skills/visual-founder-output` to add the pipeline-status tree, showing all 11 prior stages complete and this stage as
 the last one before Build. `boardroom.md`'s own report shows this same tree again once the checkpoint
 records — that's expected, not wasted effort: this view is "the plan just finished," the
 checkpoint's is "this stage's checkpoint is now recorded," one step later.
 
-## Implementation Planning.5: Gate checklist
+## Implementation Planning.6: Gate checklist
 
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
 
 - **Must include:** task breakdown, effort buckets, dependencies, milestones, risk list, sequencing
-  logic.
+  logic, **and the `IP-*` task register** (Implementation Planning.3).
 - **Must decide:** the build order, and what gets explicitly deferred.
-- **Gate passes only if** the plan is realistic for a solo founder to actually execute.
+- **Gate passes only if** the plan is realistic for a solo founder to actually execute, **and every
+  task carries an `IP-*` ID whose `Satisfies` column resolves to a real upstream ID** — verify with
+  `node "${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs" . --orphans` rather than by eye.
 
-## Implementation Planning.6: Implementation Planning checkpoint
+## Implementation Planning.7: Implementation Planning checkpoint
 
 Do not call `ExitPlanMode` directly and do not hand the founder a raw plan to approve. Instead, run `/wingman:boardroom plan`, telling it explicitly that this checkpoint's scope is **this stage's own plan only** — as of `docs/status/ARCHITECTURE.md` §4d, this stage no longer bundles the 5 original planning stages into one "Planning Milestone" checkpoint; each of the 11 prior stages already recorded its own checkpoint by the time this stage runs. `boardroom.md` records this as a scalar `"stage": "implementation-planning"` with `"bundle"` set to the same value, same shape as every other stage's checkpoint.
 

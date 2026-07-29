@@ -29,7 +29,7 @@ Whenever `/wingman:research-synthesis`, `/wingman:personas-jobs`, `/wingman:jour
 
 | Prefix | Minted by | What it identifies |
 |---|---|---|
-| `DISC-` | `/wingman:discovery` | A discovery-stage finding |
+| `DISC-` | `/wingman:discovery` | A discovery-stage finding — **the chain root**; its own `Satisfies` is always `—` |
 | `RS-` | `/wingman:research-synthesis` | A theme/risk/opportunity/open-question |
 | `PJ-` | `/wingman:personas-jobs` | A persona or job-to-be-done |
 | `JM-` | `/wingman:journey-mapping` | A journey stage/friction point |
@@ -98,16 +98,31 @@ intended to reference doesn't show up in its "distinct ID(s) referenced" count, 
 
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs` — it must report zero orphaned markers (references to IDs that don't exist) and zero unlinked requirements (a `DEF-*`/`ARCH-*`/`UX-*`/`RS-*`/`PJ-*`/`JM-*`/`IA-*`/`WF-*`/`VS-*`/`PT-*` ID with no downstream marker anywhere).
 
-**Expected, non-blocking exception**: `IP-*` (Implementation Planning) IDs — and any ID whose only
-downstream coverage is several hops away rather than a direct marker — will routinely show as
-"unlinked," because nothing is ever expected to reference the terminal stage's own ID, and the
-checker isn't transitive (a `DEF-*` covered only via an intermediate `ARCH-*` marker several links
-downstream still shows unlinked unless something also references it directly). This is a real,
-known design limitation of the current checker, not a sign the pipeline actually has an orphaned
-requirement — don't chase it as if it were a genuine gap. Found and logged during this project's
-own first real dogfooding pass (see `docs/history/retros.md`, 2026-07-14); documented here rather
-than fixed, since it's a warning, not a blocking error, and making the checker transitive is a
-real but separate future improvement, not something to speculatively build now.
+**The checker is chain-aware as of 2026-07-29.** It parses every table's `Satisfies` column and
+builds the real graph, which changes two things that used to be documented limitations:
+
+- **`IP-*` is exempt from the unlinked warning**, automatically. Nothing is ever expected to
+  reference the terminal stage's own ID, so it is no longer reported as a gap to chase.
+- **Indirect coverage now counts.** A `DEF-*` whose only downstream coverage is an `ARCH-*` row
+  naming it in that row's `Satisfies` column is genuinely linked, and no longer warns. Previously
+  the checker read only `wingman:req` markers and ignored the `Satisfies` column entirely, so the
+  whole chain was invisible to it and this class of warning was a false positive. (Found in this
+  project's first real dogfooding pass, `docs/history/retros.md` 2026-07-14; fixed 2026-07-29.)
+
+Two extra modes answer the question the chain exists for:
+
+```
+node "${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs" . --chain IP-001
+node "${CLAUDE_PLUGIN_ROOT}/scripts/check-traceability.mjs" . --orphans
+```
+
+`--chain <ID>` walks upward through `Satisfies` edges and reports `TRACED` (exit 0) if any path
+reaches a `DISC-*` root, or `BROKEN` (exit 1) naming where it stops — this is how "does this code
+trace back to the vision?" gets a mechanical answer instead of a judgment call. `--orphans` lists
+every ID with no path to a root. Both are cycle-safe.
+
+**A remaining, honest warning case**: the newest stage in a partially-run pipeline legitimately shows
+as unlinked, because nothing downstream of it exists yet. That is mid-pipeline state, not a gap.
 
 ## Output
 
