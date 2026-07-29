@@ -75,6 +75,7 @@ test-driven-development	(none: fixture is a minimal scratch TS project built inl
 test	evals/fixtures/setup-testing-patterns-fixture.sh	plugins/wingman/commands/adaptive/test.md
 testing-patterns	evals/fixtures/setup-testing-patterns-fixture.sh	plugins/wingman/skills/testing-patterns/SKILL.md
 token-economy	(none: fixture is a scratch verbose-message file built inline, not a setup-*.sh script)	plugins/wingman/skills/token-economy/SKILL.md
+traceability-chain	(none: constructed inline, mirrors dod-pre-push-check.md's own convention for tiny multi-file fixtures)	/wingman:discovery; DISC-*
 traceability-linking	(none: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script)	plugins/wingman/skills/traceability-linking/SKILL.md
 traceability-validator	(none: fixtures are inline 2-file directories built per-run (see "## Fixtures (inline, not a setup-*.sh script)" below), not a setup-*.sh script)	plugins/wingman/scripts/check-traceability.mjs; traceability-linking
 uxflow	evals/fixtures/setup-uxflow-fixture.sh	plugins/wingman/commands/pipeline/uxflow.md; seven-stage-pipeline-e2e.md
