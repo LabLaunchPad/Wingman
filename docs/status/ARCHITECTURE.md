@@ -818,7 +818,14 @@ matrix (13 domain folders, dev-repo-only, populated only when a real capability 
 speculatively across all 13) and `skills/research-gate` enforcing "Research Complete? → Architecture
 Approved? → Requirements Complete? → Implementation Starts," with `scripts/check-research-truth-doc.mjs`
 as its mechanical consumer, catching a real field-label bug in this PR's own first two populated
-`TRUTH-*.md` documents on its very first run (v0.7.34). Remaining phases are tracked in the session
+`TRUTH-*.md` documents on its very first run (v0.7.34); the 20-layer engine surface — 17
+`plugins/wingman/engines/<name>/ENGINE.md` manifests (a naming/ownership layer over machinery that
+mostly already existed, not a rebuild), `scripts/validate-engines.mjs` giving every manifest a
+mechanical consumer on day one (every command/skill/hook/reference has exactly one engine owner, no
+orphans — caught a real self-introduced bug on first run), the Evaluation Engine's 12-dimension map
+onto the 8 real Boardroom seats (`references/evaluation-dimensions.md`, derived from each seat's own
+existing check text rather than invented), and the 12-phase Core Operating Loop
+(`docs/status/CORE-LOOP.md`) (v0.7.35). Remaining phases are tracked in the session
 plan; each lands validator-green before the next starts.
 
 ## 9. Relationship to vendored reference repositories

@@ -28,7 +28,16 @@ A solo founder with no engineering background, running Claude Code (directly or 
 Seven fixed C-suite-style seats — CEO, CPO, CMO, CTO, CISO, CFO, Research — plus Design, dispatched in parallel by `/wingman:boardroom`, consolidated into one plain-language verdict (`GO` / `GO WITH CHANGES` / `DO NOT SHIP`) under grouped Business/Technical/Finance/Research summary headers. Enforced by hooks: `ExitPlanMode` is blocked until a Boardroom verdict is recorded in the plan file (see `docs/status/ARCHITECTURE.md` §4 and `docs/status/DATABASE.md`), and `dod-structural-gate.mjs` mechanically checks artifact presence (traceability, tests, a clean threat register) before a real `git push`.
 
 ### Pipeline commands (built)
-7 planning/build stages, only 3 of which produce a founder-visible Boardroom checkpoint: `/wingman:discovery` → `/wingman:define` → `/wingman:architecture` → `/wingman:uxflow` → `/wingman:implementation-planning` (bundled into one "Planning Milestone" checkpoint) → `/wingman:build` (its own checkpoint, folding in what used to be a separate `/wingman:secure` stage as a Definition-of-Done gate) → `/wingman:ship` (final checkpoint). Fewer checkpoints than the original 4-stage pipeline despite more named stages — see `docs/status/ARCHITECTURE.md` §4b.
+14 named stages, each with its own founder-visible Boardroom checkpoint — the "Planning Milestone"
+bundled-checkpoint model described in an earlier revision of this document was reversed
+(`docs/status/ARCHITECTURE.md` §4/§4d): `/wingman:discovery` → `/wingman:research-synthesis` →
+`/wingman:personas-jobs` → `/wingman:journey-mapping` → `/wingman:define` →
+`/wingman:information-architecture` → `/wingman:uxflow` → `/wingman:wireframes` →
+`/wingman:visual-design-system` → `/wingman:prototype-usability` → `/wingman:architecture` →
+`/wingman:implementation-planning` → `/wingman:build` (its own checkpoint, folding in what used to
+be a separate `/wingman:secure` stage as a Definition-of-Done gate) → `/wingman:ship` (final
+checkpoint) — 12 individual pre-build checkpoints plus Build's and Ship's own, trading ceremony for
+full enterprise UX process completeness, a founder-approved decision.
 
 ### Adaptive commands (built)
 `/wingman:retro`, `/wingman:learn`, `/wingman:evolve`, `/wingman:harness`, `/wingman:telemetry` — invoked as needed, not part of the fixed pipeline.
