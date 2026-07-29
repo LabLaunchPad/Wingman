@@ -11,6 +11,8 @@ import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { checkConstitutionCitations } from './constitution-check.mjs';
+
 const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const errors = [];
 const warnings = [];
@@ -283,6 +285,33 @@ function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {
 reportOrphans('commands', plugin.commands || [], 'command');
 reportOrphans('agents', plugin.agents || [], 'agent');
 reportOrphans('skills', plugin.skills || [], 'skill', true);
+
+// --- Constitution: every rule must name enforcement that actually exists ---------------
+//
+// references/constitution.md states 10 rules, each with an "**Enforced by:**" line naming the
+// real skills/hooks/scripts/references/commands behind it. This check resolves every one of
+// those paths against the plugin tree.
+//
+// Why it exists: a constitution nothing enforces is decoration, and this project already
+// declined a ~60-file governance tree because its files had "zero consumer" (docs/status/
+// PROJECT.md, 2026-07-22). Giving the constitution a mechanical consumer on day one is what
+// keeps it from becoming that. It also catches the narrower failure of a rule outliving the
+// mechanism it cites -- a skill renamed or a hook deleted while the rule still claims coverage.
+//
+// The decision logic lives in ./constitution-check.mjs so it is testable without executing this
+// whole validator as an import side effect.
+const constitutionRel = 'references/constitution.md';
+const constitutionPath = join(pluginRoot, constitutionRel);
+if (!existsSync(constitutionPath)) {
+  errors.push(`missing ${constitutionRel} — the constitution is shipped content cited by boardroom.md and audit.md`);
+} else {
+  for (const p of checkConstitutionCitations(
+    readFileSync(constitutionPath, 'utf-8'),
+    (rel) => existsSync(join(pluginRoot, rel)),
+  )) {
+    errors.push(p);
+  }
+}
 
 console.log(`Checked ${(plugin.commands || []).length} commands, ${(plugin.agents || []).length} agents, ${(plugin.skills || []).length} skills, hooks: ${existsSync(hooksFullPath) ? hooksFileRel + ' (auto-loaded)' : 'none found'}`);
 

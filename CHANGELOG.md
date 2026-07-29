@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.30] - 2026-07-29
+
+### Added
+- **`references/constitution.md`** — the ten rules every Wingman decision is subject to (grounding before generation, evidence before preference, reuse before reinvent, clarity before complexity, safety before automation, human approval for high-risk actions, architecture before implementation, evaluation before release, memory after outcome, consistency across agents and projects). Written as a **map of enforcement that already exists**, not a statement of intent: every rule names the real skill/hook/script behind it. Rule 6 states plainly that `references/permission-model.md`'s Level 0–4 scale is the single risk taxonomy in the system, so no second scale gets introduced. Rule 9 discloses its own honest limit — the memory read-back loop is instruction-only today.
+- **`scripts/constitution-check.mjs` + a new `validate-structure.mjs` error check** — resolves every rule's `**Enforced by:**` path against the plugin tree, so a rule cannot outlive the mechanism it claims. This is the constitution's mechanical consumer on day one, which is what keeps it from becoming the dead weight a ~60-file governance tree was already declined for in 2026-07-22 ("zero consumer"). It also rejects any `docs/` path cited as enforcement: `docs/` does not ship, so a founder's install cannot reach it. Both failure modes were caught for real on first run, in the constitution's own first draft.
+- **`skills/acceptance-criteria`** — the per-deliverable half of rule 8, and the one genuinely absent layer (confirmed: no skill covered it, only a passing mention in `references/pipeline-gate-checklist.md`). Criteria must be specific, measurable, testable, unambiguous, and grounded in a user or business outcome, with the failure case and out-of-scope boundary stated explicitly. Carries an explicit boundary table against `skills/definition-of-done` — DoD asks whether a *build* is shippable, this asks whether *one deliverable* met what was agreed — so the two don't merge into the duplicate-pattern drift rule 3 forbids.
+
 ## [0.7.29] - 2026-07-29
 
 ### Fixed
