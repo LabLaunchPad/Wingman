@@ -2,6 +2,15 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.33] - 2026-07-29
+
+### Added
+- **The Memory Engine: all 7 tiers.** `scripts/memory-tiers.mjs` (new) resolves Global (`~/.wingman/global/`) and Org (`~/.wingman/org/<slug>/`) — both outside any repo — plus Product (deliberately the same store as Project — Wingman has no multi-product-per-project concept, so a separate tier would be invented structure with no consumer), Project (the existing default), Feature, Task, and User tiers. `readAllTiers()` returns every applicable tier's entries narrowest-first, without merging — a genuine cross-tier contradiction stays visible rather than being silently resolved. `writeTierEntry()` reuses `hooks/secret-guard.mjs`'s exact `SECRET` patterns (no separate copy to drift) and **mechanically** requires `{ approved: true }` before writing to Global or Org — a promotion the founder must actually confirm via `AskUserQuestion`, enforced in code, not just documented.
+- **`query-founder-knowledge.mjs` gains `unifyTiers()`**, extending the Context Engine across all 7 tiers while `unify()` stays exactly as it was — project-tier only — for full backward compatibility with every existing caller.
+- `skills/memory/SKILL.md` documents all 7 tiers, the Product/Project collapse, and the two new mechanical rules (promotion needs approval; contradictions surface, never resolve silently).
+- `docs/status/DATABASE.md`'s file tree fixed twice in one pass: the Memory Engine's tier structure added, and a second drift found independently — 7 real `.wingman/` paths (`sdd/`, `okf-export/`, `loop.json`, `loop-counter.<sessionID>.json`, `session-state.json`, `session-health.json`, `pending-warnings.json`, `context-monitor.json`) existed on disk with no entry in this file's tree diagram. Both closed.
+- 15 new tests (13 for `memory-tiers.mjs`'s precedence/approval/secret-rejection behavior, 2 for `unifyTiers()`), including a real cross-project isolation check (a Global-tier fact IS visible from an unrelated project; a Project-tier fact is NOT). 441 → 456.
+
 ## [0.7.32] - 2026-07-29
 
 ### Added
