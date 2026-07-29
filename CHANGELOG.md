@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.31] - 2026-07-29
+
+### Added
+- **`references/wkos/` — the Wingman Knowledge Operating System document contract.** The structure every project's documentation follows, so an agent reasoning about an unfamiliar codebase can navigate it without being told where anything is. `README.md` states the layout and the one rule that makes it work; `producer-map.md` records, per document, what actually produces it; `document-template.md` locks the metadata block (Owner/Status/Version/Parents/Children/Risk Level/…) and the 20 standard sections every document follows, plus the Golden Rule check (why does this exist / how does it connect / how do we know it's correct — matching business intent, the `Satisfies` traceability chain, and `skills/acceptance-criteria`). `templates/` ships the 8 scaffolds a founder or a later pipeline stage fills in — `TEMPLATE_{PRD,SRS,ADR,RFC,TEST_PLAN,USER_FLOW,COMPONENT,RISK}.md` — never created as empty files in a project, only referenced from `producer-map.md`'s `template` rows.
+- **`scripts/validate-wkos.mjs` + `scripts/wkos-check.mjs`, wired in as the 8th check** in `scripts/validate-all.mjs` and `.github/workflows/validate.yml`. Enforces the rule mechanically: **every document has a real producer, or it is a template.** A `produced`/`existing` entry must name a plugin path that exists; a `template` entry must *not* claim a producer, since claiming one is how a gap stops looking like a gap. This is the specific guard against WKOS repeating the 2026-07-22 outcome, where a pasted ~60-file governance tree was cut to 10 files after an audit found "the blueprint's files have zero consumer… dead weight on creation."
+- **The map's own result is the argument for building it: 115 documents mapped, 67% already backed by real machinery** (43 produced by a pipeline stage or skill, 34 already existing under a current filename, 38 genuine templates). `VISION.md` is Discovery's output; `TRACEABILITY_MATRIX.md` is `check-traceability.mjs --chain`; `ACCEPTANCE_CRITERIA.md` is the skill added in 0.7.30; `FAILURE_LIBRARY.md` is `.wingman/memory/tried.md`. A test asserts the backed majority holds, so the claim cannot quietly drift into being mostly templates.
+- Three gaps named rather than buried: `CONTEXT_ENGINE.md` and `TOOL_REGISTRY.md` (later phases), and `RETENTION_POLICY.md` — data retention proper has no owner today, only the partial coverage in `references/secrets-policy.md`.
+
 ## [0.7.30] - 2026-07-29
 
 ### Added

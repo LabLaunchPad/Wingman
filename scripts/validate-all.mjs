@@ -44,6 +44,10 @@ const CHECKS = [
   { name: 'check-repo-consistency', cmd: ['node', 'scripts/check-repo-consistency.mjs'] },
   { name: 'check-fixtures', cmd: ['node', 'scripts/check-fixtures.mjs'], slow: true },
   { name: 'check-traceability', cmd: ['node', 'plugins/wingman/scripts/check-traceability.mjs'] },
+  // Enforces the WKOS contract's one rule: every document has a real producer, or it is a
+  // template. Without this the ~130-document structure could silently become the dead weight a
+  // ~60-file governance tree was already declined for (docs/status/PROJECT.md, 2026-07-22).
+  { name: 'validate-wkos', cmd: ['node', 'plugins/wingman/scripts/validate-wkos.mjs'] },
   { name: 'check-harness-adapter-drift', cmd: ['node', 'plugins/wingman/scripts/check-harness-adapter-drift.mjs'] },
   { name: 'generate-harness-adapters --check', cmd: ['node', 'plugins/wingman/scripts/generate-harness-adapters.mjs', '--check'] },
   // Kept in --fast: the suite runs in ~2.5s, cheap enough that a pre-commit hook still catches a
