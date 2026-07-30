@@ -1,0 +1,171 @@
+# Engine Registry — EngineOS reorganization, 2026-07-30.
+#
+# Declares every engine's id, path, and status in one place, plus the Core Operating Loop's
+# execution order as configuration rather than folder numbering — so inserting or renaming an
+# engine later never forces a repository-wide renumbering (see docs/status/ARCHITECTURE.md's
+# EngineOS section for the reasoning).
+#
+# This is a descriptive index, not a runtime dispatcher: Wingman's commands are markdown prompts
+# read directly by Claude Code, not compiled modules a router loads by path. Nothing parses this
+# file at runtime today. It exists so a human or an agent can answer "what engines exist, in what
+# order do they operate, and where does each one live" from one file instead of re-deriving it from
+# 22 ENGINE.md reads every time — the same reason docs/status/ENGINES.md exists, kept in sync with
+# it deliberately (ENGINES.md is the prose index for humans; this file is the same data, machine-
+# readable, for any future tool that wants it).
+#
+# scripts/validate-engines.mjs does not read this file (its scope is commands/skills/hooks/
+# references ownership, not registry consistency) — a future check that registry.yaml stays in
+# sync with the real engines/ directory listing is a legitimate follow-up, not built here since no
+# drift has yet occurred to motivate it.
+
+engines:
+  constitution:
+    id: constitution
+    version: "1.0"
+    path: engines/constitution-engine
+    status: built
+  governance:
+    id: governance
+    version: "1.0"
+    path: engines/governance-engine
+    status: built
+  risk:
+    id: risk
+    version: "1.0"
+    path: engines/risk-engine
+    status: built
+  context:
+    id: context
+    version: "1.0"
+    path: engines/context-engine
+    status: built
+  knowledge:
+    id: knowledge
+    version: "1.0"
+    path: engines/knowledge-engine
+    status: built
+  graph:
+    id: graph
+    version: "1.0"
+    path: engines/graph-engine
+    status: built
+  research:
+    id: research
+    version: "1.0"
+    path: engines/research-engine
+    status: built
+  planning:
+    id: planning
+    version: "1.0"
+    path: engines/planning-engine
+    status: built
+  vision:
+    id: vision
+    version: "1.0"
+    path: engines/vision-engine
+    status: built
+    # Covers the blueprint's "Product" node — Wingman treats vision-capture and product-intent as
+    # one concern, not two; see the reconciliation table in docs/status/ENGINES.md.
+  ux_intelligence:
+    id: ux_intelligence
+    version: "1.0"
+    path: engines/ux-intelligence-engine
+    status: built
+    # Covers the blueprint's "UX" node.
+  design:
+    id: design
+    version: "1.0"
+    path: engines/design-engine
+    status: built
+    # Covers the blueprint's "Design System" node.
+  architecture:
+    id: architecture
+    version: "1.0"
+    path: engines/architecture-engine
+    status: built
+    # Covers the blueprint's "SRS" and "ADR" nodes — system/non-functional requirements and
+    # architectural decision records are both artifacts this engine's own gate already produces
+    # and reviews; see docs/status/ENGINES.md's reconciliation table.
+  contract:
+    id: contract
+    version: "1.0"
+    path: engines/contract-engine
+    status: built-thin
+  agent_adapter:
+    id: agent_adapter
+    version: "1.0"
+    path: engines/agent-adapter-engine
+    status: built
+    # Covers the blueprint's "Harness" node.
+  evaluation:
+    id: evaluation
+    version: "1.0"
+    path: engines/evaluation-engine
+    status: built
+  operations:
+    id: operations
+    version: "1.0"
+    path: engines/operations-engine
+    status: built
+  memory:
+    id: memory
+    version: "1.0"
+    path: engines/memory-engine
+    status: built
+    # Not one of the blueprint's 19 named nodes (its interaction model lists Memory separately,
+    # after Operations/Learning, as a cross-cutting concern) — kept as Wingman's own real engine.
+  engineering:
+    id: engineering
+    version: "1.0"
+    path: engines/engineering-engine
+    status: built
+    # Not one of the blueprint's 19 named nodes — the actual code-writing engine Wingman's real
+    # pipeline needs, which a generic 19-engine SDLC blueprint didn't separately name.
+  code_intelligence:
+    id: code_intelligence
+    version: "1.0"
+    path: engines/code-intelligence-engine
+    status: built
+  tool_runtime:
+    id: tool_runtime
+    version: "1.0"
+    path: engines/tool-runtime-engine
+    status: built
+  workflow:
+    id: workflow
+    version: "1.0"
+    path: engines/workflow-engine
+    status: built
+  orchestration:
+    id: orchestration
+    version: "1.0"
+    path: engines/orchestration-engine
+    status: built
+
+# Core Operating Loop execution order (see docs/status/CORE-LOOP.md for the full 12-phase mapping
+# onto Wingman's real 14 pipeline stages). This is the blueprint's own "only forward movement is
+# allowed; feedback loops go through evaluation and operations rather than directly mutating earlier
+# artifacts" rule, expressed as data.
+pipeline:
+  - constitution
+  - governance
+  - risk
+  - context
+  - knowledge
+  - graph
+  - research
+  - planning
+  - vision
+  - ux_intelligence
+  - design
+  - architecture
+  - contract
+  - engineering
+  - code_intelligence
+  - tool_runtime
+  - agent_adapter
+  - workflow
+  - orchestration
+  - evaluation
+  - operations
+  - memory

@@ -1,5 +1,6 @@
 // Tests for plugins/wingman/scripts/engines-check.mjs -- the engine-ownership rule that keeps
-// the 17 ENGINE.md manifests from being speculative structure with no consumer.
+// the 22 ENGINE.md manifests (17 originally, reorganized 2026-07-30 into 22 via the EngineOS pass)
+// from being speculative structure with no consumer.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -58,7 +59,7 @@ test('a declared member that does not exist on disk is reported', () => {
   assert.ok(errors.some((e) => e.includes('does not exist on disk')));
 });
 
-test('the real 17 engine manifests, run against the real plugin file set, pass with zero problems', () => {
+test('the real 22 engine manifests, run against the real plugin file set, pass with zero problems', () => {
   const pluginRoot = join(process.cwd(), 'plugins', 'wingman');
   const enginesRoot = join(pluginRoot, 'engines');
 
@@ -70,7 +71,7 @@ test('the real 17 engine manifests, run against the real plugin file set, pass w
       membersText: readFileSync(join(enginesRoot, entry.name, 'ENGINE.md'), 'utf-8'),
     });
   }
-  assert.strictEqual(engines.length, 17, 'expected all 17 engine manifests to be found');
+  assert.strictEqual(engines.length, 22, 'expected all 22 engine manifests to be found');
 
   function walk(dir) {
     let entries;

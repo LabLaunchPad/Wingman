@@ -469,5 +469,31 @@ Durable decisions only — not every turn-level choice. Newest first.
   This is the last of the founder's reordered 6-layer priority list; the 2-3-9-13-12-15 sequence is
   now fully closed.
 
+<!-- wingman:log type=decision category=architecture category2=engineos status=resolved -->
+- **EngineOS reorganization, 2026-07-30 — a founder-directed blueprint applied inside the plugin, not
+  instead of it.** The founder pasted a "Locked Repository Blueprint" proposing a full top-level repo
+  restructure (19 numbered engine dirs at repo root, each with a ~24-artifact internal layout). Flagged
+  before building anything: applied literally, this had no place for the layout Claude Code's plugin
+  loader actually requires (`commands/`, `agents/`, `skills/`, `hooks/`, `.claude-plugin/` under
+  `plugins/wingman/`) — asked via `AskUserQuestion`, and the founder's refined answer was to keep the
+  plugin layout intact and build the EngineOS inside `plugins/wingman/engines/`, with unnumbered
+  engine-name directories and execution order captured in a registry rather than folder numbering.
+  Built: 4 new engines carved out of existing ones as genuine responsibility splits (Constitution,
+  Risk, and Graph out of what used to be one Governance engine; Operations out of Workflow/
+  Orchestration/Governance), 1 new thin engine (Contract, pointing at the Layer 15 versioning-policy
+  work already in `docs/status/DATABASE.md`), and `plugins/wingman/engines/registry.yaml` (id/path/
+  status + Core Operating Loop execution order as data). 5 of the blueprint's 19 names were mapped
+  onto existing engines rather than duplicated (Product→Vision, PRD→Planning, SRS→Architecture,
+  ADR→Architecture, Harness→Agent Adapter), per the blueprint's own "no duplicated responsibility"
+  criterion — real count is 22 engines, not 19, reconciled explicitly in `docs/status/ENGINES.md`
+  rather than forced to fit. `scripts/validate-engines.mjs` re-ran clean after the split: 22 engines,
+  122 real files, zero orphans.
+  **Explicitly not built in this pass**: the full ~24-artifact per-engine doc set (SPEC/ARCHITECTURE/
+  API/INPUTS/OUTPUTS/WORKFLOWS/PIPELINES/RULES/VALIDATION/TEST_PLAN/CHECKLIST/RISKS/DEPENDENCIES/
+  ADRS/RFCS/examples/schemas/templates/tests/assets/src) across all 22 engines — genuinely-grounded
+  content at that scale (~20 artifacts × 22 engines) is real follow-on work, scoped as its own
+  subsequent batch rather than claimed complete here to avoid the templated-boilerplate failure mode
+  the 6-field-skill-contract precedent already learned to avoid.
+
 See `docs/roadmap/ROADMAP.md` for the phased roadmap (moved there 2026-07-28 as part of the
 docs/status | docs/roadmap | docs/history split).

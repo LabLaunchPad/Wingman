@@ -851,6 +851,63 @@ levels rather than drawing parallel diagrams — the framework asked for "C4-sty
 existed. Business intent (free, open-source, no monetisation) is now recorded explicitly in `PRD.md`
 rather than left inferable from the MIT license alone.
 
+## 8h. EngineOS reorganization (2026-07-30) — a founder-directed blueprint applied inside the plugin, not instead of it
+
+The founder pasted a "Locked Repository Blueprint" proposing a full top-level repo restructure: 19
+numbered engine directories at the repo root, each with a ~24-artifact internal layout (README,
+ENGINE, SPEC, ARCHITECTURE, API, INPUTS, OUTPUTS, WORKFLOWS, PIPELINES, RULES, VALIDATION, TEST_PLAN,
+CHECKLIST, RISKS, DEPENDENCIES, ADRS/, RFCS/, plus `examples/`/`schemas/`/`templates/`/`tests/`/
+`assets/`/`src/`). Applied literally at the repo root, this would have had no place for the layout
+Claude Code's plugin loader actually requires (`commands/`, `agents/`, `skills/`, `hooks/`,
+`.claude-plugin/`) — not a stylistic choice, but what `marketplace.json`'s `source` pointer and the
+plugin runtime depend on to load Wingman at all.
+
+Surfaced this conflict back to the founder via `AskUserQuestion` before building anything. Their
+answer, refined further in a follow-up message: keep the Claude Code plugin layout exactly as
+required; put the EngineOS **inside** `plugins/wingman/engines/`, not instead of the plugin; treat
+the plugin as a thin orchestrator over the engines; use unnumbered engine-name directories
+(`constitution-engine/`, not `01-constitution-engine/`) with execution order captured in a registry,
+not folder numbering — "renaming or inserting a new engine later won't force a repository-wide
+renumbering."
+
+**What was built, and what was declined, reconciling the blueprint's 19 names against Wingman's real
+engines** (full reconciliation table in `docs/status/ENGINES.md`):
+
+- **4 new engines carved out of existing ones**, each a genuine responsibility split, not a cosmetic
+  rename: **Constitution** (the 10 rules themselves, split out of Governance's prior "risk taxonomy +
+  constitution + gates" bundle), **Risk** (the Level 0-4 scale and its real-time enforcement hooks —
+  secrets/injection/deploy-approval — split out of the same bundle), **Graph** (the traceability
+  chain and WKOS document-graph rule, also split out of Governance), and **Operations** (launch,
+  post-launch, telemetry, and incident response — carved out of Workflow, Orchestration, and
+  Governance respectively, since "shipping a change," "bounding a session's dispatch," and "what
+  happens to a live project" are three different concerns that happened to share owners before this
+  pass).
+- **1 new thin engine**: **Contract**, pointing at the Layer 15 versioning-policy work already landed
+  in `docs/status/DATABASE.md` — deliberately not padded with a manufactured member list to look more
+  complete than it is.
+- **5 of the blueprint's names mapped onto existing engines rather than duplicated**, per the
+  blueprint's own "no duplicated responsibility" acceptance criterion: Product→Vision, PRD→Planning,
+  SRS→Architecture, ADR→Architecture, Harness→Agent Adapter, UX→UX Intelligence, Design
+  System→Design. Forcing a literal 19-way split where Wingman's real pipeline already covers the
+  same ground with one engine would have created duplicate ownership, not clarity.
+- **`plugins/wingman/engines/registry.yaml`** (new): declares every engine's id/path/status plus the
+  Core Operating Loop's execution order as data — the blueprint's own recommended refinement, so
+  inserting or renaming an engine never requires a repository-wide renumbering. Descriptive, not a
+  runtime dispatcher: Wingman's commands are markdown prompts Claude Code reads directly, not
+  compiled modules a router loads by path, so nothing parses this file at execution time today.
+- **Real count: 22 engines, not 19** — reconciled explicitly in `docs/status/ENGINES.md` rather than
+  forcing an artificial fit to the blueprint's number.
+- **Not built in this pass**: the full ~24-artifact per-engine doc set (SPEC/ARCHITECTURE/API/
+  INPUTS/OUTPUTS/WORKFLOWS/PIPELINES/RULES/VALIDATION/TEST_PLAN/CHECKLIST/RISKS/DEPENDENCIES/ADRS/
+  RFCS/examples/schemas/templates/tests/assets/src) for all 22 engines — this landed for the 5 newly
+  created/split engines' `ENGINE.md` identity cards only. Producing genuinely-grounded (not
+  templated-boilerplate) content for ~20 artifacts × 22 engines is real, substantial follow-on work,
+  scoped as its own subsequent batch rather than claimed complete here — a templated pass across
+  hundreds of files would produce exactly the empty, information-free content this project's own
+  6-field-skill-contract precedent (§8, PR5 of the blueprint-harvest work) already learned to avoid.
+  `scripts/validate-engines.mjs` re-ran clean after the split (22 engines, 122 real files checked,
+  zero orphans) before this was considered done.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 17 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
