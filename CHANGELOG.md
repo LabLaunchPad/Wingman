@@ -2,6 +2,18 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.35] - 2026-07-29
+
+### Added
+- **The 20-layer engine surface: 17 `plugins/wingman/engines/<name>/ENGINE.md` manifests.** A naming and ownership layer over machinery that mostly already existed (~14 of 17 engines were fully built before this PR) — Vision, Context, Memory, Research, Planning, Design, Architecture, Engineering, UX Intelligence, Workflow, Orchestration, Governance, Evaluation, Agent Adapter, Knowledge (searchability deferred), and two honestly-marked not-yet-built engines (Tool Runtime, Code Intelligence — both deferred to PR8).
+- **`scripts/validate-engines.mjs` + `scripts/engines-check.mjs`, wired in as the 9th check** in `scripts/validate-all.mjs` and `.github/workflows/validate.yml`. Enforces the rule that keeps 17 manifests from being speculative structure with no consumer: every command/skill/hook/reference has exactly one engine owner, no orphans. Caught a real self-introduced bug on first run (two companion scripts declared as `## Members` when the check's own declared scope is commands/skills/hooks/references only) and, once fixed, passed clean on the real 119-file plugin tree — verified further by deliberately breaking one member declaration and confirming the check catches it before restoring.
+- **The Evaluation Engine's 12-dimension scoring map** (`references/evaluation-dimensions.md`) — 12 concrete dimensions across the 8 real Boardroom seats, derived directly from each seat's own existing "What you check" text, not invented. Deliberately not a second numeric-scoring system next to the existing `GO | GO_WITH_CONCERNS | NO_GO` verdict contract — a completeness map, not a replacement.
+- **`docs/status/ENGINES.md`** — the engine→implementation index — and **`docs/status/CORE-LOOP.md`** — the 12-phase Core Operating Loop (Vision→Understand→Research→Ground→Plan→Design→Architect→Execute→Evaluate→Improve→Remember→Learn) mapped onto the 17 engines and the real 14 pipeline stages.
+- 7 new tests for `engines-check.mjs`'s pure ownership-checking functions, including a full run of the real 17 manifests against the real plugin file tree.
+
+### Fixed
+- `docs/status/PRD.md` still described the retired 7-stage/3-checkpoint "Planning Milestone" bundling model; corrected to the real 14-stage/14-checkpoint pipeline. `docs/status/REGRESSION-CHECKLIST.md`'s Layer 1 list had silently drifted too — `validate-wkos.mjs` (shipped in PR3) was never added to its CI-checks description; fixed alongside `validate-engines.mjs`'s own new entry rather than repeating the same class of omission.
+
 ## [0.7.34] - 2026-07-29
 
 ### Added

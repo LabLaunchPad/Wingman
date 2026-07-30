@@ -79,6 +79,7 @@ traceability-chain	(none: constructed inline, mirrors dod-pre-push-check.md's ow
 traceability-linking	(none: evidence comes from this project's own real dogfooding history, not a dedicated setup-*.sh script)	plugins/wingman/skills/traceability-linking/SKILL.md
 traceability-validator	(none: fixtures are inline 2-file directories built per-run (see "## Fixtures (inline, not a setup-*.sh script)" below), not a setup-*.sh script)	plugins/wingman/scripts/check-traceability.mjs; traceability-linking
 uxflow	evals/fixtures/setup-uxflow-fixture.sh	plugins/wingman/commands/pipeline/uxflow.md; seven-stage-pipeline-e2e.md
+validate-engines	(MISSING — no fixture and no no-fixture-needed marker)	plugins/wingman/scripts/validate-engines.mjs
 verification-before-completion	evals/fixtures/setup-verify-true-fixture.sh	plugins/wingman/skills/verification-before-completion/SKILL.md
 verification-loop	(none: fixture is a minimal scratch TS project built by hand per run, not a setup-*.sh script)	plugins/wingman/skills/verification-loop/SKILL.md
 visual-design-system	evals/fixtures/setup-visual-design-system-fixture.sh	plugins/wingman/commands/pipeline/visual-design-system.md

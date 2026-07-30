@@ -48,6 +48,10 @@ const CHECKS = [
   // template. Without this the ~130-document structure could silently become the dead weight a
   // ~60-file governance tree was already declined for (docs/status/PROJECT.md, 2026-07-22).
   { name: 'validate-wkos', cmd: ['node', 'plugins/wingman/scripts/validate-wkos.mjs'] },
+  // Enforces the engine-ownership rule: every command/skill/hook/reference has exactly one
+  // engine owner, no orphans. Keeps the 17 engine manifests from being speculative structure
+  // with no consumer (docs/status/ENGINES.md).
+  { name: 'validate-engines', cmd: ['node', 'plugins/wingman/scripts/validate-engines.mjs'] },
   { name: 'check-harness-adapter-drift', cmd: ['node', 'plugins/wingman/scripts/check-harness-adapter-drift.mjs'] },
   { name: 'generate-harness-adapters --check', cmd: ['node', 'plugins/wingman/scripts/generate-harness-adapters.mjs', '--check'] },
   // Kept in --fast: the suite runs in ~2.5s, cheap enough that a pre-commit hook still catches a

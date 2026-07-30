@@ -28,6 +28,7 @@ jobs:
       - run: node scripts/check-fixtures.mjs
       - run: node plugins/wingman/scripts/check-traceability.mjs
       - run: node plugins/wingman/scripts/validate-wkos.mjs
+      - run: node plugins/wingman/scripts/validate-engines.mjs
       - run: node plugins/wingman/scripts/check-harness-adapter-drift.mjs
       - run: node plugins/wingman/scripts/generate-harness-adapters.mjs --check
       # Scoped to tests/ deliberately: a bare `node --test` also recurses into vendor/'s own
