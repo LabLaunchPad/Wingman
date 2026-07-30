@@ -840,6 +840,17 @@ faked — plus continuous benchmarking without reopening the twice-declined serv
 check over the existing agent-weakness coverage benchmark rather than introducing a new metric type
 (v0.7.37). **This completes all 9 PRs of the AI Engineering Operating System build.**
 
+Post-completion, a full 19-layer validation pass (a founder-supplied framework, distinct from the 17
+engines above — the two counts are unrelated and deliberately not merged) found and closed real gaps:
+`docs/status/SRS.md` was materially stale (specified deleted commands, documented a known-fake hook
+event as its own interface contract) and was rewritten from the real tree; `docs/status/PRD.md` was
+missing 5 required sections (personas, JTBD, business outcomes, dependencies, acceptance criteria)
+and carried the same class of staleness (an adaptive-commands list showing 5 of the real 20); and
+`docs/status/C4-ARCHITECTURE.md` (new) maps the 17 engines onto C4's Context/Container/Component
+levels rather than drawing parallel diagrams — the framework asked for "C4-style thinking" and none
+existed. Business intent (free, open-source, no monetisation) is now recorded explicitly in `PRD.md`
+rather than left inferable from the MIT license alone.
+
 ## 9. Relationship to vendored reference repositories
 
 `vendor/` holds 17 upstream projects, all MIT or Apache-2.0 (including `andrej-karpathy-skills`, MIT-declared in its `plugin.json`/`README.md`/`SKILL.md` frontmatter despite having no standalone `LICENSE` file — corrected 2026-07-08 from an earlier, inaccurate "no license" claim in this doc; its content is still restated in Wingman's own words rather than quoted, which was and remains the right approach regardless), as pinned git submodules — **reference material for design and prompt-writing, not runtime dependencies.** None of Wingman's plugin code depends on their bespoke infrastructure (`gsd-sdk`, `gbrain`, AgentShield, the instinct-CLI, npm-published CLIs, hosted dashboards); each has its own installer/runtime that Wingman deliberately does not take on. See `ATTRIBUTIONS.md` for exact file-level provenance and a systematic per-repo research writeup.
