@@ -449,5 +449,25 @@ Durable decisions only — not every turn-level choice. Newest first.
   both would need a concrete, evidenced friction point first, not built speculatively alongside a
   category-presence check. Full 9-check validator suite + `node --test` reverified clean.
 
+<!-- wingman:log type=decision category=validation category2=versioning status=resolved -->
+- **19-layer validation batch 4 (Layer 15 — Contracts/versioning policy), 2026-07-30. Last batch of
+  the founder-reordered pass (2 → 3 → 9 → 13 → 12 → 15) — this closes it.** `docs/status/DATABASE.md`
+  had 5 real, individually-documented `schema_version` migration notes (1→2→3→4→5) but no single
+  stated rule generalizing what they all actually did — a future bump 6 had precedent to infer from,
+  not a contract to follow. Added a "Versioning and compatibility policy" section extracting the
+  shared rule genuinely already followed: `checkpoints.jsonl` is append-only and never rewritten; a
+  bump is additive or discloses a breaking shape change explicitly (never silent); every migration
+  note states old shape → new shape → what a consumer must do differently; the bump is recorded at
+  the moment the schema changes, not retroactively. Named honestly as a documented convention, not
+  (yet) a mechanically-enforced one — `check-repo-consistency.mjs` does not currently assert every
+  `schema_version` value in code has a matching migration note.
+  Considered and declined adding an 8th WKOS template (`TEMPLATE_CONTRACT.md`) for founder-project
+  API/data/event contracts — no founder project has produced a document that template would serve;
+  logged as a deferred candidate in `docs/roadmap/AGENT-ROSTER.md`'s deferred-mechanism table instead
+  of built speculatively, same evidence-gated-catalog discipline the Layer 12 design-system checker
+  applied when declining a component-consistency checker.
+  This is the last of the founder's reordered 6-layer priority list; the 2-3-9-13-12-15 sequence is
+  now fully closed.
+
 See `docs/roadmap/ROADMAP.md` for the phased roadmap (moved there 2026-07-28 as part of the
 docs/status | docs/roadmap | docs/history split).
