@@ -62,11 +62,13 @@ fabricating numbers. What's real and computable instead:
 | `scripts/query-wingman-knowledge.mjs` | `wingman:log` markers by type/category/status, occurrence counts | Structured query over parsed logs |
 | `scripts/wingman-metrics.mjs` | Boardroom model-tier cost shape, eval verified/provisional ratio, `DEBT.md` ceiling rate, occurrence-threshold visibility, agent-weakness coverage | Real cost/quality/debt signals, not a performance benchmark |
 | `docs/status/AGENT-WEAKNESS-BENCHMARK.md` (scored by `wingman-metrics.mjs` §5) | Coverage of community-verified coding-agent failure modes: % with a rule, % measured by a `verified` eval (its positive/negative A/B pair) | Coverage benchmark; self-verifying (re-derives each entry's status from the real rule/eval files) |
+| `scripts/check-benchmark-regression.mjs` + `.github/workflows/benchmark-schedule.yml` (PR9) | Whether the coverage benchmark above has silently regressed since `docs/status/benchmark-baseline.json` was last recorded | Weekly scheduled automation over an existing metric — not a new metric type, never service-style |
 
 See `docs/status/PROJECT.md`'s decisions log for the record of why a proposed local/edge/cloud +
 p95/throughput/IOPS benchmark architecture was assessed and declined in favor of the tools above —
 the coverage benchmark above is the honest, computable alternative for a repo with no runtime to
-instrument.
+instrument. `check-benchmark-regression.mjs` extends that same honest shape to a schedule, rather
+than reopening the declined service-style approach.
 
 ## Root narrative & historical-ledger files — ownership and cadence
 

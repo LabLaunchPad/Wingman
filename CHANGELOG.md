@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.37] - 2026-07-30
+
+### Added
+- **Multimodal vision ingest for `/wingman:discovery`.** Images and screenshots are now folded into Discovery output for real — read directly via the `Read` tool (no new dependency), cited specifically (a labeled button, a visible error state) rather than described from a general impression, and turned into `DISC-*` rows the same as any other finding. Figma and voice input are documented as credential-gated adapter contracts, not faked: `docs/HUMAN-TODOS.md` now names exactly what each would need (a Figma API token; a chosen speech-to-text provider) and why a stub would be worse than the honest gap.
+- **Continuous benchmarking, without reopening the declined MLOps-style approach.** `scripts/check-benchmark-regression.mjs` + `.github/workflows/benchmark-schedule.yml` (weekly, matching `evals.yml`'s own scheduled-tier pattern) check whether the existing agent-weakness coverage benchmark (`docs/status/AGENT-WEAKNESS-BENCHMARK.md`) has silently regressed since `docs/status/benchmark-baseline.json` was last recorded. Deliberately **not** a new metric type — this automates a check over data `scripts/wingman-metrics.mjs` already computes, explicitly declined twice before in service-style form (p95 latency, throughput, cache-hit-rate) since Wingman has no persistent runtime to instrument. `--update-baseline` can only raise the recorded floor, never lower it to make a regression disappear.
+- 13 new tests (7 for `checkRegression`'s pure comparison logic including a real-repo-state assertion, plus coverage already counted in PR8's total) across 2 new eval cases.
+
 ## [0.7.36] - 2026-07-29
 
 ### Added
