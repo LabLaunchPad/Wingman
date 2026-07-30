@@ -1,32 +1,35 @@
 # Engine: Code Intelligence
 
-**Status:** not yet built (see PR8)
+**Status:** built
 **Purpose:** reads a project's existing structure, detects established patterns, and inventories
 reusable components before generating new code — citing what it will reuse rather than inventing a
 parallel pattern.
 
 ## Inputs
 
-(none yet — not built)
+The project's existing source tree and the plan's current task (from the Planning Engine).
 
 ## Output artifacts
 
-(none yet — not built)
+A one-line citation of the existing pattern reused (or an honest note that none applied), surfaced in
+the Build stage's founder-facing summary.
 
 ## Members
 
-(none yet — this engine has no members until PR8 builds `skills/codebase-comprehension`, wired into
-`commands/pipeline/build.md`'s Before-starting step next to `package-manager-selection`)
+- `skills/codebase-comprehension/SKILL.md`
 
 ## State read + written
 
-(none yet)
+Reads: the project's existing source files relevant to the current task. Writes: nothing directly —
+the citation flows into the Engineering Engine's Build summary.
 
 ## Escalation
 
-(none yet)
+A plan step that would introduce a second, parallel way of doing something the project already does
+one way is a Should-ask — propose reuse, surface the alternative, let the founder/department lead
+decide if divergence is genuinely justified.
 
 ## Permitted tool tiers
 
-(to be composed with `references/permission-model.md` when built — see the absorbed 17-engine plan's
-PR5/"Code Intelligence" item for the intended shape)
+Read-only (`references/permission-model.md` Level 0) — this engine reads and cites, it never writes
+code itself (that's the Engineering Engine, immediately after).

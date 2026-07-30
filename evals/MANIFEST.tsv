@@ -42,6 +42,7 @@ information-architecture	evals/fixtures/setup-information-architecture-fixture.s
 interview-one-question-at-a-time	evals/fixtures/setup-interview-fixture.sh	plugins/wingman/skills/interview-one-question-at-a-time/SKILL.md
 journey-mapping	evals/fixtures/setup-journey-mapping-fixture.sh	plugins/wingman/commands/pipeline/journey-mapping.md
 knowledge-export	evals/fixtures/setup-knowledge-export-fixture.sh	plugins/wingman/scripts/okf-export.mjs; commands/adaptive/knowledge-export.md
+knowledge-index	(none: runs directly against the real plugins/wingman/references/ tree)	plugins/wingman/scripts/knowledge-index.mjs
 launch	evals/fixtures/setup-launch-fixture.sh	plugins/wingman/commands/adaptive/launch.md
 learn	evals/fixtures/setup-waitlist-app.sh	plugins/wingman/commands/adaptive/learn.md
 management-board-activation	evals/fixtures/setup-fetch-app.sh	plugins/wingman/skills/management-board-activation/SKILL.md

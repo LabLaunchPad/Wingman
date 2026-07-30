@@ -2,6 +2,14 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.36] - 2026-07-29
+
+### Added
+- **The 3 remaining engines: Code Intelligence, Tool Runtime, and the Knowledge Engine's searchability layer.** `skills/codebase-comprehension` reads a project's existing structure and cites the specific pattern it's reusing before generating new code — wired into `commands/pipeline/build.md`'s Before-starting step, immediately after `package-manager-selection`. `references/tool-runtime.md` (a declarative intent→tool map, composed with `references/permission-model.md`'s Level 0-4 tiers, never a second scale) + `skills/tool-selection` (applies the map at an ambiguous tool-choice moment). `scripts/knowledge-index.mjs` builds an in-memory keyword index over `references/*.md` (title/headings/path scoring, no persisted index file, no embeddings) — same zero-dependency shape as `scripts/query-founder-knowledge.mjs`; semantic/vector search deliberately stays out of the shipped plugin (`install-smoke.yml` asserts `node_modules` never appears), consistent with the already-declined precedent.
+- All 17 engines in `docs/status/ENGINES.md` are now `Built` — PR8 closes the 3 gaps PR7 disclosed honestly rather than faking.
+- 2 new skills registered in `plugin.json` (44 → 46): `codebase-comprehension`, `tool-selection`.
+- 7 new tests for `knowledge-index.mjs`'s pure `parseDoc`/`buildIndex`/`searchIndex` functions, including a real query against the real 22-doc `references/` tree.
+
 ## [0.7.35] - 2026-07-29
 
 ### Added

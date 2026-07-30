@@ -1,0 +1,113 @@
+---
+description: "Use during /wingman:build's \"Before starting\" step, immediately after package-manager-selection, whenever the plan is about to add code to a project that already has real, established source files. Reads the existing structure, detects the patterns already in use, and inventories reusable components before generating anything new — never for a genuinely empty project with nothing to comprehend yet."
+globs: []
+alwaysApply: false
+---
+
+
+# Codebase Comprehension
+
+## Overview
+
+The Code Intelligence Engine's core skill (see `docs/status/ENGINES.md`, PR8 of the AI Engineering
+Operating System build). Named directly from a real, checked gap: prior dogfood runs of `/wingman:build`
+against an existing project generated a parallel utility/pattern next to one that already did the
+same job, because nothing forced a look at what already existed first. `references/constitution.md`
+rule 3 (reuse before reinvent) already states the principle; this skill is what makes it mechanically
+checkable at the one moment it matters — right before code gets written.
+
+**Core principle:** a plan's implementation choices get checked against the project's own established
+patterns before new code is generated, and the specific pattern being reused (or the specific reason
+a new one is justified) is cited in the founder-facing summary — not asserted from memory or invented
+fresh because it's easier than looking.
+
+## Inputs
+
+The project's existing source tree (whatever real files are already there) and the plan's next task
+from `/wingman:implementation-planning`.
+
+## Escalation
+
+A plan step that would introduce a second, parallel way of doing something the codebase already does
+one way (a second HTTP client, a second state-management pattern, a second test-fixture convention)
+is a **Should-ask** per `skills/research-gate`'s Human Approval Framework — propose reusing the
+existing pattern, but surface the alternative and let the founder (or the department lead) decide if
+there's a real reason for divergence.
+
+## When To Use
+
+At `/wingman:build`'s "Before starting" step, immediately after `package-manager-selection`, only
+when the project already has real source files to comprehend. Skip entirely for a genuinely empty
+project — there is nothing to detect a pattern from, and running this against an empty tree would
+just report "no patterns found," which is not information worth generating.
+
+## Core Workflow
+
+**1. Inventory before generating.** Before writing the first line of new code for the current plan
+task, read the parts of the existing tree the task will touch or sit near — the directory it lands
+in, the nearest existing module doing something similar, the project's real test-fixture convention.
+
+**2. Detect the established pattern, not the ideal one.** The question is "how does *this* project
+already do this," not "what's the textbook-best way to do this." A project using callbacks
+throughout gets a new callback-shaped addition, not a promise-based one introduced unilaterally,
+even if the latter is generally preferred — a one-off "better" pattern is still an inconsistency the
+next person (human or agent) has to reconcile.
+
+**3. Cite what's being reused, plainly, in the founder-facing summary** — e.g. "this follows the same
+validation pattern as `src/handlers/checkout.js`" — not a paragraph of architecture commentary, one
+sentence naming the real file/pattern.
+
+**4. If no existing pattern fits, say so and justify the new one.** A genuinely new kind of component
+(the project's first background job, its first webhook receiver) has nothing to reuse — state that
+plainly rather than forcing a strained fit to an unrelated existing pattern, and note the new pattern
+so a later task can reuse *it* instead of inventing a third variant.
+
+## Constraints
+
+**MUST:**
+- Read the relevant existing source before generating new code for a project that already has some.
+- Cite the specific file/pattern being reused in the founder-facing summary, by name.
+- Treat a genuinely new component honestly — state there's nothing to reuse rather than forcing one.
+
+**MUST NOT:**
+- Generate a second, parallel way of doing something the project already has an established way of
+  doing, without surfacing that as a Should-ask first.
+- Substitute "this is generally the better pattern" for "this is what the project already does" as
+  the default choice — divergence needs a stated reason, not a general preference.
+- Run a full-repo semantic/embedding scan to do this — this is a targeted read of the task's
+  immediate neighborhood, not a project-wide index (which would also violate the zero-runtime-
+  dependency invariant `install-smoke.yml` enforces).
+
+## Rationalizations
+
+| Excuse | Reality |
+|---|---|
+| "I already know the right pattern for this kind of code" | The right pattern is whatever this specific project already uses, not what's generally considered right — training-data confidence isn't a substitute for actually reading the neighboring files. |
+| "Checking existing patterns first slows things down" | A parallel, inconsistent implementation costs more later (two ways to do the same thing, ambiguity for the next session) than the one read this step costs now. |
+| "This is basically the same as what's there, close enough" | "Close enough" is exactly how a second, subtly-different pattern gets introduced — either it matches the existing convention or it's a deliberate, cited divergence, not an approximation. |
+
+## Red Flags — Stop and Reconsider
+
+- About to generate a new utility/pattern without having read whether one like it already exists.
+- About to introduce a second way of doing something the project already does one way, with no
+  stated reason and no Should-ask surfaced.
+- About to cite a pattern from memory/training data rather than a real file actually read this
+  session.
+
+## Verification
+
+Before generating new code: confirm the relevant existing files were actually read this session (not
+recalled from an earlier context window), and that the founder-facing summary names a real file/
+pattern that genuinely exists on disk — not a plausible-sounding but unverified claim.
+
+## Output
+
+A one-line citation in the founder-facing Build summary naming the specific existing pattern reused
+(or a one-line honest note that none applied and why).
+
+## Referenced by
+
+- `commands/pipeline/build.md`'s Before-starting step, immediately after `package-manager-selection`.
+
+See `docs/status/ENGINES.md`'s Code Intelligence Engine entry and `docs/status/ARCHITECTURE.md` for
+this skill's place in Wingman's overall architecture.
