@@ -11,6 +11,7 @@ boardroom-gate-rule	evals/fixtures/setup-boardroom-gate-fixture.sh	plugins/wingm
 build	evals/fixtures/setup-build-tdd-fixture.sh	plugins/wingman/commands/pipeline/build.md; full-pipeline-e2e.md
 change-triage	(MISSING — no fixture and no no-fixture-needed marker)	plugins/wingman/skills/change-triage/SKILL.md
 check-benchmark-regression	(MISSING — no fixture and no no-fixture-needed marker)	scripts/check-benchmark-regression.mjs
+check-design-system	(none: constructed inline, mirrors dod-structural-gate.md's own convention for tiny in-memory doc fixtures)	plugins/wingman/scripts/check-design-system.mjs
 code-review	(none: fixture is a plain inline project description shared with several other cases in the same consolidated session, not a dedicated setup-*.sh script)	plugins/wingman/skills/code-review/SKILL.md
 council	(none: fixture is a single inline decision question, not a setup-*.sh script)	plugins/wingman/skills/council/SKILL.md
 debt-ledger	evals/fixtures/setup-debt-ledger-fixture.sh	plugins/wingman/commands/adaptive/debt-ledger.md

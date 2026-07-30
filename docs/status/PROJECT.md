@@ -422,5 +422,32 @@ Durable decisions only — not every turn-level choice. Newest first.
 - **2026-07-28 — real, user-requested dogfood pass (scoped to Discovery, disclosed as partial) found and fixed 2 real gaps.** (1) `department-lead-activation/SKILL.md`'s Step 5 claimed a freshly-created `.claude/agents/dept-<name>.md` is dispatchable "this turn... no plugin reload is needed" — real dispatch failed outright (`Agent type 'dept-product' not found`), reproduced twice before treating it as real. Classified via `dogfood-gap-classification` (approved via `AskUserQuestion`) as a skill-candidate, not a hook — nothing mechanical to enforce, just a false assumption needing a judgment-based fallback. Fixed with a try-then-fallback branch: attempt dispatch, and if it fails, do the delegated work directly this turn using the just-written file's own remit, telling the founder plainly the department lead will run as its own subagent starting next session. Whether the root cause is specific to the sandboxed harness this run happened in, or a genuine same-turn limitation in Claude Code CLI itself, is disclosed as unconfirmed either way — the fix doesn't depend on resolving it. See `evals/cases/department-lead-activation.md` Run 4 (`provisional`) and `docs/history/retros.md`'s matching entry. (2) PR #137's docs restructure left `plugins/wingman/` untouched on the reasoning that nothing there does a *functional* read of the moved paths — true, but missed that ~63 shipped files cite those paths in prose (a recurring `<!-- See docs/ARCHITECTURE.md for this command's place... -->` footer, plus inline citations). Fixed all 63 canonical files, regenerated 220 harness-adapter files via `generate-harness-adapters.mjs --write`, and manually re-copied 17 OpenCode-ported skill files (`portedSkillsDir` has no auto-regeneration path — confirmed by running `check-harness-adapter-drift.mjs`, which correctly caught all 16 skills that had drifted, proving the drift-check itself works even though the original restructure's own risk-map only modeled functional path reads, not prose citations). `plugin.json` bumped to 0.7.28; full 7-check validator suite + `node --test` reverified clean both before and after.
 
 
+<!-- wingman:log type=decision category=validation category2=design-system status=resolved -->
+- **19-layer validation batch 3 (Layer 12 — design-system mechanization), 2026-07-30.** Third batch
+  of the founder-reordered 19-layer validation pass (order: 2 → 3 → 9 → 13 → **12** → 15; batch 1
+  covered Layer 10/SRS, batch 2 covered Layers 2/3/9/13). Fixed `commands/pipeline/visual-design-system.md`'s
+  Visual Design System.4 gate checklist, which named only 7 of the 10 Must-include categories the
+  scoping pass had already identified — added motion, responsive rules, and accessibility rules to
+  both the checklist and the Visual Design System.2 write-up prompt, so the founder is actually
+  asked for them, not just checked for them after the fact.
+  New `scripts/design-system-check.mjs` (pure `checkDesignSystemDoc(text)`, same wiring/logic split
+  as `engines-check.mjs`/`wkos-check.mjs`) + `scripts/check-design-system.mjs` (thin CLI wrapper) —
+  confirms all 10 categories are named by name in a founder project's spec doc, and at least one
+  `VS-*` traceability row exists. Cannot and does not judge whether the system is actually
+  "consistent and reusable across screens" — that stays the founder checkpoint's call.
+  6 new unit tests (`tests/hooks-integration/design-system-check.test.mjs`) plus a new eval case
+  (`evals/cases/check-design-system.md`, `verified` — 5 real fixture shapes run directly against the
+  CLI) confirm the checker distinguishes individually-named missing categories (e.g. flagging
+  "motion" without falsely flagging "responsive") rather than producing one generic "something's
+  missing" error.
+  `docs/status/ENGINES.md`'s Design Engine entry (`engines/design-engine/ENGINE.md`) gained the new
+  script as a real Members entry, noting it sits outside `validate-engines.mjs`'s scanned scope
+  (commands/skills/hooks/references, not `scripts/`) — listed for completeness, not enforced by that
+  validator.
+  **Explicitly not built**, per this project's own evidence-gated-catalog discipline: a
+  component-consistency checker and token-value linting (contrast-ratio math, spacing-scale math) —
+  both would need a concrete, evidenced friction point first, not built speculatively alongside a
+  category-presence check. Full 9-check validator suite + `node --test` reverified clean.
+
 See `docs/roadmap/ROADMAP.md` for the phased roadmap (moved there 2026-07-28 as part of the
 docs/status | docs/roadmap | docs/history split).

@@ -2,6 +2,13 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.38] - 2026-07-30
+
+### Added
+- **Design-system spec mechanization (Layer 12 of a founder-directed 19-layer validation pass).** `commands/pipeline/visual-design-system.md`'s Visual Design System.4 gate checklist named only 7 of 10 Must-include categories; added motion, responsive rules, and accessibility rules to both the checklist and the Visual Design System.2 write-up prompt. New `scripts/design-system-check.mjs` (pure `checkDesignSystemDoc(text)`) + `scripts/check-design-system.mjs` (CLI wrapper) confirm all 10 categories are named by name in a founder project's spec doc, plus at least one `VS-*` traceability row — same wiring/logic split as `engines-check.mjs`. Does not judge design-system quality itself; that stays the founder checkpoint's call.
+- 6 new unit tests (`tests/hooks-integration/design-system-check.test.mjs`) + a new `verified` eval case (`evals/cases/check-design-system.md`).
+- `docs/status/ENGINES.md`'s Design Engine entry gained the new script as a Members entry.
+
 ## [0.7.37] - 2026-07-30
 
 ### Added
