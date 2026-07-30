@@ -7,8 +7,9 @@ so this index cannot silently drift into aspiration the way a ~60-file governanc
 did once (`docs/status/PROJECT.md`, 2026-07-22).
 
 **This is a naming and ownership layer over machinery that mostly already existed** (~14 of 17
-engines were fully built before this PR) — not a rebuild. Each engine's manifest lives at
-`plugins/wingman/engines/<engine-name>/ENGINE.md`.
+engines were fully built before PR7) — not a rebuild. PR8 built the remaining 3 (Code Intelligence,
+Tool Runtime, Knowledge's searchability layer), so all 17 are now built. Each engine's manifest lives
+at `plugins/wingman/engines/<engine-name>/ENGINE.md`.
 
 | # | Engine | Status | Manifest |
 |---|---|---|---|
@@ -26,9 +27,9 @@ engines were fully built before this PR) — not a rebuild. Each engine's manife
 | 12 | Governance | Built | `engines/governance-engine/ENGINE.md` |
 | 13 | Evaluation | Built | `engines/evaluation-engine/ENGINE.md` |
 | 14 | Agent Adapter | Built | `engines/agent-adapter-engine/ENGINE.md` |
-| 15 | Knowledge | Built (searchability deferred, PR8) | `engines/knowledge-engine/ENGINE.md` |
-| 16 | Tool Runtime | Not yet built (PR8) | `engines/tool-runtime-engine/ENGINE.md` |
-| 17 | Code Intelligence | Not yet built (PR8) | `engines/code-intelligence-engine/ENGINE.md` |
+| 15 | Knowledge | Built | `engines/knowledge-engine/ENGINE.md` |
+| 16 | Tool Runtime | Built | `engines/tool-runtime-engine/ENGINE.md` |
+| 17 | Code Intelligence | Built | `engines/code-intelligence-engine/ENGINE.md` |
 
 ## The one rule
 

@@ -825,7 +825,14 @@ mechanical consumer on day one (every command/skill/hook/reference has exactly o
 orphans — caught a real self-introduced bug on first run), the Evaluation Engine's 12-dimension map
 onto the 8 real Boardroom seats (`references/evaluation-dimensions.md`, derived from each seat's own
 existing check text rather than invented), and the 12-phase Core Operating Loop
-(`docs/status/CORE-LOOP.md`) (v0.7.35). Remaining phases are tracked in the session
+(`docs/status/CORE-LOOP.md`) (v0.7.35); the 3 remaining engines PR7 disclosed as not-yet-built —
+`skills/codebase-comprehension` (Code Intelligence, wired into `build.md`'s Before-starting step
+right after `package-manager-selection`), `references/tool-runtime.md` + `skills/tool-selection`
+(Tool Runtime, a declarative intent→tool map composed with the existing permission tiers, never a
+second scale), and `scripts/knowledge-index.mjs` (the Knowledge Engine's searchability layer — a
+zero-dependency keyword index over `references/*.md`, deliberately not semantic/vector search, which
+stays in `agnostic-boardroom/`) — closing the gap honestly rather than claiming it done in PR7. All
+17 engines are now built (v0.7.36). Remaining phases are tracked in the session
 plan; each lands validator-green before the next starts.
 
 ## 9. Relationship to vendored reference repositories
