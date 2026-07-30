@@ -215,6 +215,48 @@ and are not listed in the tree above. Each is a real, working mechanism with its
 file — this is a documentation completeness gap in this file's tree diagram, not a functional one.
 Fixing the tree diagram itself is tracked as a follow-up, not done in this pass.
 
+## Versioning and compatibility policy
+
+Added 2026-07-30 (Layer 15 of the founder's 19-layer validation pass). `schema_version` has bumped
+1→2→3→4→5 across this project's history, each with its own migration note above — but until now no
+single place stated the *rule* those five bumps all actually followed, only the individual
+instances. This section makes that rule explicit and forward-looking, so bump 6 (whenever it comes)
+has a stated contract to follow rather than an implicit pattern to infer from precedent.
+
+**The rule, extracted from all five migration notes above, which already follow it consistently:**
+
+1. **`checkpoints.jsonl` is append-only and never rewritten.** A schema bump changes what *new*
+   entries look like; it never migrates, reformats, or deletes an existing line. This is why the
+   file mixes `schema_version: 1` through `5` entries side by side today, permanently.
+2. **A schema bump is additive or shape-changing, never silently breaking.** `schema_version: 4`
+   added `details_ref` (additive: absence is a valid, meaningful state — "no full detail available,"
+   not an error). `schema_version: 3` and `5` changed `stage`'s shape (scalar → array → scalar
+   again) — a real breaking change to that one field, but disclosed as one in the migration note,
+   with an explicit instruction to any consumer: check the shape before iterating, don't assume.
+3. **Every migration note documents the old shape, the new shape, and what a consumer must do
+   differently** — never just "bumped to N." `evolve-promotion`'s clustering logic is named
+   explicitly as the concrete consumer each note checks its instruction against.
+4. **A version bump is recorded here, in this file, at the moment the schema changes** — not
+   retroactively once a gap is noticed. (`docs/status/PROJECT.md`'s decisions log independently
+   records the same event from the "why" angle; this file records it from the "what changed in the
+   data" angle. Two views of one decision, not two competing records.)
+
+**What this means for the next bump (6, whenever it happens):** write its migration note in this
+same section, in the same shape as the five above (old shape → new shape → consumer instruction),
+before the code that produces `schema_version: 6` entries ships — not after. `check-repo-consistency.mjs`
+does not currently enforce this mechanically (there is no test asserting "every `schema_version` value
+found in code has a matching migration note in this file"); this is a documented convention, not (yet)
+a mechanically-checked one, and that gap is named plainly rather than silently assumed closed.
+
+**Scope note — no new `TEMPLATE_CONTRACT.md`.** The Layer 15 scoping pass considered adding an 8th
+WKOS template for founder-project API/data/event contracts (alongside the existing `TEMPLATE_ADR.md`,
+`TEMPLATE_RFC.md`, etc.). Not built: no founder project has yet produced a contract-shaped document
+this template would serve, and `references/wkos/producer-map.md`'s own rule is that a document
+without a real producer becomes dead weight, not scaffolding. Logged as a deferred candidate in
+`docs/roadmap/AGENT-ROSTER.md` rather than built speculatively — the same evidence-gated-catalog
+discipline this project applies everywhere else, including `check-design-system.mjs`'s companion
+Layer 12 fix declining a component-consistency checker for the same reason.
+
 ## Who writes/reads this
 
 Any Wingman command can read or write these files directly with the `Read`/`Write`/`Bash` tools it already has — no special access layer is required. `/wingman:boardroom` appends to `checkpoints.jsonl` and updates `state.json` after every run; `/wingman:discovery`'s session-start step reads the latest entries to recover context after a compaction or a new session, the same way `LEARNINGS.md` is read (see `commands/adaptive/learn.md`).

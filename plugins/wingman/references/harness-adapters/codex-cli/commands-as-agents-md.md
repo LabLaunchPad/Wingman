@@ -2482,7 +2482,7 @@ Immediately after (only if `dept-design` is active), use the `management-board-a
 
 ## Visual Design System.2: Write the design system spec
 
-For each `WF-*` wireframe in scope, derive the concrete design tokens and component states it needs: typography (a small type scale, not a font-per-screen), spacing (a scale, not arbitrary pixel values), color (a limited palette with defined roles — primary/secondary/error/success/neutral — not an unbounded set), the reusable component inventory this project actually needs (buttons, inputs, cards, etc. — only what's used, never a speculative full library), and each interactive component's states (default/hover/focus/disabled/error, at minimum). Tag each row with the `VS-` traceability prefix, pointing back to the `WF-*` wireframe(s) it specs for.
+For each `WF-*` wireframe in scope, derive the concrete design tokens and component states it needs: typography (a small type scale, not a font-per-screen), spacing (a scale, not arbitrary pixel values), color (a limited palette with defined roles — primary/secondary/error/success/neutral — not an unbounded set), the reusable component inventory this project actually needs (buttons, inputs, cards, etc. — only what's used, never a speculative full library), and each interactive component's states (default/hover/focus/disabled/error, at minimum). Also spec **motion** (the small set of transition/animation durations and easings actually used, not a per-component bespoke value), **responsive rules** (the breakpoints in scope and what changes at each — layout, spacing, type scale — not just "it's responsive"), and **accessibility rules** (minimum contrast ratios, focus-visible treatment, and any ARIA-role expectations for the component inventory above). Tag each row with the `VS-` traceability prefix, pointing back to the `WF-*` wireframe(s) it specs for.
 
 Append this section to a scratch visual-design-system doc (`docs/wingman/visual-design-system/<short-slug>.md` in the founder's project, creating the directory if needed — same slug as earlier stages' files, same convention):
 
@@ -2504,9 +2504,10 @@ Use `skills/visual-founder-output` to add the pipeline-status tree (per
 Before the checkpoint below, run the adaptive gap-finding loop and the 8-part output format from
 `references/pipeline-gate-checklist.md`, then confirm this stage's own gate:
 
-- **Must include:** typography, spacing, color, components, variants, tokens, usage rules.
+- **Must include:** typography, spacing, color, components, variants, tokens, usage rules, motion, responsive rules, accessibility rules.
 - **Must decide:** the design direction, and the source of truth for it.
 - **Gate passes only if** the system is consistent and reusable across screens.
+- Mechanically checked by `scripts/check-design-system.mjs` (see `docs/status/ENGINES.md`'s Design Engine entry) — it confirms every Must-include category is named in the spec doc by name, not merely implied.
 
 ## Visual Design System.5: Visual Design System checkpoint
 
