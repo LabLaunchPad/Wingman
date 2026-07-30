@@ -7,17 +7,15 @@ name: Version gate
 # vendor/awesome-claude-code-subagents/.github/workflows/enforce-plugin-version-bump.yml,
 # simplified: Wingman is one plugin and its marketplace.json carries no version
 # field, so there's nothing to cross-sync — plugin.json is the single source.
+#
+# Runs on every PR (no `paths:` filter) so this job's context always appears —
+# required for it to work as a GitHub branch-protection required check without
+# deadlocking a docs/test-only PR that would otherwise never get a context at
+# all. The "skip if no plugin content changed" guard below is what makes that
+# safe: a PR touching only docs/tests/root scripts exits 0 immediately.
 
 on:
   pull_request:
-    paths:
-      - "plugins/wingman/commands/**"
-      - "plugins/wingman/agents/**"
-      - "plugins/wingman/skills/**"
-      - "plugins/wingman/hooks/**"
-      - "plugins/wingman/references/**"
-      - "plugins/wingman/scripts/**"
-      - "plugins/wingman/.claude-plugin/plugin.json"
   workflow_dispatch:
 
 permissions:
@@ -38,6 +36,7 @@ jobs:
           persist-credentials: false
 
       - name: Require a plugin.json version bump when shipped content changed
+        id: version_check
         shell: bash
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -50,6 +49,26 @@ jobs:
             base="$(git rev-list --max-parents=0 HEAD)"
           fi
           echo "Comparing HEAD against base ${base}"
+
+          # Skip entirely if this PR touches none of the shipped-plugin paths --
+          # this is what makes running on every PR (no `paths:` filter above)
+          # safe: a docs/test-only PR gets a passing context instead of no
+          # context at all, which is what a required check needs to avoid
+          # deadlocking non-plugin PRs.
+          if ! git diff --name-only "${base}...HEAD" -- \
+                plugins/wingman/commands \
+                plugins/wingman/agents \
+                plugins/wingman/skills \
+                plugins/wingman/hooks \
+                plugins/wingman/references \
+                plugins/wingman/scripts \
+                "${PLUGIN_JSON}" \
+                | grep -q .; then
+            echo "No shipped plugin content changed — nothing to check. OK."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
           extract_version() {
             sed -n 's/.*"version":[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1
@@ -71,6 +90,6 @@ jobs:
           echo "✓ version bumped ${old_version} → ${new_version}"
 
       - name: Require a matching CHANGELOG.md entry
-        if: success()
+        if: success() && steps.version_check.outputs.changed == 'true'
         shell: bash
         run: node scripts/check-changelog-entry.mjs "$(sed -n 's/.*"version":[[:space:]]*"\([^"]*\)".*/\1/p' plugins/wingman/.claude-plugin/plugin.json | head -n1)"
