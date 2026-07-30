@@ -815,6 +815,18 @@ Do not ask the founder to make technical decisions (frameworks, data models, fil
 
 If the project's shape clearly matches one of `references/org-template/project-types/catalog.md`'s 7 types, consult that type's short playbook for what typically changes in later stages — never force a fit; most projects are close to one type but not exact, and this conversation always takes precedence over a category label.
 
+**If the founder attaches an image or screenshot** (a competitor's UI, a sketch, an existing product
+they want to match or replace), read it directly (the `Read` tool handles images natively — no new
+dependency) and fold what it actually shows into the fields below, same as any other evidence: name
+what the image shows in the Problem statement/Target user fields, and mint a `DISC-*` row for any
+concrete finding drawn from it (e.g. "the competitor's onboarding flow requires 6 steps before value
+is shown"). Never describe an image from a general impression — cite specifically what's visible
+(a labeled button, a stated price, a visible error state), the same evidence standard as any other
+Discovery finding. Figma files and voice input are **not yet supported** — both need a real external
+service integration (a design-tool API token, speech-to-text) this plugin doesn't ship with zero
+dependencies; see `docs/HUMAN-TODOS.md` for the adapter contract each would need and why it's
+credential-gated rather than faked.
+
 ## Discovery.2: Confirm the Product department is active
 
 Use the `department-lead-activation` skill to ensure `dept-product` exists for this project (its activation signal is always true) — create it in the founder's `.claude/agents/` if it doesn't exist yet, then delegate the requirements-analysis portion of this step to it.

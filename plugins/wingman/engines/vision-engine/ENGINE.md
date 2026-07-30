@@ -6,8 +6,10 @@ to — as real, ID-bearing findings rather than free prose that nothing downstre
 
 ## Inputs
 
-A founder's verbal description of what they want to build, plus (per PR6/PR9 of the AI Engineering
-Operating System build) real images or screenshots when the founder has one.
+A founder's verbal description of what they want to build, plus (per PR9 of the AI Engineering
+Operating System build) real images or screenshots when the founder has one — read directly via the
+`Read` tool, no new dependency. Figma files and voice input are documented, credential-gated adapter
+contracts, not yet built — see `docs/HUMAN-TODOS.md`.
 
 ## Output artifacts
 

@@ -832,8 +832,13 @@ right after `package-manager-selection`), `references/tool-runtime.md` + `skills
 second scale), and `scripts/knowledge-index.mjs` (the Knowledge Engine's searchability layer — a
 zero-dependency keyword index over `references/*.md`, deliberately not semantic/vector search, which
 stays in `agnostic-boardroom/`) — closing the gap honestly rather than claiming it done in PR7. All
-17 engines are now built (v0.7.36). Remaining phases are tracked in the session
-plan; each lands validator-green before the next starts.
+17 engines are now built (v0.7.36); multimodal vision ingest — `/wingman:discovery` folds real
+images/screenshots into its findings (read via the `Read` tool, no new dependency), while Figma and
+voice land as documented, credential-gated adapter contracts in `docs/HUMAN-TODOS.md` rather than
+faked — plus continuous benchmarking without reopening the twice-declined service-style approach:
+`scripts/check-benchmark-regression.mjs` + a weekly `benchmark-schedule.yml` workflow automate a
+check over the existing agent-weakness coverage benchmark rather than introducing a new metric type
+(v0.7.37). **This completes all 9 PRs of the AI Engineering Operating System build.**
 
 ## 9. Relationship to vendored reference repositories
 

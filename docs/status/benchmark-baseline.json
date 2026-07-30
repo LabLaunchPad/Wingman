@@ -1,0 +1,6 @@
+{
+  "pctCovered": 92,
+  "pctMeasured": 92,
+  "recordedAt": "2026-07-30",
+  "note": "Floor for scripts/check-benchmark-regression.mjs, run on a schedule by .github/workflows/benchmark-schedule.yml (PR9 of the AI Engineering Operating System build). Never lower this file by hand to make a regression pass -- only --update-baseline may raise it, and only when the real current numbers are at or above what's recorded here."
+}
