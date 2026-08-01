@@ -20,18 +20,20 @@ import { checkEngineOwnership } from './engines-check.mjs';
 
 const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
-function walk(dir, { maxDepth = Infinity, depth = 0 } = {}) {
+// Perf: utilizes flat accumulator pattern to avoid high memory and GC overhead from recursive spread array copies.
+function walk(dir, { maxDepth = Infinity, depth = 0 } = {}, files = []) {
   let entries;
   try {
     entries = readdirSync(dir, { withFileTypes: true });
   } catch {
-    return [];
+    return files;
   }
-  const files = [];
   for (const entry of entries) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
-      if (depth < maxDepth) files.push(...walk(full, { maxDepth, depth: depth + 1 }));
+      if (depth < maxDepth) {
+        walk(full, { maxDepth, depth: depth + 1 }, files);
+      }
     } else {
       files.push(full);
     }
