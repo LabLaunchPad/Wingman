@@ -72,18 +72,21 @@ test('the real 17 engine manifests, run against the real plugin file set, pass w
   }
   assert.strictEqual(engines.length, 17, 'expected all 17 engine manifests to be found');
 
-  function walk(dir) {
+  // Perf: utilizes flat accumulator pattern to avoid high memory and GC overhead from recursive spread array copies.
+  function walk(dir, files = []) {
     let entries;
     try {
       entries = readdirSync(dir, { withFileTypes: true });
     } catch {
-      return [];
+      return files;
     }
-    const files = [];
     for (const entry of entries) {
       const full = join(dir, entry.name);
-      if (entry.isDirectory()) files.push(...walk(full));
-      else files.push(full);
+      if (entry.isDirectory()) {
+        walk(full, files);
+      } else {
+        files.push(full);
+      }
     }
     return files;
   }

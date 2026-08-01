@@ -122,14 +122,17 @@ if (coverage.markedHeadings < coverage.totalHeadings) {
 // break silently the moment a founder installs just the plugin — the exact
 // naming-collision risk this project's own audit history (docs/history/
 // audit-reorg-2026-07-20.md, action item #8) flagged and left as a TODO.
-function walkMjs(dir) {
-  let out = [];
+// Perf: utilizes flat accumulator pattern to avoid high memory and GC overhead from recursive .concat() array copies.
+function walkMjs(dir, out = []) {
   let entries = [];
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return out; }
   for (const entry of entries) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) out = out.concat(walkMjs(full));
-    else if (entry.isFile() && entry.name.endsWith('.mjs')) out.push(full);
+    if (entry.isDirectory()) {
+      walkMjs(full, out);
+    } else if (entry.isFile() && entry.name.endsWith('.mjs')) {
+      out.push(full);
+    }
   }
   return out;
 }

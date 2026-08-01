@@ -2,6 +2,11 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.38] - 2026-08-01
+
+### Optimized
+- **Recursive file-system traversals.** Optimized recursive directory and file walking across 5 critical locations (including the `dod-structural-gate` pre-push hook, `check-repo-consistency` validation, and engine-checking utilities) to use the flat accumulator pattern instead of recursive `.concat()` array copies and spread operators. This eliminates excessive array allocation and reduces garbage collection overhead during large git pushes and repository validation runs.
+
 ## [0.7.37] - 2026-07-30
 
 ### Added
