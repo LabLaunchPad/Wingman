@@ -289,14 +289,18 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function listFilesRecursive(dir) {
-  let results = [];
+// Fast, memory-efficient recursive file listing using the flat accumulator pattern.
+// Avoids the overhead of creating and copying arrays with results.concat() on every directory.
+function listFilesRecursive(dir, results = []) {
   let entries;
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return results; }
   for (const entry of entries) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) results = results.concat(listFilesRecursive(full));
-    else results.push(full);
+    if (entry.isDirectory()) {
+      listFilesRecursive(full, results);
+    } else {
+      results.push(full);
+    }
   }
   return results;
 }
