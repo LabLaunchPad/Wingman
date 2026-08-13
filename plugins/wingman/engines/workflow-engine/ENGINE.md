@@ -2,23 +2,21 @@
 
 **Status:** built
 **Purpose:** the pipeline's own sequencing and ship-time mechanics — the shared boilerplate every
-stage inherits, the gate checklist, and what happens after Build passes (ship, launch, post-launch).
+stage inherits, the gate checklist, and the Ship stage itself. Narrowed 2026-07-30 (EngineOS
+reorganization): launch/post-launch moved to the new Operations Engine — "getting a passing change
+merged and deployed" (this engine) is distinct from "what happens to it once it's live" (Operations).
 
 ## Inputs
 
-A passing Definition-of-Done gate (Engineering Engine) ready to ship, or a shipped project ready for
-post-launch review.
+A passing Definition-of-Done gate (Engineering Engine) ready to ship.
 
 ## Output artifacts
 
-A merged, deployed change (`commands/pipeline/ship.md`), a launch record (`commands/adaptive/launch.md`),
-and post-launch findings fed back into the next Discovery pass.
+A merged, deployed change (`commands/pipeline/ship.md`).
 
 ## Members
 
 - `commands/pipeline/ship.md`
-- `commands/adaptive/launch.md`
-- `commands/adaptive/post-launch.md`
 - `skills/git-pr-workflow/SKILL.md`
 - `skills/visual-founder-output/SKILL.md`
 - `references/pipeline-stage-boilerplate.md`
@@ -29,12 +27,12 @@ and post-launch findings fed back into the next Discovery pass.
 ## State read + written
 
 Reads: Engineering Engine's DoD result. Writes: a merged PR, `.wingman/checkpoints.jsonl`'s Ship.5
-checkpoint, real usage/support signals gathered post-launch.
+checkpoint.
 
 ## Escalation
 
 Any Boardroom `NO_GO` recorded in the checkpoint log blocks Ship's deploy-class actions
-(`hooks/deploy-approval-gate.mjs`, owned by the Governance Engine) — never soft-bypassed.
+(`hooks/deploy-approval-gate.mjs`, owned by the Risk Engine) — never soft-bypassed.
 
 ## Permitted tool tiers
 

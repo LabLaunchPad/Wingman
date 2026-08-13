@@ -47,6 +47,9 @@ Living document. Update this alongside any change that affects status, not as a 
 Durable decisions only — not every turn-level choice. Newest first.
 
 <!-- wingman:log type=decision category=documentation status=resolved -->
+- **19-layer validation, batch 2: recorded business intent (Layer 2), deferred Wingman's own personas honestly (Layer 3), closed the PRD's 5 missing sections (Layer 9), and mapped the 17 engines onto C4 (Layer 13).** Asked the founder directly for Layer 2's business intent rather than inferring it — a real business decision, not an engineering judgment call — and got a clear answer: **free, open-source, no monetisation**, now recorded explicitly in `PRD.md`'s new Business outcomes section (previously only inferable from the MIT license and the absence of any paid-infra mention anywhere in the repo). For Layer 3 (Wingman's own personas — distinct from the real personas its UX Intelligence Engine produces for *founder projects*), chose to hold the gap open with a named re-visit trigger (first 3 real non-maintainer installs) rather than fabricate maintainer-proxy personas, per `references/constitution.md` rule 1 — writing personas from the maintainer's own experience and calling it research would be exactly the fabrication that rule forbids. For Layer 9, rewrote `PRD.md` to add all 5 missing sections (personas — deferred per above; JTBD — derivable from the already-validated Problem/Target-user sections without inventing a person; business outcomes; dependencies; acceptance criteria) and, in the same pass, **found and fixed the PRD's own staleness** (same class of bug as the SRS rewrite): "Adaptive commands" listed 5 of the real 20, and "Out of scope for v1" claimed `/wingman:hotfix`/`/wingman:launch` weren't built when both exist — confirmed by direct `ls` before touching either claim. For Layer 13, added `docs/status/C4-ARCHITECTURE.md` — a mapping layer, not a new architecture: names which existing artifact answers each of C4's four levels (System Context, Container, Component, Code), explicitly deferring to the 17 real `ENGINE.md` manifests for Component-level detail rather than duplicating them, and explicitly declining to draw a Level-4 code diagram since at Wingman's scale (markdown + small scripts, no OOP hierarchy) one would show nothing not already visible in the files themselves — reasoned as unnecessary, not skipped for convenience. Dev-repo-only: no `plugins/wingman/` change, no version bump.
+
+<!-- wingman:log type=decision category=documentation status=resolved -->
 - **Full 19-layer validation pass against a founder-supplied validation framework found `docs/status/SRS.md` materially stale; rewrote it from the real tree, and closed a suspected data-risk gap by checking rather than building.** The framework's Layer 10 (SRS) check caught four real defects, each verified by direct inspection rather than assumed: (1) **FR-1/FR-2 specified `/wingman:plan`** — a command that no longer exists (`ls commands/*/` confirms); (2) **FR-8 specified `/wingman:secure`** — deleted, folded into `build.md`'s Definition-of-Done gate; (3) the **Interfaces section documented the hook contract as `PermissionRequest`/`ExitPlanMode`** — but `PermissionRequest` is a **known-fake event** that once left the plan-mode safety gate *silently inert*, a bug already fixed in `hooks.json` and mechanically guarded by `validate-structure.mjs`'s `VALID_HOOK_EVENTS`; the SRS had been enshrining the bug as its specification. (4) the **Verification section claimed behavioral requirements were "verified by manual walkthrough"** and described the eval harness as a future addition, when 90 eval cases and 484 tests already existed. It was also missing 5 of the 9 sections the framework requires (assumptions, dependencies, quality attributes, acceptance criteria, traceability). Rewrote the whole document: 20 functional requirements re-derived from the real 34-command/8-seat/46-skill/17-engine surface, all 6 *real* hook events named, the 12 real traceability prefixes listed, and every count verified against the tree before writing (34 = 14 pipeline + 20 adaptive, 8 agents, 46 skills, 17 engines, 12 prefixes, `schema_version: 5` — all confirmed by direct `ls`/`grep`, not memory). Deliberately **did not** claim two things the check suggested but inspection disproved: FR-12's `ARCHITECTURE.md §9` citation is **correct** (the description-trap finding really is in §9, line 861), and FR-20's MCP-server "(Planned)" status is **consistent** with `DATABASE.md` — flagging either as stale would have been a false finding. Separately, the framework's Layer 19 flagged **backup/recovery** as a possible medium-to-high data risk; checked `.gitignore` directly and found **no `.wingman/` entry**, so founder project state is committed to git by default — **git already is the backup mechanism**. Recorded as assumption AS-3 in the new SRS rather than building a backup system for a problem that doesn't exist. Two layers were reported as failing (Layer 2 business intent, Layer 10 SRS); this closes Layer 10. Layer 2 stays open as a genuine founder decision (no revenue/monetisation content exists anywhere in `docs/status/` or `README.md`, and `LICENSE` is MIT — plausibly deliberate, but nowhere recorded either way). Dev-repo-only: no `plugins/wingman/` change, so no version bump.
 
 <!-- wingman:log type=decision category=publishing status=resolved -->
@@ -418,6 +421,79 @@ Durable decisions only — not every turn-level choice. Newest first.
 <!-- wingman:log type=decision category=dogfooding-mechanism status=resolved occurrence=7 -->
 - **2026-07-28 — real, user-requested dogfood pass (scoped to Discovery, disclosed as partial) found and fixed 2 real gaps.** (1) `department-lead-activation/SKILL.md`'s Step 5 claimed a freshly-created `.claude/agents/dept-<name>.md` is dispatchable "this turn... no plugin reload is needed" — real dispatch failed outright (`Agent type 'dept-product' not found`), reproduced twice before treating it as real. Classified via `dogfood-gap-classification` (approved via `AskUserQuestion`) as a skill-candidate, not a hook — nothing mechanical to enforce, just a false assumption needing a judgment-based fallback. Fixed with a try-then-fallback branch: attempt dispatch, and if it fails, do the delegated work directly this turn using the just-written file's own remit, telling the founder plainly the department lead will run as its own subagent starting next session. Whether the root cause is specific to the sandboxed harness this run happened in, or a genuine same-turn limitation in Claude Code CLI itself, is disclosed as unconfirmed either way — the fix doesn't depend on resolving it. See `evals/cases/department-lead-activation.md` Run 4 (`provisional`) and `docs/history/retros.md`'s matching entry. (2) PR #137's docs restructure left `plugins/wingman/` untouched on the reasoning that nothing there does a *functional* read of the moved paths — true, but missed that ~63 shipped files cite those paths in prose (a recurring `<!-- See docs/ARCHITECTURE.md for this command's place... -->` footer, plus inline citations). Fixed all 63 canonical files, regenerated 220 harness-adapter files via `generate-harness-adapters.mjs --write`, and manually re-copied 17 OpenCode-ported skill files (`portedSkillsDir` has no auto-regeneration path — confirmed by running `check-harness-adapter-drift.mjs`, which correctly caught all 16 skills that had drifted, proving the drift-check itself works even though the original restructure's own risk-map only modeled functional path reads, not prose citations). `plugin.json` bumped to 0.7.28; full 7-check validator suite + `node --test` reverified clean both before and after.
 
+
+<!-- wingman:log type=decision category=validation category2=design-system status=resolved -->
+- **19-layer validation batch 3 (Layer 12 — design-system mechanization), 2026-07-30.** Third batch
+  of the founder-reordered 19-layer validation pass (order: 2 → 3 → 9 → 13 → **12** → 15; batch 1
+  covered Layer 10/SRS, batch 2 covered Layers 2/3/9/13). Fixed `commands/pipeline/visual-design-system.md`'s
+  Visual Design System.4 gate checklist, which named only 7 of the 10 Must-include categories the
+  scoping pass had already identified — added motion, responsive rules, and accessibility rules to
+  both the checklist and the Visual Design System.2 write-up prompt, so the founder is actually
+  asked for them, not just checked for them after the fact.
+  New `scripts/design-system-check.mjs` (pure `checkDesignSystemDoc(text)`, same wiring/logic split
+  as `engines-check.mjs`/`wkos-check.mjs`) + `scripts/check-design-system.mjs` (thin CLI wrapper) —
+  confirms all 10 categories are named by name in a founder project's spec doc, and at least one
+  `VS-*` traceability row exists. Cannot and does not judge whether the system is actually
+  "consistent and reusable across screens" — that stays the founder checkpoint's call.
+  6 new unit tests (`tests/hooks-integration/design-system-check.test.mjs`) plus a new eval case
+  (`evals/cases/check-design-system.md`, `verified` — 5 real fixture shapes run directly against the
+  CLI) confirm the checker distinguishes individually-named missing categories (e.g. flagging
+  "motion" without falsely flagging "responsive") rather than producing one generic "something's
+  missing" error.
+  `docs/status/ENGINES.md`'s Design Engine entry (`engines/design-engine/ENGINE.md`) gained the new
+  script as a real Members entry, noting it sits outside `validate-engines.mjs`'s scanned scope
+  (commands/skills/hooks/references, not `scripts/`) — listed for completeness, not enforced by that
+  validator.
+  **Explicitly not built**, per this project's own evidence-gated-catalog discipline: a
+  component-consistency checker and token-value linting (contrast-ratio math, spacing-scale math) —
+  both would need a concrete, evidenced friction point first, not built speculatively alongside a
+  category-presence check. Full 9-check validator suite + `node --test` reverified clean.
+
+<!-- wingman:log type=decision category=validation category2=versioning status=resolved -->
+- **19-layer validation batch 4 (Layer 15 — Contracts/versioning policy), 2026-07-30. Last batch of
+  the founder-reordered pass (2 → 3 → 9 → 13 → 12 → 15) — this closes it.** `docs/status/DATABASE.md`
+  had 5 real, individually-documented `schema_version` migration notes (1→2→3→4→5) but no single
+  stated rule generalizing what they all actually did — a future bump 6 had precedent to infer from,
+  not a contract to follow. Added a "Versioning and compatibility policy" section extracting the
+  shared rule genuinely already followed: `checkpoints.jsonl` is append-only and never rewritten; a
+  bump is additive or discloses a breaking shape change explicitly (never silent); every migration
+  note states old shape → new shape → what a consumer must do differently; the bump is recorded at
+  the moment the schema changes, not retroactively. Named honestly as a documented convention, not
+  (yet) a mechanically-enforced one — `check-repo-consistency.mjs` does not currently assert every
+  `schema_version` value in code has a matching migration note.
+  Considered and declined adding an 8th WKOS template (`TEMPLATE_CONTRACT.md`) for founder-project
+  API/data/event contracts — no founder project has produced a document that template would serve;
+  logged as a deferred candidate in `docs/roadmap/AGENT-ROSTER.md`'s deferred-mechanism table instead
+  of built speculatively, same evidence-gated-catalog discipline the Layer 12 design-system checker
+  applied when declining a component-consistency checker.
+  This is the last of the founder's reordered 6-layer priority list; the 2-3-9-13-12-15 sequence is
+  now fully closed.
+
+<!-- wingman:log type=decision category=architecture category2=engineos status=resolved -->
+- **EngineOS reorganization, 2026-07-30 — a founder-directed blueprint applied inside the plugin, not
+  instead of it.** The founder pasted a "Locked Repository Blueprint" proposing a full top-level repo
+  restructure (19 numbered engine dirs at repo root, each with a ~24-artifact internal layout). Flagged
+  before building anything: applied literally, this had no place for the layout Claude Code's plugin
+  loader actually requires (`commands/`, `agents/`, `skills/`, `hooks/`, `.claude-plugin/` under
+  `plugins/wingman/`) — asked via `AskUserQuestion`, and the founder's refined answer was to keep the
+  plugin layout intact and build the EngineOS inside `plugins/wingman/engines/`, with unnumbered
+  engine-name directories and execution order captured in a registry rather than folder numbering.
+  Built: 4 new engines carved out of existing ones as genuine responsibility splits (Constitution,
+  Risk, and Graph out of what used to be one Governance engine; Operations out of Workflow/
+  Orchestration/Governance), 1 new thin engine (Contract, pointing at the Layer 15 versioning-policy
+  work already in `docs/status/DATABASE.md`), and `plugins/wingman/engines/registry.yaml` (id/path/
+  status + Core Operating Loop execution order as data). 5 of the blueprint's 19 names were mapped
+  onto existing engines rather than duplicated (Product→Vision, PRD→Planning, SRS→Architecture,
+  ADR→Architecture, Harness→Agent Adapter), per the blueprint's own "no duplicated responsibility"
+  criterion — real count is 22 engines, not 19, reconciled explicitly in `docs/status/ENGINES.md`
+  rather than forced to fit. `scripts/validate-engines.mjs` re-ran clean after the split: 22 engines,
+  122 real files, zero orphans.
+  **Explicitly not built in this pass**: the full ~24-artifact per-engine doc set (SPEC/ARCHITECTURE/
+  API/INPUTS/OUTPUTS/WORKFLOWS/PIPELINES/RULES/VALIDATION/TEST_PLAN/CHECKLIST/RISKS/DEPENDENCIES/
+  ADRS/RFCS/examples/schemas/templates/tests/assets/src) across all 22 engines — genuinely-grounded
+  content at that scale (~20 artifacts × 22 engines) is real follow-on work, scoped as its own
+  subsequent batch rather than claimed complete here to avoid the templated-boilerplate failure mode
+  the 6-field-skill-contract precedent already learned to avoid.
 
 See `docs/roadmap/ROADMAP.md` for the phased roadmap (moved there 2026-07-28 as part of the
 docs/status | docs/roadmap | docs/history split).

@@ -2,7 +2,9 @@
 
 **Status:** built
 **Purpose:** the mechanics of running multiple agents/turns efficiently and safely — parallel
-subagent dispatch patterns, token economy, session health, and loop/compaction control.
+subagent dispatch patterns, token economy, session health, and loop/compaction control. Narrowed
+2026-07-30 (EngineOS reorganization): `telemetry.md` moved to the new Operations Engine — this
+engine bounds a single session's own dispatch, not a shipped product's ongoing production metrics.
 
 ## Inputs
 
@@ -10,12 +12,11 @@ Any multi-agent or long-running session that needs bounded, efficient dispatch.
 
 ## Output artifacts
 
-Telemetry findings (`commands/adaptive/telemetry.md`), session-health/compaction/stall signals from
-the 4 owned hooks, and token-efficiency guidance applied across every other engine's dispatch.
+Session-health/compaction/stall signals from the 4 owned hooks, and token-efficiency guidance
+applied across every other engine's dispatch.
 
 ## Members
 
-- `commands/adaptive/telemetry.md`
 - `skills/token-economy/SKILL.md`
 - `hooks/context-monitor.mjs`
 - `hooks/pre-compact-guard.mjs`

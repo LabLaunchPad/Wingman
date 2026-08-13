@@ -19,6 +19,11 @@ Design-taste judgments and accessibility findings consumed by `agents/boardroom-
 
 - `skills/design-taste/SKILL.md`
 - `references/accessibility-checklist.md`
+- `scripts/check-design-system.mjs` — mechanizes `commands/pipeline/visual-design-system.md`'s
+  Visual Design System.4 gate checklist: confirms all 10 Must-include categories are named in a
+  founder project's spec doc (added 2026-07-30, Layer 12 of the 19-layer validation pass). Not in
+  `validate-engines.mjs`'s scanned scope (that check covers commands/skills/hooks/references, not
+  `scripts/`) — listed here for completeness, same as other scripts other engines reference.
 
 ## State read + written
 

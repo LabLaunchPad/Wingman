@@ -1,7 +1,9 @@
 # Core Operating Loop
 
-The 12-phase loop from the founder's Master Build Prompt, mapped onto the 17 engines
-(`docs/status/ENGINES.md`) and the real 14 pipeline stages. This is the operating instruction the
+The 12-phase loop from the founder's Master Build Prompt, mapped onto the engines
+(`docs/status/ENGINES.md` — 17 at the time this loop was first written, reorganized 2026-07-30 into
+22 EngineOS engines; the phase mapping below still holds since the split engines inherited their
+parent's phase ownership) and the real 14 pipeline stages. This is the operating instruction the
 engine layer implements — not a new mechanism, a naming layer over what PR1-PR7 of the "Wingman as
 an AI Engineering Operating System" build already made real.
 

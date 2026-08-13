@@ -2,6 +2,21 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.39] - 2026-07-30
+
+### Changed
+- **EngineOS reorganization — a founder-directed blueprint applied inside the plugin, not instead of it.** The founder proposed a full top-level repo restructure (19 numbered engine dirs at repo root); surfaced the conflict with Claude Code's own required plugin layout (`commands/`, `agents/`, `skills/`, `hooks/`, `.claude-plugin/`) before building anything. Applied instead entirely inside `plugins/wingman/engines/`: 4 new engines carved out of existing ones as genuine responsibility splits (**Constitution**, **Risk**, **Graph** out of what used to be one Governance engine; **Operations** out of Workflow/Orchestration/Governance), 1 new thin engine (**Contract**, pointing at the existing Layer 15 versioning-policy work in `docs/status/DATABASE.md`), and `plugins/wingman/engines/registry.yaml` (id/path/status + Core Operating Loop execution order as data, not folder numbering — the founder's own recommended refinement).
+- 5 of the blueprint's 19 names were mapped onto existing engines rather than duplicated (Product→Vision, PRD→Planning, SRS→Architecture, ADR→Architecture, Harness→Agent Adapter), per the blueprint's own "no duplicated responsibility" acceptance criterion. Real count: **22 engines, not 19** — reconciled explicitly in `docs/status/ENGINES.md`.
+- `scripts/validate-engines.mjs` re-ran clean after the split: 22 engines, 122 real files, zero orphans.
+- **Not built in this pass**: the full ~24-artifact per-engine doc set (SPEC/ARCHITECTURE/API/INPUTS/OUTPUTS/WORKFLOWS/PIPELINES/RULES/VALIDATION/TEST_PLAN/CHECKLIST/RISKS/DEPENDENCIES/ADRS/RFCS/examples/schemas/templates/tests/assets/src) across all 22 engines — scoped as its own follow-on batch rather than claimed complete, to avoid the templated-boilerplate failure mode this project's own 6-field-skill-contract precedent already learned to avoid.
+
+## [0.7.38] - 2026-07-30
+
+### Added
+- **Design-system spec mechanization (Layer 12 of a founder-directed 19-layer validation pass).** `commands/pipeline/visual-design-system.md`'s Visual Design System.4 gate checklist named only 7 of 10 Must-include categories; added motion, responsive rules, and accessibility rules to both the checklist and the Visual Design System.2 write-up prompt. New `scripts/design-system-check.mjs` (pure `checkDesignSystemDoc(text)`) + `scripts/check-design-system.mjs` (CLI wrapper) confirm all 10 categories are named by name in a founder project's spec doc, plus at least one `VS-*` traceability row — same wiring/logic split as `engines-check.mjs`. Does not judge design-system quality itself; that stays the founder checkpoint's call.
+- 6 new unit tests (`tests/hooks-integration/design-system-check.test.mjs`) + a new `verified` eval case (`evals/cases/check-design-system.md`).
+- `docs/status/ENGINES.md`'s Design Engine entry gained the new script as a Members entry.
+
 ## [0.7.37] - 2026-07-30
 
 ### Added

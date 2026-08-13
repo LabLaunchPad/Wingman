@@ -1,20 +1,23 @@
 # Engine: Governance
 
 **Status:** built
-**Purpose:** the single risk taxonomy (`references/permission-model.md`'s Level 0-4 scale), the
-constitution's 10 rules, and every mechanical gate that enforces them — secrets, injection, deploy
-approval, structural DoD checks, and the adaptive/retrospective commands that keep the system honest
-over time.
+**Purpose:** the adaptive process discipline that keeps the system honest over time — change triage
+routing, structural Definition-of-Done checks, and the retrospective/learning/evolution loop
+(department/board activation, evolve-promotion, dogfood-gap-classification). Narrowed 2026-07-30
+(EngineOS reorganization): the risk taxonomy and its real-time enforcement hooks moved to the new
+Risk Engine, the constitution's 10 rules moved to the new Constitution Engine, and the traceability
+chain moved to the new Graph Engine — this engine now owns *process*, not the rules/scale those
+processes check against.
 
 ## Inputs
 
-Any change, at any point in the pipeline, that touches a trust boundary, secrets, auth, payments,
-data, or a deploy-class action.
+A proposed change needing routing (`skills/change-triage`), a `git push` needing a structural
+artifact-presence check, or a periodic learning/retrospective/dogfooding pass.
 
 ## Output artifacts
 
-A routing decision (`skills/change-triage`), a blocked or allowed action (the 6 owned hooks), a
-retrospective/learning/evolution record (`retro`/`learn`/`evolve`/`dogfood`/`incident`).
+A routing decision (`skills/change-triage`), a blocked or allowed `git push` (`dod-structural-gate.mjs`),
+a retrospective/learning/evolution record (`retro`/`learn`/`evolve`/`dogfood`).
 
 ## Members
 
@@ -22,42 +25,30 @@ retrospective/learning/evolution record (`retro`/`learn`/`evolve`/`dogfood`/`inc
 - `commands/adaptive/learn.md`
 - `commands/adaptive/evolve.md`
 - `commands/adaptive/dogfood.md`
-- `commands/adaptive/incident.md`
 - `skills/department-lead-activation/SKILL.md`
 - `skills/management-board-activation/SKILL.md`
 - `skills/evolve-promotion/SKILL.md`
 - `skills/dogfood-gap-classification/SKILL.md`
 - `skills/evidence-gated-catalog/SKILL.md`
-- `skills/traceability-linking/SKILL.md`
 - `skills/definition-of-done/SKILL.md`
-- `skills/security-checklist/SKILL.md`
 - `skills/change-triage/SKILL.md`
 - `skills/prompt-diff-check/SKILL.md`
-- `skills/incident-response/SKILL.md`
-- `hooks/content-injection-scanner.mjs`
-- `hooks/deploy-approval-gate.mjs`
 - `hooks/dod-structural-gate.mjs`
-- `hooks/prompt-guard.mjs`
-- `hooks/secret-guard.mjs`
-- `hooks/secret-scanner.mjs`
-- `references/constitution.md`
-- `references/permission-model.md`
-- `references/prompt-defense-baseline.md`
-- `references/secrets-policy.md`
-- `references/security-checklist.md`
-- `references/threat-register.md`
 
 ## State read + written
 
-Reads: every other engine's output for risk-relevant signals. Writes: `.wingman/checkpoints.jsonl`'s
-verdict field, blocked/allowed tool-call decisions (never project code directly).
+Reads: every other engine's output for process-relevant signals (test presence, threat-register
+cleanliness, checkpoint verdict history). Writes: `LEARNINGS.md`/`docs/history/retros.md` entries,
+blocked/allowed `git push` decisions (never project code directly).
 
 ## Escalation
 
 Anything touching a trust boundary is Level 3+ **by definition** regardless of how it's classified —
-triage may route work up, never down. Any real `NO_GO` blocks unconditionally; this is never softened.
+triage may route work up, never down (the risk scale itself is the Risk Engine's; this engine only
+applies it at the routing step). A structural DoD failure blocks the push and names the specific
+missing artifact, never a generic "not ready."
 
 ## Permitted tool tiers
 
-Spans all 5 levels by design (`references/permission-model.md`) — this is the engine that *defines*
-the tiers other engines operate within.
+Draft (`references/permission-model.md` Level 1) for triage/retro/learn; the `git push` block itself
+is enforced at Conditional (Level 3), composed with the Risk Engine's own gate, not a second scale.
