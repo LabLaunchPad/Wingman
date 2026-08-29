@@ -254,16 +254,15 @@ function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {
   function walk(relSoFar) {
     let entries;
     try {
-      entries = readdirSync(join(pluginRoot, relSoFar));
+      entries = readdirSync(join(pluginRoot, relSoFar), { withFileTypes: true });
     } catch {
       return; // dir doesn't exist -- nothing declared from it either, fine
     }
     for (const entry of entries) {
-      const entryRel = `${relSoFar}/${entry}`;
-      const full = join(pluginRoot, entryRel);
+      const entryRel = `${relSoFar}/${entry.name}`;
       if (isSkillDir) {
-        if (statSync(full).isDirectory()) {
-          if (existsSync(join(full, 'SKILL.md'))) {
+        if (entry.isDirectory()) {
+          if (existsSync(join(pluginRoot, entryRel, 'SKILL.md'))) {
             if (!declared.has(entryRel)) {
               errors.push(`${kind} "${entryRel}/" exists on disk but is not declared in plugin.json — it will never load`);
             }
@@ -271,11 +270,11 @@ function reportOrphans(dirRel, declaredPaths, kind, isSkillDir = false) {
             walk(entryRel); // category folder -- recurse, don't flag it directly
           }
         }
-      } else if (statSync(full).isDirectory()) {
+      } else if (entry.isDirectory()) {
         walk(entryRel); // category folder
-      } else if (entry === 'README.md') {
+      } else if (entry.name === 'README.md') {
         // A category folder's own index/backlink stub, not a command -- never declared in plugin.json.
-      } else if (entry.endsWith('.md') && !declared.has(entryRel)) {
+      } else if (entry.name.endsWith('.md') && !declared.has(entryRel)) {
         errors.push(`${kind} "${entryRel}" exists on disk but is not declared in plugin.json — it will never load`);
       }
     }

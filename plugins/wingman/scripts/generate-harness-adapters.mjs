@@ -78,10 +78,15 @@ function harnessNoteBlock(primitiveIds, target) {
 function listSkills() {
   // Flat skills/<name>/SKILL.md layout (no category subdirectory) -- matches how listCommands()
   // already scans dynamically rather than assuming fixed depth.
+  // Pre-reads body and pre-detects primitives once to avoid O(harnesses x skills) redundant I/O & regex passes.
   const out = [];
   for (const skill of readdirSync(skillsDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
     const skillPath = join(skillsDir, skill.name, 'SKILL.md');
-    if (existsSync(skillPath)) out.push({ name: skill.name, path: skillPath });
+    if (existsSync(skillPath)) {
+      const body = readFileSync(skillPath, 'utf-8');
+      const primitives = detectPrimitives(body);
+      out.push({ name: skill.name, path: skillPath, body, primitives });
+    }
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -90,11 +95,15 @@ function listCommands() {
   // Scans every category subdirectory dynamically, matching listSkills()'s pattern -- a hardcoded
   // ['pipeline', 'adaptive'] list would silently skip a new category directory with no error, and
   // --check would keep passing since there'd be nothing to diff a missing file against.
+  // Pre-reads body and pre-detects primitives once to avoid O(harnesses x commands) redundant I/O & regex passes.
   const out = [];
   for (const category of readdirSync(commandsDir, { withFileTypes: true }).filter((d) => d.isDirectory())) {
     const dir = join(commandsDir, category.name);
     for (const f of readdirSync(dir).filter((f) => f.endsWith('.md') && f !== 'README.md')) {
-      out.push({ name: f.replace(/\.md$/, ''), path: join(dir, f) });
+      const path = join(dir, f);
+      const body = readFileSync(path, 'utf-8');
+      const primitives = detectPrimitives(body);
+      out.push({ name: f.replace(/\.md$/, ''), path, body, primitives });
     }
   }
   return out.sort((a, b) => a.name.localeCompare(b.name));
@@ -104,6 +113,7 @@ function listCommands() {
 async function buildTargets() {
   const targets = new Map();
   const harnessTargets = await loadHarnessTargets();
+  const skillEntries = listSkills();
 
   // Shared skills output: every harness that declares `skills.sharedOutDir` reads the same file, so
   // write it once per distinct sharedOutDir, with each contributing harness's note appended in a
@@ -123,9 +133,7 @@ async function buildTargets() {
 
   for (const sharedOutDir of sharedOutDirs) {
     const contributingTargets = orderedSkillTargets(sharedOutDir);
-    for (const { name, path } of listSkills()) {
-      const body = readFileSync(path, 'utf-8');
-      const primitives = detectPrimitives(body);
+    for (const { name, body, primitives } of skillEntries) {
       const notesBlock = contributingTargets.map((t) => harnessNoteBlock(primitives, t)).join('');
       const content = body + notesBlock;
       targets.set(join(...sharedOutDir.split('/'), name, 'SKILL.md'), content);
@@ -140,14 +148,12 @@ async function buildTargets() {
   // (description/globs/alwaysApply, per real, documented Cursor Project Rules schema).
   for (const target of harnessTargets) {
     if (!target.skills?.mdcOutDir) continue;
-    for (const { name, path } of listSkills()) {
-      const raw = readFileSync(path, 'utf-8');
+    for (const { name, body: raw, primitives } of skillEntries) {
       const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
       const frontmatter = fmMatch ? fmMatch[1] : '';
       const body = fmMatch ? fmMatch[2] : raw;
       const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
       const description = (descMatch ? descMatch[1].trim() : name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
-      const primitives = detectPrimitives(raw);
       const note = harnessNoteBlock(primitives, target);
       const mdcFrontmatter = target.skills.mdcFrontmatter(description);
       targets.set(join(...target.skills.mdcOutDir.split('/'), `${name}.mdc`), mdcFrontmatter + body + note);
@@ -160,9 +166,7 @@ async function buildTargets() {
     if (!target.commands) continue;
 
     if (target.commands.mode === 'perFile') {
-      for (const { name, path } of commandEntries) {
-        const body = readFileSync(path, 'utf-8');
-        const primitives = detectPrimitives(body);
+      for (const { name, body, primitives } of commandEntries) {
         const content = body + harnessNoteBlock(primitives, target);
         targets.set(join(...target.commands.outDir.split('/'), `${name}.md`), content);
       }
@@ -173,12 +177,10 @@ async function buildTargets() {
       // Gemini's real placeholder syntax) as a TOML literal multi-line string (`'''...'''`) so no
       // escaping of quotes/backslashes in the body is needed; `description` comes from the
       // canonical file's own frontmatter `description:` field, as a basic TOML string.
-      for (const { name, path } of commandEntries) {
-        const raw = readFileSync(path, 'utf-8');
+      for (const { name, body: raw, primitives } of commandEntries) {
         const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
         const frontmatter = fmMatch ? fmMatch[1] : '';
         const body = (fmMatch ? fmMatch[2] : raw).replace(/\$ARGUMENTS/g, '{{args}}');
-        const primitives = detectPrimitives(raw);
         const descMatch = frontmatter.match(/^description:\s*(.+)$/m);
         const description = (descMatch ? descMatch[1].trim() : name).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
         const note = harnessNoteBlock(primitives, target);
@@ -191,9 +193,7 @@ async function buildTargets() {
     } else if (target.commands.mode === 'folded') {
       // This harness has no per-file command primitive -- fold all commands into one
       // appendable reference file, each as its own section.
-      const sections = commandEntries.map(({ name, path }) => {
-        const body = readFileSync(path, 'utf-8');
-        const primitives = detectPrimitives(body);
+      const sections = commandEntries.map(({ name, body, primitives }) => {
         const note = harnessNoteBlock(primitives, target);
         return `## \`/wingman:${name}\`\n\n${body}${note}`;
       });

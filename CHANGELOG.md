@@ -2,6 +2,12 @@
 
 All notable changes to the Wingman Claude Code plugin.
 
+## [0.7.40] - 2026-07-30
+
+### Optimized
+- **Harness adapter generator I/O & primitive scanning optimization.** `generate-harness-adapters.mjs` previously called `readFileSync` and `detectPrimitives` repeatedly for the same skill and command files across target generation loops (~200 file reads and regex executions per run). `listSkills()` and `listCommands()` now pre-read content and primitives once, reusing them across target formatting loops to eliminate redundant disk I/O and regex evaluation.
+- **Structure validator directory traversal optimization.** `validate-structure.mjs`'s `reportOrphans()` previously invoked `readdirSync` without `withFileTypes: true` followed by `statSync` calls for every entry. Updated to use `dirent.isDirectory()`, eliminating unnecessary `statSync` calls during orphan scanning.
+
 ## [0.7.39] - 2026-07-30
 
 ### Changed
