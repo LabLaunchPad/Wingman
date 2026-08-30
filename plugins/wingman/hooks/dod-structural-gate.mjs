@@ -289,13 +289,14 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function listFilesRecursive(dir) {
-  let results = [];
+// Perf: Uses a flat accumulator array pattern to avoid intermediate array allocations
+// and GC overhead from recursive .concat() copies during file-system traversals.
+function listFilesRecursive(dir, results = []) {
   let entries;
   try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return results; }
   for (const entry of entries) {
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) results = results.concat(listFilesRecursive(full));
+    if (entry.isDirectory()) listFilesRecursive(full, results);
     else results.push(full);
   }
   return results;
